@@ -111,8 +111,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Utility\Loaders\Model\AnimationSystem.cpp" />
-    <ClCompile Include="Application\Objects\Enemy\Enemy.cpp" />
-    <ClCompile Include="Application\Objects\Enemy\EnemyManager.cpp" />
     <ClCompile Include="Application\Scenes\MainScenes\Clear\ClearScene.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Model\Animation.cpp" />
     <ClCompile Include="Application\Scenes\CoreScenes\Base\BaseScene.cpp" />
@@ -137,8 +135,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Graphics\Drawer\LineManager\Line.cpp" />
     <ClCompile Include="Engine\Graphics\PipelineManager\PipelineManager.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Model\Joint.cpp" />
-    <ClCompile Include="Application\Objects\Player\ICommand\ICommandMove.cpp" />
-    <ClCompile Include="Application\Objects\Player\InputHandle\InputHandleMove.cpp" />
     <ClCompile Include="Application\Objects\Ground\Ground.cpp" />
     <ClCompile Include="Application\Scenes\MainScenes\Transitions\Fade\Fade.cpp" />
     <ClCompile Include="Engine\Utility\Systems\GameTime\HitStop.cpp" />
@@ -163,9 +159,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Core\Framework\MyGame.cpp" />
     <ClCompile Include="Engine\Generators\Particle\ParticleManager.cpp" />
     <ClCompile Include="Application\Scenes\CoreScenes\Factory\SceneFactory.cpp" />
-    <ClCompile Include="Application\Objects\Player\Player.cpp" />
     <ClCompile Include="Math\MathFunc.cpp" />
-    <ClCompile Include="Application\Objects\Player\PlayerBullet.cpp" />
     <ClCompile Include="Engine\Graphics\WorldTransform\WorldTransform.cpp" />
     <ClCompile Include="Engine\Generators\Particle\ParticleEmitter.cpp" />
     <ClCompile Include="Engine\Graphics\PipelineManager\SkinningManager.cpp" />
@@ -174,7 +168,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Utility\Loaders\Model\Skeleton.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Model\Node.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Model\SkinCluster.cpp" />
-    <ClCompile Include="Application\Objects\Player\PlayerWeapon\PlayerWeapon.cpp" />
     <ClCompile Include="Application\SystemsApp\Cameras\TopDownCamera\TopDownCamera.cpp" />
     <ClCompile Include="Engine\Utility\Systems\GameTime\ObjectTime.cpp" />
     <ClCompile Include="Application\Scenes\MainScenes\Transitions\Base\TransitionFactory.cpp" />
@@ -184,8 +177,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Utility\Loaders\Model\AnimationSystem.h" />
-    <ClInclude Include="Application\Objects\Enemy\Enemy.h" />
-    <ClInclude Include="Application\Objects\Enemy\EnemyManager.h" />
     <ClInclude Include="Application\Scenes\MainScenes\Clear\ClearScene.h" />
     <ClInclude Include="Engine\Utility\Loaders\Json\ConversionJson.h" />
     <ClInclude Include="Engine\Utility\Loaders\Json\VariableJson.h" />
@@ -208,8 +199,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Utility\Debugger\LeakChecker.h" />
     <ClInclude Include="Engine\Utility\Systems\Input\Input.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\Joint.h" />
-    <ClInclude Include="Application\Objects\Player\ICommand\ICommandMove.h" />
-    <ClInclude Include="Application\Objects\Player\InputHandle\InputHandleMove.h" />
     <ClInclude Include="Application\Objects\Ground\Ground.h" />
     <ClInclude Include="Application\Scenes\MainScenes\Transitions\Fade\Fade.h" />
     <ClInclude Include="Engine\Utility\Systems\GameTime\HitStop.h" />
@@ -241,8 +230,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Core\Framework\MyGame.h" />
     <ClInclude Include="Engine\Generators\Particle\ParticleManager.h" />
     <ClInclude Include="Application\Scenes\CoreScenes\Factory\SceneFactory.h" />
-    <ClInclude Include="Application\Objects\Player\Player.h" />
-    <ClInclude Include="Application\Objects\Player\PlayerBullet.h" />
     <ClInclude Include="Engine\Graphics\WorldTransform\WorldTransform.h" />
     <ClInclude Include="Engine\Generators\Particle\ParticleEmitter.h" />
     <ClInclude Include="Engine\Graphics\LightManager\LightManager.h" />
@@ -253,7 +240,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Utility\Loaders\Model\Skeleton.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\Node.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\SkinCluster.h" />
-    <ClInclude Include="Application\Objects\Player\PlayerWeapon\PlayerWeapon.h" />
     <ClInclude Include="Application\SystemsApp\Cameras\TopDownCamera\TopDownCamera.h" />
     <ClInclude Include="Engine\Utility\Systems\GameTime\ObjectTime.h" />
     <ClInclude Include="Application\Scenes\MainScenes\Transitions\Base\TransitionFactory.h" />

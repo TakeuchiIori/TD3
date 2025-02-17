@@ -29,7 +29,8 @@ void GameScene::Initialize()
     // カメラの生成
     sceneCamera_ = cameraManager_.AddCamera();
     
-
+    // 初期カメラモード設定
+    cameraMode_ = CameraMode::DEFAULT;
     CollisionManager::GetInstance()->Initialize();
     // 線
     line_ = std::make_unique<Line>();
@@ -41,21 +42,12 @@ void GameScene::Initialize()
     boneLine_->SetCamera(sceneCamera_.get());
 
 
-    //// コマンドパターン
-    //inputHandler_ = std::make_unique<InputHandleMove>();
-
-    //inputHandler_->AssignMoveFrontCommandPressKeyW();
-    //inputHandler_->AssignMoveBehindCommandPressKeyS();
-    //inputHandler_->AssignMoveRightCommandPressKeyD();
-    //inputHandler_->AssignMoveLeftCommandPressKeyA();
 
 	GameTime::GetInstance()->Initialize();
     
 	followCamera_.Initialize();
     // 各オブジェクトの初期化
-    player_ = std::make_unique<Player>();
-    player_->Initialize(sceneCamera_.get());
-    followCamera_.SetTarget(player_.get()->GetWorldTransform());
+
     
     // 地面
     ground_ = std::make_unique<Ground>();
@@ -69,12 +61,9 @@ void GameScene::Initialize()
     testWorldTransform_.Initialize();
    
 
-    // 初期カメラモード設定
-    cameraMode_ = CameraMode::FOLLOW;
+
 
     // パーティクル
-   
-  
     emitterPosition_ = Vector3{ 0.0f, 0.0f, 0.0f }; // エミッタの初期位置
     particleCount_ = 1;
     particleEmitter_[0] = std::make_unique<ParticleEmitter>("Circle", emitterPosition_, particleCount_);
@@ -105,26 +94,9 @@ void GameScene::Initialize()
 void GameScene::Update()
 {
 
-
-    //particleEmitter_[0]->SetPosition(player_->GetPosition());
-
-
-    //iCommand_ = inputHandler_->HandleInput();
-
-    //if (this->iCommand_) {
-    //    iCommand_->Exec(*player_.get());
-    //}
-
-           // パーティクル更新
-
     CheckAllCollisions();
     CollisionManager::GetInstance()->UpdateWorldTransform();
-    // スポーンタイマーを更新
 
-    // objの更新
-    player_->Update();
-    player_->JsonImGui();
-    //followCamera_.JsonImGui();
 
     // enemy_->Update();
     ground_->Update();
@@ -141,11 +113,9 @@ void GameScene::Update()
 
 
 
-    // ParticleManager::GetInstance()->UpdateParticlePlayerWeapon(weaponPos);
     ShowImGui();
 
 
-    // particleEmitter_[1]->Update();
 
     JsonManager::ImGuiManager();
     // ワールドトランスフォーム更新
@@ -179,7 +149,7 @@ void GameScene::Draw()
     /// ここから描画可能です
     /// </summary>
     CollisionManager::GetInstance()->Draw();
-    player_->Draw();
+  
 
     ground_->Draw();
     //line_->UpdateVertices(start_, end_);
@@ -264,6 +234,7 @@ void GameScene::UpdateCamera()
     case CameraMode::DEFAULT:
     {
         sceneCamera_->DefaultCamera();
+        sceneCamera_->UpdateMatrix();
     }
     break;
     case CameraMode::FOLLOW:
@@ -279,10 +250,8 @@ void GameScene::UpdateCamera()
     break;
     case CameraMode::TOP_DOWN:
     {
-        //Vector3 topDownPosition = Vector3(0.0f, 100.0f, 0.0f);
-        //sceneCamera_->SetTopDownCamera(topDownPosition + player_->GetPosition());
-        
-        topDownCamera_.SetTarget(player_.get()->GetWorldTransform());
+
+   
         topDownCamera_.Update();
 		sceneCamera_->viewMatrix_ = topDownCamera_.matView_;
 		sceneCamera_->transform_.translate = topDownCamera_.translate_;
@@ -335,13 +304,8 @@ void GameScene::CheckAllCollisions() {
     CollisionManager::GetInstance()->Reset();
 
     // コライダーをリストに登録
-    CollisionManager::GetInstance()->AddCollider(player_.get());
+    //CollisionManager::GetInstance()->AddCollider(player_.get());
 
-    // コライダーリストに登録
-    CollisionManager::GetInstance()->AddCollider(player_->GetPlayerWeapon());
-
-
-   // CollisionManager::GetInstance()->AddCollider(enemy_.get());
 
     // 衝突判定と応答
     CollisionManager::GetInstance()->CheckAllCollisions();

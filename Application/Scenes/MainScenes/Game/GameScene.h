@@ -12,12 +12,8 @@
 #include "Particle/ParticleEmitter.h"
 #include "Object3D/Object3d.h"
 #include "Sprite/Sprite.h"
-#include "Player/Player.h"
-#include "Enemy/Enemy.h"
 #include "WorldTransform./WorldTransform.h"
 #include "Drawer/LineManager/Line.h"
-#include "Player/ICommand/ICommandMove.h"
-#include "Player/InputHandle/InputHandleMove.h"
 #include "Ground/Ground.h"
 #include "../Transitions/Fade/Fade.h"
 
@@ -26,7 +22,7 @@
 #include "Vector3.h"
 #include "../../../SystemsApp/Cameras/FollowCamera/FollowCamera.h"
 #include "../../../SystemsApp/Cameras/TopDownCamera/TopDownCamera.h"
-#include <Enemy/EnemyManager.h>
+
 
 enum class CameraMode
 {
@@ -109,18 +105,11 @@ private:
     std::unique_ptr<Object3d> test_;
     WorldTransform testWorldTransform_;
 
-    // プレイヤー
-    std::unique_ptr<Player> player_;
-
     // 地面
     std::unique_ptr< Ground> ground_;
 
     // 2Dスプライト
     std::vector<std::unique_ptr<Sprite>> sprites;
-
-    // コマンドパターン
-    std::unique_ptr<InputHandleMove> inputHandler_ = nullptr;
-    ICommandMove* iCommand_ = nullptr;
 
     // Line
     std::unique_ptr<Line> line_;

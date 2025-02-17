@@ -11,7 +11,6 @@
 #include "Particle/ParticleEmitter.h"
 #include "Object3D/Object3d.h"
 #include "Sprite/Sprite.h"
-#include "Player/Player.h"
 #include "WorldTransform./WorldTransform.h"
 #include "Drawer/LineManager/Line.h"
 #include "../Transitions/Fade/Fade.h"
@@ -78,8 +77,6 @@ private:
 	Audio::SoundData soundData;
 	IXAudio2SourceVoice* sourceVoice;
 
-	// プレイヤー
-	std::unique_ptr<Player> player_;
 
 	std::unique_ptr<Sprite> sprite_;
 };

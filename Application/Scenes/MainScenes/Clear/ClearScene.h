@@ -11,7 +11,6 @@
 #include "Particle/ParticleEmitter.h"
 #include "Object3D/Object3d.h"
 #include "Sprite/Sprite.h"
-#include "Player/Player.h"
 #include "WorldTransform./WorldTransform.h"
 #include "Drawer/LineManager/Line.h"
 #include "../Transitions/Fade/Fade.h"

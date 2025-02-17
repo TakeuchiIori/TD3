@@ -258,12 +258,6 @@
     <ClCompile Include="Math\Matrix4x4.cpp">
       <Filter>ソース ファイル\Math</Filter>
     </ClCompile>
-    <ClCompile Include="Application\Objects\Player\Player.cpp">
-      <Filter>ソース ファイル\Application\Objects\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Objects\Player\PlayerBullet.cpp">
-      <Filter>ソース ファイル\Application\Objects\Player</Filter>
-    </ClCompile>
     <ClCompile Include="Math\MathFunc.cpp">
       <Filter>ソース ファイル\Math</Filter>
     </ClCompile>
@@ -399,21 +393,6 @@
     <ClCompile Include="Engine\Utility\Loaders\Model\SkinCluster.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Application\Objects\Player\ICommand\ICommandMove.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Objects\Player\InputHandle\InputHandleMove.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Objects\Enemy\Enemy.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Objects\Player\PlayerWeapon\PlayerWeapon.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Objects\Enemy\EnemyManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Application\Objects\Ground\Ground.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -490,12 +469,6 @@
     </ClInclude>
     <ClInclude Include="Math\Vector4.h">
       <Filter>ヘッダー ファイル\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Objects\Player\Player.h">
-      <Filter>ヘッダー ファイル\Application\Objects\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Objects\Player\PlayerBullet.h">
-      <Filter>ヘッダー ファイル\Application\Objects\Player</Filter>
     </ClInclude>
     <ClInclude Include="Application\Scenes\CoreScenes\Base\BaseScene.h">
       <Filter>ヘッダー ファイル\Application\Scenes\Corescenes\Base</Filter>
@@ -624,21 +597,6 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Utility\Loaders\Model\SkinCluster.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Objects\Player\ICommand\ICommandMove.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Objects\Player\InputHandle\InputHandleMove.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Objects\Enemy\Enemy.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Objects\Player\PlayerWeapon\PlayerWeapon.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Objects\Enemy\EnemyManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Application\Objects\Ground\Ground.h">
