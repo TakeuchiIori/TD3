@@ -28,9 +28,11 @@ void GameScene::Initialize()
     srand(static_cast<unsigned int>(time(nullptr))); // 乱数シード設定
     // カメラの生成
     sceneCamera_ = cameraManager_.AddCamera();
-    
+	playerCamera_ = cameraManager_.AddCamera();
+
     // 初期カメラモード設定
     cameraMode_ = CameraMode::DEFAULT;
+
     CollisionManager::GetInstance()->Initialize();
     // 線
     line_ = std::make_unique<Line>();
