@@ -32,36 +32,30 @@ void GameScene::Initialize()
     // 初期カメラモード設定
     cameraMode_ = CameraMode::DEFAULT;
     CollisionManager::GetInstance()->Initialize();
-    // 線
-    line_ = std::make_unique<Line>();
-    line_->Initialize();
-    line_->SetCamera(sceneCamera_.get());
-
-    boneLine_ = std::make_unique<Line>();
-    boneLine_->Initialize();
-    boneLine_->SetCamera(sceneCamera_.get());
 
 
 
 	GameTime::GetInstance()->Initialize();
     
 	followCamera_.Initialize();
+
+    playerCamera_.Initialize();
+
     // 各オブジェクトの初期化
+    player_ = std::make_unique<Player>();
+    player_->Initialize(sceneCamera_.get());
+    followCamera_.SetTarget(player_->GetWorldTransform());
+    playerCamera_.SetTarget(player_->GetWorldTransform());
+
+    cube_ = std::make_unique<Cube>();
+    cube_->Initialize(sceneCamera_.get());
 
     
     // 地面
     ground_ = std::make_unique<Ground>();
     ground_->Initialize(sceneCamera_.get());
     
-    // test
-    test_ = std::make_unique<Object3d>();
-    test_->Initialize();
-    test_->SetModel("walk.gltf",true);
-    //test_->SetModel("sneakWalk.gltf", true);
-    testWorldTransform_.Initialize();
    
-
-
 
     // パーティクル
     emitterPosition_ = Vector3{ 0.0f, 0.0f, 0.0f }; // エミッタの初期位置
@@ -97,10 +91,13 @@ void GameScene::Update()
     CheckAllCollisions();
     CollisionManager::GetInstance()->UpdateWorldTransform();
 
+    player_->Update();
+    player_->SetFPSMode(cameraMode_ == CameraMode::FPS);
 
     // enemy_->Update();
+
+    cube_->Update();
     ground_->Update();
-    test_->UpdateAnimation();
 
 
     particleEmitter_[0]->Emit();
@@ -119,7 +116,6 @@ void GameScene::Update()
 
     JsonManager::ImGuiManager();
     // ワールドトランスフォーム更新
-    testWorldTransform_.UpdateMatrix();
     cameraManager_.UpdateAllCameras();
 
     //=====================================================//
@@ -150,7 +146,9 @@ void GameScene::Draw()
     /// </summary>
     CollisionManager::GetInstance()->Draw();
   
+    player_->Draw();
 
+    cube_->Draw();
     ground_->Draw();
     //line_->UpdateVertices(start_, end_);
   
@@ -165,13 +163,13 @@ void GameScene::Draw()
     /// ここから描画可能です
     /// </summary>
 
-    test_->Draw(sceneCamera_.get(), testWorldTransform_);
+    //test_->Draw(sceneCamera_.get(), testWorldTransform_);
 
-    // 骨描画
-    if (test_ && test_->GetModel()->GetSkeleton().joints.size() > 0) {
-        test_->DrawSkeleton(test_->GetModel()->GetSkeleton(), *boneLine_);
-        boneLine_->DrawLine();
-    }
+    //// 骨描画
+    //if (test_ && test_->GetModel()->GetSkeleton().joints.size() > 0) {
+    //    test_->DrawSkeleton(test_->GetModel()->GetSkeleton(), *boneLine_);
+    //    boneLine_->DrawLine();
+    //}
 
    
 
@@ -263,6 +261,12 @@ void GameScene::UpdateCamera()
     case CameraMode::FPS:
     {
 
+        playerCamera_.Update();
+        sceneCamera_->viewMatrix_ = playerCamera_.matView_;
+        sceneCamera_->transform_.translate = playerCamera_.translate_;
+        sceneCamera_->transform_.rotate = playerCamera_.rotate_;
+
+        sceneCamera_->UpdateMatrix();
     }
     break;
 

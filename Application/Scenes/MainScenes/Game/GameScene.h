@@ -23,6 +23,12 @@
 #include "../../../SystemsApp/Cameras/FollowCamera/FollowCamera.h"
 #include "../../../SystemsApp/Cameras/TopDownCamera/TopDownCamera.h"
 
+#include "../../../SystemsApp/Cameras/PlayerCamera/PlayerCamera.h"
+
+// Application
+#include "Player/Player.h"
+#include "Cube/Cube.h"
+
 
 enum class CameraMode
 {
@@ -89,6 +95,7 @@ private:
     CameraManager cameraManager_;
 	FollowCamera followCamera_;
     TopDownCamera topDownCamera_;
+    PlayerCamera playerCamera_;
     // サウンド
     Audio::SoundData soundData;
     IXAudio2SourceVoice* sourceVoice;
@@ -102,20 +109,14 @@ private:
     std::unique_ptr<Sprite> sprite_;
 
     // 3Dモデル
-    std::unique_ptr<Object3d> test_;
-    WorldTransform testWorldTransform_;
+    std::unique_ptr<Player> player_;
+    std::unique_ptr<Cube> cube_;
 
     // 地面
     std::unique_ptr< Ground> ground_;
 
     // 2Dスプライト
     std::vector<std::unique_ptr<Sprite>> sprites;
-
-    // Line
-    std::unique_ptr<Line> line_;
-    std::unique_ptr<Line> boneLine_;
-    Vector3 start_ = { 0.0f,0.0f,0.0f };
-    Vector3 end_ = { 10.0f,0.0f,10.0f };
 
      bool isClear_ = false;
  
