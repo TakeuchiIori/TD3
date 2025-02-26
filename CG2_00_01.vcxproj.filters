@@ -447,6 +447,9 @@
     <ClCompile Include="Math\Easing.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Generators\OffScreen\OffScreen.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Utility\Systems\Input\Input.h">
@@ -662,12 +665,27 @@
     <ClInclude Include="Math\Easing.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Generators\OffScreen\OffScreen.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Particle.hlsli" />
     <None Include="Resources\shaders\Skinning.hlsli" />
     <None Include="Resources\shaders\Skinning.PS.hlsl" />
     <None Include="Resources\shaders\Sprite.hlsli" />
+    <None Include="Resources\Models\plane\plane.bin">
+      <Filter>リソース ファイル</Filter>
+    </None>
+    <None Include="Resources\Models\simpleSkin\simpleSkin.bin">
+      <Filter>リソース ファイル</Filter>
+    </None>
+    <None Include="Resources\Models\sneakWalk\sneakWalk.bin">
+      <Filter>リソース ファイル</Filter>
+    </None>
+    <None Include="Resources\Models\walk\walk.bin">
+      <Filter>リソース ファイル</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Particle.PS.hlsl" />
