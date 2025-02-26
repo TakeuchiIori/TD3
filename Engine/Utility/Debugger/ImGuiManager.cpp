@@ -92,7 +92,7 @@ void ImGuiManager::Draw()
 {
 #ifdef _DEBUG
 	// デスクリプターヒープの配列をセットするコマンド
-	ID3D12DescriptorHeap* ppHeaps[] = { srvHeap_.Get()};
+	ID3D12DescriptorHeap* ppHeaps[] = { srvHeap_.Get() };
 	dxCommon_->GetCommandList()->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 	if (ImGui::GetDrawData()->TotalVtxCount == 0) {
 		printf("Warning: No vertices to render!\n");
@@ -100,7 +100,7 @@ void ImGuiManager::Draw()
 	}
 	// 描画コマンドを発行
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon_->GetCommandList().Get());
-	
+
 #endif
 }
 
@@ -195,7 +195,7 @@ void ImGuiManager::CustomizeColor()
 		ImVec4 activeTabColor = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);						// 選択されたタブの色
 		colors[ImGuiCol_TabUnfocused] = inactiveTabColor;							// 非アクティブなタブの色
 		colors[ImGuiCol_TabUnfocusedActive] = inactiveTabActiveColor;
-		
+
 		// スタイルの変更
 		style.WindowRounding = 15.0f;      // ウィンドウの角丸
 		style.FrameRounding = 4.0f;        // フレームの角丸
