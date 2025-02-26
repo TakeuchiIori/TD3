@@ -114,6 +114,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Objects\StageObject\BaseStageObject\BaseStageObject.cpp" />
     <ClCompile Include="Application\Stages\BaseStage\BaseStage.cpp" />
     <ClCompile Include="Application\Objects\StageObject\BaseFloorObject\BaseFloorObject.cpp" />
+    <ClCompile Include="Engine\Generators\OffScreen\OffScreen.cpp" />
+    <ClCompile Include="Math\Easing.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Model\AnimationSystem.cpp" />
     <ClCompile Include="Application\Scenes\MainScenes\Clear\ClearScene.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Model\Animation.cpp" />
@@ -189,6 +191,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Objects\StageObject\BaseStageObject\BaseStageObject.h" />
     <ClInclude Include="Application\Stages\BaseStage\BaseStage.h" />
     <ClInclude Include="Application\Objects\StageObject\BaseFloorObject\BaseFloorObject.h" />
+    <ClInclude Include="Engine\Generators\OffScreen\OffScreen.h" />
+    <ClInclude Include="Math\Easing.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\AnimationSystem.h" />
     <ClInclude Include="Application\Scenes\MainScenes\Clear\ClearScene.h" />
     <ClInclude Include="Engine\Utility\Loaders\Json\ConversionJson.h" />
@@ -273,6 +277,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Models\plane\plane.bin" />
+    <None Include="Resources\Models\simpleSkin\simpleSkin.bin" />
+    <None Include="Resources\Models\sneakWalk\sneakWalk.bin" />
+    <None Include="Resources\Models\walk\walk.bin" />
     <None Include="Resources\shaders\Particle.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

@@ -93,6 +93,7 @@ private:
     // カメラ
     CameraMode cameraMode_;
     std::shared_ptr<Camera> sceneCamera_;
+	std::shared_ptr<Camera> playerCamera_;
     CameraManager cameraManager_;
 	FollowCamera followCamera_;
     TopDownCamera topDownCamera_;

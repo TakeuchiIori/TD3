@@ -70,10 +70,28 @@ private:
 	void CreatePSO_Line();
 
 	/// <summary>
-	/// ライン用のパイプライン
+	/// パーティクル用のパイプライン
 	/// </summary>
 	void CreatePSO_Particle();
 
+	/*=================================================================
+
+							オフスクリーン関連
+
+	=================================================================*/
+	/// <summary>
+	/// オフスクリーン用のパイプライン
+	/// </summary>
+	//void CreatePSO_OffScreen();
+
+	void CreatePSO_BaseOffScreen(
+		const std::wstring& pixelShaderPath = L"",
+		const std::string& pipelineKey = ""
+	);
+	void CreatePSO_Smoothing(
+		const std::wstring& pixelShaderPath = L"",
+		const std::string& pipelineKey = ""
+	);
 
 private:
 	PipelineManager(const  PipelineManager&) = delete;
