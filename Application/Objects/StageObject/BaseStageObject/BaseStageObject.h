@@ -22,17 +22,17 @@ public:
 	void Draw() override;
 
 
-	void InitJson();
+	virtual void InitJson();
 
 
 public: // getter & setter
-	void SetName(std::string& objectName) { name_ = objectName; }
+	virtual void SetName(std::string& objectName) { name_ = objectName; }
 
-	void SetScale(const Vector3& scale) { worldTransform_.scale_ = scale; }
+	virtual void SetScale(const Vector3& scale) { worldTransform_.scale_ = scale; }
 
-	void SetTranslate(const Vector3& translate) { worldTransform_.translation_ = translate; }
+	virtual void SetTranslate(const Vector3& translate) { worldTransform_.translation_ = translate; }
 
-	void SetRotate(const Vector3& rotate) { worldTransform_.rotation_ = rotate; }
+	virtual void SetRotate(const Vector3& rotate) { worldTransform_.rotation_ = rotate; }
 
 private:
 

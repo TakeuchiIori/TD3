@@ -28,6 +28,7 @@
 // Application
 #include "Player/Player.h"
 #include "Cube/Cube.h"
+#include "../Stages/StageManager/StageManager.h"
 
 
 enum class CameraMode
@@ -95,7 +96,7 @@ private:
     CameraManager cameraManager_;
 	FollowCamera followCamera_;
     TopDownCamera topDownCamera_;
-    PlayerCamera playerCamera_;
+    std::unique_ptr<PlayerCamera> playerCamera_;
     // サウンド
     Audio::SoundData soundData;
     IXAudio2SourceVoice* sourceVoice;
@@ -107,6 +108,10 @@ private:
     Vector3 weaponPos;
 
     std::unique_ptr<Sprite> sprite_;
+
+
+    StageManager stageManager_;
+
 
     // 3Dモデル
     std::unique_ptr<Player> player_;

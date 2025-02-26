@@ -28,7 +28,7 @@ public:
 private:
 	// ポインタ
 	std::unique_ptr<Object3d> obj_;
-	Camera* camera_;
+	Camera* camera_ = nullptr;
 	// ワールドトランスフォーム
 	WorldTransform worldTransform_;
 };

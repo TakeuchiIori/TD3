@@ -45,7 +45,7 @@ public: // getter&setter
 	void SetFPSMode(bool isFPS) { isFPSMode_ = isFPS; }
 
 private:
-	Input* input_;
+	Input* input_ = nullptr;
 
 	// 体のトランスフォーム
 	WorldTransform bodyTransform_;

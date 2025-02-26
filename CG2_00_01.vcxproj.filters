@@ -453,10 +453,19 @@
     <ClCompile Include="Application\Objects\Cube\Cube.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Application\Objects\StageObject\BaseStageObject.cpp">
+    <ClCompile Include="Application\Objects\StageObject\BaseStageObject\BaseStageObject.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Application\Stages\BaseStage\BaseStage.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Objects\StageObject\BaseFloorObject\BaseFloorObject.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\SystemsApp\Cameras\StageCamera\StageCamera.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Stages\StageManager\StageManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -683,10 +692,19 @@
     <ClInclude Include="Application\Objects\Cube\Cube.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Application\Objects\StageObject\BaseStageObject.h">
+    <ClInclude Include="Application\Objects\StageObject\BaseStageObject\BaseStageObject.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Application\Stages\BaseStage\BaseStage.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Objects\StageObject\BaseFloorObject\BaseFloorObject.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\SystemsApp\Cameras\StageCamera\StageCamera.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Stages\StageManager\StageManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

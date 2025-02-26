@@ -7,7 +7,7 @@ void Ground::Initialize(Camera* camera)
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
 	obj_->SetModel("unitFloor.obj");
-	obj_->SetMaterialUVTransform(MakeScaleMatrix({ 30,30,0 }));
+	obj_->SetMaterialUVTransform(MakeScaleMatrix({ 100,100,0 }));
 
 	worldTransform_.Initialize();
 	worldTransform_.scale_ = { 100,1,100 };

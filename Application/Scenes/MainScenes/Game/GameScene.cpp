@@ -33,19 +33,20 @@ void GameScene::Initialize()
     cameraMode_ = CameraMode::DEFAULT;
     CollisionManager::GetInstance()->Initialize();
 
-
+    stageManager_.Initialize();
 
 	GameTime::GetInstance()->Initialize();
     
 	followCamera_.Initialize();
 
-    playerCamera_.Initialize();
+    playerCamera_ = std::make_unique<PlayerCamera>();
+    playerCamera_->Initialize();
 
     // 各オブジェクトの初期化
     player_ = std::make_unique<Player>();
     player_->Initialize(sceneCamera_.get());
     followCamera_.SetTarget(player_->GetWorldTransform());
-    playerCamera_.SetTarget(player_->GetWorldTransform());
+    playerCamera_->SetTarget(player_->GetWorldTransform());
 
     cube_ = std::make_unique<Cube>();
     cube_->Initialize(sceneCamera_.get());
@@ -91,8 +92,13 @@ void GameScene::Update()
     CheckAllCollisions();
     CollisionManager::GetInstance()->UpdateWorldTransform();
 
+
     player_->Update();
     player_->SetFPSMode(cameraMode_ == CameraMode::FPS);
+
+    if (Input::GetInstance()->TriggerKey(DIK_L)) {
+        playerCamera_ = nullptr;
+    }
 
     // enemy_->Update();
 
@@ -104,6 +110,7 @@ void GameScene::Update()
 
     ParticleManager::GetInstance()->Update();
     // カメラ更新
+    //stageManager_.SelectStage();
     UpdateCameraMode();
     UpdateCamera();
 
@@ -261,10 +268,10 @@ void GameScene::UpdateCamera()
     case CameraMode::FPS:
     {
 
-        playerCamera_.Update();
-        sceneCamera_->viewMatrix_ = playerCamera_.matView_;
-        sceneCamera_->transform_.translate = playerCamera_.translate_;
-        sceneCamera_->transform_.rotate = playerCamera_.rotate_;
+        playerCamera_->Update();
+        sceneCamera_->viewMatrix_ = playerCamera_->matView_;
+        sceneCamera_->transform_.translate = playerCamera_->translate_;
+        sceneCamera_->transform_.rotate = playerCamera_->rotate_;
 
         sceneCamera_->UpdateMatrix();
     }
