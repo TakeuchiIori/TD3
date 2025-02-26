@@ -1,4 +1,5 @@
 #include "Ground.h"
+#include "imgui.h"
 
 void Ground::Initialize(Camera* camera)
 {
@@ -14,7 +15,12 @@ void Ground::Initialize(Camera* camera)
 
 void Ground::Update()
 {
+
 	worldTransform_.UpdateMatrix();
+
+	ImGui::Begin("Ground");
+	ImGui::DragFloat3("Position", &worldTransform_.translation_.x, 0.01f);
+	ImGui::End();
 }
 
 void Ground::Draw()

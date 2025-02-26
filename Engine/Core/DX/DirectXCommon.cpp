@@ -212,7 +212,7 @@ void DirectXCommon::InitializeRenderTarget()
 
 	// オフスクリーンリソースの作成
 	renderTargetClearColor_ = {
-		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
+		DXGI_FORMAT_R8G8B8A8_UNORM,
 		{ 0.1f, 0.5f, 0.1f, 1.0f }
 	};
 
