@@ -36,10 +36,10 @@ void BaseStageObject::InitJson()
 {
 	if (stageName_.size() > 0)
 	{
-		jsonManager_ = std::make_unique<JsonManager>(name_, "Resources/JSON");
-		jsonManager_->Register("ID", &id);
-		jsonManager_->Register("Scale", &worldTransform_.scale_);
-		jsonManager_->Register("Translate", &worldTransform_.translation_);
-		jsonManager_->Register("Rotate", &worldTransform_.rotation_);
+		jsonManager_ = std::make_unique<JsonManager>(stageName_, "Resources/JSON");
+		jsonManager_->ChildRegister(stageName_, name_, "ID", &id);
+		jsonManager_->ChildRegister(stageName_, name_, "Scale", &worldTransform_.scale_);
+		jsonManager_->ChildRegister(stageName_, name_, "Translate", &worldTransform_.translation_);
+		jsonManager_->ChildRegister(stageName_, name_, "Rotate", &worldTransform_.rotation_);
 	}
 }
