@@ -33,7 +33,7 @@ void MyGame::Finalize()
 
 void MyGame::Update()
 {
-	
+
 	// 基盤の更新
 	Framework::Update();
 
@@ -49,9 +49,9 @@ void MyGame::Draw()
 	SceneManager::GetInstance()->Draw();
 
 	dxCommon_->PreDrawImGui();
+	offScreen_->SetProjection(SceneManager::GetInstance()->GetScene()->GetViewProjection());
 	offScreen_->Draw();
 	imguiManager_->Draw();
-
 	// DirectXの描画終了
 	dxCommon_->PostDraw();
 }
