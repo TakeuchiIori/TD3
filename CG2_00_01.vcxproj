@@ -176,6 +176,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Utility\Loaders\Model\Mesh.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Model\ModelTest.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Model\ModelLoader.cpp" />
+    <ClCompile Include="Application\SystemsApp\Picture\Picture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Generators\OffScreen\OffScreen.h" />
@@ -250,6 +251,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Utility\Loaders\Model\Mesh.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\ModelTest.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\ModelLoader.h" />
+    <ClInclude Include="Application\SystemsApp\Picture\Picture.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">

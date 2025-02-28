@@ -110,7 +110,6 @@ public:
 	/// <summary>
 	/// 描画前処理
 	/// </summary>
-	void RenderTexture();
 	void PreDrawScene();
 	void PreDrawImGui();
 	
@@ -251,6 +250,14 @@ public: // アクセッサ
 	HANDLE GetFenceEvent() { return fenceEvent_; }
 	UINT GetBackBufferCount()const { return  backBufferIndex; }
 
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> GetOffScreenResource() { return offScreenResource_; }
+	D3D12_CLEAR_VALUE GetRenderTargetClearColor() { return renderTargetClearColor_; }
+	uint32_t GetOffScreenSrvIndex() { return offScreenSrvIndex_; }
+	UINT GetCurrentBackBufferIndex() const {
+		// スワップチェーンから現在のバックバッファインデックスを取得
+		return swapChain_->GetCurrentBackBufferIndex();
+	}
 private:
 	/// <summary>
 	/// デフォルトコンストラクタ（シングルトンパターンのためプライベートに設定）

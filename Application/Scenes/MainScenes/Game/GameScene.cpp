@@ -43,7 +43,8 @@ void GameScene::Initialize()
     boneLine_->Initialize();
     boneLine_->SetCamera(sceneCamera_.get());
 
-
+	picture_ = std::make_unique<Picture>();
+	picture_->Initialize();
 
 	GameTime::GetInstance()->Initialize();
     
@@ -99,6 +100,10 @@ void GameScene::Update()
     CheckAllCollisions();
     CollisionManager::GetInstance()->UpdateWorldTransform();
 
+	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
+		picture_->Update();
+	
+    }
 
     // enemy_->Update();
     ground_->Update();

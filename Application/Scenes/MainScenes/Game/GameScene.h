@@ -23,6 +23,8 @@
 #include "../../../SystemsApp/Cameras/FollowCamera/FollowCamera.h"
 #include "../../../SystemsApp/Cameras/TopDownCamera/TopDownCamera.h"
 
+// App
+#include "../SystemsApp/Picture/Picture.h"
 
 enum class CameraMode
 {
@@ -59,12 +61,6 @@ public:
     Matrix4x4 GetViewProjection() override { return sceneCamera_->viewProjectionMatrix_; }
 
 private:
-
-    /// <summary>
-    /// フェースの切り替え
-    /// </summary>
-    void ChangePahse();
-
 
     /// <summary>
     /// カメラモードを更新する
@@ -113,6 +109,8 @@ private:
 
     // 2Dスプライト
     std::vector<std::unique_ptr<Sprite>> sprites;
+
+    std::unique_ptr<Picture> picture_;
 
     // Line
     std::unique_ptr<Line> line_;
