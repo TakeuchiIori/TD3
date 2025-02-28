@@ -8,6 +8,7 @@
 class BaseObject
 {
 public:
+	virtual ~BaseObject() {};
 	/// <summary>
 	/// 初期化
 	/// </summary>

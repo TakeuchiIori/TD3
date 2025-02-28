@@ -86,7 +86,7 @@ void FollowCamera::JsonImGui()
 
 void FollowCamera::ImGui()
 {
-	ImGui::Begin("FollowCamera Info");
+	/*ImGui::Begin("FollowCamera Info");
 
 	ImGui::DragFloat3("Translate", &translate_.x);
 
@@ -94,7 +94,7 @@ void FollowCamera::ImGui()
 
 	ImGui::DragFloat3("Scale", &scale_.x);
 
-	ImGui::End();
+	ImGui::End();*/
 }
 
 

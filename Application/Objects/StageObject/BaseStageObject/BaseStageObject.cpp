@@ -1,8 +1,13 @@
 #include "BaseStageObject.h"
 
+int BaseStageObject::count = 0;
+int BaseStageObject::next_id = 0;
+
 void BaseStageObject::Initialize(Camera* camera)
 {
 	camera_ = camera;
+
+	name_ = name_ + std::to_string(id);
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
@@ -14,6 +19,7 @@ void BaseStageObject::Initialize(Camera* camera)
 	obj_->SetModel("unitCube.obj");
 
 	InitJson();
+	worldTransform_.UpdateMatrix();
 }
 
 void BaseStageObject::Update()
@@ -28,9 +34,10 @@ void BaseStageObject::Draw()
 
 void BaseStageObject::InitJson()
 {
-	if (name_.size() > 0)
+	if (stageName_.size() > 0)
 	{
 		jsonManager_ = std::make_unique<JsonManager>(name_, "Resources/JSON");
+		jsonManager_->Register("ID", &id);
 		jsonManager_->Register("Scale", &worldTransform_.scale_);
 		jsonManager_->Register("Translate", &worldTransform_.translation_);
 		jsonManager_->Register("Rotate", &worldTransform_.rotation_);

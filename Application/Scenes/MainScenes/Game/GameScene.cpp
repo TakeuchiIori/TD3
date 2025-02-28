@@ -28,14 +28,14 @@ void GameScene::Initialize()
     srand(static_cast<unsigned int>(time(nullptr))); // 乱数シード設定
     // カメラの生成
     sceneCamera_ = cameraManager_.AddCamera();
-	playerCamera_ = cameraManager_.AddCamera();
+	//playerCamera_ = cameraManager_.AddCamera();
 
     // 初期カメラモード設定
     cameraMode_ = CameraMode::DEFAULT;
 
     CollisionManager::GetInstance()->Initialize();
 
-    stageManager_.Initialize();
+    stageManager_.Initialize(sceneCamera_.get());
 
 	GameTime::GetInstance()->Initialize();
     
@@ -94,6 +94,7 @@ void GameScene::Update()
     CheckAllCollisions();
     CollisionManager::GetInstance()->UpdateWorldTransform();
 
+    stageManager_.Update();
 
     player_->Update();
     player_->SetFPSMode(cameraMode_ == CameraMode::FPS);
@@ -112,7 +113,6 @@ void GameScene::Update()
 
     ParticleManager::GetInstance()->Update();
     // カメラ更新
-    //stageManager_.SelectStage();
     UpdateCameraMode();
     UpdateCamera();
 
@@ -154,6 +154,8 @@ void GameScene::Draw()
     /// ここから描画可能です
     /// </summary>
     CollisionManager::GetInstance()->Draw();
+
+    stageManager_.Draw();
   
     player_->Draw();
 

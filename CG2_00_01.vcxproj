@@ -66,7 +66,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)Application\Objects;$(ProjectDir)Application\Scenes;$(ProjectDir)Engine\Core;$(ProjectDir)Engine\Generators;$(ProjectDir)Engine\Graphics;$(ProjectDir)Engine\Systems;$(ProjectDir)Engine\Utility;$(ProjectDir)Math</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Application\Objects;$(ProjectDir)Application\Scenes;$(ProjectDir)Application\SystemApp;$(ProjectDir)Application\Stages;$(ProjectDir)Engine\Core;$(ProjectDir)Engine\Generators;$(ProjectDir)Engine\Graphics;$(ProjectDir)Engine\Systems;$(ProjectDir)Engine\Utility;$(ProjectDir)Math</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -93,7 +93,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>false</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir)Application\Objects;$(ProjectDir)Application\Scenes;$(ProjectDir)Engine\Core;$(ProjectDir)Engine\Generators;$(ProjectDir)Engine\Graphics;$(ProjectDir)Engine\Systems;$(ProjectDir)Engine\Utility;$(ProjectDir)Math</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Application\Objects;$(ProjectDir)Application\Scenes;$(ProjectDir)Application\SystemApp;$(ProjectDir)Application\Stages;$(ProjectDir)Engine\Core;$(ProjectDir)Engine\Generators;$(ProjectDir)Engine\Graphics;$(ProjectDir)Engine\Systems;$(ProjectDir)Engine\Utility;$(ProjectDir)Math</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -184,6 +184,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\SystemsApp\Cameras\PlayerCamera\PlayerCamera.cpp" />
     <ClCompile Include="Application\SystemsApp\Cameras\StageCamera\StageCamera.cpp" />
     <ClCompile Include="Application\Stages\StageManager\StageManager.cpp" />
+    <ClCompile Include="Application\Objects\StageObject\StageObjectManager\StageObjectManager.cpp" />
+    <ClCompile Include="TestStage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -267,6 +269,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\SystemsApp\Cameras\PlayerCamera\PlayerCamera.h" />
     <ClInclude Include="Application\SystemsApp\Cameras\StageCamera\StageCamera.h" />
     <ClInclude Include="Application\Stages\StageManager\StageManager.h" />
+    <ClInclude Include="Application\Objects\StageObject\StageObjectManager\StageObjectManager.h" />
+    <ClInclude Include="TestStage.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
