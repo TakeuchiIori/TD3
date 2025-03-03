@@ -21,7 +21,7 @@ void StageManager::InitJson()
 	jsonManager_ = std::make_unique<JsonManager>("StageManager", "Resources/JSON");
 	jsonManager_->Register("Total Stage Number", &totalStageNum_);
 	for (int i = 0; i < totalStageNum_; ++i) {
-		stageVector_.push_back("Stage" + std::to_string(i + 1));
+		stageVector_.push_back("Stage" + std::to_string(i));
 	}
 }
 
