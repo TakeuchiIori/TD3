@@ -67,7 +67,7 @@ public:
         }
         else if constexpr (std::is_same_v<T, float>)
         {
-            ImGui::DragFloat(label.c_str(), ptr_);
+            ImGui::DragFloat(label.c_str(), ptr_, 0.1f);
         }
         else if constexpr (std::is_same_v<T, bool>)
         {
@@ -85,15 +85,15 @@ public:
         }
         else if constexpr (std::is_same_v<T, Vector2>)
         {
-            ImGui::DragFloat2(label.c_str(), reinterpret_cast<float*>(ptr_));
+            ImGui::DragFloat2(label.c_str(), reinterpret_cast<float*>(ptr_), 0.1f);
         }
         else if constexpr (std::is_same_v<T, Vector3>)
         {
-            ImGui::DragFloat3(label.c_str(), reinterpret_cast<float*>(ptr_));
+            ImGui::DragFloat3(label.c_str(), reinterpret_cast<float*>(ptr_), 0.1f);
         }
         else if constexpr (std::is_same_v<T, Quaternion>)
         {
-            ImGui::DragFloat4(label.c_str(), reinterpret_cast<float*>(ptr_));
+            ImGui::DragFloat4(label.c_str(), reinterpret_cast<float*>(ptr_), 0.1f);
         }
 #endif // _DEBUG
 
