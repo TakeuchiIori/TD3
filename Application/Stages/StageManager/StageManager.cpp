@@ -45,8 +45,12 @@ void StageManager::SelectStage()
 	}
 	static std::string beforeStage = currentStage_;
 	if (ImGui::Combo("StageSelect", &comboCurrentStage, stages.data(), totalStageNum_)) {
-		currentStage_ = stages[comboCurrentStage];
-		if (currentStage_ != beforeStage) {
+		currentStage_ = stageVector_[comboCurrentStage];
+		if (currentStage_ == beforeStage)
+		{
+		}
+		else
+		{
 			objManager_.InitStageJson(currentStage_);
 		}
 	}

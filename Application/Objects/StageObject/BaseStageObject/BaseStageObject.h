@@ -6,7 +6,7 @@ class BaseStageObject :
     public BaseObject
 {
 public:
-	BaseStageObject() : id(next_id++) {
+	BaseStageObject() : id(count) {
 		++count;
 	}
 	~BaseStageObject() override {
@@ -45,6 +45,8 @@ public: // getter & setter
 	virtual void SetModel(const std::string& filePath, bool isAnimation = false) { obj_->SetModel(filePath, isAnimation); }
 
 	int GetId() { return id; }
+
+	std::string& GetName() { return name_; }
 
 private:
 

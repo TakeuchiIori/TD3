@@ -68,6 +68,11 @@ public:
 	template <typename T>
 	void ChildRegister(std::string parentFileName, std::string childName, const std::string& name, T* ptr);
 
+	void ChildResset(std::string parentFileName, std::string childName);
+
+
+	void ClearRegister(std::string parentFileName);
+
 private:
 	/// <summary>
 	///  フォルダパスとファイル名からフルパス文字列を組み立てる

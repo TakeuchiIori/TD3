@@ -5,8 +5,12 @@ void StageObjectManager::Initialize(Camera* camera)
 	camera_ = camera;
 }
 
-void StageObjectManager::ResetObjList()
+void StageObjectManager::ResetObjList(std::string& stageName)
 {
+	for (auto&& obj : stageObjects_) {
+		jsonManager_[stageName]->ChildResset(stageName, obj->GetName());
+		obj.reset();
+	}
 	stageObjects_.clear();
 }
 
@@ -32,8 +36,8 @@ void StageObjectManager::AddObject(std::string& stageName)
 	std::string objName = "object";
 	obj->SetName(objName);
 	obj->Initialize(camera_);
-	if (obj->GetId() + 1 > totalObjNum_) {
-		totalObjNum_ = obj->GetId() + 1;
+	if (obj->GetId() + 1 > totalObjNums_[stageName]) {
+		totalObjNums_[stageName] = obj->GetId() + 1;
 	}
 
 	stageObjects_.push_back(std::move(obj));
@@ -41,10 +45,20 @@ void StageObjectManager::AddObject(std::string& stageName)
 
 void StageObjectManager::InitStageJson(std::string& stageName)
 {
-	ResetObjList();
-	jsonManager_ = std::make_unique<JsonManager>(stageName, "Resources/JSON");
-	jsonManager_->Register("totalObjNum", &totalObjNum_);
-	for (int i = 0; i < totalObjNum_; ++i) {
+	ResetObjList(stageName);
+
+	// 既に登録済みならリセット
+	if (jsonManager_.find(stageName) != jsonManager_.end()) {
+		jsonManager_.erase(stageName);
+	}
+
+	jsonManager_.insert({ stageName, std::make_unique<JsonManager>(stageName, "Resources/JSON") });
+
+
+	// totalObjNums_ を初期化
+	jsonManager_[stageName]->Register(stageName + "totalObjNum", &totalObjNums_[stageName]);
+
+	for (int i = 0; i < totalObjNums_[stageName]; ++i) {
 		AddObject(stageName);
 	}
 }

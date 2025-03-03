@@ -190,48 +190,6 @@ void JsonManager::ImGuiManager()
 			// Start child window with scrollbar for variables
 			ImGui::BeginChild("VariableList", ImVec2(0, 200), true);
 
-			/*for (auto& pair : instance->variables_)
-			{
-				if(!instance->child_.empty())
-				{
-				}
-				else
-				{
-					pair.second->ShowImGui(pair.first, selectedClass);
-				}
-			}*/
-
-			//if (instance->child_.empty()) // childが空なら
-			//{
-			//	for (auto& pair : instance->variables_) // 全部表示
-			//	{
-			//		pair.second->ShowImGui(pair.first, selectedClass);
-			//	}
-			//}
-			//else // childが空ではない場合
-			//{
-			//	for (auto& CHPair : instance->child_)
-			//	{
-			//		for (auto& pair : instance->variables_)
-			//		{
-			//			if (pair.first.compare(0, CHPair.first.size(), CHPair.first) != 0)
-			//			{
-			//				pair.second->ShowImGui(pair.first, selectedClass);
-			//			}
-			//		}
-			//		ImGui::Checkbox(CHPair.first.c_str(), &CHPair.second);
-			//		if (CHPair.second)
-			//		{
-			//			for (auto& pair : instance->variables_)
-			//			{
-			//				if (pair.first.compare(0, CHPair.first.size(), CHPair.first) == 0)
-			//				{
-			//					pair.second->ShowImGui(pair.first, selectedClass);
-			//				}
-			//			}
-			//		}
-			//	}
-			//}
 
 			if (instance->child_.empty())  // childが空なら、すべての変数を表示
 			{
@@ -278,6 +236,7 @@ void JsonManager::ImGuiManager()
 					{
 						for (auto& var : groupedVars[CHPair.first])
 						{
+							
 							var.second->ShowImGui(var.first, selectedClass);
 						}
 					}
@@ -298,6 +257,59 @@ void JsonManager::ImGuiManager()
 
 	ImGui::End();
 #endif
+}
+
+void JsonManager::ChildResset(std::string parentFileName, std::string childName)
+{
+	auto it = instances.find(selectedClass);
+	if (it != instances.end()) {
+		JsonManager* instance = it->second;
+
+
+		if (instance->child_.empty())  // childが空なら
+		{
+			return;
+		}
+		else  // childがある場合
+		{
+			std::unordered_map<std::string, std::vector<std::pair<std::string, IVariableJson*>>> groupedVars;
+
+			// 変数を child_ のキーごとに分類
+			for (auto& pair : instance->variables_)
+			{
+				for (auto& CHPair : instance->child_)
+				{
+					if (pair.first.length() >= CHPair.first.size() &&
+						pair.first.compare(0, CHPair.first.size(), CHPair.first) == 0)
+					{
+						groupedVars[CHPair.first].emplace_back(pair.first, pair.second.get());
+						break; // 1つの `child_` にマッチすれば十分
+					}
+				}
+			}
+
+			// 各 child_ のチェックボックスと対応する変数表示
+			for (auto& CHPair : instance->child_)
+			{
+				ImGui::Checkbox(CHPair.first.c_str(), &CHPair.second);
+				if (CHPair.second) // ON の場合
+				{
+					for (auto& var : groupedVars[CHPair.first])
+					{
+						instance->variables_.erase(var.first);
+					}
+				}
+			}
+		}
+	}
+}
+
+void JsonManager::ClearRegister(std::string parentFileName)
+{
+	if (instances.find(parentFileName) != instances.end()) // 親ファイルがあるかチェック
+	{
+		instances[parentFileName]->variables_.clear();
+	}
 }
 
 std::string JsonManager::MakeFullPath(const std::string& folder, const std::string& file) const
