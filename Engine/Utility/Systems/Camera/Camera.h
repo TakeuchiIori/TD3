@@ -70,6 +70,7 @@ public: // アクセッサ
 	Vector3 GetRotate() const { return transform_.rotate; }
 	Vector3 GetTranslate() const { return transform_.translate; }
 	Vector3 GetScale() const { return transform_.scale; }
+	float GetFovY() { return fovY_; }
 
 public: 
 	EulerTransform transform_;	   

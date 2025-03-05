@@ -1,0 +1,19 @@
+{
+    "Stage2totalObjNum": 1,
+    "object0 : ID": 0,
+    "object0 : Rotate": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "object0 : Scale": {
+        "x": 1.0,
+        "y": 3.0,
+        "z": 1.0
+    },
+    "object0 : Translate": {
+        "x": -2.0,
+        "y": 0.5,
+        "z": 0.0
+    }
+}

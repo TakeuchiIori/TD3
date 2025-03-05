@@ -1,0 +1,51 @@
+{
+    "Stage1totalObjNum": 3,
+    "object0 : ID": 0,
+    "object0 : Rotate": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "object0 : Scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+    },
+    "object0 : Translate": {
+        "x": -6.0,
+        "y": 0.5,
+        "z": 0.0
+    },
+    "object1 : ID": 1,
+    "object1 : Rotate": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "object1 : Scale": {
+        "x": 1.0,
+        "y": -7.0,
+        "z": 1.0
+    },
+    "object1 : Translate": {
+        "x": 0.0,
+        "y": 4.5,
+        "z": 8.0
+    },
+    "object2 : ID": 2,
+    "object2 : Rotate": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "object2 : Scale": {
+        "x": -4.0,
+        "y": 1.0,
+        "z": 1.0
+    },
+    "object2 : Translate": {
+        "x": -4.0,
+        "y": 1.5,
+        "z": 5.0
+    }
+}
