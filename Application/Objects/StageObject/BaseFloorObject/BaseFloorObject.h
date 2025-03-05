@@ -1,9 +1,14 @@
 #pragma once
-#include "StageObject/BaseStageObject/BaseStageObject.h"
+#include "BaseObject/BaseObject.h"
 
 class BaseFloorObject :
-    public BaseStageObject
+    public BaseObject
 {
+public:
+	enum Shapes {
+		kRect,
+		kCircle,
+	};
 public:
 	/// <summary>
 	/// 初期化
@@ -21,9 +26,13 @@ public:
 	void Draw() override;
 
 
-	void InitJson() override;
+	void InitJson();
+
+public:
+	void SetShapes(const Shapes& shapes) { shapes_ = shapes; }
 
 private:
 	WorldTransform clampAreaTransform_;
+	Shapes shapes_;
 };
 

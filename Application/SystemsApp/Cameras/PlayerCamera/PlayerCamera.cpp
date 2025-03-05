@@ -8,9 +8,9 @@ void PlayerCamera::Initialize()
 void PlayerCamera::Update()
 {
 
-	UpdateInput();
-
 	FollowProsess();
+
+	UpdateInput();
 
 
 	//jsonManager_->ImGui("FollowCamera");

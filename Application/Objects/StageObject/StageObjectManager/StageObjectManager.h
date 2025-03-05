@@ -20,6 +20,12 @@ public:
 
 	void Draw();
 
+	void ObjectModelSetting(std::string& stageName);
+public:
+	void SetModelName(const char* name) { modelList_.push_back(name); }
+
+	void SetModelNames(std::list<const char*>& nameList) { modelList_.splice(modelList_.end(), nameList); }
+
 private:
 	// ポインタ
 	Camera* camera_;
@@ -27,6 +33,8 @@ private:
 	std::unordered_map<std::string, std::unique_ptr<JsonManager>> jsonManager_;
 
 	std::list<std::unique_ptr<BaseStageObject>> stageObjects_;
+
+	std::list<const char*> modelList_;
 
 	std::unordered_map<std::string, int> totalObjNums_;
 	int totalObjNum_ = 0;

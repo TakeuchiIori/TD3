@@ -30,6 +30,6 @@ private:
 
     int totalStageNum_ = 0;
 
-    StageObjectManager objManager_;
+    StageObjectManager stageObjManager_;
 };
 

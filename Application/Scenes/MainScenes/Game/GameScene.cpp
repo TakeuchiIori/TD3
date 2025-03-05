@@ -50,9 +50,6 @@ void GameScene::Initialize()
     followCamera_.SetTarget(player_->GetWorldTransform());
     playerCamera_->SetTarget(player_->GetWorldTransform());
 
-    cube_ = std::make_unique<Cube>();
-    cube_->Initialize(sceneCamera_.get());
-
     
     // 地面
     ground_ = std::make_unique<Ground>();
@@ -99,13 +96,27 @@ void GameScene::Update()
     player_->Update();
     player_->SetFPSMode(cameraMode_ == CameraMode::FPS);
 
-    if (Input::GetInstance()->TriggerKey(DIK_L)) {
-        playerCamera_ = nullptr;
+    if (Input::GetInstance()->TriggerKey(DIK_L))
+    {
+        if (cameraMode_ == CameraMode::FPS) 
+        {
+            cameraMode_ = CameraMode::FOLLOW;
+        }
+        else
+        {
+            cameraMode_ = CameraMode::FPS;
+        }
+    }
+
+    if (Input::GetInstance()->PushKey(DIK_UP)) {
+        sceneCamera_->SetFovY(sceneCamera_->GetFovY() - 0.001f);
+    }
+    if (Input::GetInstance()->PushKey(DIK_DOWN)) {
+        sceneCamera_->SetFovY(sceneCamera_->GetFovY() + 0.001f);
     }
 
     // enemy_->Update();
 
-    cube_->Update();
     ground_->Update();
 
 
@@ -159,7 +170,6 @@ void GameScene::Draw()
   
     player_->Draw();
 
-    cube_->Draw();
     ground_->Draw();
     //line_->UpdateVertices(start_, end_);
   

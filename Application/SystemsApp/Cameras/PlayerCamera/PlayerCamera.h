@@ -32,6 +32,6 @@ private:
     float kDeadZoneL_ = 100.0f;
     // 追従対象
     const WorldTransform* target_;
-    Vector3 offset_ = { 0.0f, 0.5f, 0.5f };
+    Vector3 offset_ = { 0.0f, 0.5f, 0.52f };
 };
 

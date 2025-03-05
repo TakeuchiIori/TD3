@@ -228,17 +228,16 @@ void JsonManager::ImGuiManager()
 					var.second->ShowImGui(var.first, selectedClass);
 				}
 
-				// 各 child_ のチェックボックスと対応する変数表示
+				// 各 child_ のツリーノードと対応する変数表示
 				for (auto& CHPair : instance->child_)
 				{
-					ImGui::Checkbox(CHPair.first.c_str(), &CHPair.second);
-					if (CHPair.second) // ON の場合
+					if (ImGui::TreeNode(CHPair.first.c_str()))
 					{
 						for (auto& var : groupedVars[CHPair.first])
 						{
-							
 							var.second->ShowImGui(var.first, selectedClass);
 						}
+						ImGui::TreePop();
 					}
 				}
 			}
@@ -259,7 +258,7 @@ void JsonManager::ImGuiManager()
 #endif
 }
 
-void JsonManager::ChildResset(std::string parentFileName, std::string childName)
+void JsonManager::ChildReset(std::string parentFileName, std::string childName)
 {
 	auto it = instances.find(selectedClass);
 	if (it != instances.end()) {

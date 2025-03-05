@@ -27,7 +27,6 @@
 
 // Application
 #include "Player/Player.h"
-#include "Cube/Cube.h"
 #include "../Stages/StageManager/StageManager.h"
 
 
@@ -116,7 +115,6 @@ private:
 
     // 3Dモデル
     std::unique_ptr<Player> player_;
-    std::unique_ptr<Cube> cube_;
 
     // 地面
     std::unique_ptr< Ground> ground_;

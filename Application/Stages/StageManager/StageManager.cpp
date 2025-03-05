@@ -6,14 +6,18 @@ void StageManager::Initialize(Camera* camera)
 	camera_ = camera;
 	InitJson();
 	currentStage_ = stageVector_[0];
-	objManager_.Initialize(camera_);
-	objManager_.InitStageJson(currentStage_);
+	stageObjManager_.Initialize(camera_);
+	stageObjManager_.InitStageJson(currentStage_);
+	stageObjManager_.SetModelName("unitCube.obj");
+	stageObjManager_.SetModelName("unitSphere.obj");
+	stageObjManager_.SetModelName("player.obj");
+
 }
 
 void StageManager::Update()
 {
 	SelectStage();
-	objManager_.Update(currentStage_);
+	stageObjManager_.Update(currentStage_);
 }
 
 void StageManager::InitJson()
@@ -30,13 +34,15 @@ void StageManager::SelectStage()
 #ifdef _DEBUG
 	ImGui::Begin("stage");
 	if (ImGui::Button("Add Stage")) {
-		totalStageNum_++;
 		stageVector_.push_back("Stage" + std::to_string(totalStageNum_));
+		totalStageNum_++;
+		jsonManager_->Save();
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("Sub Stage")) {
 		totalStageNum_--;
 		stageVector_.pop_back();
+		jsonManager_->Save();
 	}
 	static int comboCurrentStage = 0;
 	std::vector<const char*> stages;
@@ -44,14 +50,14 @@ void StageManager::SelectStage()
 		stages.push_back(stage.c_str());
 	}
 	static std::string beforeStage = currentStage_;
-	if (ImGui::Combo("StageSelect", &comboCurrentStage, stages.data(), totalStageNum_)) {
+	if (ImGui::Combo("StageSelector", &comboCurrentStage, stages.data(), totalStageNum_)) {
 		currentStage_ = stageVector_[comboCurrentStage];
 		if (currentStage_ == beforeStage)
 		{
 		}
 		else
 		{
-			objManager_.InitStageJson(currentStage_);
+			stageObjManager_.InitStageJson(currentStage_);
 		}
 	}
 	ImGui::Text("CurrentStage : %s", currentStage_.c_str());
@@ -61,5 +67,5 @@ void StageManager::SelectStage()
 
 void StageManager::Draw()
 {
-	objManager_.Draw();
+	stageObjManager_.Draw();
 }

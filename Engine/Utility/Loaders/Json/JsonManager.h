@@ -68,7 +68,7 @@ public:
 	template <typename T>
 	void ChildRegister(std::string parentFileName, std::string childName, const std::string& name, T* ptr);
 
-	void ChildResset(std::string parentFileName, std::string childName);
+	void ChildReset(std::string parentFileName, std::string childName);
 
 
 	void ClearRegister(std::string parentFileName);
@@ -99,7 +99,7 @@ inline void JsonManager::ChildRegister(std::string parentFileName, std::string c
 {
 	if (instances.find(parentFileName) != instances.end()) // 親ファイルがあるかチェック
 	{
-		instances[parentFileName]->child_.insert({ childName, false });
+		instances[parentFileName]->child_.insert({ childName, true });
 		instances[parentFileName]->Register(childName + " : " + name, ptr);
 	}
 }

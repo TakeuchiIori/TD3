@@ -8,7 +8,7 @@ void StageObjectManager::Initialize(Camera* camera)
 void StageObjectManager::ResetObjList(std::string& stageName)
 {
 	for (auto&& obj : stageObjects_) {
-		jsonManager_[stageName]->ChildResset(stageName, obj->GetName());
+		jsonManager_[stageName]->ChildReset(stageName, obj->GetName());
 		obj.reset();
 	}
 	stageObjects_.clear();
@@ -21,6 +21,7 @@ void StageObjectManager::Update(std::string& stageName)
 	if (ImGui::Button("Add Obj")) {
 		AddObject(stageName);
 	}
+	ObjectModelSetting(stageName);
 	ImGui::End();
 #endif // _DEBUG
 	for (auto&& obj : stageObjects_) {
@@ -68,4 +69,47 @@ void StageObjectManager::Draw()
 	for (auto&& obj : stageObjects_) {
 		obj->Draw();
 	}
+}
+
+void StageObjectManager::ObjectModelSetting(std::string& stageName)
+{
+#ifdef _DEBUG
+	ImGui::Begin("ModelSetting");
+
+	ImGui::Text("CurrentStage : %s", stageName.c_str());
+
+	std::vector<const char*> models;
+	for (const auto& model : modelList_) {
+		models.push_back(model);
+	}
+
+	static std::unordered_map<std::string, int> comboCurrentModelMap;
+
+	for (auto&& obj : stageObjects_) {
+
+		std::string objName = obj->GetName();
+
+		// 各オブジェクトごとに選択状態を保持する
+		if (comboCurrentModelMap.find(objName) == comboCurrentModelMap.end()) {
+			comboCurrentModelMap[objName] = 0;
+		}
+
+		// CollapsingHeader に一意のIDを付与
+		std::string headerLabel = objName + "##" + std::to_string(obj->GetId());
+
+		//ImGui::SetNextTreeNodeOpen(true, ImGuiSetCond_Once);
+		if (ImGui::TreeNode(headerLabel.c_str()))
+		{
+			ImGui::Combo(obj->GetName().c_str(), &comboCurrentModelMap[objName], models.data(), modelList_.size());
+			std::string a = obj->GetName().c_str();
+			a += " : Apply";
+			if (ImGui::Button(a.c_str()))
+			{
+				obj->SetModel(models[comboCurrentModelMap[objName]]);
+			}
+			ImGui::TreePop();
+		}
+	}
+	ImGui::End();
+#endif // _DEBUG
 }
