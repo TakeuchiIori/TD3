@@ -69,6 +69,28 @@ public:
 private:
 
     /// <summary>
+    /// 3Dオブジェクトの描画
+    /// </summary>
+    void DrawObject();
+
+    /// <summary>
+    /// 2Dスプライトの描画
+    /// </summary>
+    void DrawSprite();
+
+    /// <summary>
+    /// アニメーション描画
+    /// </summary>
+    void DrawAnimation();
+
+    /// <summary>
+    /// 線描画
+    /// </summary>
+    void DrawLine();
+
+private:
+
+    /// <summary>
     /// カメラモードを更新する
     /// </summary>
     void UpdateCameraMode();
@@ -87,26 +109,75 @@ private:
 
 
 private:
-    // カメラ
+    /// <summary>
+    /// オクルージョンクエリの初期化
+    /// </summary>
+    void InitializeOcclusionQuery();
+
+    /// <summary>
+    /// 読み取り開始
+    /// </summary>
+    void BeginOcclusionQuery(UINT queryIndex);
+
+    /// <summary>
+    /// 読み取りの終了
+    /// </summary>
+    void EndOcclusionQuery(UINT queryIndex);
+
+    /// <summary>
+    /// オクルージョンクエリの解決
+    /// </summary>
+    void ResolvedOcclusionQuery();
+
+private:
+    /*=================================================================
+
+                               カメラ関連
+
+    =================================================================*/
     CameraMode cameraMode_;
     std::shared_ptr<Camera> sceneCamera_;
-	//std::shared_ptr<Camera> playerCamera_;
     CameraManager cameraManager_;
-	FollowCamera followCamera_;
+    FollowCamera followCamera_;
     TopDownCamera topDownCamera_;
     std::unique_ptr<PlayerCamera> playerCamera_;
     // サウンド
+
+    /*=================================================================
+
+                               サウンド関連
+
+    =================================================================*/
     Audio::SoundData soundData;
     IXAudio2SourceVoice* sourceVoice;
-    // パーティクルエミッター
+
+    /*=================================================================
+
+                              パーティクル関連
+
+    =================================================================*/
     std::unique_ptr<ParticleEmitter> particleEmitter_[2];
     Vector3 emitterPosition_;
     uint32_t particleCount_;
 
+    /*=================================================================
+
+                               スプライト関連
+
+    =================================================================*/
     Vector3 weaponPos;
-
     std::unique_ptr<Sprite> sprite_;
+    std::vector<std::unique_ptr<Sprite>> sprites;
 
+    /*=================================================================
+
+                               オブジェクト関連
+
+    =================================================================*/
+    std::unique_ptr<Object3d> test_;
+    std::unique_ptr<Picture> picture_;
+    WorldTransform testWorldTransform_;
+    std::unique_ptr<Ground> ground_;
 
     StageManager stageManager_;
 
@@ -114,20 +185,33 @@ private:
     // 3Dモデル
     std::unique_ptr<Player> player_;
 
-    // 地面
-    std::unique_ptr< Ground> ground_;
+    /*=================================================================
 
-    // 2Dスプライト
-    std::vector<std::unique_ptr<Sprite>> sprites;
+                                   線
 
-    std::unique_ptr<Picture> picture_;
-
-    // Line
+    =================================================================*/
     std::unique_ptr<Line> line_;
     std::unique_ptr<Line> boneLine_;
-    Vector3 start_ = { 0.0f,0.0f,0.0f };
-    Vector3 end_ = { 10.0f,0.0f,10.0f };
+    Vector3 start_ = { 0.0f, 0.0f, 0.0f };
+    Vector3 end_ = { 10.0f, 0.0f, 10.0f };
 
-     bool isClear_ = false;
- 
+    /*=================================================================
+
+                                 その他
+
+    =================================================================*/
+
+    bool isClear_ = false;
+
+private:
+    /*=================================================================
+
+                            オクルージョンクエリ
+
+    =================================================================*/
+    Microsoft::WRL::ComPtr<ID3D12QueryHeap> queryHeap_;
+    Microsoft::WRL::ComPtr<ID3D12Resource> queryResultBuffer_;
+    std::vector<UINT64> occlusionResults_;                          // オブジェクトごとに結果を保持
+    uint32_t queryCount_ = 2;                                       // オクルージョンクエリの数
+    ID3D12GraphicsCommandList* commandList_;
 };
