@@ -136,69 +136,9 @@ void Picture::EnsureDirectoryExists(const std::wstring& path) {
 }
 
 void Picture::Update() {
-    if (shouldTakeScreenshot_) {
-        if (useCameraView_ && camera_) {
-            TakeCameraViewScreenshot();
-        } else {
-            TakeScreenshot();
-        }
-        shouldTakeScreenshot_ = false;
-    }
-}
 
-void Picture::TakeScreenshot() {
-    // 最大枚数チェック
-    if (pictureNumber_ >= MAX_SCREENSHOTS) {
-        pictureNumber_ = 0;
-    }
-    
-    // スワップチェインリソースを取得
-    auto swapChainResources = dxCommon_->GetOffScreenResource();
-    UINT backBufferIndex = dxCommon_->GetCurrentBackBufferIndex();
-    
-    // DirectXTex を使って画像をキャプチャ（バリア遷移も含めて内部で処理）
-    DirectX::ScratchImage image;
-    HRESULT hr = DirectX::CaptureTexture(
-        commandQueue_.Get(),
-        swapChainResources.Get(),
-        false,
-        image,
-        D3D12_RESOURCE_STATE_PRESENT,    // 現在の状態
-        D3D12_RESOURCE_STATE_PRESENT     // キャプチャ後に戻す状態
-    );
-    
-    if (FAILED(hr)) {
-        return;
-    }
-    
-    // イメージデータの確認
-    const DirectX::Image* images = image.GetImages();
-    size_t imageCount = image.GetImageCount();
-    if (!images || imageCount == 0) {
-        return;
-    }
-    
-    // PNG に保存
-    std::wstringstream ss;
-    ss << filePath_ << L"/"
-       << savePath_ << L"/"
-       << filePrefix_ << L"_"
-       << std::setw(4) << std::setfill(L'0') << pictureNumber_
-       << png_ext_;
-    std::wstring fullPath = ss.str();
-    
-    hr = DirectX::SaveToWICFile(
-        images,
-        imageCount,
-        DirectX::WIC_FLAGS_FORCE_SRGB,
-        GUID_ContainerFormatPng,
-        fullPath.c_str()
-    );
-    
-    // 成功したら通し番号をインクリメント
-    if (SUCCEEDED(hr)) {
-        pictureNumber_++;
-    }
+   TakeCameraViewScreenshot();
+
 }
 
 void Picture::TakeCameraViewScreenshot() {
@@ -297,7 +237,7 @@ void Picture::TakeCameraViewScreenshot() {
     std::wstringstream ss;
     ss << filePath_ << L"/"
        << savePath_ << L"/"
-       << L"camera_view_" << filePrefix_ << L"_"
+       << L"GameTitle_" << filePrefix_ << L""
        << std::setw(4) << std::setfill(L'0') << pictureNumber_
        << png_ext_;
     std::wstring fullPath = ss.str();

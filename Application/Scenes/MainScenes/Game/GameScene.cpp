@@ -104,9 +104,7 @@ void GameScene::Update()
     CollisionManager::GetInstance()->UpdateWorldTransform();
 
 	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
-        picture_->TriggerScreenshot(true);
 		picture_->Update();
-	
     }
 
     // enemy_->Update();
