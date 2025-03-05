@@ -169,17 +169,22 @@ void GameScene::Draw()
     DrawAnimation();
     DrawLine();
 
+}
+
+void GameScene::DrawOffScreen()
+{
+    //----------
+    // Sprite
+    //----------
+    SpriteCommon::GetInstance()->DrawPreference();
+    DrawSprite();
+
 
     //----------
     // Particle
     //----------
     ParticleManager::GetInstance()->Draw();
 
-    //----------
-    // Sprite
-    //----------
-    SpriteCommon::GetInstance()->DrawPreference();
-    DrawSprite();
 }
 
 void GameScene::DrawObject()
@@ -198,7 +203,7 @@ void GameScene::DrawObject()
 
 void GameScene::DrawSprite()
 {
-    //sprite_->Draw();
+    sprite_->Draw();
 }
 
 void GameScene::DrawAnimation()

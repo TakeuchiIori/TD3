@@ -292,6 +292,7 @@ void DirectXCommon::PreDrawScene()
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetDSVCPUDescriptorHandle(0);
 	BeginRenderTargetRTV(rtvHandles_[2], &dsvHandle);
 	// クリア処理
+	commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex], false, &dsvHandle);
 	commandList_->ClearRenderTargetView(rtvHandles_[2], renderTargetClearColor_.Color, 0, nullptr);
 	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
@@ -312,6 +313,7 @@ void DirectXCommon::PreDrawImGui()
 
 	BeginRenderTargetRTV(rtvHandles_[backBufferIndex], nullptr);
 	float clearColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex], false, &dsvHandle);
 	commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex], clearColor, 0, nullptr);
 
 	commandList_->RSSetViewports(1, &viewport_);
@@ -323,7 +325,7 @@ void DirectXCommon::PostDraw()
 {
 	HRESULT hr;
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
-	TransitionBarrier(depthStencilResource_.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+	
 
 	// バックバッファを表示用に変更
 	TransitionBarrier(swapChainResources_[backBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
@@ -350,6 +352,11 @@ void DirectXCommon::PostDraw()
 	assert(SUCCEEDED(hr));
 	hr = commandList_->Reset(commandAllocator_.Get(), nullptr);
 	assert(SUCCEEDED(hr));
+}
+
+void DirectXCommon::DepthBarrier()
+{
+	TransitionBarrier(depthStencilResource_.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 }
 
 void DirectXCommon::WaitForGpu() {

@@ -153,14 +153,14 @@ void Picture::TakeScreenshot() {
     }
     
     // スワップチェインリソースを取得
-    auto swapChainResources = dxCommon_->GetSwapChainResources();
+    auto swapChainResources = dxCommon_->GetOffScreenResource();
     UINT backBufferIndex = dxCommon_->GetCurrentBackBufferIndex();
     
     // DirectXTex を使って画像をキャプチャ（バリア遷移も含めて内部で処理）
     DirectX::ScratchImage image;
     HRESULT hr = DirectX::CaptureTexture(
         commandQueue_.Get(),
-        swapChainResources[backBufferIndex].Get(),
+        swapChainResources.Get(),
         false,
         image,
         D3D12_RESOURCE_STATE_PRESENT,    // 現在の状態
@@ -230,7 +230,7 @@ void Picture::TakeCameraViewScreenshot() {
     // メインのレンダーターゲットからカメラビュー用レンダーターゲットへコピー
     // ※実際のゲームエンジンでは、ここでカメラの視点からシーンを再レンダリングすることも可能
     
-    auto swapChainResources = dxCommon_->GetSwapChainResources();
+    auto swapChainResources = dxCommon_->GetOffScreenResource();
     UINT backBufferIndex = dxCommon_->GetCurrentBackBufferIndex();
     
     // リソースバリア設定
@@ -238,8 +238,8 @@ void Picture::TakeCameraViewScreenshot() {
     
     // バックバッファを読み取り用に
     barriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-    barriers[0].Transition.pResource = swapChainResources[backBufferIndex].Get();
-    barriers[0].Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+    barriers[0].Transition.pResource = swapChainResources.Get();
+    barriers[0].Transition.StateBefore = D3D12_RESOURCE_STATE_GENERIC_READ;
     barriers[0].Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
     
     // カメラレンダーターゲットをコピー先用に
@@ -251,11 +251,11 @@ void Picture::TakeCameraViewScreenshot() {
     screenshotCommandList_->ResourceBarrier(2, barriers);
     
     // コピー実行
-    screenshotCommandList_->CopyResource(cameraRenderTarget_.Get(), swapChainResources[backBufferIndex].Get());
+    screenshotCommandList_->CopyResource(cameraRenderTarget_.Get(), swapChainResources.Get());
     
     // リソースバリアを元に戻す
     barriers[0].Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_SOURCE;
-    barriers[0].Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+    barriers[0].Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
     barriers[1].Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
     barriers[1].Transition.StateAfter = D3D12_RESOURCE_STATE_COMMON;
     

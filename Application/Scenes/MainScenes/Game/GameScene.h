@@ -58,6 +58,12 @@ public:
     /// </summary>
     void Draw() override;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    void DrawOffScreen() override;
+
+
     Matrix4x4 GetViewProjection() override { return sceneCamera_->viewProjectionMatrix_; }
 
 private:
