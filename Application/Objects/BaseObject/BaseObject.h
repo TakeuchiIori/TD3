@@ -5,30 +5,29 @@
 #include "WorldTransform/WorldTransform.h"
 #include "Systems/Camera/Camera.h"
 
-class Ground
+class BaseObject
 {
 public:
-
+	virtual ~BaseObject() {};
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(Camera* camera);
+	virtual void Initialize(Camera* camera) = 0;
 
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update();
+	virtual void Update() = 0;
 
 	/// <summary>
 	/// 描画
 	/// </summary>
-	void Draw();
+	virtual void Draw() = 0;
 
-
-private:
+protected:
 	// ポインタ
 	std::unique_ptr<Object3d> obj_;
-	Camera* camera_ = nullptr;
+	Camera* camera_;
 	// ワールドトランスフォーム
 	WorldTransform worldTransform_;
 };
