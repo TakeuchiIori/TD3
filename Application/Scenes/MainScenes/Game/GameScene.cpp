@@ -31,7 +31,7 @@ void GameScene::Initialize()
 	//playerCamera_ = cameraManager_.AddCamera();
 
     // 初期カメラモード設定
-    cameraMode_ = CameraMode::DEFAULT;
+    cameraMode_ = CameraMode::FOLLOW;
 
     CollisionManager::GetInstance()->Initialize();
 
