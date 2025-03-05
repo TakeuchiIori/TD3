@@ -538,3 +538,16 @@ Matrix4x4 TranslationMatrixFromVector3(const Vector3& translate)
 
 	return translationMatrix;
 }
+
+// Matrix4x4からDirectX::XMMATRIXに変換する関数
+DirectX::XMMATRIX ConvertToXMMATRIX(const Matrix4x4& matrix) {
+	DirectX::XMMATRIX result;
+
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			result.r[i].m128_f32[j] = matrix.m[i][j];
+		}
+	}
+
+	return result;
+}

@@ -92,6 +92,14 @@ private:
 		const std::wstring& pixelShaderPath = L"",
 		const std::string& pipelineKey = ""
 	);
+	void CreatePSO_Edge(
+		const std::wstring& pixelShaderPath = L"",
+		const std::string& pipelineKey = ""
+	);
+	void CreatePSO_DepthOutLine(
+		const std::wstring& pixelShaderPath = L"",
+		const std::string& pipelineKey = ""
+	);
 
 private:
 	PipelineManager(const  PipelineManager&) = delete;

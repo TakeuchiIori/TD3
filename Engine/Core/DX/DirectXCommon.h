@@ -101,24 +101,15 @@ private:
 	/// <summary>
 	/// バリア
 	/// </summary>
-	/// <param name="resource"></param>
-	/// <param name="beforeState"></param>
-	/// <param name="afterState"></param>
-	/// <param name="subresource"></param>
-	void TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES newState);
-	void TransitionResource(ID3D12Resource* pResource, D3D12_RESOURCE_STATES Before, D3D12_RESOURCE_STATES After);
+	void TransitionBarrier(ID3D12Resource* pResource, D3D12_RESOURCE_STATES Before, D3D12_RESOURCE_STATES After);
 	void BeginRenderTargetRTV(const D3D12_CPU_DESCRIPTOR_HANDLE& rtvHandle, const D3D12_CPU_DESCRIPTOR_HANDLE* dsvHandle = nullptr);
-
-	// リソース状態管理
 	
-	void TransitionOffScreen(D3D12_RESOURCE_STATES newState);
 
 public:
 	
 	/// <summary>
 	/// 描画前処理
 	/// </summary>
-	void RenderTexture();
 	void PreDrawScene();
 	void PreDrawImGui();
 	
@@ -126,6 +117,11 @@ public:
 	/// 描画後処理
 	/// </summary>
 	void PostDraw();
+
+	/// <summary>
+	/// GPUに
+	/// </summary>
+	void WaitForGpu();
 
 
 public: // メンバ関数
@@ -166,11 +162,13 @@ public: // メンバ関数
 	D3D12_GPU_DESCRIPTOR_HANDLE GetDSVGPUDescriptorHandle(uint32_t index);
 
 	/// <summary>
-	/// オフスクリーンのGPUハンドルを取得
+	/// ハンドルを取得（OffScreen）
+	/// ハンドルを取得（Depth）
 	/// </summary>
-	/// <returns></returns>
 	D3D12_GPU_DESCRIPTOR_HANDLE GetOffScreenGPUHandle() { return offScreenSrvHandleGPU_; }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetOffScreenCPUHandle() { return offScreenSrvHandleCPU_; }
+	D3D12_GPU_DESCRIPTOR_HANDLE GetDepthGPUHandle() { return depthSrvHandleGPU_; }
+	D3D12_CPU_DESCRIPTOR_HANDLE GetDepthCPUHandle() { return depthSrvHandleCPU_; }
 
 private:
 	/// <summary>
@@ -207,13 +205,22 @@ public:
 	/// </summary>
 	Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages);
 
+
+public:
+
 	/// <summary>
 	/// オフスクリーンのSRVを生成
 	/// </summary>
 	/// <param name="srvManager"></param>
 	void CreateSRVForOffScreen();
 
-	
+	/// <summary>
+	/// Depth用のSRVを生成
+	/// </summary>
+	void CreateSRVDepth();
+	void DepthResourceBarrier();
+
+public:
 
 	/// <summary>
 	/// ログ
@@ -248,6 +255,14 @@ public: // アクセッサ
 	HANDLE GetFenceEvent() { return fenceEvent_; }
 	UINT GetBackBufferCount()const { return  backBufferIndex; }
 
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> GetOffScreenResource() { return offScreenResource_; }
+	D3D12_CLEAR_VALUE GetRenderTargetClearColor() { return renderTargetClearColor_; }
+	uint32_t GetOffScreenSrvIndex() { return offScreenSrvIndex_; }
+	UINT GetCurrentBackBufferIndex() const {
+		// スワップチェーンから現在のバックバッファインデックスを取得
+		return swapChain_->GetCurrentBackBufferIndex();
+	}
 private:
 	/// <summary>
 	/// デフォルトコンストラクタ（シングルトンパターンのためプライベートに設定）
@@ -321,7 +336,9 @@ private:
 
 	=================================================================*/
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;
-
+	uint32_t depthSrvIndex_ = 0;
+	D3D12_CPU_DESCRIPTOR_HANDLE depthSrvHandleCPU_;
+	D3D12_GPU_DESCRIPTOR_HANDLE depthSrvHandleGPU_;
 	/*=================================================================
 	
 								描画設定
@@ -352,7 +369,6 @@ private:
 	=================================================================*/
 	D3D12_CLEAR_VALUE renderTargetClearColor_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> offScreenResource_;
-
 	uint32_t offScreenSrvIndex_ = 0;
 	D3D12_CPU_DESCRIPTOR_HANDLE offScreenSrvHandleCPU_;
 	D3D12_GPU_DESCRIPTOR_HANDLE offScreenSrvHandleGPU_;

@@ -186,6 +186,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Stages\StageManager\StageManager.cpp" />
     <ClCompile Include="Application\Objects\StageObject\StageObjectManager\StageObjectManager.cpp" />
     <ClCompile Include="TestStage.cpp" />
+    <ClCompile Include="Application\SystemsApp\Picture\Picture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -271,6 +272,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Stages\StageManager\StageManager.h" />
     <ClInclude Include="Application\Objects\StageObject\StageObjectManager\StageObjectManager.h" />
     <ClInclude Include="TestStage.h" />
+    <ClInclude Include="Application\SystemsApp\Picture\Picture.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
