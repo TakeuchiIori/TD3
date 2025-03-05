@@ -45,6 +45,7 @@ void GameScene::Initialize()
 
 	picture_ = std::make_unique<Picture>();
 	picture_->Initialize();
+	picture_->SetCamera(sceneCamera_.get());
 
 	GameTime::GetInstance()->Initialize();
     
@@ -84,8 +85,8 @@ void GameScene::Initialize()
 
     sprite_ = std::make_unique<Sprite>();
     sprite_->Initialize("Resources/Textures/KoboRB.png");
-    sprite_->SetSize(Vector2{ 1280.0f,720.0f });
-    sprite_->SetTextureSize(Vector2{ 1280,720 });
+    sprite_->SetSize(Vector2{ 100.0f,500.0f });
+   // sprite_->SetTextureSize(Vector2{ 1280,720 });
 
     ParticleManager::GetInstance()->SetCamera(sceneCamera_.get());
 
@@ -101,6 +102,7 @@ void GameScene::Update()
     CollisionManager::GetInstance()->UpdateWorldTransform();
 
 	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
+        picture_->TriggerScreenshot(true);
 		picture_->Update();
 	
     }
@@ -197,7 +199,7 @@ ParticleManager::GetInstance()->Draw();
     /// <summary>
     /// ここから描画可能です
     /// </summary>
-    //sprite_->Draw();
+    sprite_->Draw();
 
 #pragma endregion
 

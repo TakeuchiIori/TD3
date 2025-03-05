@@ -118,6 +118,11 @@ public:
 	/// </summary>
 	void PostDraw();
 
+	/// <summary>
+	/// GPUに
+	/// </summary>
+	void WaitForGpu();
+
 
 public: // メンバ関数
 	/// <summary>
