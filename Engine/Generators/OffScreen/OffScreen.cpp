@@ -20,6 +20,7 @@ void OffScreen::Draw()
 	materialData_->Inverse = Inverse(projectionInverse_);
 	dxCommon_->GetCommandList()->SetPipelineState(pipelineState_.Get());
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
+	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, dxCommon_->GetOffScreenGPUHandle());
 
 	//dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, gaussResource_->GetGPUVirtualAddress());

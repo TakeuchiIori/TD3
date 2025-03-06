@@ -99,6 +99,11 @@ void TitleScene::Draw()
 
 }
 
+void TitleScene::DrawOffScreen()
+{
+
+}
+
 /// <summary>
 /// 解放処理
 /// </summary>

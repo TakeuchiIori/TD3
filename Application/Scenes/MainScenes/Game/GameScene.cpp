@@ -104,9 +104,7 @@ void GameScene::Update()
     CollisionManager::GetInstance()->UpdateWorldTransform();
 
 	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
-        picture_->TriggerScreenshot(true);
 		picture_->Update();
-	
     }
     stageManager_.Update();
 
@@ -194,17 +192,22 @@ void GameScene::Draw()
     DrawAnimation();
     DrawLine();
 
+}
+
+void GameScene::DrawOffScreen()
+{
+    //----------
+    // Sprite
+    //----------
+    SpriteCommon::GetInstance()->DrawPreference();
+    DrawSprite();
+
 
     //----------
     // Particle
     //----------
     ParticleManager::GetInstance()->Draw();
 
-    //----------
-    // Sprite
-    //----------
-    SpriteCommon::GetInstance()->DrawPreference();
-    DrawSprite();
 }
 
 void GameScene::DrawObject()
@@ -229,7 +232,7 @@ void GameScene::DrawObject()
 
 void GameScene::DrawSprite()
 {
-    //sprite_->Draw();
+    sprite_->Draw();
 }
 
 void GameScene::DrawAnimation()
