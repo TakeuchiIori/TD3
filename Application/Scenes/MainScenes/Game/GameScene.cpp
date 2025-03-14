@@ -34,14 +34,8 @@ void GameScene::Initialize()
     cameraMode_ = CameraMode::DEFAULT;
 
     CollisionManager::GetInstance()->Initialize();
-    // 線
-    line_ = std::make_unique<Line>();
-    line_->Initialize();
-    line_->SetCamera(sceneCamera_.get());
 
-    boneLine_ = std::make_unique<Line>();
-    boneLine_->Initialize();
-    boneLine_->SetCamera(sceneCamera_.get());
+    stageManager_.Initialize(sceneCamera_.get());
 
 	picture_ = std::make_unique<Picture>();
 	picture_->Initialize();
@@ -50,7 +44,15 @@ void GameScene::Initialize()
 	GameTime::GetInstance()->Initialize();
     
 	followCamera_.Initialize();
+
+    playerCamera_ = std::make_unique<PlayerCamera>();
+    playerCamera_->Initialize();
+
     // 各オブジェクトの初期化
+    player_ = std::make_unique<Player>();
+    player_->Initialize(sceneCamera_.get());
+    followCamera_.SetTarget(player_->GetWorldTransform());
+    playerCamera_->SetTarget(player_->GetWorldTransform());
 
     mpInfo_ = std::make_unique<MapChipInfo>();
     mpInfo_->Initialize();
@@ -59,16 +61,14 @@ void GameScene::Initialize()
     // 地面
     ground_ = std::make_unique<Ground>();
     ground_->Initialize(sceneCamera_.get());
-    
-    // test
+
     test_ = std::make_unique<Object3d>();
     test_->Initialize();
-    test_->SetModel("walk.gltf",true);
-    //test_->SetModel("sneakWalk.gltf", true);
+    test_->SetModel("walk.gltf", true);
+    //test->SetModel("sneakWalk.gltf", true);
     testWorldTransform_.Initialize();
+    
    
-
-
 
     // パーティクル
     emitterPosition_ = Vector3{ 0.0f, 0.0f, 0.0f }; // エミッタの初期位置
@@ -109,10 +109,36 @@ void GameScene::Update()
 	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
 		picture_->Update();
     }
+    stageManager_.Update();
+
+    test_->UpdateAnimation();
+    testWorldTransform_.UpdateMatrix();
+
+    player_->Update();
+    player_->SetFPSMode(cameraMode_ == CameraMode::FPS);
+
+    if (Input::GetInstance()->TriggerKey(DIK_L))
+    {
+        if (cameraMode_ == CameraMode::FPS) 
+        {
+            cameraMode_ = CameraMode::FOLLOW;
+        }
+        else
+        {
+            cameraMode_ = CameraMode::FPS;
+        }
+    }
+
+    if (Input::GetInstance()->PushKey(DIK_UP)) {
+        sceneCamera_->SetFovY(sceneCamera_->GetFovY() - 0.001f);
+    }
+    if (Input::GetInstance()->PushKey(DIK_DOWN)) {
+        sceneCamera_->SetFovY(sceneCamera_->GetFovY() + 0.001f);
+    }
 
     // enemy_->Update();
+
     ground_->Update();
-    test_->UpdateAnimation();
 
 
     particleEmitter_[0]->Emit();
@@ -131,7 +157,6 @@ void GameScene::Update()
 
     JsonManager::ImGuiManager();
     // ワールドトランスフォーム更新
-    testWorldTransform_.UpdateMatrix();
     cameraManager_.UpdateAllCameras();
 
     //=====================================================//
@@ -201,6 +226,12 @@ void GameScene::DrawObject()
     ground_->Draw();
     commandList_->EndQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
 
+
+
+    stageManager_.Draw();
+
+    player_->Draw();
+
 }
 
 void GameScene::DrawSprite()
@@ -225,10 +256,10 @@ void GameScene::DrawAnimation()
 void GameScene::DrawLine()
 {
     // 骨描画
-    if (test_ && test_->GetModel()->GetSkeleton().joints.size() > 0) {
+   /* if (test_ && test_->GetModel()->GetSkeleton().joints.size() > 0) {
         test_->DrawSkeleton(test_->GetModel()->GetSkeleton(), *boneLine_);
         boneLine_->DrawLine();
-    }
+    }*/
 }
 
 
@@ -297,6 +328,12 @@ void GameScene::UpdateCamera()
     case CameraMode::FPS:
     {
 
+        playerCamera_->Update();
+        sceneCamera_->viewMatrix_ = playerCamera_->matView_;
+        sceneCamera_->transform_.translate = playerCamera_->translate_;
+        sceneCamera_->transform_.rotate = playerCamera_->rotate_;
+
+        sceneCamera_->UpdateMatrix();
     }
     break;
 

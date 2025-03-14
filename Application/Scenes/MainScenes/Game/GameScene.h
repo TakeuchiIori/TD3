@@ -25,6 +25,12 @@
 
 // App
 #include "../SystemsApp/Picture/Picture.h"
+#include "../../../SystemsApp/Cameras/PlayerCamera/PlayerCamera.h"
+
+// Application
+#include "Player/Player.h"
+#include "../Stages/StageManager/StageManager.h"
+
 
 enum class CameraMode
 {
@@ -140,6 +146,8 @@ private:
     CameraManager cameraManager_;
     FollowCamera followCamera_;
     TopDownCamera topDownCamera_;
+    std::unique_ptr<PlayerCamera> playerCamera_;
+    // サウンド
 
     /*=================================================================
 
@@ -176,6 +184,12 @@ private:
     std::unique_ptr<Picture> picture_;
     WorldTransform testWorldTransform_;
     std::unique_ptr<Ground> ground_;
+
+    StageManager stageManager_;
+
+
+    // 3Dモデル
+    std::unique_ptr<Player> player_;
 
     /*=================================================================
 

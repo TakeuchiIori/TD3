@@ -20,6 +20,7 @@ void FollowCamera::Update()
 
 	FollowProsess();
 	
+	ImGui();
 	
 	//jsonManager_->ImGui("FollowCamera");
 }
@@ -75,6 +76,7 @@ void FollowCamera::InitJson()
 {
 	jsonManager_ = std::make_unique<JsonManager>("FollowCamera", "Resources/JSON");
 	jsonManager_->Register("OffSet Translate", &offset_);
+	jsonManager_->Register("Rotate", &rotate_);
 }
 
 void FollowCamera::JsonImGui()
@@ -84,15 +86,15 @@ void FollowCamera::JsonImGui()
 
 void FollowCamera::ImGui()
 {
-	//ImGui::Begin("FollowCamera Info");
+	/*ImGui::Begin("FollowCamera Info");
 
-	//ImGui::DragFloat3("Translate", &translate_.x);
+	ImGui::DragFloat3("Translate", &translate_.x);
 
-	//ImGui::DragFloat3("Rotation", &rotate_.x);
+	ImGui::DragFloat3("Rotation", &rotate_.x);
 
-	//ImGui::DragFloat3("Scale", &scale_.x);
+	ImGui::DragFloat3("Scale", &scale_.x);
 
-	//ImGui::End();
+	ImGui::End();*/
 }
 
 
