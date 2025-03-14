@@ -16,7 +16,7 @@
 #include "Drawer/LineManager/Line.h"
 #include "Ground/Ground.h"
 #include "../Transitions/Fade/Fade.h"
-
+#include "Systems/MapChip/MapChipInfo.h"
 
 // Math
 #include "Vector3.h"
@@ -206,7 +206,7 @@ private:
                                  その他
 
     =================================================================*/
-
+    std::unique_ptr<MapChipInfo> mpInfo_;
     bool isClear_ = false;
 
 private:
