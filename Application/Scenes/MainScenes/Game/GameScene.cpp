@@ -35,7 +35,7 @@ void GameScene::Initialize()
 
     CollisionManager::GetInstance()->Initialize();
 
-    stageManager_.Initialize(sceneCamera_.get());
+    //stageManager_.Initialize(sceneCamera_.get());
 
 	picture_ = std::make_unique<Picture>();
 	picture_->Initialize();
@@ -108,7 +108,7 @@ void GameScene::Update()
 		picture_->Update();
 	
     }
-    stageManager_.Update();
+    //stageManager_.Update();
 
     test_->UpdateAnimation();
     testWorldTransform_.UpdateMatrix();
@@ -221,7 +221,7 @@ void GameScene::DrawObject()
 
 
 
-    stageManager_.Draw();
+    //stageManager_.Draw();
 
     player_->Draw();
 
