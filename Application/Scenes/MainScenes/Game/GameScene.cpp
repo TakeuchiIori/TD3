@@ -52,6 +52,9 @@ void GameScene::Initialize()
 	followCamera_.Initialize();
     // 各オブジェクトの初期化
 
+    mpInfo_ = std::make_unique<MapChipInfo>();
+    mpInfo_->Initialize();
+    mpInfo_->SetCamera(sceneCamera_.get());
     
     // 地面
     ground_ = std::make_unique<Ground>();
@@ -99,7 +102,7 @@ void GameScene::Initialize()
 /// </summary>
 void GameScene::Update()
 {
-
+	mpInfo_->Update();
     CheckAllCollisions();
     CollisionManager::GetInstance()->UpdateWorldTransform();
 
@@ -189,6 +192,7 @@ void GameScene::DrawObject()
 {
     CollisionManager::GetInstance()->Draw();
 
+	mpInfo_->Draw();
     // オクルージョンクエリ開始
     uint32_t queryIndex = 0;
 
