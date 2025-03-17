@@ -1,0 +1,34 @@
+{
+    "anchorPoint": {
+        "x": 0.0,
+        "y": 0.0
+    },
+    "color": {
+        "a": 1.0,
+        "b": 1.0,
+        "g": 1.0,
+        "r": 1.0
+    },
+    "flipX": false,
+    "flipY": false,
+    "name": "UIButton",
+    "position": {
+        "x": 227.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "rotation": {
+        "x": 12.100000381469727,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "scale": {
+        "x": 16.0,
+        "y": 163.0
+    },
+    "textureLeftTop": {
+        "x": 0.0,
+        "y": 0.0
+    },
+    "texturePath": "./Resources/images/white.png"
+}
