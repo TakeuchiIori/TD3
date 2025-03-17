@@ -95,6 +95,12 @@ void GameScene::Initialize()
 
 
     InitializeOcclusionQuery();
+
+    uiBase_ = std::make_unique<UIBase>("UIButton");
+    uiBase_->Initialize("Resources/JSON/UI/Button.json");
+
+    uiSub_ = std::make_unique<UIBase>("UISub");
+    uiSub_->Initialize("Resources/JSON/UI/Sub.json");
 }
 
 /// <summary>
@@ -168,7 +174,8 @@ void GameScene::Update()
 
 
 	sprite_->Update();
-  
+    uiBase_->Update();
+    uiSub_->Update();
    
 }
 
@@ -237,6 +244,8 @@ void GameScene::DrawObject()
 void GameScene::DrawSprite()
 {
     sprite_->Draw();
+    uiBase_->Draw();
+    uiSub_->Draw();
 }
 
 void GameScene::DrawAnimation()
