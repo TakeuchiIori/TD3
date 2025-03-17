@@ -1,5 +1,5 @@
 #include "WinApp.h"
-
+#define IDI_ICON1 101
 WinApp* WinApp::instance = nullptr;
 
 #ifdef _DEBUG
@@ -55,6 +55,8 @@ void WinApp::Initialize()
 	wc.hInstance = GetModuleHandle(nullptr);
 	// カーソル
 	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	// アイコン
+	wc.hIcon = LoadIcon(wc.hInstance, MAKEINTRESOURCE(IDI_ICON1));			/// メインアイコン
 	// ウィンドウクラスを登録する
 	RegisterClass(&wc);
 
@@ -82,6 +84,9 @@ void WinApp::Initialize()
 	ShowWindow(hwnd, SW_SHOW);
 	// システムタイマーの分解能を上げる
 	timeBeginPeriod(1);
+
+	HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1));
+	SendMessage(GetConsoleWindow(), WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 }
 
 
