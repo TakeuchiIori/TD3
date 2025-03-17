@@ -183,6 +183,7 @@
     <ClInclude Include="Application\SystemsApp\Picture\Picture.h" />
     <ClInclude Include="Engine\Utility\Systems\UI\UIBase.h" />
     <ClInclude Include="Engine\Utility\Systems\UI\UIButton.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />
@@ -193,5 +194,11 @@
     <None Include="Resources\shaders\Skinning.hlsli" />
     <None Include="Resources\shaders\Skinning.PS.hlsl" />
     <None Include="Resources\shaders\Sprite.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DirectXGame.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\Textures\Ico\icon.ico" />
   </ItemGroup>
 </Project>
