@@ -2,10 +2,12 @@
 
 // Engine
 #include "Systems/Input/Input.h"
+#include "PlayerMapCollision.h"
 
 
 // Application
 #include "BaseObject/BaseObject.h"
+#include "PlayerBody.h"
 
 class Player 
 	: BaseObject
@@ -44,6 +46,8 @@ public: // getter&setter
 	// 一人称視点にした場合横を向いているので操作を切り替えるため
 	void SetFPSMode(bool isFPS) { isFPSMode_ = isFPS; }
 
+	void SetMapInfo(MapChipField* mapChipField) { mapCollision_.SetMap(mapChipField); }
+
 private:
 	Input* input_ = nullptr;
 
@@ -57,5 +61,13 @@ private:
 	Vector3 moveDirection_ = { 0.0f,0.0f,0.0f };	// 動く向き
 	float speed_ = 0.3f;							// 動く速度
 	bool isFPSMode_ = false;
+
+	PlayerMapCollision mapCollision_;
+
+	MapChipCollision::ColliderRect colliderRct_;
+
+	MapChipCollision::CollisionFlag collisionFlag_ = MapChipCollision::CollisionFlag::None;
+
+	std::list <std::unique_ptr<PlayerBody>> playerBodys_;
 };
 

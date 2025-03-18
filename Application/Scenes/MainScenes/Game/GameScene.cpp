@@ -57,6 +57,8 @@ void GameScene::Initialize()
     mpInfo_ = std::make_unique<MapChipInfo>();
     mpInfo_->Initialize();
     mpInfo_->SetCamera(sceneCamera_.get());
+
+    player_->SetMapInfo(mpInfo_->GetMapChipField());
     
     // 地面
     ground_ = std::make_unique<Ground>();
