@@ -112,6 +112,12 @@ void Player::Move()
 	if (mapCollision_.GetIsCollision())
 	{
 		moveDirection_ = { 0,0,0 };
+		if (mapCollision_.GetIsCollisionBody()) {
+			for (size_t i = playerBodys_.size(); 2 < playerBodys_.size();) {
+				mapCollision_.ElasePos(playerBodys_.begin()->get()->GetPos());
+				playerBodys_.pop_front();
+			}
+		}
 	}
 
 }

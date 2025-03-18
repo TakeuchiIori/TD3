@@ -21,5 +21,7 @@ public:
 	void Draw() override;
 
 	void SetPos(Vector3 pos) { worldTransform_.translation_ = pos; }
+
+	Vector3 GetPos() { return worldTransform_.translation_; }
 };
 

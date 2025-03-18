@@ -19,6 +19,8 @@ public:
 
     bool GetIsCollision() { return isCollision_; }
 
+    bool GetIsCollisionBody() { return isCollisionBody_; }
+
     bool GetIsPopBody() { return (isPopLeft_ || isPopRight_ || isPopTop_ || isPopBottom_); }
 
     Vector3 GetPopPos() { 
@@ -26,10 +28,16 @@ public:
         return MapChipField::GetMapChipPositionByIndex(popBlock.xIndex, popBlock.yIndex);
     }
 
+    void ElasePos(Vector3 pos) {
+        MapChipField::IndexSet elaseBlock = mapChipField_->GetMapChipIndexSetByPosition(pos);
+        mapChipField_->SetMapChipTypeByIndex(elaseBlock.xIndex, elaseBlock.yIndex, MapChipType::kBlank);
+    }
+
 private:
     bool isCollision_ = false;
 
-    bool isPopBody_ = false;
+    bool isCollisionBody_ = false;
+
     bool isPopLeft_ = false;
     bool isPopRight_ = false;
     bool isPopTop_ = false;

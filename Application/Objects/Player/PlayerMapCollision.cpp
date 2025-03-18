@@ -9,6 +9,7 @@ void PlayerMapCollision::DetectAndResolveCollision(
 {
 	////
 	isCollision_ = false;
+	isCollisionBody_ = false;
 
 	// 速度が大きい場合はサブステップに分割
 	const float maxSafeDisplacement = mapChipField_->GetBlockSize() * 0.5f;
@@ -165,24 +166,36 @@ void PlayerMapCollision::DetectAndResolveCollision(
 					if ((checkFlags & CollisionFlag::Left) && velocity.x > 0 && leftPenetration < minPenetration) {
 						minPenetration = leftPenetration;
 						collisionDirection = CollisionDirection::LeftDir;
+						if (blockType == MapChipType::kBody) {
+							isCollisionBody_ = true;
+						}
 					}
 
 					/// 右方向の衝突チェック
 					if ((checkFlags & CollisionFlag::Right) && velocity.x < 0 && rightPenetration < minPenetration) {
 						minPenetration = rightPenetration;
 						collisionDirection = CollisionDirection::RightDir;
+						if (blockType == MapChipType::kBody) {
+							isCollisionBody_ = true;
+						}
 					}
 
 					/// 上方向の衝突チェック
 					if ((checkFlags & CollisionFlag::Top) && velocity.z > 0 && topPenetration < minPenetration) {
 						minPenetration = topPenetration;
 						collisionDirection = CollisionDirection::TopDir;
+						if (blockType == MapChipType::kBody) {
+							isCollisionBody_ = true;
+						}
 					}
 
 					/// 下方向の衝突チェック
 					if ((checkFlags & CollisionFlag::Bottom) && velocity.z < 0 && bottomPenetration < minPenetration) {
 						minPenetration = bottomPenetration;
 						collisionDirection = CollisionDirection::BottomDir;
+						if (blockType == MapChipType::kBody) {
+							isCollisionBody_ = true;
+						}
 					}
 
 					// 衝突情報を設定
