@@ -119,6 +119,11 @@ public:
 	void PostDraw();
 
 	/// <summary>
+	/// 
+	/// </summary>
+	void DepthBarrier();
+
+	/// <summary>
 	/// GPUに
 	/// </summary>
 	void WaitForGpu();
@@ -258,6 +263,8 @@ public: // アクセッサ
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> GetOffScreenResource() { return offScreenResource_; }
 	D3D12_CLEAR_VALUE GetRenderTargetClearColor() { return renderTargetClearColor_; }
+	Microsoft::WRL::ComPtr<ID3D12Resource> GetDepthStencilResource() { return depthStencilResource_; }
+
 	uint32_t GetOffScreenSrvIndex() { return offScreenSrvIndex_; }
 	UINT GetCurrentBackBufferIndex() const {
 		// スワップチェーンから現在のバックバッファインデックスを取得

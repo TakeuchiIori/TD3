@@ -10,428 +10,180 @@
     <FxCompile Include="Resources\shaders\Sprite.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\Matrix4x4.cpp">
-      <Filter>ソース ファイル\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\MathFunc.cpp">
-      <Filter>ソース ファイル\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Scenes\CoreScenes\Base\BaseScene.cpp">
-      <Filter>ソース ファイル\Application\Scenes\CoreScenes\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Scenes\MainScenes\Title\TitleScene.cpp">
-      <Filter>ソース ファイル\Application\Scenes\MainScenes\Title</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Scenes\MainScenes\Game\GameScene.cpp">
-      <Filter>ソース ファイル\Application\Scenes\MainScenes\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Scenes\CoreScenes\Manager\SceneManager.cpp">
-      <Filter>ソース ファイル\Application\Scenes\CoreScenes\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Scenes\CoreScenes\Factory\SceneFactory.cpp">
-      <Filter>ソース ファイル\Application\Scenes\CoreScenes\Factory</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\DX\DirectXCommon.cpp">
-      <Filter>ソース ファイル\NOIR\Core\DX</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\Framework\Framework.cpp">
-      <Filter>ソース ファイル\NOIR\Core\Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\Framework\MyGame.cpp">
-      <Filter>ソース ファイル\NOIR\Core\Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\WinApp\WinApp.cpp">
-      <Filter>ソース ファイル\NOIR\Core\WinApp</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Generators\Sprite\SpriteCommon.cpp">
-      <Filter>ソース ファイル\NOIR\Generators\Sprite</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Generators\Sprite\Sprite.cpp">
-      <Filter>ソース ファイル\NOIR\Generators\Sprite</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Generators\Object3D\Object3d.cpp">
-      <Filter>ソース ファイル\NOIR\Generators\Object3D</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Generators\Object3D\Object3dCommon.cpp">
-      <Filter>ソース ファイル\NOIR\Generators\Object3D</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Generators\Particle\ParticleEmitter.cpp">
-      <Filter>ソース ファイル\NOIR\Generators\Particle</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Generators\Particle\ParticleManager.cpp">
-      <Filter>ソース ファイル\NOIR\Generators\Particle</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Graphics\WorldTransform\WorldTransform.cpp">
-      <Filter>ソース ファイル\NOIR\Graphics\WorldTransform</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Graphics\LightManager\LightManager.cpp">
-      <Filter>ソース ファイル\NOIR\Graphics\LightManager</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Graphics\Drawer\LineManager\LineManager.cpp">
-      <Filter>ソース ファイル\NOIR\Graphics\Drawer\LineManager</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Graphics\Drawer\LineManager\Line.cpp">
-      <Filter>ソース ファイル\NOIR\Graphics\Drawer\LineManager</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Graphics\SrvManager\SrvManager.cpp">
-      <Filter>ソース ファイル\NOIR\Graphics\SrvManager</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Graphics\PipelineManager\PipelineManager.cpp">
-      <Filter>ソース ファイル\NOIR\Graphics\PipelineManager</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Collision\Collider.cpp">
-      <Filter>ソース ファイル\NOIR\Utility\Collision</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Collision\CollisionManager.cpp">
-      <Filter>ソース ファイル\NOIR\Utility\Collision</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Collision\ContactRecord.cpp">
-      <Filter>ソース ファイル\NOIR\Utility\Collision</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Collision\Effect.cpp">
-      <Filter>ソース ファイル\NOIR\Utility\Collision</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Collision\GlobalVariables.cpp">
-      <Filter>ソース ファイル\NOIR\Utility\Collision</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Debugger\ImGuiManager.cpp">
-      <Filter>ソース ファイル\NOIR\Utility\Debugger</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Debugger\LeakChecker.cpp">
-      <Filter>ソース ファイル\NOIR\Utility\Debugger</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Systems\Audio\Audio.cpp">
-      <Filter>ソース ファイル\NOIR\Utility\Systems\Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Systems\Input\Input.cpp">
-      <Filter>ソース ファイル\NOIR\Utility\Systems\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Systems\Camera\Camera.cpp">
-      <Filter>ソース ファイル\NOIR\Utility\Systems\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Systems\Camera\CameraManager.cpp">
-      <Filter>ソース ファイル\NOIR\Utility\Systems\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Loaders\Texture\TextureManager.cpp">
-      <Filter>ソース ファイル\NOIR\Utility\Loaders\Texture</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Loaders\Model\ModelCommon.cpp">
-      <Filter>ソース ファイル\NOIR\Utility\Loaders\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Loaders\Model\ModelManager.cpp">
-      <Filter>ソース ファイル\NOIR\Utility\Loaders\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Loaders\Model\Model.cpp">
-      <Filter>ソース ファイル\NOIR\Utility\Loaders\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Graphics\PipelineManager\SkinningManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\Quaternion.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\Vector3.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Loaders\Model\Skeleton.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Loaders\Model\Joint.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Loaders\Model\Node.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Loaders\Model\Animation.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Loaders\Model\SkinCluster.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Objects\Ground\Ground.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Scenes\MainScenes\Transitions\Fade\Fade.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Systems\GameTime\HitStop.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\SystemsApp\Cameras\FollowCamera\FollowCamera.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\SystemsApp\Cameras\TopDownCamera\TopDownCamera.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Loaders\Json\JsonManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Systems\GameTime\GameTIme.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Systems\GameTime\ObjectTime.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Scenes\MainScenes\Clear\ClearScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Scenes\MainScenes\Transitions\Base\ISceneTransition.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Scenes\MainScenes\Transitions\Fade\FadeTransition.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Scenes\MainScenes\Transitions\Base\TransitionFactory.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Loaders\Model\Mesh.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Loaders\Model\Material.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Loaders\Model\ModelTest.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Loaders\Model\AnimationSystem.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Utility\Loaders\Model\ModelLoader.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\Easing.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Generators\OffScreen\OffScreen.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\SystemsApp\Picture\Picture.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
+    <ClCompile Include="Application\Objects\Cube\Cube.cpp" />
+    <ClCompile Include="Application\Objects\StageObject\BaseStageObject\BaseStageObject.cpp" />
+    <ClCompile Include="Application\Stages\BaseStage\BaseStage.cpp" />
+    <ClCompile Include="Application\Objects\StageObject\BaseFloorObject\BaseFloorObject.cpp" />
+    <ClCompile Include="Engine\Generators\OffScreen\OffScreen.cpp" />
+    <ClCompile Include="Engine\Utility\Systems\MapChip\MapChipCollision.cpp" />
+    <ClCompile Include="Engine\Utility\Systems\MapChip\MapChipField.cpp" />
+    <ClCompile Include="Engine\Utility\Systems\MapChip\MapChipInfo.cpp" />
+    <ClCompile Include="Math\Easing.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Model\AnimationSystem.cpp" />
+    <ClCompile Include="Application\Scenes\MainScenes\Clear\ClearScene.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Model\Animation.cpp" />
+    <ClCompile Include="Application\Scenes\CoreScenes\Base\BaseScene.cpp" />
+    <ClCompile Include="Application\Scenes\MainScenes\Game\GameScene.cpp" />
+    <ClCompile Include="Application\Scenes\CoreScenes\Manager\SceneManager.cpp" />
+    <ClCompile Include="Application\Scenes\MainScenes\Title\TitleScene.cpp" />
+    <ClCompile Include="Engine\Utility\Systems\Camera\CameraManager.cpp" />
+    <ClCompile Include="Engine\Utility\Collision\Collider.cpp" />
+    <ClCompile Include="Engine\Utility\Collision\CollisionManager.cpp" />
+    <ClCompile Include="Engine\Utility\Collision\ContactRecord.cpp" />
+    <ClCompile Include="Engine\Utility\Collision\Effect.cpp" />
+    <ClCompile Include="Engine\Utility\Collision\GlobalVariables.cpp" />
+    <ClCompile Include="Engine\Utility\Systems\Audio\Audio.cpp" />
+    <ClCompile Include="Engine\Utility\Systems\Camera\Camera.cpp" />
+    <ClCompile Include="Engine\Core\DX\DirectXCommon.cpp" />
+    <ClCompile Include="Engine\Utility\Debugger\LeakChecker.cpp" />
+    <ClCompile Include="Engine\Utility\Systems\Input\Input.cpp" />
+    <ClCompile Include="Engine\Core\Framework\Framework.cpp" />
+    <ClCompile Include="Engine\Utility\Debugger\ImGuiManager.cpp" />
+    <ClCompile Include="Engine\Graphics\LightManager\LightManager.cpp" />
+    <ClCompile Include="Engine\Graphics\Drawer\LineManager\LineManager.cpp" />
+    <ClCompile Include="Engine\Graphics\Drawer\LineManager\Line.cpp" />
+    <ClCompile Include="Engine\Graphics\PipelineManager\PipelineManager.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Model\Joint.cpp" />
+    <ClCompile Include="Application\Objects\Ground\Ground.cpp" />
+    <ClCompile Include="Application\Scenes\MainScenes\Transitions\Fade\Fade.cpp" />
+    <ClCompile Include="Engine\Utility\Systems\GameTime\HitStop.cpp" />
+    <ClCompile Include="Application\SystemsApp\Cameras\FollowCamera\FollowCamera.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Json\JsonManager.cpp" />
+    <ClCompile Include="Engine\Utility\Systems\GameTime\GameTIme.cpp" />
+    <ClCompile Include="Application\Scenes\MainScenes\Transitions\Base\ISceneTransition.cpp" />
+    <ClCompile Include="Application\Scenes\MainScenes\Transitions\Fade\FadeTransition.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Model\Material.cpp" />
+    <ClCompile Include="Math\Matrix4x4.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Model\Model.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Model\ModelCommon.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Model\ModelManager.cpp" />
+    <ClCompile Include="Engine\Generators\Object3D\Object3d.cpp" />
+    <ClCompile Include="Engine\Generators\Object3D\Object3dCommon.cpp" />
+    <ClCompile Include="Engine\Generators\Sprite\Sprite.cpp" />
+    <ClCompile Include="Engine\Generators\Sprite\SpriteCommon.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Texture\TextureManager.cpp" />
+    <ClCompile Include="Engine\Core\WinApp\WinApp.cpp" />
+    <ClCompile Include="Engine\Graphics\SrvManager\SrvManager.cpp" />
+    <ClCompile Include="Engine\Core\Framework\MyGame.cpp" />
+    <ClCompile Include="Engine\Generators\Particle\ParticleManager.cpp" />
+    <ClCompile Include="Application\Scenes\CoreScenes\Factory\SceneFactory.cpp" />
+    <ClCompile Include="Math\MathFunc.cpp" />
+    <ClCompile Include="Engine\Graphics\WorldTransform\WorldTransform.cpp" />
+    <ClCompile Include="Engine\Generators\Particle\ParticleEmitter.cpp" />
+    <ClCompile Include="Engine\Graphics\PipelineManager\SkinningManager.cpp" />
+    <ClCompile Include="Math\Quaternion.cpp" />
+    <ClCompile Include="Math\Vector3.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Model\Skeleton.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Model\Node.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Model\SkinCluster.cpp" />
+    <ClCompile Include="Application\SystemsApp\Cameras\TopDownCamera\TopDownCamera.cpp" />
+    <ClCompile Include="Engine\Utility\Systems\GameTime\ObjectTime.cpp" />
+    <ClCompile Include="Application\Scenes\MainScenes\Transitions\Base\TransitionFactory.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Model\Mesh.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Model\ModelTest.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Model\ModelLoader.cpp" />
+    <ClCompile Include="Application\Objects\Player\Player.cpp" />
+    <ClCompile Include="Application\SystemsApp\Cameras\PlayerCamera\PlayerCamera.cpp" />
+    <ClCompile Include="Application\SystemsApp\Cameras\StageCamera\StageCamera.cpp" />
+    <ClCompile Include="Application\Stages\StageManager\StageManager.cpp" />
+    <ClCompile Include="Application\Objects\StageObject\StageObjectManager\StageObjectManager.cpp" />
+    <ClCompile Include="TestStage.cpp" />
+    <ClCompile Include="Application\SystemsApp\Picture\Picture.cpp" />
+    <ClCompile Include="Engine\Utility\Systems\UI\UIBase.cpp" />
+    <ClCompile Include="Engine\Utility\Systems\UI\UIButton.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Engine\Utility\Systems\Input\Input.h">
-      <Filter>ヘッダー ファイル\NOIR\Utility\Systems\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Systems\Audio\Audio.h">
-      <Filter>ヘッダー ファイル\NOIR\Utility\Systems\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\MathFunc.h">
-      <Filter>ヘッダー ファイル\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Matrix3x3.h">
-      <Filter>ヘッダー ファイル\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Matrix4x4.h">
-      <Filter>ヘッダー ファイル\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Vector2.h">
-      <Filter>ヘッダー ファイル\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Vector3.h">
-      <Filter>ヘッダー ファイル\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Vector4.h">
-      <Filter>ヘッダー ファイル\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Scenes\CoreScenes\Base\BaseScene.h">
-      <Filter>ヘッダー ファイル\Application\Scenes\Corescenes\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Scenes\MainScenes\Game\GameScene.h">
-      <Filter>ヘッダー ファイル\Application\Scenes\MainScenes\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Scenes\MainScenes\Title\TitleScene.h">
-      <Filter>ヘッダー ファイル\Application\Scenes\MainScenes\Title</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Scenes\CoreScenes\Manager\SceneManager.h">
-      <Filter>ヘッダー ファイル\Application\Scenes\Corescenes\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Scenes\CoreScenes\Factory\SceneFactory.h">
-      <Filter>ヘッダー ファイル\Application\Scenes\Corescenes\Factory</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\DX\DirectXCommon.h">
-      <Filter>ヘッダー ファイル\NOIR\Core\DX</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\Framework\Framework.h">
-      <Filter>ヘッダー ファイル\NOIR\Core\Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\Framework\MyGame.h">
-      <Filter>ヘッダー ファイル\NOIR\Core\Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\WinApp\WinApp.h">
-      <Filter>ヘッダー ファイル\NOIR\Core\WinApp</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Generators\Object3D\Object3dCommon.h">
-      <Filter>ヘッダー ファイル\NOIR\Generators\Object3D</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Generators\Object3D\Object3d.h">
-      <Filter>ヘッダー ファイル\NOIR\Generators\Object3D</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Generators\Sprite\Sprite.h">
-      <Filter>ヘッダー ファイル\NOIR\Generators\Sprite</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Generators\Sprite\SpriteCommon.h">
-      <Filter>ヘッダー ファイル\NOIR\Generators\Sprite</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Generators\Particle\ParticleManager.h">
-      <Filter>ヘッダー ファイル\NOIR\Generators\Particle</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Generators\Particle\ParticleEmitter.h">
-      <Filter>ヘッダー ファイル\NOIR\Generators\Particle</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\LightManager\LightManager.h">
-      <Filter>ヘッダー ファイル\NOIR\Graphics\LightManager</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\Drawer\LineManager\LineManager.h">
-      <Filter>ヘッダー ファイル\NOIR\Graphics\Drawer\LineManager</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\Drawer\LineManager\Line.h">
-      <Filter>ヘッダー ファイル\NOIR\Graphics\Drawer\LineManager</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\PipelineManager\PipelineManager.h">
-      <Filter>ヘッダー ファイル\NOIR\Graphics\PipelineManager</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\WorldTransform\WorldTransform.h">
-      <Filter>ヘッダー ファイル\NOIR\Graphics\WorldTransform</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\SrvManager\SrvManager.h">
-      <Filter>ヘッダー ファイル\NOIR\Graphics\SrvManager</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Systems\Camera\Camera.h">
-      <Filter>ヘッダー ファイル\NOIR\Utility\Systems\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Systems\Camera\CameraManager.h">
-      <Filter>ヘッダー ファイル\NOIR\Utility\Systems\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Collision\Collider.h">
-      <Filter>ヘッダー ファイル\NOIR\Utility\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Collision\CollisionTypeIdDef.h">
-      <Filter>ヘッダー ファイル\NOIR\Utility\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Collision\GlobalVariables.h">
-      <Filter>ヘッダー ファイル\NOIR\Utility\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Collision\Effect.h">
-      <Filter>ヘッダー ファイル\NOIR\Utility\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Collision\ContactRecord.h">
-      <Filter>ヘッダー ファイル\NOIR\Utility\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Collision\CollisionManager.h">
-      <Filter>ヘッダー ファイル\NOIR\Utility\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Debugger\LeakChecker.h">
-      <Filter>ヘッダー ファイル\NOIR\Utility\Debugger</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Debugger\ImGuiManager.h">
-      <Filter>ヘッダー ファイル\NOIR\Utility\Debugger</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Scenes\CoreScenes\Factory\AbstractSceneFactory.h">
-      <Filter>ヘッダー ファイル\Application\Scenes\Corescenes\Factory</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Loaders\Model\Model.h">
-      <Filter>ヘッダー ファイル\NOIR\Utility\Loaders\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Loaders\Model\ModelCommon.h">
-      <Filter>ヘッダー ファイル\NOIR\Utility\Loaders\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Loaders\Model\ModelManager.h">
-      <Filter>ヘッダー ファイル\NOIR\Utility\Loaders\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Loaders\Texture\TextureManager.h">
-      <Filter>ヘッダー ファイル\NOIR\Utility\Loaders\Texture</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Graphics\PipelineManager\SkinningManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Quaternion.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Loaders\Model\Skeleton.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Loaders\Model\Joint.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Loaders\Model\Node.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Loaders\Model\Animation.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Loaders\Model\SkinCluster.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Objects\Ground\Ground.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Scenes\MainScenes\Transitions\Fade\Fade.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Systems\GameTime\HitStop.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\SystemsApp\Cameras\FollowCamera\FollowCamera.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\SystemsApp\Cameras\TopDownCamera\TopDownCamera.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Loaders\Json\JsonManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Loaders\Json\ConversionJson.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Loaders\Json\VariableJson.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Systems\GameTime\GameTIme.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Systems\GameTime\ObjectTime.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Scenes\MainScenes\Clear\ClearScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Scenes\MainScenes\Transitions\Base\ISceneTransition.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Scenes\MainScenes\Transitions\Fade\FadeTransition.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Scenes\MainScenes\Transitions\Base\TransitionFactory.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Loaders\Model\Mesh.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Loaders\Model\Material.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Loaders\Model\ModelTest.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Loaders\Model\AnimationSystem.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Utility\Loaders\Model\ModelLoader.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Easing.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Generators\OffScreen\OffScreen.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\SystemsApp\Picture\Picture.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
+    <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
+    <ClInclude Include="Application\Objects\Cube\Cube.h" />
+    <ClInclude Include="Application\Objects\StageObject\BaseStageObject\BaseStageObject.h" />
+    <ClInclude Include="Application\Stages\BaseStage\BaseStage.h" />
+    <ClInclude Include="Application\Objects\StageObject\BaseFloorObject\BaseFloorObject.h" />
+    <ClInclude Include="Engine\Generators\OffScreen\OffScreen.h" />
+    <ClInclude Include="Engine\Utility\Systems\MapChip\MapChipCollision.h" />
+    <ClInclude Include="Engine\Utility\Systems\MapChip\MapChipField.h" />
+    <ClInclude Include="Engine\Utility\Systems\MapChip\MapChipInfo.h" />
+    <ClInclude Include="Math\Easing.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\AnimationSystem.h" />
+    <ClInclude Include="Application\Scenes\MainScenes\Clear\ClearScene.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Json\ConversionJson.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Json\VariableJson.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\Animation.h" />
+    <ClInclude Include="Application\Scenes\CoreScenes\Base\BaseScene.h" />
+    <ClInclude Include="Application\Scenes\MainScenes\Game\GameScene.h" />
+    <ClInclude Include="Application\Scenes\CoreScenes\Manager\SceneManager.h" />
+    <ClInclude Include="Application\Scenes\MainScenes\Title\TitleScene.h" />
+    <ClInclude Include="Engine\Utility\Systems\Camera\CameraManager.h" />
+    <ClInclude Include="Engine\Utility\Collision\Collider.h" />
+    <ClInclude Include="Engine\Utility\Collision\CollisionManager.h" />
+    <ClInclude Include="Engine\Utility\Collision\CollisionTypeIdDef.h" />
+    <ClInclude Include="Engine\Utility\Collision\ContactRecord.h" />
+    <ClInclude Include="Engine\Utility\Collision\Effect.h" />
+    <ClInclude Include="Engine\Utility\Collision\GlobalVariables.h" />
+    <ClInclude Include="Application\Scenes\CoreScenes\Factory\AbstractSceneFactory.h" />
+    <ClInclude Include="Engine\Utility\Systems\Audio\Audio.h" />
+    <ClInclude Include="Engine\Utility\Systems\Camera\Camera.h" />
+    <ClInclude Include="Engine\Core\DX\DirectXCommon.h" />
+    <ClInclude Include="Engine\Utility\Debugger\LeakChecker.h" />
+    <ClInclude Include="Engine\Utility\Systems\Input\Input.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\Joint.h" />
+    <ClInclude Include="Application\Objects\Ground\Ground.h" />
+    <ClInclude Include="Application\Scenes\MainScenes\Transitions\Fade\Fade.h" />
+    <ClInclude Include="Engine\Utility\Systems\GameTime\HitStop.h" />
+    <ClInclude Include="Application\SystemsApp\Cameras\FollowCamera\FollowCamera.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Json\JsonManager.h" />
+    <ClInclude Include="Engine\Utility\Systems\GameTime\GameTIme.h" />
+    <ClInclude Include="Application\Scenes\MainScenes\Transitions\Base\ISceneTransition.h" />
+    <ClInclude Include="Application\Scenes\MainScenes\Transitions\Fade\FadeTransition.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\Material.h" />
+    <ClInclude Include="Math\MathFunc.h" />
+    <ClInclude Include="Math\Matrix3x3.h" />
+    <ClInclude Include="Math\Matrix4x4.h" />
+    <ClInclude Include="Math\Quaternion.h" />
+    <ClInclude Include="Math\Vector2.h" />
+    <ClInclude Include="Math\Vector3.h" />
+    <ClInclude Include="Math\Vector4.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\Model.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\ModelCommon.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\ModelManager.h" />
+    <ClInclude Include="Engine\Generators\Object3D\Object3d.h" />
+    <ClInclude Include="Engine\Generators\Object3D\Object3dCommon.h" />
+    <ClInclude Include="Engine\Generators\Sprite\Sprite.h" />
+    <ClInclude Include="Engine\Generators\Sprite\SpriteCommon.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Texture\TextureManager.h" />
+    <ClInclude Include="Engine\Core\WinApp\WinApp.h" />
+    <ClInclude Include="Engine\Graphics\SrvManager\SrvManager.h" />
+    <ClInclude Include="Engine\Core\Framework\Framework.h" />
+    <ClInclude Include="Engine\Utility\Debugger\ImGuiManager.h" />
+    <ClInclude Include="Engine\Core\Framework\MyGame.h" />
+    <ClInclude Include="Engine\Generators\Particle\ParticleManager.h" />
+    <ClInclude Include="Application\Scenes\CoreScenes\Factory\SceneFactory.h" />
+    <ClInclude Include="Engine\Graphics\WorldTransform\WorldTransform.h" />
+    <ClInclude Include="Engine\Generators\Particle\ParticleEmitter.h" />
+    <ClInclude Include="Engine\Graphics\LightManager\LightManager.h" />
+    <ClInclude Include="Engine\Graphics\Drawer\LineManager\LineManager.h" />
+    <ClInclude Include="Engine\Graphics\Drawer\LineManager\Line.h" />
+    <ClInclude Include="Engine\Graphics\PipelineManager\PipelineManager.h" />
+    <ClInclude Include="Engine\Graphics\PipelineManager\SkinningManager.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\Skeleton.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\Node.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\SkinCluster.h" />
+    <ClInclude Include="Application\SystemsApp\Cameras\TopDownCamera\TopDownCamera.h" />
+    <ClInclude Include="Engine\Utility\Systems\GameTime\ObjectTime.h" />
+    <ClInclude Include="Application\Scenes\MainScenes\Transitions\Base\TransitionFactory.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\Mesh.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\ModelTest.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\ModelLoader.h" />
+    <ClInclude Include="Application\Objects\Player\Player.h" />
+    <ClInclude Include="Application\SystemsApp\Cameras\PlayerCamera\PlayerCamera.h" />
+    <ClInclude Include="Application\SystemsApp\Cameras\StageCamera\StageCamera.h" />
+    <ClInclude Include="Application\Stages\StageManager\StageManager.h" />
+    <ClInclude Include="Application\Objects\StageObject\StageObjectManager\StageObjectManager.h" />
+    <ClInclude Include="TestStage.h" />
+    <ClInclude Include="Application\SystemsApp\Picture\Picture.h" />
+    <ClInclude Include="Engine\Utility\Systems\UI\UIBase.h" />
+    <ClInclude Include="Engine\Utility\Systems\UI\UIButton.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />
@@ -442,5 +194,11 @@
     <None Include="Resources\shaders\Skinning.hlsli" />
     <None Include="Resources\shaders\Skinning.PS.hlsl" />
     <None Include="Resources\shaders\Sprite.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DirectXGame.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\Textures\Ico\icon.ico" />
   </ItemGroup>
 </Project>

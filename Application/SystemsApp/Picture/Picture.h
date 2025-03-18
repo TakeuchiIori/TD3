@@ -61,11 +61,9 @@ public:
     void SetFilePrefix(const std::wstring& prefix) { filePrefix_ = prefix; }
 
 private:
+
     // 保存先ディレクトリの確認・作成
     void EnsureDirectoryExists(const std::wstring& path);
-
-    // 通常のスクリーンショットを撮影
-    void TakeScreenshot();
 
     // カメラビューのスクリーンショットを撮影
     void TakeCameraViewScreenshot();
@@ -92,8 +90,8 @@ private:
 
     // ファイルパス関連
     std::wstring filePath_ = L".";  // 基本ディレクトリ
-    std::wstring savePath_ = L"Resources/GameAlbum/";  // 保存ディレクトリ
-    std::wstring filePrefix_ = L"screenshot";  // ファイル名プレフィックス
+    std::wstring savePath_ = L"Resources/Photos/";  // 保存ディレクトリ
+    std::wstring filePrefix_ = L"";  // ファイル名プレフィックス
     std::wstring png_ext_ = L".png";  // 拡張子
 
     // スクリーンショット管理

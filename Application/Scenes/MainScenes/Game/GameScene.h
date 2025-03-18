@@ -16,7 +16,8 @@
 #include "Drawer/LineManager/Line.h"
 #include "Ground/Ground.h"
 #include "../Transitions/Fade/Fade.h"
-
+#include "Systems/MapChip/MapChipInfo.h"
+#include "Systems/UI/UIBase.h"
 
 // Math
 #include "Vector3.h"
@@ -63,6 +64,12 @@ public:
     /// 描画
     /// </summary>
     void Draw() override;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    void DrawOffScreen() override;
+
 
     Matrix4x4 GetViewProjection() override { return sceneCamera_->viewProjectionMatrix_; }
 
@@ -200,8 +207,11 @@ private:
                                  その他
 
     =================================================================*/
-
+    std::unique_ptr<MapChipInfo> mpInfo_;
     bool isClear_ = false;
+
+    std::unique_ptr<UIBase> uiBase_;
+    std::unique_ptr<UIBase> uiSub_;
 
 private:
     /*=================================================================

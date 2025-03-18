@@ -54,6 +54,9 @@ void GameScene::Initialize()
     followCamera_.SetTarget(player_->GetWorldTransform());
     playerCamera_->SetTarget(player_->GetWorldTransform());
 
+    mpInfo_ = std::make_unique<MapChipInfo>();
+    mpInfo_->Initialize();
+    mpInfo_->SetCamera(sceneCamera_.get());
     
     // 地面
     ground_ = std::make_unique<Ground>();
@@ -92,6 +95,12 @@ void GameScene::Initialize()
 
 
     InitializeOcclusionQuery();
+
+    uiBase_ = std::make_unique<UIBase>("UIButton");
+    uiBase_->Initialize("Resources/JSON/UI/Button.json");
+
+    uiSub_ = std::make_unique<UIBase>("UISub");
+    uiSub_->Initialize("Resources/JSON/UI/Sub.json");
 }
 
 /// <summary>
@@ -99,14 +108,12 @@ void GameScene::Initialize()
 /// </summary>
 void GameScene::Update()
 {
-
+	mpInfo_->Update();
     CheckAllCollisions();
     CollisionManager::GetInstance()->UpdateWorldTransform();
 
 	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
-        picture_->TriggerScreenshot(true);
 		picture_->Update();
-	
     }
     //stageManager_.Update();
 
@@ -167,7 +174,8 @@ void GameScene::Update()
 
 
 	sprite_->Update();
-  
+    uiBase_->Update();
+    uiSub_->Update();
    
 }
 
@@ -194,23 +202,29 @@ void GameScene::Draw()
     DrawAnimation();
     DrawLine();
 
+}
+
+void GameScene::DrawOffScreen()
+{
+    //----------
+    // Sprite
+    //----------
+    SpriteCommon::GetInstance()->DrawPreference();
+    DrawSprite();
+
 
     //----------
     // Particle
     //----------
     ParticleManager::GetInstance()->Draw();
 
-    //----------
-    // Sprite
-    //----------
-    SpriteCommon::GetInstance()->DrawPreference();
-    DrawSprite();
 }
 
 void GameScene::DrawObject()
 {
     CollisionManager::GetInstance()->Draw();
 
+	mpInfo_->Draw();
     // オクルージョンクエリ開始
     uint32_t queryIndex = 0;
 
@@ -229,7 +243,9 @@ void GameScene::DrawObject()
 
 void GameScene::DrawSprite()
 {
-    //sprite_->Draw();
+    sprite_->Draw();
+    uiBase_->Draw();
+    uiSub_->Draw();
 }
 
 void GameScene::DrawAnimation()
