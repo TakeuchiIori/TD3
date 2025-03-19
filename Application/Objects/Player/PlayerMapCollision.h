@@ -4,6 +4,8 @@ class PlayerMapCollision :
     public MapChipCollision
 {
 public:
+    void Init(const ColliderRect& colliderRect, Vector3& position);
+
     // 指定した位置と速度をもとに衝突判定と解決を行う
     // colliderRect: 衝突判定に使用する矩形
     // position: 現在位置（参照渡しで修正可能）
@@ -45,8 +47,8 @@ private:
 
     MapChipField::IndexSet popBlock;
 
-    MapChipField::IndexSet currentBlock;
+    MapChipField::Rect currentBlock;
 
-    MapChipField::IndexSet nextBlock;
+    MapChipField::Rect prevBlock;
 };
 

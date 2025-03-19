@@ -1,5 +1,16 @@
 #include "PlayerMapCollision.h"
 
+void PlayerMapCollision::Init(const ColliderRect& colliderRect, Vector3& position)
+{
+	currentBlock = {
+		position.x - colliderRect.width / 2.0f + colliderRect.offsetX,
+		position.x + colliderRect.width / 2.0f + colliderRect.offsetX - 0.01f,
+		position.z - colliderRect.height / 2.0f + colliderRect.offsetY,
+		position.z + colliderRect.height / 2.0f + colliderRect.offsetY - 0.01f
+	};
+	prevBlock = currentBlock;
+}
+
 void PlayerMapCollision::DetectAndResolveCollision(
 	const ColliderRect& colliderRect,
 	Vector3& position,
@@ -28,8 +39,7 @@ void PlayerMapCollision::DetectAndResolveCollision(
 	// 検査範囲（速度に基づいて動的に調整）
 	int searchRadius = 2 + static_cast<int>(std::max(std::abs(velocity.x), std::abs(velocity.z)) / mapChipField_->GetBlockSize());
 
-	// **現在のブロックインデックス**
-	currentBlock = currentIndex;
+
 
 	// オブジェクトの現在の矩形を計算
 	MapChipField::Rect objectRect = {
@@ -39,6 +49,17 @@ void PlayerMapCollision::DetectAndResolveCollision(
 		position.z + colliderRect.height / 2.0f + colliderRect.offsetY - 0.01f
 	};
 
+	// **現在のブロック
+	prevBlock = objectRect;
+
+	// 移動後
+	currentBlock = {
+			objectRect.left + velocity.x,
+			objectRect.right + velocity.x,
+			objectRect.bottom + velocity.z,
+			objectRect.top + velocity.z
+	};
+
 	// 各ステップごとに衝突処理を実行
 	for (int step = 0; step < numSteps; step++) {
 		// このステップでの速度を設定
@@ -46,9 +67,6 @@ void PlayerMapCollision::DetectAndResolveCollision(
 
 		// 衝突情報のリスト
 		std::vector<CollisionInfo> collisions;
-
-		// 移動後のブロックインデックス
-		nextBlock = mapChipField_->GetMapChipIndexSetByPosition(position + velocity);
 
 		// 移動後の予測位置
 		MapChipField::Rect nextObjectRect = {

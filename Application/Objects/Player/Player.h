@@ -46,7 +46,10 @@ public: // getter&setter
 	// 一人称視点にした場合横を向いているので操作を切り替えるため
 	void SetFPSMode(bool isFPS) { isFPSMode_ = isFPS; }
 
-	void SetMapInfo(MapChipField* mapChipField) { mapCollision_.SetMap(mapChipField); }
+	void SetMapInfo(MapChipField* mapChipField) { 
+		mapCollision_.SetMap(mapChipField);
+		mapCollision_.Init(colliderRct_, worldTransform_.translation_);
+	}
 
 private:
 	Input* input_ = nullptr;
