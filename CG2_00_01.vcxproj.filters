@@ -92,6 +92,7 @@
     <ClCompile Include="Application\SystemsApp\Picture\Picture.cpp" />
     <ClCompile Include="Engine\Utility\Systems\UI\UIBase.cpp" />
     <ClCompile Include="Engine\Utility\Systems\UI\UIButton.cpp" />
+    <ClCompile Include="Application\SystemsApp\Cameras\DebugCamera\DebugCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -184,6 +185,7 @@
     <ClInclude Include="Engine\Utility\Systems\UI\UIBase.h" />
     <ClInclude Include="Engine\Utility\Systems\UI\UIButton.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Application\SystemsApp\Cameras\DebugCamera\DebugCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />

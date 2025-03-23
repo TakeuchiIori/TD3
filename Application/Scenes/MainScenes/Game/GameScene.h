@@ -21,6 +21,9 @@
 
 // Math
 #include "Vector3.h"
+
+// Cameras
+#include "../../../SystemsApp/Cameras/DebugCamera/DebugCamera.h"
 #include "../../../SystemsApp/Cameras/FollowCamera/FollowCamera.h"
 #include "../../../SystemsApp/Cameras/TopDownCamera/TopDownCamera.h"
 
@@ -38,7 +41,8 @@ enum class CameraMode
     DEFAULT,
     FOLLOW,
     TOP_DOWN,
-    FPS
+    FPS,
+    DEBUG
 
 };
 
@@ -147,8 +151,10 @@ private:
     CameraManager cameraManager_;
     FollowCamera followCamera_;
     TopDownCamera topDownCamera_;
+    DebugCamera debugCamera_;
+    bool isDebugCamera_ = false;
     std::unique_ptr<PlayerCamera> playerCamera_;
-    // サウンド
+
 
     /*=================================================================
 
