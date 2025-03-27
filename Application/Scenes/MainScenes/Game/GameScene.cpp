@@ -25,34 +25,35 @@
 /// </summary>
 void GameScene::Initialize()
 {
-    srand(static_cast<unsigned int>(time(nullptr))); // 乱数シード設定
-    // カメラの生成
-    sceneCamera_ = cameraManager_.AddCamera();
+	srand(static_cast<unsigned int>(time(nullptr))); // 乱数シード設定
+	// カメラの生成
+	sceneCamera_ = cameraManager_.AddCamera();
 	//playerCamera_ = cameraManager_.AddCamera();
 
     // 初期カメラモード設定
     cameraMode_ = CameraMode::FOLLOW;
 
-    CollisionManager::GetInstance()->Initialize();
+	CollisionManager::GetInstance()->Initialize();
 
-    //stageManager_.Initialize(sceneCamera_.get());
+	stageManager_.Initialize(sceneCamera_.get());
 
 	picture_ = std::make_unique<Picture>();
 	picture_->Initialize();
 	picture_->SetCamera(sceneCamera_.get());
 
 	GameTime::GetInstance()->Initialize();
-    
+
 	followCamera_.Initialize();
+	debugCamera_.Initialize();
 
-    playerCamera_ = std::make_unique<PlayerCamera>();
-    playerCamera_->Initialize();
+	playerCamera_ = std::make_unique<PlayerCamera>();
+	playerCamera_->Initialize();
 
-    // 各オブジェクトの初期化
-    player_ = std::make_unique<Player>();
-    player_->Initialize(sceneCamera_.get());
-    followCamera_.SetTarget(player_->GetWorldTransform());
-    playerCamera_->SetTarget(player_->GetWorldTransform());
+	// 各オブジェクトの初期化
+	player_ = std::make_unique<Player>();
+	player_->Initialize(sceneCamera_.get());
+	followCamera_.SetTarget(player_->GetWorldTransform());
+	playerCamera_->SetTarget(player_->GetWorldTransform());
 
     mpInfo_ = std::make_unique<MapChipInfo>();
     mpInfo_->Initialize();
@@ -64,45 +65,45 @@ void GameScene::Initialize()
     ground_ = std::make_unique<Ground>();
     ground_->Initialize(sceneCamera_.get());
 
-    test_ = std::make_unique<Object3d>();
-    test_->Initialize();
-    test_->SetModel("walk.gltf", true);
-    //test->SetModel("sneakWalk.gltf", true);
-    testWorldTransform_.Initialize();
-    
-   
-
-    // パーティクル
-    emitterPosition_ = Vector3{ 0.0f, 0.0f, 0.0f }; // エミッタの初期位置
-    particleCount_ = 1;
-    particleEmitter_[0] = std::make_unique<ParticleEmitter>("Circle", emitterPosition_, particleCount_);
-    particleEmitter_[0]->Initialize();
+	test_ = std::make_unique<Object3d>();
+	test_->Initialize();
+	test_->SetModel("walk.gltf", true);
+	//test->SetModel("sneakWalk.gltf", true);
+	testWorldTransform_.Initialize();
 
 
 
-    //// オーディオファイルのロード（例: MP3）
-    //soundData = Audio::GetInstance()->LoadAudio(L"Resources./images./harpohikunezumi.mp3");
-    //// オーディオの再生
-    //sourceVoice = Audio::GetInstance()->SoundPlayAudio(soundData);
-    //// 音量の設定（0.0f ～ 1.0f）
-    //Audio::GetInstance()->SetVolume(sourceVoice, 0.8f); // 80%の音量に設定
+	// パーティクル
+	emitterPosition_ = Vector3{ 0.0f, 0.0f, 0.0f }; // エミッタの初期位置
+	particleCount_ = 1;
+	particleEmitter_[0] = std::make_unique<ParticleEmitter>("Circle", emitterPosition_, particleCount_);
+	particleEmitter_[0]->Initialize();
 
 
-    sprite_ = std::make_unique<Sprite>();
-    sprite_->Initialize("Resources/Textures/KoboRB.png");
-    sprite_->SetSize(Vector2{ 100.0f,500.0f });
-   // sprite_->SetTextureSize(Vector2{ 1280,720 });
 
-    ParticleManager::GetInstance()->SetCamera(sceneCamera_.get());
+	//// オーディオファイルのロード（例: MP3）
+	//soundData = Audio::GetInstance()->LoadAudio(L"Resources./images./harpohikunezumi.mp3");
+	//// オーディオの再生
+	//sourceVoice = Audio::GetInstance()->SoundPlayAudio(soundData);
+	//// 音量の設定（0.0f ～ 1.0f）
+	//Audio::GetInstance()->SetVolume(sourceVoice, 0.8f); // 80%の音量に設定
 
 
-    InitializeOcclusionQuery();
+	sprite_ = std::make_unique<Sprite>();
+	sprite_->Initialize("Resources/Textures/KoboRB.png");
+	sprite_->SetSize(Vector2{ 100.0f,500.0f });
+	// sprite_->SetTextureSize(Vector2{ 1280,720 });
 
-    uiBase_ = std::make_unique<UIBase>("UIButton");
-    uiBase_->Initialize("Resources/JSON/UI/Button.json");
+	ParticleManager::GetInstance()->SetCamera(sceneCamera_.get());
 
-    uiSub_ = std::make_unique<UIBase>("UISub");
-    uiSub_->Initialize("Resources/JSON/UI/Sub.json");
+
+	InitializeOcclusionQuery();
+
+	uiBase_ = std::make_unique<UIBase>("UIButton");
+	uiBase_->Initialize("Resources/JSON/UI/Button.json");
+
+	uiSub_ = std::make_unique<UIBase>("UISub");
+	uiSub_->Initialize("Resources/JSON/UI/Sub.json");
 }
 
 /// <summary>
@@ -110,75 +111,80 @@ void GameScene::Initialize()
 /// </summary>
 void GameScene::Update()
 {
+	if ((Input::GetInstance()->TriggerKey(DIK_LCONTROL)) || Input::GetInstance()->IsPadTriggered(0, GamePadButton::RT)) {
+		isDebugCamera_ = !isDebugCamera_;
+	}
+
 	mpInfo_->Update();
-    CheckAllCollisions();
-    CollisionManager::GetInstance()->UpdateWorldTransform();
+	CheckAllCollisions();
+	CollisionManager::GetInstance()->UpdateWorldTransform();
 
 	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
 		picture_->Update();
     }
     //stageManager_.Update();
 
-    test_->UpdateAnimation();
-    testWorldTransform_.UpdateMatrix();
+	test_->UpdateAnimation();
+	testWorldTransform_.UpdateMatrix();
 
-    player_->Update();
-    player_->SetFPSMode(cameraMode_ == CameraMode::FPS);
+	if (!isDebugCamera_) {
+		player_->Update();
+	}
+	player_->SetFPSMode(cameraMode_ == CameraMode::FPS);
 
-    if (Input::GetInstance()->TriggerKey(DIK_L))
-    {
-        if (cameraMode_ == CameraMode::FPS) 
-        {
-            cameraMode_ = CameraMode::FOLLOW;
-        }
-        else
-        {
-            cameraMode_ = CameraMode::FPS;
-        }
-    }
+	if (Input::GetInstance()->TriggerKey(DIK_L))
+	{
+		if (cameraMode_ == CameraMode::FPS)
+		{
+			cameraMode_ = CameraMode::FOLLOW;
+		} else
+		{
+			cameraMode_ = CameraMode::FPS;
+		}
+	}
 
-    if (Input::GetInstance()->PushKey(DIK_UP)) {
-        sceneCamera_->SetFovY(sceneCamera_->GetFovY() - 0.001f);
-    }
-    if (Input::GetInstance()->PushKey(DIK_DOWN)) {
-        sceneCamera_->SetFovY(sceneCamera_->GetFovY() + 0.001f);
-    }
+	if (Input::GetInstance()->PushKey(DIK_UP)) {
+		sceneCamera_->SetFovY(sceneCamera_->GetFovY() - 0.001f);
+	}
+	if (Input::GetInstance()->PushKey(DIK_DOWN)) {
+		sceneCamera_->SetFovY(sceneCamera_->GetFovY() + 0.001f);
+	}
 
-    // enemy_->Update();
+	// enemy_->Update();
 
-    ground_->Update();
-
-
-    particleEmitter_[0]->Emit();
-
-    ParticleManager::GetInstance()->Update();
-    // カメラ更新
-    UpdateCameraMode();
-    UpdateCamera();
+	ground_->Update();
 
 
+	particleEmitter_[0]->Emit();
 
-
-    ShowImGui();
+	ParticleManager::GetInstance()->Update();
+	// カメラ更新
+	UpdateCameraMode();
+	UpdateCamera();
 
 
 
-    JsonManager::ImGuiManager();
-    // ワールドトランスフォーム更新
-    cameraManager_.UpdateAllCameras();
 
-    //=====================================================//
-    /*                  これより下は触るな危険　　　　　　　   　*/
-    //=====================================================//
+	ShowImGui();
 
-    // ライティング
-    LightManager::GetInstance()->ShowLightingEditor();
+
+
+	JsonManager::ImGuiManager();
+	// ワールドトランスフォーム更新
+	cameraManager_.UpdateAllCameras();
+
+	//=====================================================//
+	/*                  これより下は触るな危険　　　　　　　   　*/
+	//=====================================================//
+
+	// ライティング
+	LightManager::GetInstance()->ShowLightingEditor();
 
 
 	sprite_->Update();
-    uiBase_->Update();
-    uiSub_->Update();
-   
+	uiBase_->Update();
+	uiSub_->Update();
+
 }
 
 
@@ -187,90 +193,90 @@ void GameScene::Update()
 /// </summary>
 void GameScene::Draw()
 {
-    //---------
-    // 3D
-    //---------
-    Object3dCommon::GetInstance()->DrawPreference();
-    LightManager::GetInstance()->SetCommandList();
-    DrawObject();
-    ///line_->UpdateVertices(start_, end_);
-    ///line_->DrawLine();
+	//---------
+	// 3D
+	//---------
+	Object3dCommon::GetInstance()->DrawPreference();
+	LightManager::GetInstance()->SetCommandList();
+	DrawObject();
+	///line_->UpdateVertices(start_, end_);
+	///line_->DrawLine();
 
-    //---------
-    // Animation
-    //---------
-    SkinningManager::GetInstance()->DrawPreference();
-    LightManager::GetInstance()->SetCommandList();
-    DrawAnimation();
-    DrawLine();
+	//---------
+	// Animation
+	//---------
+	SkinningManager::GetInstance()->DrawPreference();
+	LightManager::GetInstance()->SetCommandList();
+	DrawAnimation();
+	DrawLine();
 
 }
 
 void GameScene::DrawOffScreen()
 {
-    //----------
-    // Sprite
-    //----------
-    SpriteCommon::GetInstance()->DrawPreference();
-    DrawSprite();
+	//----------
+	// Sprite
+	//----------
+	SpriteCommon::GetInstance()->DrawPreference();
+	DrawSprite();
 
 
-    //----------
-    // Particle
-    //----------
-    ParticleManager::GetInstance()->Draw();
+	//----------
+	// Particle
+	//----------
+	ParticleManager::GetInstance()->Draw();
 
 }
 
 void GameScene::DrawObject()
 {
-    CollisionManager::GetInstance()->Draw();
+	CollisionManager::GetInstance()->Draw();
 
 	mpInfo_->Draw();
-    // オクルージョンクエリ開始
-    uint32_t queryIndex = 0;
+	// オクルージョンクエリ開始
+	uint32_t queryIndex = 0;
 
-    // Ground のオクルージョンチェック
-    commandList_->BeginQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
-    ground_->Draw();
-    commandList_->EndQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
+	// Ground のオクルージョンチェック
+	commandList_->BeginQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
+	ground_->Draw();
+	commandList_->EndQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
 
 
 
     //stageManager_.Draw();
 
-    player_->Draw();
+	player_->Draw();
 
 }
 
 void GameScene::DrawSprite()
 {
-    sprite_->Draw();
-    uiBase_->Draw();
-    uiSub_->Draw();
+	sprite_->Draw();
+	uiBase_->Draw();
+	uiSub_->Draw();
 }
 
 void GameScene::DrawAnimation()
 {
-    // オクルージョンクエリ開始
-    uint32_t queryIndex = 1;
+	// オクルージョンクエリ開始
+	uint32_t queryIndex = 1;
 
-    // Ground のオクルージョンチェック
-    commandList_->BeginQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
-    test_->Draw(sceneCamera_.get(), testWorldTransform_);
-    commandList_->EndQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
+	// Ground のオクルージョンチェック
+	commandList_->BeginQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
+	test_->Draw(sceneCamera_.get(), testWorldTransform_);
+	commandList_->EndQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
 
-    ResolvedOcclusionQuery();
-   
+	ResolvedOcclusionQuery();
+
 }
 
 void GameScene::DrawLine()
 {
-    // 骨描画
+	// 骨描画
    /* if (test_ && test_->GetModel()->GetSkeleton().joints.size() > 0) {
-        test_->DrawSkeleton(test_->GetModel()->GetSkeleton(), *boneLine_);
-        boneLine_->DrawLine();
-    }*/
+		test_->DrawSkeleton(test_->GetModel()->GetSkeleton(), *boneLine_);
+		boneLine_->DrawLine();
+	}*/
 }
 
 
@@ -279,201 +285,216 @@ void GameScene::DrawLine()
 /// </summary>
 void GameScene::Finalize()
 {
-    cameraManager_.RemoveCamera(sceneCamera_);
+	cameraManager_.RemoveCamera(sceneCamera_);
 }
 
 
 void GameScene::UpdateCameraMode()
 {
 #ifdef _DEBUG
-    ImGui::Begin("Camera Mode");
-    if (ImGui::Button("DEFAULT Camera")) {
-        cameraMode_ = CameraMode::DEFAULT;
-    }
-    if (ImGui::Button("Follow Camera")) {
-        cameraMode_ = CameraMode::FOLLOW;
-    }
-    if (ImGui::Button("Top-Down Camera")) {
-        cameraMode_ = CameraMode::TOP_DOWN;
-    }
-    if (ImGui::Button("FPS Camera")) {
-        cameraMode_ = CameraMode::FPS;
-    }
-    ImGui::End();
+	ImGui::Begin("Camera Mode");
+	if (ImGui::Button("DEFAULT Camera")) {
+		cameraMode_ = CameraMode::DEFAULT;
+	}
+	if (ImGui::Button("Follow Camera")) {
+		cameraMode_ = CameraMode::FOLLOW;
+	}
+	if (ImGui::Button("Top-Down Camera")) {
+		cameraMode_ = CameraMode::TOP_DOWN;
+	}
+	if (ImGui::Button("FPS Camera")) {
+		cameraMode_ = CameraMode::FPS;
+	}
+	if (ImGui::Button("DEBUG Camera")) {
+		cameraMode_ = CameraMode::DEBUG;
+	}
+	ImGui::End();
 #endif
 }
 
 void GameScene::UpdateCamera()
 {
-    switch (cameraMode_)
-    {
-    case CameraMode::DEFAULT:
-    {
-        sceneCamera_->DefaultCamera();
-        sceneCamera_->UpdateMatrix();
-    }
-    break;
-    case CameraMode::FOLLOW:
-    {
-        
-        followCamera_.Update();
+	switch (cameraMode_)
+	{
+	case CameraMode::DEFAULT:
+	{
+		sceneCamera_->DefaultCamera();
+		sceneCamera_->UpdateMatrix();
+	}
+	break;
+	case CameraMode::FOLLOW:
+	{
+
+		followCamera_.Update();
 		sceneCamera_->viewMatrix_ = followCamera_.matView_;
 		sceneCamera_->transform_.translate = followCamera_.translate_;
 		sceneCamera_->transform_.rotate = followCamera_.rotate_;
 
 		sceneCamera_->UpdateMatrix();
-    }
-    break;
-    case CameraMode::TOP_DOWN:
-    {
+	}
+	break;
+	case CameraMode::TOP_DOWN:
+	{
 
-   
-        topDownCamera_.Update();
+
+		topDownCamera_.Update();
 		sceneCamera_->viewMatrix_ = topDownCamera_.matView_;
 		sceneCamera_->transform_.translate = topDownCamera_.translate_;
 		sceneCamera_->transform_.rotate = topDownCamera_.rotate_;
 
 		sceneCamera_->UpdateMatrix();
-    }
-    break;
-    case CameraMode::FPS:
-    {
+	}
+	break;
+	case CameraMode::FPS:
+	{
 
-        playerCamera_->Update();
-        sceneCamera_->viewMatrix_ = playerCamera_->matView_;
-        sceneCamera_->transform_.translate = playerCamera_->translate_;
-        sceneCamera_->transform_.rotate = playerCamera_->rotate_;
+		playerCamera_->Update();
+		sceneCamera_->viewMatrix_ = playerCamera_->matView_;
+		sceneCamera_->transform_.translate = playerCamera_->translate_;
+		sceneCamera_->transform_.rotate = playerCamera_->rotate_;
 
-        sceneCamera_->UpdateMatrix();
-    }
-    break;
+		sceneCamera_->UpdateMatrix();
+	}
+	break;
 
-    default:
-        break;
-    }
+	case CameraMode::DEBUG:
+	{
+		if (isDebugCamera_) {
+			debugCamera_.Update();
+			sceneCamera_->SetFovY(debugCamera_.GetFov());
+			sceneCamera_->viewMatrix_ = debugCamera_.matView_;
+			sceneCamera_->transform_.translate = debugCamera_.translate_;
+			sceneCamera_->transform_.rotate = debugCamera_.rotate_;
+			sceneCamera_->UpdateMatrix();
+		}
+	}
+
+	default:
+		break;
+	}
 }
 
 void GameScene::ShowImGui()
 {
 #ifdef _DEBUG
-    ImGui::Begin("FPS");
-    ImGui::Text("FPS:%.1f", ImGui::GetIO().Framerate);
-    ImGui::End();
-    ImGui::Begin("Emitter");
-    ImGui::DragFloat3("Emitter Position", &emitterPosition_.x, 0.1f);
-   // particleEmitter_[0]->SetPosition(emitterPosition_);
+	ImGui::Begin("FPS");
+	ImGui::Text("FPS:%.1f", ImGui::GetIO().Framerate);
+	ImGui::End();
+	ImGui::Begin("Emitter");
+	ImGui::DragFloat3("Emitter Position", &emitterPosition_.x, 0.1f);
+	// particleEmitter_[0]->SetPosition(emitterPosition_);
 
-    // パーティクル数の表示と調整
-    ImGui::Text("Particle Count: %.0d", particleCount_); // 現在のパーティクル数を表示
-    if (ImGui::Button("Increase Count")) {
-        particleCount_ += 1; // パーティクル数を増加
-    }
-    if (ImGui::Button("Decrease Count")) {
-        if (particleCount_ > 1) { // パーティクル数が1未満にならないように制限
-            particleCount_ -= 1;
-        }
-    }
-    //particleEmitter_[0]->SetCount(particleCount_);
+	 // パーティクル数の表示と調整
+	ImGui::Text("Particle Count: %.0d", particleCount_); // 現在のパーティクル数を表示
+	if (ImGui::Button("Increase Count")) {
+		particleCount_ += 1; // パーティクル数を増加
+	}
+	if (ImGui::Button("Decrease Count")) {
+		if (particleCount_ > 1) { // パーティクル数が1未満にならないように制限
+			particleCount_ -= 1;
+		}
+	}
+	//particleEmitter_[0]->SetCount(particleCount_);
 
 
-    ImGui::End();
+	ImGui::End();
 
-    ImGui::Begin("Occlusion Query");
-    ImGui::Text("Occlusion Ground: %lld", occlusionResults_[0]);
-    ImGui::Text("Occlusion AnimationModel: %lld", occlusionResults_[1]);
-    ImGui::End();
+	ImGui::Begin("Occlusion Query");
+	ImGui::Text("Occlusion Ground: %lld", occlusionResults_[0]);
+	ImGui::Text("Occlusion AnimationModel: %lld", occlusionResults_[1]);
+	ImGui::End();
 #endif // _DEBUG
 }
 
 void GameScene::CheckAllCollisions() {
 
-    // 衝突マネージャーのリセット
-    CollisionManager::GetInstance()->Reset();
+	// 衝突マネージャーのリセット
+	CollisionManager::GetInstance()->Reset();
 
-    // コライダーをリストに登録
-    //CollisionManager::GetInstance()->AddCollider(player_.get());
+	// コライダーをリストに登録
+	//CollisionManager::GetInstance()->AddCollider(player_.get());
 
 
-    // 衝突判定と応答
-    CollisionManager::GetInstance()->CheckAllCollisions();
+	// 衝突判定と応答
+	CollisionManager::GetInstance()->CheckAllCollisions();
 
 }
 void GameScene::InitializeOcclusionQuery()
 {
-    ID3D12Device* device = DirectXCommon::GetInstance()->GetDevice().Get();
-    commandList_ = DirectXCommon::GetInstance()->GetCommandList().Get();
+	ID3D12Device* device = DirectXCommon::GetInstance()->GetDevice().Get();
+	commandList_ = DirectXCommon::GetInstance()->GetCommandList().Get();
 
-    // クエリの数をオブジェクト数に合わせる
-    occlusionResults_.resize(queryCount_, 0);
+	// クエリの数をオブジェクト数に合わせる
+	occlusionResults_.resize(queryCount_, 0);
 
-    D3D12_QUERY_HEAP_DESC queryHeapDesc = {};
-    queryHeapDesc.Count = queryCount_;
-    queryHeapDesc.Type = D3D12_QUERY_HEAP_TYPE_OCCLUSION;
-    queryHeapDesc.NodeMask = 0;
+	D3D12_QUERY_HEAP_DESC queryHeapDesc = {};
+	queryHeapDesc.Count = queryCount_;
+	queryHeapDesc.Type = D3D12_QUERY_HEAP_TYPE_OCCLUSION;
+	queryHeapDesc.NodeMask = 0;
 
-    // クエリヒープ作成
-    HRESULT hr = device->CreateQueryHeap(&queryHeapDesc, IID_PPV_ARGS(&queryHeap_));
-    if (FAILED(hr)) {
-        throw std::runtime_error("Failed to create Query Heap.");
-    }
+	// クエリヒープ作成
+	HRESULT hr = device->CreateQueryHeap(&queryHeapDesc, IID_PPV_ARGS(&queryHeap_));
+	if (FAILED(hr)) {
+		throw std::runtime_error("Failed to create Query Heap.");
+	}
 
-    // クエリ結果格納用のバッファを作成
-    D3D12_RESOURCE_DESC bufferDesc = {};
-    bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-    bufferDesc.Width = sizeof(UINT64) * queryCount_; // クエリ数に応じたサイズ
-    bufferDesc.Height = 1;
-    bufferDesc.DepthOrArraySize = 1;
-    bufferDesc.MipLevels = 1;
-    bufferDesc.Format = DXGI_FORMAT_UNKNOWN;
-    bufferDesc.SampleDesc.Count = 1;
-    bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-    bufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+	// クエリ結果格納用のバッファを作成
+	D3D12_RESOURCE_DESC bufferDesc = {};
+	bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	bufferDesc.Width = sizeof(UINT64) * queryCount_; // クエリ数に応じたサイズ
+	bufferDesc.Height = 1;
+	bufferDesc.DepthOrArraySize = 1;
+	bufferDesc.MipLevels = 1;
+	bufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+	bufferDesc.SampleDesc.Count = 1;
+	bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	bufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-    D3D12_HEAP_PROPERTIES heapProps = { D3D12_HEAP_TYPE_READBACK };
+	D3D12_HEAP_PROPERTIES heapProps = { D3D12_HEAP_TYPE_READBACK };
 
-    hr = device->CreateCommittedResource(
-        &heapProps, D3D12_HEAP_FLAG_NONE, &bufferDesc,
-        D3D12_RESOURCE_STATE_COPY_DEST, nullptr,
-        IID_PPV_ARGS(&queryResultBuffer_)
-    );
+	hr = device->CreateCommittedResource(
+		&heapProps, D3D12_HEAP_FLAG_NONE, &bufferDesc,
+		D3D12_RESOURCE_STATE_COPY_DEST, nullptr,
+		IID_PPV_ARGS(&queryResultBuffer_)
+	);
 
-    if (FAILED(hr)) {
-        throw std::runtime_error("Failed to create Query Result Buffer.");
-    }
+	if (FAILED(hr)) {
+		throw std::runtime_error("Failed to create Query Result Buffer.");
+	}
 }
 
 void GameScene::BeginOcclusionQuery(UINT queryIndex)
 {
-    commandList_->BeginQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
+	commandList_->BeginQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
 }
 
 void GameScene::EndOcclusionQuery(UINT queryIndex)
 {
-    commandList_->EndQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
+	commandList_->EndQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
 }
 
 void GameScene::ResolvedOcclusionQuery()
 {
-    // クエリ結果をリソースにコピー
-    commandList_->ResolveQueryData
-    (
-        queryHeap_.Get(),
-        D3D12_QUERY_TYPE_OCCLUSION,
-        0,
-        queryCount_,
-        queryResultBuffer_.Get(),
-        0
-    );
+	// クエリ結果をリソースにコピー
+	commandList_->ResolveQueryData
+	(
+		queryHeap_.Get(),
+		D3D12_QUERY_TYPE_OCCLUSION,
+		0,
+		queryCount_,
+		queryResultBuffer_.Get(),
+		0
+	);
 
-    // 結果をマッピング
-    void* mappedData = nullptr;
-    D3D12_RANGE readRange = { 0, sizeof(UINT64) * queryCount_ };
-    if (SUCCEEDED(queryResultBuffer_->Map(0, &readRange, &mappedData)))
-    {
-        UINT64* queryData = static_cast<UINT64*>(mappedData);
-        for (uint32_t i = 0; i < queryCount_; i++) {
-            occlusionResults_[i] = queryData[i]; // 結果を保存
-        }
-        queryResultBuffer_->Unmap(0, nullptr);
-    }
+	// 結果をマッピング
+	void* mappedData = nullptr;
+	D3D12_RANGE readRange = { 0, sizeof(UINT64) * queryCount_ };
+	if (SUCCEEDED(queryResultBuffer_->Map(0, &readRange, &mappedData)))
+	{
+		UINT64* queryData = static_cast<UINT64*>(mappedData);
+		for (uint32_t i = 0; i < queryCount_; i++) {
+			occlusionResults_[i] = queryData[i]; // 結果を保存
+		}
+		queryResultBuffer_->Unmap(0, nullptr);
+	}
 }
