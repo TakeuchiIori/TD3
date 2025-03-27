@@ -3,7 +3,6 @@
 #include "imgui.h"
 #endif // _DEBUG
 
-
 void Player::Initialize(Camera* camera)
 {
 	input_ = Input::GetInstance();
@@ -31,7 +30,9 @@ void Player::Initialize(Camera* camera)
 
 void Player::Update()
 {
+
 	Move();
+	TimerManager();
 	UpdateMatrices();
 }
 
@@ -40,6 +41,18 @@ void Player::Draw()
 	obj_->Draw(camera_, bodyTransform_);
 	for (const auto& body : playerBodys_) {
 		body->Draw();
+	}
+}
+
+void Player::OnCollision()
+{
+	if (false) // 草を食べたら
+	{
+		if (MaxGrassGauge_ > grassGauge_)
+		{
+			grassGauge_++;
+			extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
+		}
 	}
 }
 
@@ -54,6 +67,8 @@ void Player::UpdateMatrices()
 
 void Player::Move()
 {
+	Boost();
+
 	velocity_ = { 0.0f,0.0f,0.0f };
 
 	if (input_->PushKey(DIK_W))
@@ -112,4 +127,35 @@ void Player::Move()
 		}
 	}*/
 
+}
+
+void Player::Boost()
+{
+#ifdef _DEBUG
+	if (input_->TriggerKey(DIK_B))
+	{
+		boostTimer_ = kBoostTime_;
+	}
+#endif // _DEBUG
+
+	if (0 < boostTimer_)
+	{
+		speed_ = defaultSpeed_ + boostSpeed_;
+	}
+	else
+	{
+		speed_ = defaultSpeed_;
+	}
+}
+
+void Player::TimerManager()
+{
+	if (0 < extendTimer_) 
+	{
+		extendTimer_ -= deltaTime_;
+	}
+	if (0 < boostTimer_) 
+	{
+		boostTimer_ -= deltaTime_;
+	}
 }
