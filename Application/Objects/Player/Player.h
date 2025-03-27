@@ -65,6 +65,9 @@ private:
 	float speed_ = 0.3f;							// 動く速度
 	bool isFPSMode_ = false;
 
+	bool isMove_ = false;
+
+
 	PlayerMapCollision mapCollision_;
 
 	MapChipCollision::ColliderRect colliderRct_;

@@ -94,6 +94,7 @@
     <ClCompile Include="Engine\Utility\Systems\UI\UIButton.cpp" />
     <ClCompile Include="Application\Objects\Player\PlayerMapCollision.cpp" />
     <ClCompile Include="Application\Objects\Player\PlayerBody.cpp" />
+    <ClCompile Include="Application\Objects\Grass\Grass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -188,6 +189,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="Application\Objects\Player\PlayerMapCollision.h" />
     <ClInclude Include="Application\Objects\Player\PlayerBody.h" />
+    <ClInclude Include="Application\Objects\Grass\Grass.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />

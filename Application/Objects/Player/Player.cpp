@@ -56,28 +56,26 @@ void Player::Move()
 {
 	velocity_ = { 0.0f,0.0f,0.0f };
 
-	if(Length(moveDirection_) == 0.0f)
+	if (input_->PushKey(DIK_W))
 	{
-		if (input_->PushKey(DIK_W))
-		{
-			moveDirection_.z++;
-			collisionFlag_ = MapChipCollision::CollisionFlag::Top;
-		}
-		else if (input_->PushKey(DIK_S))
-		{
-			moveDirection_.z--;
-			collisionFlag_ = MapChipCollision::CollisionFlag::Bottom;
-		}
-		else if (input_->PushKey(DIK_A))
-		{
-			moveDirection_.x--;
-			collisionFlag_ = MapChipCollision::CollisionFlag::Right;
-		}
-		else if (input_->PushKey(DIK_D))
-		{
-			moveDirection_.x++;
-			collisionFlag_ = MapChipCollision::CollisionFlag::Left;
-		}
+		moveDirection_ = { 0,1,0 };
+		//moveDirection_.z++;
+		collisionFlag_ = MapChipCollision::CollisionFlag::Top;
+	}
+	else if (input_->PushKey(DIK_S))
+	{
+		moveDirection_ = { 0,-1,0 };
+		collisionFlag_ = MapChipCollision::CollisionFlag::Bottom;
+	}
+	else if (input_->PushKey(DIK_A))
+	{
+		moveDirection_ = { -1,0,0 };
+		collisionFlag_ = MapChipCollision::CollisionFlag::Right;
+	}
+	else if (input_->PushKey(DIK_D))
+	{
+		moveDirection_ = { 1,0,0 };
+		collisionFlag_ = MapChipCollision::CollisionFlag::Left;
 	}
 	
 	moveDirection_ = Normalize(moveDirection_);
@@ -89,27 +87,21 @@ void Player::Move()
 
 	velocity_ += moveDirection_ * speed_;
 
-	mapCollision_.DetectAndResolveCollision(colliderRct_, worldTransform_.translation_, velocity_, collisionFlag_);
-#ifdef _DEBUG
-	bool i = mapCollision_.GetIsPopBody();
-	ImGui::Begin("Player");
-	ImGui::Text("isPop : %d", i);
-	ImGui::End();
-#endif // _DEBUG
+	//mapCollision_.DetectAndResolveCollision(colliderRct_, worldTransform_.translation_, velocity_, collisionFlag_);
 
 
 	
 
-	if (mapCollision_.GetIsPopBody()) {
+	/*if (mapCollision_.GetIsPopBody()) {
 		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
 		body->Initialize(camera_);
 		body->SetPos(mapCollision_.GetPopPos());
 		playerBodys_.push_back(move(body));
-	}
+	}*/
 
 	worldTransform_.translation_ += velocity_;
 
-	if (mapCollision_.GetIsCollision())
+	/*if (mapCollision_.GetIsCollision())
 	{
 		moveDirection_ = { 0,0,0 };
 		if (mapCollision_.GetIsCollisionBody()) {
@@ -118,6 +110,6 @@ void Player::Move()
 				playerBodys_.pop_front();
 			}
 		}
-	}
+	}*/
 
 }
