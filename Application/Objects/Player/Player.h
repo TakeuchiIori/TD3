@@ -184,6 +184,9 @@ private:
 
 	const float deltaTime_ = 1.0f / 60.0f; // 仮対応
 
+	// ヒットポイント
+	int32_t HP_ = 3;
+
 
 	//PlayerMapCollision mapCollision_;
 

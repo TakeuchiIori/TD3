@@ -24,3 +24,7 @@ void Grass::Draw()
 {
 	obj_->Draw(camera_, worldTransform_);
 }
+
+void Grass::Growth()
+{
+}
