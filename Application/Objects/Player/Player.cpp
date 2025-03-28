@@ -221,7 +221,7 @@ void Player::TimerManager()
 #ifdef _DEBUG
 void Player::DebugPlayer()
 {
-	int a = moveHistory_.size();
+	int a = static_cast<int>(moveHistory_.size());
 	ImGui::Begin("DebugPlayer");
 	ImGui::Text("Start : SPACE  |  Boost : B  |  Return : N");
 	ImGui::Text("TimeLimit  : %.2f", extendTimer_);
