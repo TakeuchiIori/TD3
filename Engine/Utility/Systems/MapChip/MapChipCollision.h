@@ -58,7 +58,7 @@ public:
     };
 
     // コンストラクタ
-    MapChipCollision() = default;
+    MapChipCollision(MapChipField* mapChipField) : mapChipField_(mapChipField) {}
 
     void SetMap(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
 

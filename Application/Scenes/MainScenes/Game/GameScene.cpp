@@ -50,14 +50,16 @@ void GameScene::Initialize()
 	playerCamera_->Initialize();
 
 	// 各オブジェクトの初期化
-	player_ = std::make_unique<Player>();
+	mpInfo_ = std::make_unique<MapChipInfo>();
+	mpInfo_->Initialize();
+	mpInfo_->SetCamera(sceneCamera_.get());
+
+	player_ = std::make_unique<Player>(mpInfo_->GetMapChipField());
 	player_->Initialize(sceneCamera_.get());
 	followCamera_.SetTarget(player_->GetWorldTransform());
 	playerCamera_->SetTarget(player_->GetWorldTransform());
 
-    mpInfo_ = std::make_unique<MapChipInfo>();
-    mpInfo_->Initialize();
-    mpInfo_->SetCamera(sceneCamera_.get());
+
 
     player_->SetMapInfo(mpInfo_->GetMapChipField());
     

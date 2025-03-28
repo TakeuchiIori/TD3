@@ -24,8 +24,8 @@ void Player::Initialize(Camera* camera)
 	obj_->SetModel("unitCube.obj");
 	obj_->SetMaterialColor({ 0.3f,0.3f,1.0f,1.0f });
 
-	colliderRct_.height = 2.0f;
-	colliderRct_.width = 2.0f;
+	//colliderRct_.height = 2.0f;
+	//colliderRct_.width = 2.0f;
 }
 
 void Player::Update()
@@ -46,13 +46,38 @@ void Player::Draw()
 
 void Player::OnCollision()
 {
-	if (false) // 草を食べたら
-	{
-		if (MaxGrassGauge_ > grassGauge_)
-		{
-			grassGauge_++;
-			extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
-		}
+	//if (false) // 草を食べたら
+	//{
+	//	if (MaxGrassGauge_ > grassGauge_)
+	//	{
+	//		grassGauge_++;
+	//		extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
+	//	}
+	//}
+}
+
+void Player::MapChipOnCollision(const CollisionInfo& info)
+{// 衝突したブロックの種類に応じた処理
+	switch (info.blockType) {
+	case MapChipType::kBlock:
+		// 通常ブロックの処理
+		break;
+
+		// 将来的に追加される特殊ブロックの処理
+		// case MapChipType::kDamageBlock:
+		//     TakeDamage(10);
+		//     break;
+		// case MapChipType::kJumpBlock:
+		//     velocity_.y = 10.0f;  // ジャンプさせる
+		//     break;
+
+	default:
+		break;
+	}
+
+	// 衝突方向に応じた処理
+	if (info.direction == 4) {  // 下方向の衝突 = 着地
+		//isGrounded_ = true;
 	}
 }
 
@@ -75,22 +100,22 @@ void Player::Move()
 	{
 		moveDirection_ = { 0,1,0 };
 		//moveDirection_.z++;
-		collisionFlag_ = MapChipCollision::CollisionFlag::Top;
+		//collisionFlag_ = MapChipCollision::CollisionFlag::Top;
 	}
 	else if (input_->PushKey(DIK_S))
 	{
 		moveDirection_ = { 0,-1,0 };
-		collisionFlag_ = MapChipCollision::CollisionFlag::Bottom;
+		//collisionFlag_ = MapChipCollision::CollisionFlag::Bottom;
 	}
 	else if (input_->PushKey(DIK_A))
 	{
 		moveDirection_ = { -1,0,0 };
-		collisionFlag_ = MapChipCollision::CollisionFlag::Right;
+		//collisionFlag_ = MapChipCollision::CollisionFlag::Right;
 	}
 	else if (input_->PushKey(DIK_D))
 	{
 		moveDirection_ = { 1,0,0 };
-		collisionFlag_ = MapChipCollision::CollisionFlag::Left;
+		//collisionFlag_ = MapChipCollision::CollisionFlag::Left;
 	}
 	
 	moveDirection_ = Normalize(moveDirection_);
@@ -114,7 +139,7 @@ void Player::Move()
 		playerBodys_.push_back(move(body));
 	}*/
 
-	worldTransform_.translation_ += velocity_;
+	Vector3 newPos = worldTransform_.translation_ + velocity_;
 
 	/*if (mapCollision_.GetIsCollision())
 	{
@@ -126,6 +151,19 @@ void Player::Move()
 			}
 		}
 	}*/
+
+	mpCollision_.DetectAndResolveCollision(
+		colliderRect_,  // 衝突判定用矩形
+		newPos,    // 更新される位置（衝突解決後）
+		velocity_,      // 更新される速度
+		MapChipCollision::CollisionFlag::All,  // すべての方向をチェック
+		[this](const CollisionInfo& info) {
+			// 衝突時の処理（例：特殊ブロック対応）
+			MapChipOnCollision(info);
+		}
+	);
+
+	worldTransform_.translation_ = newPos;
 
 }
 
