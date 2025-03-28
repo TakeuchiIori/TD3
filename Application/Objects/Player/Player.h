@@ -2,10 +2,19 @@
 
 // Engine
 #include "Systems/Input/Input.h"
+#include "PlayerMapCollision.h"
 
 
 // Application
 #include "BaseObject/BaseObject.h"
+#include "PlayerBody.h"
+
+enum BehaviorPlayer
+{
+	Move,
+	Return,
+	Boost
+};
 
 class Player 
 	: BaseObject
@@ -26,6 +35,8 @@ public:
 	/// </summary>
 	void Draw() override;
 
+	void OnCollision();
+
 private:
 	/// 全行列の転送
 	void UpdateMatrices();
@@ -33,6 +44,9 @@ private:
 	// 移動
 	void Move();
 
+	void Boost();
+
+	void TimerManager();
 
 public: // getter&setter
 	/// WorldTransformの取得
@@ -43,6 +57,11 @@ public: // getter&setter
 
 	// 一人称視点にした場合横を向いているので操作を切り替えるため
 	void SetFPSMode(bool isFPS) { isFPSMode_ = isFPS; }
+
+	void SetMapInfo(MapChipField* mapChipField) { 
+		mapCollision_.SetMap(mapChipField);
+		mapCollision_.Init(colliderRct_, worldTransform_.translation_);
+	}
 
 private:
 	Input* input_ = nullptr;
@@ -55,7 +74,39 @@ private:
 	// 移動
 	Vector3 velocity_ = { 0.0f,0.0f,0.0f };			// 加速度
 	Vector3 moveDirection_ = { 0.0f,0.0f,0.0f };	// 動く向き
-	float speed_ = 0.3f;							// 動く速度
+	float defaultSpeed_ = 0.3f;
+	float speed_ = defaultSpeed_;							// 動く速度
 	bool isFPSMode_ = false;
+
+	bool isMove_ = false;
+
+	float boostSpeed_ = 0.4f;
+
+	// 移動履歴
+	std::list<Vector3> moveHistory_;
+
+
+	// ゲージ
+	int32_t MaxGrassGauge_ = 6;
+	int32_t grassGauge_ = 0;
+
+	// 時間制限 : 単位(sec)
+	float kTimeLimit_ = 10.0f;			// タイマーの限界値
+	float extendTimer_ = kTimeLimit_;	// 伸びられる残り時間
+	float grassTime_ = 6.0f;			// 草を食べて追加される時間
+
+	float kBoostTime_ = 1.5f;
+	float boostTimer_ = 0;
+
+	const float deltaTime_ = 1.0f / 60.0f; // 仮対応
+
+
+	PlayerMapCollision mapCollision_;
+
+	MapChipCollision::ColliderRect colliderRct_;
+
+	MapChipCollision::CollisionFlag collisionFlag_ = MapChipCollision::CollisionFlag::None;
+
+	std::list <std::unique_ptr<PlayerBody>> playerBodys_;
 };
 

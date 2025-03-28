@@ -92,6 +92,11 @@ MapChipType MapChipField::GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex
     return mapChipData_.data[yIndex][xIndex];
 }
 
+void MapChipField::SetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex, MapChipType type)
+{
+    mapChipData_.data[yIndex][xIndex] = type;
+}
+
 Vector3 MapChipField::GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex) {
     return Vector3(
         kBlockWidth * xIndex,
