@@ -9,11 +9,12 @@
 #include "BaseObject/BaseObject.h"
 #include "PlayerBody.h"
 
-enum BehaviorPlayer
+enum class BehaviorPlayer
 {
-	Move,
+	Root,
+	Moving,
+	Boost,
 	Return,
-	Boost
 };
 
 class Player 
@@ -52,9 +53,76 @@ private:
 	// 移動
 	void Move();
 
-	void Boost();
+	// 移動へ移行
+	void EntryMove();
+
+	// ブーストへ移行
+	void EntryBoost();
+
+	// 帰還へ移行
+	void EntryReturn();
+
 
 	void TimerManager();
+
+
+#ifdef _DEBUG
+	// デバッグ用 (ImGuiとか)
+	void DebugPlayer();
+#endif // _DEBUG
+
+private: // プレイヤーのふるまい
+
+	/// <summary>
+	/// ふるまい全体の初期化
+	/// </summary>
+	void BehaviorInitialize();
+	/// <summary>
+	/// ふるまい全体の更新
+	/// </summary>
+	void BehaviorUpdate();
+
+
+	/// <summary>
+	/// 停止状態初期化
+	/// </summary>
+	void BehaviorRootInit();
+	/// <summary>
+	/// 停止状態更新
+	/// </summary>
+	void BehaviorRootUpdate();
+
+
+	/// <summary>
+	/// 移動状態初期化
+	/// </summary>
+	void BehaviorMovingInit();
+	/// <summary>
+	/// 移動状態更新
+	/// </summary>
+	void BehaviorMovingUpdate();
+
+
+	/// <summary>
+	/// 加速状態初期化
+	/// </summary>
+	void BehaviorBoostInit();
+	/// <summary>
+	/// 加速状態更新
+	/// </summary>
+	void BehaviorBoostUpdate();
+
+
+	/// <summary>
+	/// 帰還状態初期化
+	/// </summary>
+	void BehaviorReturnInit();
+	/// <summary>
+	/// 帰還状態更新
+	/// </summary>
+	void BehaviorReturnUpdate();
+
+
 
 public: // getter&setter
 	/// WorldTransformの取得
@@ -103,11 +171,15 @@ private:
 
 	// 時間制限 : 単位(sec)
 	float kTimeLimit_ = 10.0f;			// タイマーの限界値
-	float extendTimer_ = kTimeLimit_;	// 伸びられる残り時間
+	float extendTimer_ = 0;				// 伸びられる残り時間
 	float grassTime_ = 6.0f;			// 草を食べて追加される時間
 
-	float kBoostTime_ = 1.5f;
-	float boostTimer_ = 0;
+	float kBoostTime_ = 1.5f;			// ブーストの最大効果時間
+	float boostTimer_ = 0;				// 現在のブーストの残り時間
+
+	float kBoostCT_ = 5.0f;				// ブーストのクールタイム
+	float boostCoolTimer_ = 0;			// 現在のクールタイムトの残り時間
+
 
 	const float deltaTime_ = 1.0f / 60.0f; // 仮対応
 
@@ -119,5 +191,11 @@ private:
 	//MapChipCollision::CollisionFlag collisionFlag_ = MapChipCollision::CollisionFlag::None;
 
 	std::list <std::unique_ptr<PlayerBody>> playerBodys_;
+
+	
+	// 振る舞い
+	BehaviorPlayer behavior_ = BehaviorPlayer::Root;
+	// 次の振る舞いリクエスト
+	std::optional<BehaviorPlayer> behaviortRquest_ = std::nullopt;
 };
 

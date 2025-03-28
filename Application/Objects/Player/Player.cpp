@@ -1,6 +1,7 @@
 #include "Player.h"
 #ifdef _DEBUG
 #include "imgui.h"
+#include "string"
 #endif // _DEBUG
 
 void Player::Initialize(Camera* camera)
@@ -30,10 +31,19 @@ void Player::Initialize(Camera* camera)
 
 void Player::Update()
 {
+	// 各行動の初期化
+	BehaviorInitialize();
 
-	Move();
+	// 各行動の更新
+	BehaviorUpdate();
+
 	TimerManager();
 	UpdateMatrices();
+	
+#ifdef _DEBUG
+	DebugPlayer();
+#endif // _DEBUG
+
 }
 
 void Player::Draw()
@@ -92,30 +102,28 @@ void Player::UpdateMatrices()
 
 void Player::Move()
 {
-	Boost();
 
 	velocity_ = { 0.0f,0.0f,0.0f };
 
-	if (input_->PushKey(DIK_W))
+	if (input_->PushKey(DIK_W) && moveDirection_ != Vector3{ 0,1,0 })
 	{
 		moveDirection_ = { 0,1,0 };
-		//moveDirection_.z++;
-		//collisionFlag_ = MapChipCollision::CollisionFlag::Top;
+		moveHistory_.push_back(worldTransform_.translation_);
 	}
-	else if (input_->PushKey(DIK_S))
+	else if (input_->PushKey(DIK_S) && moveDirection_ != Vector3{ 0,-1,0 })
 	{
 		moveDirection_ = { 0,-1,0 };
-		//collisionFlag_ = MapChipCollision::CollisionFlag::Bottom;
+		moveHistory_.push_back(worldTransform_.translation_);
 	}
-	else if (input_->PushKey(DIK_A))
+	else if (input_->PushKey(DIK_A) && moveDirection_ != Vector3{ -1,0,0 })
 	{
 		moveDirection_ = { -1,0,0 };
-		//collisionFlag_ = MapChipCollision::CollisionFlag::Right;
+		moveHistory_.push_back(worldTransform_.translation_);
 	}
-	else if (input_->PushKey(DIK_D))
+	else if (input_->PushKey(DIK_D) && moveDirection_ != Vector3{ 1,0,0 })
 	{
 		moveDirection_ = { 1,0,0 };
-		//collisionFlag_ = MapChipCollision::CollisionFlag::Left;
+		moveHistory_.push_back(worldTransform_.translation_);
 	}
 	
 	moveDirection_ = Normalize(moveDirection_);
@@ -167,23 +175,35 @@ void Player::Move()
 
 }
 
-void Player::Boost()
+void Player::EntryMove()
 {
 #ifdef _DEBUG
-	if (input_->TriggerKey(DIK_B))
+	if (input_->TriggerKey(DIK_SPACE))
 	{
-		boostTimer_ = kBoostTime_;
+		behaviortRquest_ = BehaviorPlayer::Moving;
+		moveDirection_ = { 0,1,0 };
+		extendTimer_ = kTimeLimit_;
+		moveHistory_.push_back(worldTransform_.translation_);
 	}
 #endif // _DEBUG
+}
 
-	if (0 < boostTimer_)
+void Player::EntryBoost()
+{
+	if(0 >= boostCoolTimer_)
 	{
-		speed_ = defaultSpeed_ + boostSpeed_;
+#ifdef _DEBUG
+		if (input_->TriggerKey(DIK_B))
+		{
+			behaviortRquest_ = BehaviorPlayer::Boost;
+		}
+#endif // _DEBUG
 	}
-	else
-	{
-		speed_ = defaultSpeed_;
-	}
+}
+
+void Player::EntryReturn()
+{
+	behaviortRquest_ = BehaviorPlayer::Return;
 }
 
 void Player::TimerManager()
@@ -192,8 +212,155 @@ void Player::TimerManager()
 	{
 		extendTimer_ -= deltaTime_;
 	}
-	if (0 < boostTimer_) 
+	if (0 < boostCoolTimer_)
+	{
+		boostCoolTimer_ -= deltaTime_;
+	}
+}
+
+#ifdef _DEBUG
+void Player::DebugPlayer()
+{
+	int a = moveHistory_.size();
+	ImGui::Begin("DebugPlayer");
+	ImGui::Text("TimeLimit  : %.2f", extendTimer_);
+	ImGui::Text("BoostTimer : %.2f", boostTimer_);
+	ImGui::Text("BoostCT    : %.2f", boostCoolTimer_);
+	ImGui::Text("HistorySize: %d", a);
+	ImGui::End();
+
+	if (input_->TriggerKey(DIK_N))
+	{
+		EntryReturn();
+	}
+}
+#endif // _DEBUG
+
+void Player::BehaviorInitialize()
+{
+	if (behaviortRquest_)
+	{
+		// 振る舞いを変更する
+		behavior_ = behaviortRquest_.value();
+		// 各振る舞いごとの初期化を実行
+		switch (behavior_)
+		{
+		case BehaviorPlayer::Root:
+		default:
+			BehaviorRootInit();
+			break;
+		case BehaviorPlayer::Moving:
+			BehaviorMovingInit();
+			break;
+		case BehaviorPlayer::Boost:
+			BehaviorBoostInit();
+			break;
+		case BehaviorPlayer::Return:
+			BehaviorReturnInit();
+			break;
+		}
+		// 振る舞いリクエストをリセット
+		behaviortRquest_ = std::nullopt;
+	}
+}
+
+void Player::BehaviorUpdate()
+{
+	switch (behavior_)
+	{
+	case BehaviorPlayer::Root:
+	default:
+		BehaviorRootUpdate();
+		break;
+	case BehaviorPlayer::Moving:
+		BehaviorMovingUpdate();
+		break;
+	case BehaviorPlayer::Boost:
+		BehaviorBoostUpdate();
+		break;
+	case BehaviorPlayer::Return:
+		BehaviorReturnUpdate();
+		break;
+	}
+
+}
+
+void Player::BehaviorRootInit()
+{
+	speed_ = 0;
+}
+
+void Player::BehaviorRootUpdate()
+{
+	EntryMove();
+}
+
+void Player::BehaviorMovingInit()
+{
+	speed_ = defaultSpeed_;
+}
+
+void Player::BehaviorMovingUpdate()
+{
+	Move();
+
+	EntryBoost();
+
+	if (0 >= extendTimer_)
+	{
+		EntryReturn();
+	}
+}
+
+void Player::BehaviorBoostInit()
+{
+	speed_ = defaultSpeed_ + boostSpeed_;
+	boostTimer_ = kBoostTime_;
+}
+
+void Player::BehaviorBoostUpdate()
+{
+	Move();
+
+	if (0 < boostTimer_)
 	{
 		boostTimer_ -= deltaTime_;
+	}
+	else
+	{
+		behaviortRquest_ = BehaviorPlayer::Moving;
+		boostCoolTimer_ = kBoostCT_;
+	}
+
+	if (0 >= extendTimer_)
+	{
+		EntryReturn();
+	}
+}
+
+void Player::BehaviorReturnInit()
+{
+	speed_ = defaultSpeed_;
+	moveDirection_ = { 0,0,0 };
+}
+
+void Player::BehaviorReturnUpdate()
+{
+	if (moveHistory_.size() > 0)
+	{
+		if (Length(worldTransform_.translation_ - moveHistory_.back()) > speed_)
+		{
+			Vector3 direction = Normalize(moveHistory_.back() - worldTransform_.translation_);
+			worldTransform_.translation_ += speed_ * direction;
+		}
+		else
+		{
+			worldTransform_.translation_ = moveHistory_.back();
+			moveHistory_.pop_back();
+		}
+	}
+	else
+	{
+		behaviortRquest_ = BehaviorPlayer::Root;
 	}
 }
