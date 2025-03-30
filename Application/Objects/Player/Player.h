@@ -65,6 +65,8 @@ private:
 
 	void TimerManager();
 
+	void PopGrass();
+
 
 #ifdef _DEBUG
 	// デバッグ用 (ImGuiとか)
@@ -138,6 +140,8 @@ public: // getter&setter
 		//mapCollision_.SetMap(mapChipField);
 		//mapCollision_.Init(colliderRct_, worldTransform_.translation_);
 	}
+
+	bool IsBoost() { return behavior_ == BehaviorPlayer::Boost; }
 
 private:
 	Input* input_ = nullptr;

@@ -62,6 +62,11 @@ void GameScene::Initialize()
 
 
     player_->SetMapInfo(mpInfo_->GetMapChipField());
+
+	// 草
+	grass_ = std::make_unique<Grass>();
+	grass_->Initialize(sceneCamera_.get());
+
     
     // 地面
     ground_ = std::make_unique<Ground>();
@@ -155,7 +160,7 @@ void GameScene::Update()
 	// enemy_->Update();
 
 	ground_->Update();
-
+	grass_->Update();
 
 	particleEmitter_[0]->Emit();
 
@@ -243,12 +248,13 @@ void GameScene::DrawObject()
 	ground_->Draw();
 	commandList_->EndQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
 
-
+	
 
     //stageManager_.Draw();
 
 	player_->Draw();
 
+	grass_->Draw();
 }
 
 void GameScene::DrawSprite()

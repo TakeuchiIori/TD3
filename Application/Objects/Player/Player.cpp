@@ -1,4 +1,5 @@
 #include "Player.h"
+
 #ifdef _DEBUG
 #include "imgui.h"
 #include "string"
@@ -36,6 +37,8 @@ void Player::Update()
 
 	// 各行動の更新
 	BehaviorUpdate();
+
+	PopGrass();
 
 	TimerManager();
 	UpdateMatrices();
@@ -215,6 +218,14 @@ void Player::TimerManager()
 	if (0 < boostCoolTimer_)
 	{
 		boostCoolTimer_ -= deltaTime_;
+	}
+}
+
+void Player::PopGrass()
+{
+	if (grassGauge_ == MaxGrass_) {
+		grassGauge_ = 0;
+		//ここで草のPopタイマースタート
 	}
 }
 
