@@ -19,7 +19,6 @@ JsonManager::~JsonManager()
 		instances.erase(fileName_);
 	}
 }
-
 void JsonManager::Unregister(const std::string& name)
 {
 	// 変数が存在する場合、削除
@@ -64,8 +63,7 @@ void JsonManager::Reset(bool clearVariables)
 	if (clearVariables)
 	{
 		variables_.clear();  // すべての変数を削除
-	} 
-	else
+	} else
 	{
 		for (auto& pair : variables_)
 		{
@@ -148,113 +146,119 @@ void JsonManager::LoadAll()
 	}
 }
 
+void JsonManager::ImGui(const std::string& className)
+{
+#ifdef _DEBUG
+
+
+	auto it = instances.find(className);
+	if (it == instances.end()) return; // クラスが存在しない場合は何もしない
+
+	JsonManager* instance = it->second;
+
+	std::string windowTitle = "JsonManager - " + className;
+	ImGui::Begin(windowTitle.c_str());
+
+	// クラス名を強調
+	ImGui::TextColored(ImVec4(1.0f, 0.6f, 0.2f, 1.0f), "[ %s ]", className.c_str());
+	ImGui::Separator();
+
+	ImGui::PushID(className.c_str()); // クラスごとにIDを設定
+
+	for (auto& pair : instance->variables_)
+	{
+		pair.second->ShowImGui(pair.first, className);
+	}
+
+	ImGui::Separator();
+
+	// ボタンをセンタリング
+	float buttonWidth = 120.0f;
+	float windowWidth = ImGui::GetWindowWidth();
+	float buttonPosX = (windowWidth - buttonWidth * 2) * 0.5f;
+
+	ImGui::SetCursorPosX(buttonPosX);
+	if (ImGui::Button(("Reset " + className).c_str(), ImVec2(buttonWidth, 0)))
+	{
+		instance->Reset();
+	}
+	ImGui::SameLine();
+	if (ImGui::Button(("Clear All " + className).c_str(), ImVec2(buttonWidth, 0)))
+	{
+		instance->Reset(true);
+	}
+
+	ImGui::PopID();
+	ImGui::End();
+
+#endif // _DEBUG
+}
+
+// JsonManager.cpp の ImGuiManager を修正
 void JsonManager::ImGuiManager()
 {
 #ifdef _DEBUG
-	ImGui::Begin("JsonManager"); // Parent window
+	ImGui::Begin("JsonManager"); // 親ウィンドウ
 
-	ImGui::Text("Select Class:");
-	ImGui::Separator();
+	ImGui::Text("Select Category:");
+	//ImGui::Separator();
 
-	// Start child window with scrollbar
-	ImGui::BeginChild("ClassList", ImVec2(0, 150), true);
-
-	// Display class name buttons vertically
-	for (auto& instance : instances) {
-		ImGui::PushTextWrapPos(ImGui::GetWindowWidth() - 20.0f);
-		if (ImGui::Button(instance.first.c_str(),
-			ImVec2(250, 30))) // Unified button width
-		{
-			selectedClass = instance.first; // Update selected class
-		}
-		ImGui::PopTextWrapPos();
+	// カテゴリごとのマップを作る
+	std::unordered_map<std::string, std::vector<std::string>> categoryMap;
+	for (const auto& [name, manager] : instances) {
+		std::string category = manager->GetCategory().empty() ? "Uncategorized" : manager->GetCategory();
+		categoryMap[category].push_back(name);
 	}
 
-	ImGui::EndChild();  // End child window
-	ImGui::Separator(); // Separator line
+	// クラス選択スクロール部分（固定せず最大限使う）
+	ImGui::BeginChild("ClassList", ImVec2(0, 0), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
-	// Display only the selected class
+	for (const auto& [category, classList] : categoryMap) {
+		if (ImGui::TreeNode(category.c_str())) {
+			for (const auto& className : classList) {
+				if (ImGui::Button(className.c_str(), ImVec2(250, 30))) {
+					selectedClass = className;
+				}
+			}
+			ImGui::TreePop();
+		}
+	}
+
+	ImGui::EndChild(); // クラス一覧パネル終わり
+
+	//ImGui::Separator();
+
+	// 選択されたクラスを表示
 	if (!selectedClass.empty()) {
 		auto it = instances.find(selectedClass);
 		if (it != instances.end()) {
 			JsonManager* instance = it->second;
 
-			std::string windowTitle = "JsonManager - " + selectedClass;
-			ImGui::TextColored(ImVec4(1.0f, 0.6f, 0.2f, 1.0f), "[ %s ]",
-				selectedClass.c_str());
+			ImGui::TextColored(ImVec4(1.0f, 0.6f, 0.2f, 1.0f), "[ %s ]", selectedClass.c_str());
+			//ImGui::Separator();
 
-			ImGui::Separator();
+			ImGui::PushID(selectedClass.c_str());
 
-			ImGui::PushID(selectedClass.c_str()); // Set ID for each class
+			// 変数表示もスクロールできるように
+			ImGui::BeginChild("VariableList", ImVec2(0, 200), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
-			// Start child window with scrollbar for variables
-			ImGui::BeginChild("VariableList", ImVec2(0, 200), true);
-
-
-			if (instance->child_.empty())  // childが空なら、すべての変数を表示
-			{
-				for (auto& pair : instance->variables_)
-				{
-					pair.second->ShowImGui(pair.first, selectedClass);
-				}
-			}
-			else  // childがある場合
-			{
-				std::unordered_map<std::string, std::vector<std::pair<std::string, IVariableJson*>>> groupedVars;
-
-				// 変数を child_ のキーごとに分類
-				for (auto& pair : instance->variables_)
-				{
-					bool matched = false;
-					for (auto& CHPair : instance->child_)
-					{
-						if (pair.first.length() >= CHPair.first.size() &&
-							pair.first.compare(0, CHPair.first.size(), CHPair.first) == 0)
-						{
-							groupedVars[CHPair.first].emplace_back(pair.first, pair.second.get());
-							matched = true;
-							break; // 1つの `child_` にマッチすれば十分
-						}
-					}
-					if (!matched)
-					{
-						groupedVars[""].emplace_back(pair.first, pair.second.get()); // マッチしない変数
-					}
-				}
-
-				// child_ に関連しない変数を表示
-				for (auto& var : groupedVars[""])
-				{
-					var.second->ShowImGui(var.first, selectedClass);
-				}
-
-				// 各 child_ のツリーノードと対応する変数表示
-				for (auto& CHPair : instance->child_)
-				{
-					if (ImGui::TreeNode(CHPair.first.c_str()))
-					{
-						for (auto& var : groupedVars[CHPair.first])
-						{
-							var.second->ShowImGui(var.first, selectedClass);
-						}
-						ImGui::TreePop();
-					}
-				}
+			for (auto& pair : instance->variables_) {
+				pair.second->ShowImGui(pair.first, selectedClass);
 			}
 
-
-			ImGui::EndChild(); // End child window for variables
+			ImGui::EndChild();
 
 			if (ImGui::Button(("Save " + selectedClass).c_str())) {
 				std::string message = format("{}.json Saved!!.", selectedClass);
 				MessageBoxA(nullptr, message.c_str(), "JsonManager", 0);
 				instance->Save();
 			}
+
 			ImGui::PopID();
 		}
 	}
 
-	ImGui::End();
+	ImGui::End(); // 親ウィンドウ終わり
 #endif
 }
 
@@ -268,8 +272,7 @@ void JsonManager::ChildReset(std::string parentFileName, std::string childName)
 		if (instance->child_.empty())  // childが空なら
 		{
 			return;
-		}
-		else  // childがある場合
+		} else  // childがある場合
 		{
 			std::unordered_map<std::string, std::vector<std::pair<std::string, IVariableJson*>>> groupedVars;
 
@@ -310,6 +313,7 @@ void JsonManager::ClearRegister(std::string parentFileName)
 		instances[parentFileName]->variables_.clear();
 	}
 }
+
 
 std::string JsonManager::MakeFullPath(const std::string& folder, const std::string& file) const
 {
