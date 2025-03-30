@@ -30,8 +30,8 @@ void GameScene::Initialize()
 	sceneCamera_ = cameraManager_.AddCamera();
 	//playerCamera_ = cameraManager_.AddCamera();
 
-	// 初期カメラモード設定
-	cameraMode_ = CameraMode::DEFAULT;
+    // 初期カメラモード設定
+    cameraMode_ = CameraMode::FOLLOW;
 
 	CollisionManager::GetInstance()->Initialize();
 
@@ -50,18 +50,22 @@ void GameScene::Initialize()
 	playerCamera_->Initialize();
 
 	// 各オブジェクトの初期化
-	player_ = std::make_unique<Player>();
-	player_->Initialize(sceneCamera_.get());
-	followCamera_.SetTarget(player_->GetWorldTransform());
-	playerCamera_->SetTarget(player_->GetWorldTransform());
-
 	mpInfo_ = std::make_unique<MapChipInfo>();
 	mpInfo_->Initialize();
 	mpInfo_->SetCamera(sceneCamera_.get());
 
-	// 地面
-	ground_ = std::make_unique<Ground>();
-	ground_->Initialize(sceneCamera_.get());
+	player_ = std::make_unique<Player>(mpInfo_->GetMapChipField());
+	player_->Initialize(sceneCamera_.get());
+	followCamera_.SetTarget(player_->GetWorldTransform());
+	playerCamera_->SetTarget(player_->GetWorldTransform());
+
+
+
+    player_->SetMapInfo(mpInfo_->GetMapChipField());
+    
+    // 地面
+    ground_ = std::make_unique<Ground>();
+    ground_->Initialize(sceneCamera_.get());
 
 	test_ = std::make_unique<Object3d>();
 	test_->Initialize();
@@ -119,8 +123,8 @@ void GameScene::Update()
 
 	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
 		picture_->Update();
-	}
-	stageManager_.Update();
+    }
+    //stageManager_.Update();
 
 	test_->UpdateAnimation();
 	testWorldTransform_.UpdateMatrix();
@@ -239,7 +243,7 @@ void GameScene::DrawObject()
 
 
 
-	stageManager_.Draw();
+    //stageManager_.Draw();
 
 	player_->Draw();
 

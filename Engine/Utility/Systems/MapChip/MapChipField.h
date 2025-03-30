@@ -18,6 +18,7 @@ enum class MapChipType {
     kBlank, // 空白
     kBlock, // ブロック
     // 将来的に拡張しやすいよう、ここに新しいタイプを追加できます
+    kBody,
 };
 
 class MapChipField {
@@ -59,6 +60,12 @@ public:
     /// </summary>
     /// <returns>指定位置のマップチップタイプ</returns>
     MapChipType GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex) const;
+
+    /// <summary>
+    /// マップチップの種別を取得
+    /// </summary>
+    /// <returns>指定位置のマップチップタイプ</returns>
+    void SetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex, MapChipType type);
 
     /// <summary>
     /// 座標を取得

@@ -124,6 +124,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Utility\Systems\MapChip\MapChipInfo.cpp" />
     <ClCompile Include="Engine\Utility\Systems\UI\UIBase.cpp" />
     <ClCompile Include="Engine\Utility\Systems\UI\UIButton.cpp" />
+    <ClCompile Include="Application\Objects\Grass\Grass.cpp" />
     <ClCompile Include="Math\Easing.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Model\AnimationSystem.cpp" />
     <ClCompile Include="Application\Scenes\MainScenes\Clear\ClearScene.cpp" />
@@ -194,6 +195,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\SystemsApp\Cameras\StageCamera\StageCamera.cpp" />
     <ClCompile Include="Application\Stages\StageManager\StageManager.cpp" />
     <ClCompile Include="Application\Objects\StageObject\StageObjectManager\StageObjectManager.cpp" />
+    <ClCompile Include="Application\Objects\Player\PlayerMapCollision.cpp" />
+    <ClCompile Include="Application\Objects\Player\PlayerBody.cpp" />
     <ClCompile Include="TestStage.cpp" />
     <ClCompile Include="Application\SystemsApp\Picture\Picture.cpp" />
   </ItemGroup>
@@ -213,6 +216,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Utility\Systems\MapChip\MapChipInfo.h" />
     <ClInclude Include="Engine\Utility\Systems\UI\UIBase.h" />
     <ClInclude Include="Engine\Utility\Systems\UI\UIButton.h" />
+    <ClInclude Include="Application\Objects\Grass\Grass.h" />
     <ClInclude Include="Math\Easing.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\AnimationSystem.h" />
     <ClInclude Include="Application\Scenes\MainScenes\Clear\ClearScene.h" />
@@ -289,6 +293,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\SystemsApp\Cameras\StageCamera\StageCamera.h" />
     <ClInclude Include="Application\Stages\StageManager\StageManager.h" />
     <ClInclude Include="Application\Objects\StageObject\StageObjectManager\StageObjectManager.h" />
+    <ClInclude Include="Application\Objects\Player\PlayerMapCollision.h" />
+    <ClInclude Include="Application\Objects\Player\PlayerBody.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="TestStage.h" />
     <ClInclude Include="Application\SystemsApp\Picture\Picture.h" />

@@ -96,6 +96,9 @@
     <ClCompile Include="Engine\Utility\Collision\AABB\AABBCollider.cpp" />
     <ClCompile Include="Engine\Utility\Collision\OBB\OBBCollider.cpp" />
     <ClCompile Include="Engine\Utility\Collision\Sphere\SphereCollider.cpp" />
+    <ClCompile Include="Application\Objects\Player\PlayerMapCollision.cpp" />
+    <ClCompile Include="Application\Objects\Player\PlayerBody.cpp" />
+    <ClCompile Include="Application\Objects\Grass\Grass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -192,6 +195,9 @@
     <ClInclude Include="Engine\Utility\Collision\AABB\AABBCollider.h" />
     <ClInclude Include="Engine\Utility\Collision\OBB\OBBCollider.h" />
     <ClInclude Include="Engine\Utility\Collision\Sphere\SphereCollider.h" />
+    <ClInclude Include="Application\Objects\Player\PlayerMapCollision.h" />
+    <ClInclude Include="Application\Objects\Player\PlayerBody.h" />
+    <ClInclude Include="Application\Objects\Grass\Grass.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />
