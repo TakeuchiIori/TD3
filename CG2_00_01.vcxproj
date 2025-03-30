@@ -116,6 +116,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Objects\StageObject\BaseFloorObject\BaseFloorObject.cpp" />
     <ClCompile Include="Application\SystemsApp\Cameras\DebugCamera\DebugCamera.cpp" />
     <ClCompile Include="Engine\Generators\OffScreen\OffScreen.cpp" />
+    <ClCompile Include="Engine\Utility\Collision\AABB\AABBCollider.cpp" />
+    <ClCompile Include="Engine\Utility\Collision\OBB\OBBCollider.cpp" />
+    <ClCompile Include="Engine\Utility\Collision\Sphere\SphereCollider.cpp" />
     <ClCompile Include="Engine\Utility\Systems\MapChip\MapChipCollision.cpp" />
     <ClCompile Include="Engine\Utility\Systems\MapChip\MapChipField.cpp" />
     <ClCompile Include="Engine\Utility\Systems\MapChip\MapChipInfo.cpp" />
@@ -202,6 +205,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Objects\StageObject\BaseFloorObject\BaseFloorObject.h" />
     <ClInclude Include="Application\SystemsApp\Cameras\DebugCamera\DebugCamera.h" />
     <ClInclude Include="Engine\Generators\OffScreen\OffScreen.h" />
+    <ClInclude Include="Engine\Utility\Collision\AABB\AABBCollider.h" />
+    <ClInclude Include="Engine\Utility\Collision\OBB\OBBCollider.h" />
+    <ClInclude Include="Engine\Utility\Collision\Sphere\SphereCollider.h" />
     <ClInclude Include="Engine\Utility\Systems\MapChip\MapChipCollision.h" />
     <ClInclude Include="Engine\Utility\Systems\MapChip\MapChipField.h" />
     <ClInclude Include="Engine\Utility\Systems\MapChip\MapChipInfo.h" />
