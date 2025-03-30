@@ -12,8 +12,8 @@ void GrassManager::Update()
 		grass->Update();
 	}
 
-	grassList_.remove_if([](Grass& g) {
-		return g.IsDelete();
+	grassList_.remove_if([](const std::unique_ptr<Grass>& g) {
+		return g->IsDelete();
 		});
 }
 

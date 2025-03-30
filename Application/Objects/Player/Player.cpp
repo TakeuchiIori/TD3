@@ -12,6 +12,8 @@ void Player::Initialize(Camera* camera)
 	BaseObject::camera_ = camera;
 	SphereCollider::SetCamera(BaseObject::camera_);
 	SphereCollider::Initialize();
+	SetRadius(2.0f);
+	SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kPlayer));
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
@@ -27,7 +29,7 @@ void Player::Initialize(Camera* camera)
 	obj_->Initialize();
 	obj_->SetModel("unitCube.obj");
 	obj_->SetMaterialColor({ 0.3f,0.3f,1.0f,1.0f });
-
+	
 	//colliderRct_.height = 2.0f;
 	//colliderRct_.width = 2.0f;
 }
@@ -44,6 +46,7 @@ void Player::Update()
 
 	TimerManager();
 	UpdateMatrices();
+	SphereCollider::Update();
 	
 #ifdef _DEBUG
 	DebugPlayer();
@@ -102,7 +105,7 @@ void Player::OnCollision(Collider* other)
 
 void Player::EnterCollision(Collider* other)
 {
-	if(behavior_ != BehaviorPlayer::Return)
+	if (behavior_ != BehaviorPlayer::Return)
 	{
 		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrass)) // 草を食べたら
 		{

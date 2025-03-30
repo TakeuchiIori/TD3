@@ -19,13 +19,14 @@ void Grass::Initialize(Camera* camera)
 	SphereCollider::Initialize();
 
 	SetRadius(defaultScale_.x);
+	SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kGrass));
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
 	worldTransform_.scale_ = { 2.0f,2.0f,2.0f };
 
 	//
-	worldTransform_.translation_ = { 8.0f,2.0f,5.0f };
+	worldTransform_.translation_ = { 8.0f,5.0f,6.0f };
 
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
@@ -37,7 +38,7 @@ void Grass::Initialize(Camera* camera)
 void Grass::Update()
 {
 	worldTransform_.UpdateMatrix();
-
+	SphereCollider::Update();
 
 
 #ifdef _DEBUG
@@ -77,7 +78,7 @@ void Grass::ExitCollision(Collider* other)
 		{
 			if(!isMadeByPlayer_)
 			{
-				worldTransform_.scale_ = defaultScale_;
+				behaviortRquest_ = BehaviorGrass::Repop;
 			}
 		}
 	}

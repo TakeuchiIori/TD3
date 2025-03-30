@@ -35,7 +35,7 @@ void GameScene::Initialize()
 
 	CollisionManager::GetInstance()->Initialize();
 
-	stageManager_.Initialize(sceneCamera_.get());
+	//stageManager_.Initialize(sceneCamera_.get());
 
 	picture_ = std::make_unique<Picture>();
 	picture_->Initialize();
@@ -66,6 +66,7 @@ void GameScene::Initialize()
 	// 草
 	grass_ = std::make_unique<Grass>();
 	grass_->Initialize(sceneCamera_.get());
+	grass_->SetPlayer(player_.get());
 
     
     // 地面

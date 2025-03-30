@@ -50,7 +50,7 @@ public:
 
 public:
 	Vector3 GetCenterPosition() const override { return worldTransform_.translation_; }
-	virtual Vector3 GetEulerRotation() override {};
+	virtual Vector3 GetEulerRotation() override { return{}; }
 	Matrix4x4 GetWorldMatrix() const override { return worldTransform_.matWorld_; }
 	void OnCollision([[maybe_unused]] Collider* other) override;
 	void EnterCollision([[maybe_unused]] Collider* other) override;
@@ -169,13 +169,13 @@ private:
 	// 移動
 	Vector3 velocity_ = { 0.0f,0.0f,0.0f };			// 加速度
 	Vector3 moveDirection_ = { 0.0f,0.0f,0.0f };	// 動く向き
-	float defaultSpeed_ = 0.3f;
+	float defaultSpeed_ = 0.15f;
 	float speed_ = defaultSpeed_;							// 動く速度
 	bool isFPSMode_ = false;
 
 	bool isMove_ = false;
 
-	float boostSpeed_ = 0.4f;
+	float boostSpeed_ = 0.2f;
 
 	// 移動履歴
 	std::list<Vector3> moveHistory_;
