@@ -41,10 +41,11 @@ public:
 		LoadAll();
 	}
 
+
 	/// <summary>
-	/// 指定した変数を登録解除（削除）
-	/// </summary>
-	/// <param name="name">削除したい変数のキー</param>
+/// 指定した変数を登録解除（削除）
+/// </summary>
+/// <param name="name">削除したい変数のキー</param>
 	void Unregister(const std::string& name);
 
 	void Reset(bool clearVariables = false);
@@ -60,6 +61,12 @@ public:
 	void LoadAll();
 
 	/// <summary>
+	/// ImGui
+	/// </summary>
+	/// <param name="className"></param>
+	static void ImGui(const std::string& className);
+
+	/// <summary>
 	/// 実際にImGuiを表示する
 	/// </summary>
 	static void ImGuiManager();
@@ -72,6 +79,10 @@ public:
 
 
 	void ClearRegister(std::string parentFileName);
+public:
+
+	void SetCategory(const std::string& category) { category_ = category; }
+	const std::string& GetCategory() const { return category_; }
 
 private:
 	/// <summary>
@@ -92,8 +103,8 @@ private:
 	std::unordered_map<std::string, bool> child_;
 	static inline std::unordered_map<std::string, JsonManager*> instances;
 	static inline std::string selectedClass;
+	std::string category_;
 };
-
 template<typename T>
 inline void JsonManager::ChildRegister(std::string parentFileName, std::string childName, const std::string& name, T* ptr)
 {
