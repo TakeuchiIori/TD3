@@ -119,7 +119,7 @@ void GameScene::Update()
 
 	mpInfo_->Update();
 	CheckAllCollisions();
-	CollisionManager::GetInstance()->UpdateWorldTransform();
+	CollisionManager::GetInstance()->Update();
 
 	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
 		picture_->Update();
@@ -201,7 +201,7 @@ void GameScene::Draw()
 	Object3dCommon::GetInstance()->DrawPreference();
 	LightManager::GetInstance()->SetCommandList();
 	DrawObject();
-	///line_->UpdateVertices(start_, end_);
+	///line_->RegisterLine(start_, end_);
 	///line_->DrawLine();
 
 	//---------
@@ -232,8 +232,6 @@ void GameScene::DrawOffScreen()
 
 void GameScene::DrawObject()
 {
-	CollisionManager::GetInstance()->Draw();
-
 	mpInfo_->Draw();
 	// オクルージョンクエリ開始
 	uint32_t queryIndex = 0;

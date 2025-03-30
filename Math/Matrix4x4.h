@@ -10,7 +10,6 @@
 
 // DirectX
 #include <DirectXMath.h>
-
 struct Matrix4x4 {
 	float m[4][4];
 
@@ -117,7 +116,7 @@ Matrix4x4 MakeScaleMatrix(const Vector3& scale);
 Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
 
 // 9. 座標変換
-Vector3 TransformCoordinates(const Vector3& vector, const Matrix4x4& matrix);
+Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);
 
 // ベクトル変換データ
 Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
@@ -129,7 +128,7 @@ Matrix4x4 MakeRotateMatrixY(float radian);
 //    Z軸回転行列
 Matrix4x4 MakeRotateMatrixZ(float radian);
 
-Matrix4x4 MakeRotateMatrixXYZ(Vector3& rad);
+Matrix4x4 MakeRotateMatrixXYZ(Vector3 rad);
 
 // 11. 3次元のアフィン変換行列
 Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate);
@@ -148,5 +147,8 @@ Matrix4x4 ScaleMatrixFromVector3(const Vector3& scale);
 
 // Vector3から平行移動行列を作成する関数
 Matrix4x4 TranslationMatrixFromVector3(const Vector3& translate);
+
+
+Vector3 MatrixToEuler(const Matrix4x4& m);
 
 DirectX::XMMATRIX ConvertToXMMATRIX(const Matrix4x4& matrix);
