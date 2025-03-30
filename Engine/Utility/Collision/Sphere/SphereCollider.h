@@ -47,6 +47,8 @@ public:
 
 	float GetRadius() const { return sphere_.radius; }
 	float GetRadius() { return sphere_.radius; }
+
+	void SetRadius(float radius) { radius_ = radius; }
 private:
 	Sphere sphere_;
 	Sphere sphereOffset_;

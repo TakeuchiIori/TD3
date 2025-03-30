@@ -14,7 +14,11 @@ void Grass::Initialize(Camera* camera)
 {
 	input_ = Input::GetInstance();
 
-	camera_ = camera;
+	BaseObject::camera_ = camera;
+	SphereCollider::SetCamera(BaseObject::camera_);
+	SphereCollider::Initialize();
+
+	SetRadius(defaultScale_.x);
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
@@ -43,7 +47,40 @@ void Grass::Update()
 
 void Grass::Draw()
 {
-	obj_->Draw(camera_, worldTransform_);
+	obj_->Draw(BaseObject::camera_, worldTransform_);
+}
+
+void Grass::OnCollision(Collider* other)
+{
+}
+
+void Grass::EnterCollision(Collider* other)
+{
+	if(player_->behavior_ != BehaviorPlayer::Return)
+	{
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
+		{
+			worldTransform_.scale_ = { 0.0f,0.0f,0.0f };
+			if (isMadeByPlayer_)
+			{
+				behaviortRquest_ = BehaviorGrass::Delete;
+			}
+		}
+	}
+}
+
+void Grass::ExitCollision(Collider* other)
+{
+	if (player_->behavior_ == BehaviorPlayer::Return)
+	{
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
+		{
+			if(!isMadeByPlayer_)
+			{
+				worldTransform_.scale_ = defaultScale_;
+			}
+		}
+	}
 }
 
 
@@ -52,16 +89,10 @@ void Grass::DebugGrass()
 {
 	float t = 1.0f - (growthTimer_ / kGrowthTime_);
 	ImGui::Begin("DebugGrass");
-	ImGui::Text("Growth : G ");
 	ImGui::DragFloat("t", &t);
 
 
 	ImGui::End();
-
-	if (input_->PushKey(DIK_G))
-	{
-		growthTimer_ = kGrowthTime_;
-	}
 }
 #endif // _DEBUG
 
@@ -135,6 +166,7 @@ void Grass::BehaviorGrowthUpdate()
 		float t = 1.0f - growthTimer_ / kGrowthTime_;
 
 		worldTransform_.scale_ = Lerp(defaultScale_, growthScale_, t);
+		SetRadius(worldTransform_.scale_.x);
 	}
 	else
 	{
@@ -145,10 +177,13 @@ void Grass::BehaviorGrowthUpdate()
 
 void Grass::BehaviorRepopInit()
 {
+	worldTransform_.scale_ = defaultScale_;
+	SetRadius(defaultScale_.x);
 }
 
 void Grass::BehaviorRepopUpdate()
 {
+	behaviortRquest_ = BehaviorGrass::Root;
 }
 
 void Grass::BehaviorDeleteInit()

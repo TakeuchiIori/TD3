@@ -9,7 +9,9 @@ void Player::Initialize(Camera* camera)
 {
 	input_ = Input::GetInstance();
 
-	camera_ = camera;
+	BaseObject::camera_ = camera;
+	SphereCollider::SetCamera(BaseObject::camera_);
+	SphereCollider::Initialize();
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
@@ -51,23 +53,23 @@ void Player::Update()
 
 void Player::Draw()
 {
-	obj_->Draw(camera_, bodyTransform_);
+	obj_->Draw(BaseObject::camera_, bodyTransform_);
 	for (const auto& body : playerBodys_) {
 		body->Draw();
 	}
 }
 
-void Player::OnCollision()
-{
-	//if (false) // 草を食べたら
-	//{
-	//	if (MaxGrassGauge_ > grassGauge_)
-	//	{
-	//		grassGauge_++;
-	//		extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
-	//	}
-	//}
-}
+//void Player::OnCollision()
+//{
+//	if (false) // 草を食べたら
+//	{
+//		if (MaxGrassGauge_ > grassGauge_)
+//		{
+//			grassGauge_++;
+//			extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
+//		}
+//	}
+//}
 
 void Player::MapChipOnCollision(const CollisionInfo& info)
 {// 衝突したブロックの種類に応じた処理
@@ -92,6 +94,42 @@ void Player::MapChipOnCollision(const CollisionInfo& info)
 	if (info.direction == 4) {  // 下方向の衝突 = 着地
 		//isGrounded_ = true;
 	}
+}
+
+void Player::OnCollision(Collider* other)
+{
+}
+
+void Player::EnterCollision(Collider* other)
+{
+	if(behavior_ != BehaviorPlayer::Return)
+	{
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrass)) // 草を食べたら
+		{
+			if (MaxGrass_ > grassGauge_ && createGrassTimer_ <= 0)
+			{
+				if (dynamic_cast<SphereCollider*>(other)->GetRadius() < 2.8f)
+				{
+					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
+				}
+				else
+				{
+					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + largeGrassTime_);
+				}
+				grassGauge_++;
+			}
+			if (MaxGrass_ <= grassGauge_)
+			{
+				grassGauge_ = 0;
+				createGrassTimer_ = kCreateGrassTime_;
+				isCreateGrass_ = true;
+			}
+		}
+	}
+}
+
+void Player::ExitCollision(Collider* other)
+{
 }
 
 void Player::UpdateMatrices()
@@ -219,14 +257,20 @@ void Player::TimerManager()
 	{
 		boostCoolTimer_ -= deltaTime_;
 	}
+	if (0 < createGrassTimer_)
+	{
+		createGrassTimer_ -= deltaTime_;
+	}
 }
 
-void Player::PopGrass()
+bool Player::PopGrass()
 {
-	if (grassGauge_ == MaxGrass_) {
-		grassGauge_ = 0;
-		//ここで草のPopタイマースタート
+	if (0 >= createGrassTimer_ && isCreateGrass_)
+	{
+		isCreateGrass_ = false;
+		return true;
 	}
+	return false;
 }
 
 #ifdef _DEBUG

@@ -3,6 +3,10 @@
 
 // Engine
 #include "Systems/Input/Input.h"
+#include "Collision/Sphere/SphereCollider.h"
+
+
+#include "Player/Player.h"
 
 enum class BehaviorGrass
 {
@@ -13,7 +17,7 @@ enum class BehaviorGrass
 };
 
 class Grass :
-    public BaseObject
+	public BaseObject , public SphereCollider
 {
 public:
 	Grass() : id_(count_) { ++count_; }
@@ -34,6 +38,15 @@ public:
 	/// 描画
 	/// </summary>
 	void Draw() override;
+
+
+public:
+	Vector3 GetCenterPosition() const override { return worldTransform_.translation_; }
+	virtual Vector3 GetEulerRotation() override {};
+	Matrix4x4 GetWorldMatrix() const override { return worldTransform_.matWorld_; }
+	void OnCollision([[maybe_unused]] Collider* other) override;
+	void EnterCollision([[maybe_unused]] Collider* other) override;
+	void ExitCollision([[maybe_unused]] Collider* other) override;
 
 
 private:
@@ -108,7 +121,13 @@ public: // getter & setter
 
 	bool IsMadeByPlayer() { return isMadeByPlayer_; }
 
+	void SetPlayer(Player* player) { player_ = player; }
+
+	bool IsDelete() { return behavior_ == BehaviorGrass::Delete; }
+
 private:
+	Player* player_ = nullptr;
+
 	Input* input_ = nullptr;
 
 	const float deltaTime_ = 1.0f / 60.0f; // 仮対応

@@ -4,6 +4,7 @@
 #include "Systems/Input/Input.h"
 #include "PlayerMapCollision.h"
 #include "Systems/MapChip/MapChipCollision.h"
+#include "Collision/Sphere/SphereCollider.h"
 
 // Application
 #include "BaseObject/BaseObject.h"
@@ -18,7 +19,7 @@ enum class BehaviorPlayer
 };
 
 class Player 
-	: BaseObject
+	: public BaseObject, public SphereCollider
 {
 public:
 	Player(MapChipField* mapChipField)
@@ -44,8 +45,19 @@ public:
 	/// </summary>
 	void Draw() override;
 
-	void OnCollision();
 	void MapChipOnCollision(const CollisionInfo& info);
+
+
+public:
+	Vector3 GetCenterPosition() const override { return worldTransform_.translation_; }
+	virtual Vector3 GetEulerRotation() override {};
+	Matrix4x4 GetWorldMatrix() const override { return worldTransform_.matWorld_; }
+	void OnCollision([[maybe_unused]] Collider* other) override;
+	void EnterCollision([[maybe_unused]] Collider* other) override;
+	void ExitCollision([[maybe_unused]] Collider* other) override;
+
+
+
 private:
 	/// 全行列の転送
 	void UpdateMatrices();
@@ -65,7 +77,7 @@ private:
 
 	void TimerManager();
 
-	void PopGrass();
+	bool PopGrass();
 
 
 #ifdef _DEBUG
@@ -186,6 +198,11 @@ private:
 	float boostCoolTimer_ = 0;			// 現在のクールタイムトの残り時間
 
 
+	bool kCreateGrassTime_ = 2.0f;
+	bool createGrassTimer_ = 0.0f;
+	bool isCreateGrass_ = false;
+
+
 	const float deltaTime_ = 1.0f / 60.0f; // 仮対応
 
 	// ヒットポイント
@@ -200,7 +217,7 @@ private:
 
 	std::list <std::unique_ptr<PlayerBody>> playerBodys_;
 
-	
+public:
 	// 振る舞い
 	BehaviorPlayer behavior_ = BehaviorPlayer::Root;
 	// 次の振る舞いリクエスト
