@@ -48,6 +48,7 @@ public:
 public:
 	Vector3 GetCenterPosition() const override { return worldTransform_.translation_; }
 	virtual Vector3 GetEulerRotation() override { return{}; }
+	Vector3 GetScale() const override { return worldTransform_.scale_ / 2.0f; }
 	Matrix4x4 GetWorldMatrix() const override { return worldTransform_.matWorld_; }
 	void OnCollision([[maybe_unused]] Collider* other) override;
 	void EnterCollision([[maybe_unused]] Collider* other) override;

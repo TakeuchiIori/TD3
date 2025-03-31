@@ -1,6 +1,15 @@
 #pragma once
 // Application
 #include "BaseObject/BaseObject.h"
+
+enum ExtendDirection
+{
+	Up,
+	Left,
+	Right,
+	Down,
+};
+
 class PlayerBody :
     public BaseObject
 {
@@ -21,31 +30,34 @@ public:
 	void Draw() override;
 
 
-	void UpGrowth();
+	void UpExtend();
 
-	void LeftGrowth();
+	void LeftExtend();
 
-	void RightGrowth();
+	void RightExtend();
 
-	void DownGrowth();
+	void DownExtend();
+
+private:
+	void ExtendUpdate();
 
 
 public:
-	void SetPos(Vector3 pos) { worldTransform_.translation_ = pos; }
+	void SetPos(const Vector3 pos) { worldTransform_.translation_ = pos; }
 
 	Vector3 GetPos() { return worldTransform_.translation_; }
 
-	void SetStartPos(Vector3& pos) { startPos_ = pos; }
+	void SetStartPos(const Vector3 pos) { startPos_ = pos; }
 
-	void SetEndPos(Vector3& pos) { endPos_ = pos; }
+	void SetEndPos(const Vector3& pos) { endPos_ = pos; }
 
 private:
-	Vector3 upGrowthScale_ = { 2.0f,0.0f,2.0f };
-	Vector3 leftGrowthScale_ = { 0.0f,2.0f,2.0f };
-	Vector3 rightGrowthScale_ = { 0.0f,2.0f,2.0f };
-	Vector3 downGrowthScale_ = { 2.0f,0.0f,2.0f };
+	Vector3 verticalGrowthScale_ = { 2.0f,0.0f,2.0f };
+	Vector3 horizontalGrowthScale_ = { 0.0f,2.0f,2.0f };
 
 	Vector3 startPos_ = {};
 	Vector3 endPos_ = {};
+
+	ExtendDirection extendDirection_ = ExtendDirection::Up;
 };
 

@@ -57,6 +57,7 @@ public:
 public:
 	Vector3 GetCenterPosition() const override { return worldTransform_.translation_; }
 	virtual Vector3 GetEulerRotation() override { return{}; }
+	Vector3 GetScale() const override { return worldTransform_.scale_ / 2.0f; }
 	Matrix4x4 GetWorldMatrix() const override { return worldTransform_.matWorld_; }
 	void OnCollision([[maybe_unused]] Collider* other) override;
 	void EnterCollision([[maybe_unused]] Collider* other) override;
@@ -84,6 +85,9 @@ private:
 	void TimerManager();
 
 	bool PopGrass();
+
+
+	void ExtendBody();
 
 
 #ifdef _DEBUG
@@ -229,6 +233,7 @@ private:
 public:
 	// 振る舞い
 	BehaviorPlayer behavior_ = BehaviorPlayer::Root;
+	BehaviorPlayer Beforebehavior_ = behavior_;
 	// 次の振る舞いリクエスト
 	std::optional<BehaviorPlayer> behaviortRquest_ = std::nullopt;
 };

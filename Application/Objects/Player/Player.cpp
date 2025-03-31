@@ -51,15 +51,20 @@ void Player::InitJson()
 
 void Player::Update()
 {
+	Beforebehavior_ = behavior_;
+
 	// 各行動の初期化
 	BehaviorInitialize();
 
 	// 各行動の更新
 	BehaviorUpdate();
 
+	ExtendBody();
+
 	PopGrass();
 
 	TimerManager();
+
 	UpdateMatrices();
 	//SphereCollider::Update();
 	AABBCollider::Update();
@@ -239,6 +244,9 @@ void Player::Move()
 
 	worldTransform_.translation_ = newPos;
 
+
+	ExtendBody();
+
 }
 
 void Player::EntryMove()
@@ -296,6 +304,32 @@ bool Player::PopGrass()
 		return true;
 	}
 	return false;
+}
+
+void Player::ExtendBody()
+{
+	if (Beforebehavior_ == BehaviorPlayer::Root && behavior_ == BehaviorPlayer::Moving)
+	{
+		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
+		body->Initialize(BaseObject::camera_);
+		body->SetStartPos(GetCenterPosition());
+		body->SetPos(GetCenterPosition());
+		body->UpExtend();
+		playerBodys_.push_back(std::move(body));
+	}
+
+
+
+
+
+
+
+
+
+	if (playerBodys_.size() > 0)
+	{
+		playerBodys_.back()->SetEndPos(GetCenterPosition());
+	}
 }
 
 #ifdef _DEBUG
