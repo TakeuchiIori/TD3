@@ -35,15 +35,15 @@ public:
 
 	Vector3 GetPos() { return worldTransform_.translation_; }
 
-	void SetOffsetScale(Vector3& scale) { offsetScale_ = scale; }
-
 	void SetStartPos(Vector3& pos) { startPos_ = pos; }
 
 	void SetEndPos(Vector3& pos) { endPos_ = pos; }
 
 private:
-	Vector3 defaultScale_ = { 2.0f,2.0f,2.0f };
-	Vector3 offsetScale_ = {};
+	Vector3 upGrowthScale_ = { 2.0f,0.0f,2.0f };
+	Vector3 leftGrowthScale_ = { 0.0f,2.0f,2.0f };
+	Vector3 rightGrowthScale_ = { 0.0f,2.0f,2.0f };
+	Vector3 downGrowthScale_ = { 2.0f,0.0f,2.0f };
 
 	Vector3 startPos_ = {};
 	Vector3 endPos_ = {};

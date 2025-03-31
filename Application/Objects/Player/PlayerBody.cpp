@@ -24,3 +24,23 @@ void PlayerBody::Draw()
 {
 	obj_->Draw(camera_, worldTransform_);
 }
+
+void PlayerBody::UpGrowth()
+{
+	worldTransform_.anchorPoint_ = { 0.5f,0.0f,0.5f };
+}
+
+void PlayerBody::LeftGrowth()
+{
+	worldTransform_.anchorPoint_ = { 0.0f,0.5f,0.5f };
+}
+
+void PlayerBody::RightGrowth()
+{
+	worldTransform_.anchorPoint_ = { 1.0f,0.5f,0.5f };
+}
+
+void PlayerBody::DownGrowth()
+{
+	worldTransform_.anchorPoint_ = { 0.5f,1.0f,0.5f };
+}
