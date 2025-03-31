@@ -62,6 +62,12 @@ public: // 基本的関数
 	/// </summary>
 	void ChangeTexture(const std::string textureFilePath);
 
+	/// <summary>
+	/// テクスチャサイズをイメージに合わせる
+	/// </summary>
+	void AdjustTaxtureSize();
+
+
 private: // メンバ関数
 
 	/// <summary>
@@ -94,10 +100,7 @@ private: // メンバ関数
 	/// </summary>
 	void TransformResource();
 
-	/// <summary>
-	/// テクスチャサイズをイメージに合わせる
-	/// </summary>
-	void AdjustTaxtureSize();
+
 
 
 public: // アクセッサ
@@ -212,9 +215,10 @@ private: // メンバ変数
 	Vector2 textureSize_ = { 100.0f,100.0f };
 
 	// スプライト
-	Vector3 position_ = { 0.0f,0.0f ,0.0f};
+	Vector3 position_ = { 0.0f,0.0f ,0.0f };
 	Vector3 rotation_ = { 0.0f,0.0f,0.0f };
 	Vector2 size_ = { 100.0f,100.0f };
+	const float numVertices_ = 6.0f;
 
 	// アンカーポイント
 	Vector2 anchorPoint_ = { 0.0f,0.0f };

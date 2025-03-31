@@ -19,7 +19,7 @@ UIBase::UIBase(const std::string& name) :
 UIBase::~UIBase() {
     // 設定パスがある場合は現在の状態を保存
     if (!configPath_.empty()) {
-       // SaveToJSON();
+        // SaveToJSON();
     }
 }
 
@@ -27,7 +27,7 @@ void UIBase::Initialize(const std::string& jsonConfigPath) {
     configPath_ = jsonConfigPath;
 
     // スプライトを作成
-    sprite_ = new Sprite ();
+    sprite_ = std::make_unique<Sprite>();
 
     // JSONファイルが存在するか確認
     bool jsonExists = std::filesystem::exists(jsonConfigPath);
@@ -75,6 +75,8 @@ void UIBase::Draw() {
 }
 
 void UIBase::ImGUi() {
+#ifdef _DEBUG
+
     if (!sprite_) return;
     ImGui::Begin(name_.c_str());
 
@@ -91,14 +93,14 @@ void UIBase::ImGUi() {
 
     // トランスフォーム設定
     if (ImGui::CollapsingHeader("変形", ImGuiTreeNodeFlags_DefaultOpen)) {
-       
+
         // スケール設定
         Vector2 scale = GetScale();
         if (ImGui::DragFloat2("拡大縮小", &scale.x, 0.5f)) {
             SetScale(scale);
             modified = true;
         }
-        
+
         // 回転設定
         Vector3 rotation = GetRotation();
         if (ImGui::DragFloat3("回転", &rotation.x, 0.1f)) {
@@ -290,7 +292,7 @@ void UIBase::ImGUi() {
 
             ImGui::EndPopup();
         }
-    
+
 
         // テクスチャ座標設定
         Vector2 leftTop = sprite_->GetTextureLeftTop();
@@ -351,6 +353,7 @@ void UIBase::ImGUi() {
 
     // ウィンドウ終了
     ImGui::End();
+#endif // _DEBUG
 }
 
 void UIBase::EnableHotReload(bool enable) {
@@ -616,7 +619,7 @@ void UIBase::ApplyJSONToState(const nlohmann::json& data) {
 
         // スプライトがまだ作成されていない場合は初期化
         if (!sprite_) {
-            sprite_ = new Sprite();
+            sprite_ = std::make_unique<Sprite>();
             sprite_->Initialize(texturePath_);
         } else {
             // すでにある場合はテクスチャを変更
@@ -625,7 +628,7 @@ void UIBase::ApplyJSONToState(const nlohmann::json& data) {
         }
     } else if (!sprite_) {
         // テクスチャが指定されていない場合はデフォルトテクスチャで初期化
-        sprite_ = new Sprite();
+        sprite_ = std::make_unique<Sprite>();
         sprite_->Initialize("./Resources/images/white.png");
         texturePath_ = "./Resources/images/white.png";
     }
