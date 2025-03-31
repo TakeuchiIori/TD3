@@ -4,20 +4,24 @@
 #include "Systems/Input/Input.h"
 #include "PlayerMapCollision.h"
 #include "Systems/MapChip/MapChipCollision.h"
+#include "Collision/Sphere/SphereCollider.h"
+#include "Collision/AABB/AABBCollider.h"
+#include "Loaders/Json/JsonManager.h"
 
 // Application
 #include "BaseObject/BaseObject.h"
 #include "PlayerBody.h"
 
-enum BehaviorPlayer
+enum class BehaviorPlayer
 {
-	Move,
+	Root,
+	Moving,
+	Boost,
 	Return,
-	Boost
 };
 
 class Player 
-	: BaseObject
+	: public BaseObject, public AABBCollider
 {
 public:
 	Player(MapChipField* mapChipField)
@@ -33,6 +37,8 @@ public:
 	/// </summary>
 	void Initialize(Camera* camera) override;
 
+	void InitJson();
+
 	/// <summary>
 	/// 更新
 	/// </summary>
@@ -43,8 +49,28 @@ public:
 	/// </summary>
 	void Draw() override;
 
-	void OnCollision();
+	void DrawCollision();
+
 	void MapChipOnCollision(const CollisionInfo& info);
+
+
+public:
+	Vector3 GetCenterPosition() const override { 
+		return
+		{
+			worldTransform_.matWorld_.m[3][0],
+			worldTransform_.matWorld_.m[3][1],
+			worldTransform_.matWorld_.m[3][2]
+		};
+	}
+	virtual Vector3 GetEulerRotation() override { return{}; }
+	const WorldTransform& GetWorldTransform() { return worldTransform_; }
+	void OnCollision([[maybe_unused]] Collider* other) override;
+	void EnterCollision([[maybe_unused]] Collider* other) override;
+	void ExitCollision([[maybe_unused]] Collider* other) override;
+
+
+
 private:
 	/// 全行列の転送
 	void UpdateMatrices();
@@ -52,16 +78,83 @@ private:
 	// 移動
 	void Move();
 
-	void Boost();
+	// 移動へ移行
+	void EntryMove();
+
+	// ブーストへ移行
+	void EntryBoost();
+
+	// 帰還へ移行
+	void EntryReturn();
+
 
 	void TimerManager();
 
-public: // getter&setter
-	/// WorldTransformの取得
-	WorldTransform& GetWorldTransform() { return worldTransform_; }
 
-	/// WorldTransformの取得
-	WorldTransform& GetBodyTransform() { return bodyTransform_; }
+	void ExtendBody();
+
+	void ShrinkBody();
+
+
+#ifdef _DEBUG
+	// デバッグ用 (ImGuiとか)
+	void DebugPlayer();
+#endif // _DEBUG
+
+private: // プレイヤーのふるまい
+
+	/// <summary>
+	/// ふるまい全体の初期化
+	/// </summary>
+	void BehaviorInitialize();
+	/// <summary>
+	/// ふるまい全体の更新
+	/// </summary>
+	void BehaviorUpdate();
+
+
+	/// <summary>
+	/// 停止状態初期化
+	/// </summary>
+	void BehaviorRootInit();
+	/// <summary>
+	/// 停止状態更新
+	/// </summary>
+	void BehaviorRootUpdate();
+
+
+	/// <summary>
+	/// 移動状態初期化
+	/// </summary>
+	void BehaviorMovingInit();
+	/// <summary>
+	/// 移動状態更新
+	/// </summary>
+	void BehaviorMovingUpdate();
+
+
+	/// <summary>
+	/// 加速状態初期化
+	/// </summary>
+	void BehaviorBoostInit();
+	/// <summary>
+	/// 加速状態更新
+	/// </summary>
+	void BehaviorBoostUpdate();
+
+
+	/// <summary>
+	/// 帰還状態初期化
+	/// </summary>
+	void BehaviorReturnInit();
+	/// <summary>
+	/// 帰還状態更新
+	/// </summary>
+	void BehaviorReturnUpdate();
+
+
+
+public: // getter&setter
 
 	// 一人称視点にした場合横を向いているので操作を切り替えるため
 	void SetFPSMode(bool isFPS) { isFPSMode_ = isFPS; }
@@ -71,45 +164,61 @@ public: // getter&setter
 		//mapCollision_.Init(colliderRct_, worldTransform_.translation_);
 	}
 
+	bool IsBoost() { return behavior_ == BehaviorPlayer::Boost; }
+
+	bool PopGrass();
+
 private:
 	Input* input_ = nullptr;
+
+	std::unique_ptr<JsonManager> jsonManager_;
+	std::unique_ptr<JsonManager> jsonCollider_;
 	
 	MapChipCollision mpCollision_;
 	MapChipCollision::ColliderRect colliderRect_;
 
-	// 体のトランスフォーム
-	WorldTransform bodyTransform_;
-	// 体のオフセット
-	Vector3 bodyOffset_ = { 0.0f,0.5f,0.0f };
 
 	// 移動
 	Vector3 velocity_ = { 0.0f,0.0f,0.0f };			// 加速度
 	Vector3 moveDirection_ = { 0.0f,0.0f,0.0f };	// 動く向き
-	float defaultSpeed_ = 0.3f;
+	float defaultSpeed_ = 0.05f;
 	float speed_ = defaultSpeed_;							// 動く速度
 	bool isFPSMode_ = false;
 
 	bool isMove_ = false;
 
-	float boostSpeed_ = 0.4f;
+	float boostSpeed_ = 0.2f;
 
 	// 移動履歴
 	std::list<Vector3> moveHistory_;
 
 
 	// ゲージ
-	int32_t MaxGrassGauge_ = 6;
+	int32_t MaxGrass_ = 2;
 	int32_t grassGauge_ = 0;
 
 	// 時間制限 : 単位(sec)
 	float kTimeLimit_ = 10.0f;			// タイマーの限界値
-	float extendTimer_ = kTimeLimit_;	// 伸びられる残り時間
-	float grassTime_ = 6.0f;			// 草を食べて追加される時間
+	float extendTimer_ = 0;				// 伸びられる残り時間
+	float grassTime_ = 3.0f;			// 草を食べて追加される時間
+	float largeGrassTime_ = 6.0f;		// 大きい草
 
-	float kBoostTime_ = 1.5f;
-	float boostTimer_ = 0;
+	float kBoostTime_ = 1.5f;			// ブーストの最大効果時間
+	float boostTimer_ = 0;				// 現在のブーストの残り時間
+
+	float kBoostCT_ = 5.0f;				// ブーストのクールタイム
+	float boostCoolTimer_ = 0;			// 現在のクールタイムトの残り時間
+
+
+	float kCreateGrassTime_ = 3.0f;		// 草が詰まるまでの時間
+	float createGrassTimer_ = 0.0f;
+	bool isCreateGrass_ = false;
+
 
 	const float deltaTime_ = 1.0f / 60.0f; // 仮対応
+
+	// ヒットポイント
+	int32_t HP_ = 3;
 
 
 	//PlayerMapCollision mapCollision_;
@@ -119,5 +228,12 @@ private:
 	//MapChipCollision::CollisionFlag collisionFlag_ = MapChipCollision::CollisionFlag::None;
 
 	std::list <std::unique_ptr<PlayerBody>> playerBodys_;
+
+public:
+	// 振る舞い
+	BehaviorPlayer behavior_ = BehaviorPlayer::Root;
+	BehaviorPlayer beforebehavior_ = behavior_;
+	// 次の振る舞いリクエスト
+	std::optional<BehaviorPlayer> behaviortRquest_ = std::nullopt;
 };
 

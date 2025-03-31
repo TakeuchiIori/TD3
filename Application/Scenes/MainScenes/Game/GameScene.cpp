@@ -62,6 +62,12 @@ void GameScene::Initialize()
 
 
     player_->SetMapInfo(mpInfo_->GetMapChipField());
+
+	// 草
+	grassManager_ = std::make_unique<GrassManager>();
+	grassManager_->SetPlayer(player_.get());
+	grassManager_->Initialize(sceneCamera_.get());
+
     
     // 地面
     ground_ = std::make_unique<Ground>();
@@ -118,8 +124,9 @@ void GameScene::Update()
 	}
 
 	mpInfo_->Update();
-	CheckAllCollisions();
 	CollisionManager::GetInstance()->Update();
+	CheckAllCollisions();
+	
 
 	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
 		picture_->Update();
@@ -131,6 +138,7 @@ void GameScene::Update()
 
 	if (!isDebugCamera_) {
 		player_->Update();
+		grassManager_->hakuGrass(player_->PopGrass(), player_->GetCenterPosition());
 	}
 	player_->SetFPSMode(cameraMode_ == CameraMode::FPS);
 
@@ -155,7 +163,7 @@ void GameScene::Update()
 	// enemy_->Update();
 
 	ground_->Update();
-
+	grassManager_->Update();
 
 	particleEmitter_[0]->Emit();
 
@@ -241,12 +249,13 @@ void GameScene::DrawObject()
 	ground_->Draw();
 	commandList_->EndQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
 
-
+	
 
     //stageManager_.Draw();
 
 	player_->Draw();
 
+	grassManager_->Draw();
 }
 
 void GameScene::DrawSprite()
@@ -277,6 +286,8 @@ void GameScene::DrawLine()
 		test_->DrawSkeleton(test_->GetModel()->GetSkeleton(), *boneLine_);
 		boneLine_->DrawLine();
 	}*/
+	player_->DrawCollision();
+	grassManager_->DrawCollision();
 }
 
 
@@ -408,15 +419,15 @@ void GameScene::ShowImGui()
 
 void GameScene::CheckAllCollisions() {
 
-	// 衝突マネージャーのリセット
-	CollisionManager::GetInstance()->Reset();
+	//// 衝突マネージャーのリセット
+	//CollisionManager::GetInstance()->Reset();
 
-	// コライダーをリストに登録
-	//CollisionManager::GetInstance()->AddCollider(player_.get());
+	//// コライダーをリストに登録
+	////CollisionManager::GetInstance()->AddCollider(player_.get());
 
 
-	// 衝突判定と応答
-	CollisionManager::GetInstance()->CheckAllCollisions();
+	//// 衝突判定と応答
+	//CollisionManager::GetInstance()->CheckAllCollisions();
 
 }
 void GameScene::InitializeOcclusionQuery()

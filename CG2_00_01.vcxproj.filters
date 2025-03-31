@@ -99,6 +99,7 @@
     <ClCompile Include="Application\Objects\Player\PlayerMapCollision.cpp" />
     <ClCompile Include="Application\Objects\Player\PlayerBody.cpp" />
     <ClCompile Include="Application\Objects\Grass\Grass.cpp" />
+    <ClCompile Include="Application\Objects\Grass\GrassManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -198,6 +199,7 @@
     <ClInclude Include="Application\Objects\Player\PlayerMapCollision.h" />
     <ClInclude Include="Application\Objects\Player\PlayerBody.h" />
     <ClInclude Include="Application\Objects\Grass\Grass.h" />
+    <ClInclude Include="Application\Objects\Grass\GrassManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />
