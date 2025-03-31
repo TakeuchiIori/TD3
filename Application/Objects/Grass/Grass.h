@@ -19,7 +19,7 @@ enum class BehaviorGrass
 };
 
 class Grass :
-	public BaseObject , public AABBCollider
+	public BaseObject , public SphereCollider
 {
 public:
 	Grass() : id_(count_) { ++count_; }

@@ -138,7 +138,7 @@ void Player::EnterCollision(Collider* other)
 		{
 			if (MaxGrass_ > grassGauge_ && createGrassTimer_ <= 0)
 			{
-				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x != /*GetRadius()*/0)
+				if (dynamic_cast<SphereCollider*>(other)->GetWorldTransform().scale_.x != /*GetRadius()*/0)
 				{
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
 				}

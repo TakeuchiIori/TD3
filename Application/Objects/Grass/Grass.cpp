@@ -31,8 +31,8 @@ void Grass::Initialize(Camera* camera)
 	obj_->SetModel("unitCube.obj");
 	obj_->SetMaterialColor({ 0.3f,1.0f,0.3f,1.0f });
 
-	AABBCollider::SetCamera(BaseObject::camera_);
-	AABBCollider::Initialize();
+	SphereCollider::SetCamera(BaseObject::camera_);
+	SphereCollider::Initialize();
 	SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kGrass));
 
 	InitJson();
@@ -43,7 +43,7 @@ void Grass::InitJson()
 	jsonManager_ = std::make_unique<JsonManager>("grassObj", "Resources/JSON/");
 
 	jsonCollider_ = std::make_unique<JsonManager>("grassCollider", "Resources/JSON/");
-	AABBCollider::InitJson(jsonCollider_.get());
+	SphereCollider::InitJson(jsonCollider_.get());
 }
 
 void Grass::Update()
@@ -52,7 +52,7 @@ void Grass::Update()
 	BehaviorUpdate();
 
 	worldTransform_.UpdateMatrix();
-	AABBCollider::Update();
+	SphereCollider::Update();
 
 
 #ifdef _DEBUG
@@ -67,7 +67,7 @@ void Grass::Draw()
 
 void Grass::DrawCollision()
 {
-	AABBCollider::Draw();
+	SphereCollider::Draw();
 }
 
 void Grass::OnCollision(Collider* other)
