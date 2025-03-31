@@ -5,7 +5,7 @@
 //Windowsアプリのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
-	//_CrtSetBreakAlloc(984674); // ←{1730} を例に
+	//_CrtSetBreakAlloc(146); // ←{1730} を例に
 
 	std::unique_ptr<Framework> game = std::make_unique<MyGame>();
 

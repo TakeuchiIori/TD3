@@ -4,12 +4,23 @@
 #include "Matrix4x4.h"
 #include "MathFunc.h"
 
+MapChipInfo::~MapChipInfo()
+{
+
+	for (auto& row : wt_) {
+		for (auto& ptr : row) {
+			delete ptr;
+			ptr = nullptr;
+		}
+	}
+}
+
 void MapChipInfo::Initialize()
 {
-	mpField_ = new MapChipField();
+	mpField_ = std::make_unique<MapChipField>();
 	mpField_->LoadMapChipCsv("Resources/images/MapChip.csv");
 
-	obj_ = new Object3d();
+	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
 	obj_->SetModel("cube.obj");
 
@@ -19,9 +30,9 @@ void MapChipInfo::Initialize()
 void MapChipInfo::Update()
 {
 
-    for (std::vector<WorldTransform*>& row : wt_) {
-        for (WorldTransform* wt : row) {
-            if (wt) {
+	for (std::vector<WorldTransform*>& row : wt_) {
+		for (WorldTransform* wt : row) {
+			if (wt) {
 				Matrix4x4 scaleMatrix = MakeScaleMatrix(wt->scale_);
 				// 各軸の回転行列
 				Matrix4x4 rotX = MakeRotateMatrixX(wt->rotation_.x);
@@ -30,10 +41,10 @@ void MapChipInfo::Update()
 				Matrix4x4 rotXYZ = Multiply(rotX, Multiply(rotY, rotZ));
 				// 平行移動行列
 				Matrix4x4 translateMatrix = MakeTranslateMatrix(wt->translation_);
-                wt->UpdateMatrix();
-            }
-        }
-    }
+				wt->UpdateMatrix();
+			}
+		}
+	}
 
 
 }
@@ -44,7 +55,7 @@ void MapChipInfo::Draw()
 		for (WorldTransform* worldTransformBlock : wt) {
 			if (!worldTransformBlock)
 				continue;
-			obj_->Draw(camera_,*worldTransformBlock);
+			obj_->Draw(camera_, *worldTransformBlock);
 
 		}
 	}
