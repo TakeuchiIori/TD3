@@ -3,7 +3,7 @@
 void AABBCollider::InitJson(JsonManager* jsonManager)
 {
 	// 衝突球のオフセットや半径を JSON に登録
-	//jsonManager->SetCategory("Colliders");
+	jsonManager->SetCategory("Colliders");
 	jsonManager->Register("Collider Offset Min X", &aabbOffset_.min.x);
 	jsonManager->Register("Collider Offset Min Y", &aabbOffset_.min.y);
 	jsonManager->Register("Collider Offset Min Z", &aabbOffset_.min.z);

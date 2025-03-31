@@ -177,6 +177,25 @@ bool Collision::Check(const OBBCollider* a, const OBBCollider* b)
 	return Check(a->GetOBB(), b->GetOBB());
 }
 
+bool Collision::Check(Collider* a, Collider* b)
+{
+	// ここで dynamic_cast してペアを判定
+	if (auto sa = dynamic_cast<SphereCollider*>(a)) {
+		if (auto sb = dynamic_cast<SphereCollider*>(b)) return Check(sa, sb);
+		if (auto ob = dynamic_cast<OBBCollider*>(b))    return Check(sa, ob);
+		if (auto ab = dynamic_cast<AABBCollider*>(b))    return Check(sa, ab);
+	} else if (auto oa = dynamic_cast<OBBCollider*>(a)) {
+		if (auto sb = dynamic_cast<SphereCollider*>(b)) return Check(sb, oa); // 順序逆
+		if (auto ob = dynamic_cast<OBBCollider*>(b))    return Check(oa, ob);
+		if (auto ab = dynamic_cast<AABBCollider*>(b))    return Check(ab, oa); // 順序逆
+	} else if (auto aa = dynamic_cast<AABBCollider*>(a)) {
+		if (auto sb = dynamic_cast<SphereCollider*>(b)) return Check(sb, aa); // 順序逆
+		if (auto ob = dynamic_cast<OBBCollider*>(b))    return Check(aa, ob);
+		if (auto ab = dynamic_cast<AABBCollider*>(b))    return Check(aa, ab);
+	}
+	return false;
+}
+
 
 
 
@@ -200,36 +219,24 @@ void CollisionManager::Reset() {
 }
 
 void CollisionManager::CheckCollisionPair(Collider* a, Collider* b) {
-	// Sphere
-	if (auto sa = dynamic_cast<SphereCollider*>(a)) {
-		if (auto sb = dynamic_cast<SphereCollider*>(b)) {
-			if (Collision::Check(sa, sb)) { sa->OnCollision(sb); sb->OnCollision(sa); }
-		} else if (auto ab = dynamic_cast<AABBCollider*>(b)) {
-			if (Collision::Check(sa, ab)) { sa->OnCollision(ab); ab->OnCollision(sa); }
-		} else if (auto ob = dynamic_cast<OBBCollider*>(b)) {
-			if (Collision::Check(sa, ob)) { sa->OnCollision(ob); ob->OnCollision(sa); }
-		}
-	}
+	// 順序を統一してペアのキーにする（ポインタの小さい順）
+	auto key = std::minmax(a, b);
+	bool isNowColliding = Collision::Check(a, b); // ← BaseCollider* 用のオーバーロードが必要
+	bool wasColliding = collidingPairs_.contains(key);
 
-	// AABB
-	else if (auto aa = dynamic_cast<AABBCollider*>(a)) {
-		if (auto sb = dynamic_cast<SphereCollider*>(b)) {
-			if (Collision::Check(sb, aa)) { aa->OnCollision(sb); sb->OnCollision(aa); } // 順序注意
-		} else if (auto ab = dynamic_cast<AABBCollider*>(b)) {
-			if (Collision::Check(aa, ab)) { aa->OnCollision(ab); ab->OnCollision(aa); }
-		} else if (auto ob = dynamic_cast<OBBCollider*>(b)) {
-			if (Collision::Check(aa, ob)) { aa->OnCollision(ob); ob->OnCollision(aa); }
+	if (isNowColliding) {
+		if (!wasColliding) {
+			a->EnterCollision(b);
+			b->EnterCollision(a);
+			collidingPairs_.insert(key);
 		}
-	}
-
-	// OBB
-	else if (auto oa = dynamic_cast<OBBCollider*>(a)) {
-		if (auto sb = dynamic_cast<SphereCollider*>(b)) {
-			if (Collision::Check(sb, oa)) { oa->OnCollision(sb); sb->OnCollision(oa); } // 順序注意
-		} else if (auto ab = dynamic_cast<AABBCollider*>(b)) {
-			if (Collision::Check(ab, oa)) { oa->OnCollision(ab); ab->OnCollision(oa); } // 順序注意
-		} else if (auto ob = dynamic_cast<OBBCollider*>(b)) {
-			if (Collision::Check(oa, ob)) { oa->OnCollision(ob); ob->OnCollision(oa); }
+		a->OnCollision(b);
+		b->OnCollision(a);
+	} else {
+		if (wasColliding) {
+			a->ExitCollision(b);
+			b->ExitCollision(a);
+			collidingPairs_.erase(key);
 		}
 	}
 }
