@@ -16,7 +16,7 @@ public:
 	~OBBCollider() = default;
 	void InitJson(JsonManager* jsonManager) override;
 	Vector3 GetCenterPosition() const override = 0;
-	WorldTransform GetWorldTransform() const = 0;
+	WorldTransform& GetWorldTransform() const = 0;
 	virtual Vector3 GetEulerRotation() = 0;
 	
 	void OnCollision([[maybe_unused]] Collider* other) override = 0;
