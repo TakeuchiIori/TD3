@@ -6,7 +6,7 @@ void PlayerBody::Initialize(Camera* camera)
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
-	worldTransform_.scale_ = { 2.0f,2.0f,2.0f };
+	worldTransform_.scale_ = defaultScale_;
 
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();

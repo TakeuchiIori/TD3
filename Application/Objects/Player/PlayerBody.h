@@ -20,8 +20,16 @@ public:
 	/// </summary>
 	void Draw() override;
 
+
+public:
 	void SetPos(Vector3 pos) { worldTransform_.translation_ = pos; }
 
 	Vector3 GetPos() { return worldTransform_.translation_; }
+
+	void SetOffsetScale(Vector3& scale) { offsetScale_ = scale; }
+
+private:
+	Vector3 defaultScale_ = { 2.0f,2.0f,2.0f };
+	Vector3 offsetScale_ = {};
 };
 
