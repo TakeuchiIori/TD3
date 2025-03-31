@@ -14,6 +14,7 @@
 #include "Sphere/SphereCollider.h"
 #include "AABB/AABBCollider.h"
 #include "OBB/OBBCollider.h"
+#include <set>
 
 namespace Collision {
 
@@ -38,6 +39,8 @@ namespace Collision {
 	// OBB - OBB
 	bool Check(const OBBCollider* a, const OBBCollider* b);
 
+	// Base - Base
+	bool Check(Collider* a, Collider* b);
 }
 
 class CollisionManager {
@@ -98,6 +101,7 @@ private:
 
 	// コライダー
 	std::list<Collider*> colliders_;
+	std::set<std::pair<Collider*, Collider*>> collidingPairs_;
 	// bool型
 	bool isDrawCollider_ = false;
 };

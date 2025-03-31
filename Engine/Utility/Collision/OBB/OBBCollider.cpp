@@ -3,7 +3,7 @@
 
 void OBBCollider::InitJson(JsonManager* jsonManager)
 {
-	//jsonManager->SetCategory("Colliders");
+	jsonManager->SetCategory("Colliders");
 
 	jsonManager->Register("OBB Offset Center X", &obbOffset_.center.x);
 	jsonManager->Register("OBB Offset Center Y", &obbOffset_.center.y);
