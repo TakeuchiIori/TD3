@@ -24,6 +24,7 @@ void SphereCollider::Initialize()
 
 void SphereCollider::Update()
 {
+	sphereOffset_.center = GetScale();
 	sphere_.center = GetCenterPosition() + sphereOffset_.center;
 	sphere_.radius = radius_ + sphereOffset_.radius;
 }

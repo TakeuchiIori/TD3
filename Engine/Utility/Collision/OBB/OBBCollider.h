@@ -16,6 +16,7 @@ public:
 	~OBBCollider() = default;
 	void InitJson(JsonManager* jsonManager) override;
 	Vector3 GetCenterPosition() const override = 0;
+	Vector3 GetScale() const override = 0;
 	virtual Vector3 GetEulerRotation() = 0;
 	Matrix4x4 GetWorldMatrix() const override = 0;
 	
