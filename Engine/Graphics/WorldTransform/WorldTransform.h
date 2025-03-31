@@ -24,6 +24,8 @@ public:
 		Vector3 translate;
 	};
 
+	// アンカーポイント
+	Vector3 anchorPoint_ = { 0, 0, 0 };
 	// ローカルスケール
 	Vector3 scale_ = { 1, 1, 1 };
 	// X,Y,Z軸回りのローカル回転角
@@ -68,6 +70,9 @@ public:
 
 	void SetMapWorld(const Matrix4x4& world) { transformData_->World = world; }
 	const Matrix4x4& GetMatWorld() { return matWorld_; }
+
+	const Vector3& GetAnchorPoint() const { return anchorPoint_; }
+	void SetAnchorPoint(const Vector3& anchorPoint) { this->anchorPoint_ = anchorPoint; }
 
 private:
 	// 定数バッファ

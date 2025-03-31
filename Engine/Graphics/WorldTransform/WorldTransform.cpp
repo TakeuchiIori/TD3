@@ -29,8 +29,17 @@ void WorldTransform::CreateConstBuffer()
 
 void WorldTransform::UpdateMatrix()
 {
-    // スケール、回転、平行移動を合成して行列を計算する
-    matWorld_ = MakeAffineMatrix(scale_, rotation_, translation_);
+    // アンカーポイントの補正行列を作成
+    Matrix4x4 translateToOrigin = MakeTranslateMatrix({ -anchorPoint_.x, -anchorPoint_.y, -anchorPoint_.z });
+    Matrix4x4 translateBack = MakeTranslateMatrix(anchorPoint_);
+
+    // 各種行列を作成
+    Matrix4x4 scaleMatrix = MakeScaleMatrix(scale_);
+    Matrix4x4 rotateMatrix = MakeRotateMatrixXYZ(rotation_);
+    Matrix4x4 translateMatrix = MakeTranslateMatrix(translation_);
+
+    // アンカーポイントを考慮した行列合成
+    matWorld_ = translateBack * scaleMatrix * rotateMatrix * translateToOrigin * translateMatrix;
 
     // ワールド行列を定数バッファに転送
     if (transformData_ != nullptr) {

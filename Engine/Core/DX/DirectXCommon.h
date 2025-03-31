@@ -103,16 +103,16 @@ private:
 	/// </summary>
 	void TransitionBarrier(ID3D12Resource* pResource, D3D12_RESOURCE_STATES Before, D3D12_RESOURCE_STATES After);
 	void BeginRenderTargetRTV(const D3D12_CPU_DESCRIPTOR_HANDLE& rtvHandle, const D3D12_CPU_DESCRIPTOR_HANDLE* dsvHandle = nullptr);
-	
+
 
 public:
-	
+
 	/// <summary>
 	/// 描画前処理
 	/// </summary>
 	void PreDrawScene();
 	void PreDrawImGui();
-	
+
 	/// <summary>
 	/// 描画後処理
 	/// </summary>
@@ -258,7 +258,7 @@ public: // アクセッサ
 
 	D3D12_CPU_DESCRIPTOR_HANDLE* GetrtvHandles() { return rtvHandles_; }
 	HANDLE GetFenceEvent() { return fenceEvent_; }
-	UINT GetBackBufferCount()const { return  backBufferIndex; }
+	UINT GetBackBufferCount()const { return  backBufferIndex_; }
 
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> GetOffScreenResource() { return offScreenResource_; }
@@ -283,7 +283,7 @@ private:
 
 
 	/*=================================================================
-	
+
 								DirectX基盤
 
    =================================================================*/
@@ -295,7 +295,7 @@ private:
 	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_;
 
 	/*=================================================================
-	
+
 								コマンド関連
 
 	=================================================================*/
@@ -311,7 +311,7 @@ private:
 	HANDLE fenceEvent_;
 
 	/*=================================================================
-	
+
 								スワップチェーン
 
 	=================================================================*/
@@ -319,11 +319,11 @@ private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_;
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
 	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources_;
-	int backBuffers = 2; // ダブルバッファ
-	UINT backBufferIndex = backBuffers;
+	int backBuffers_ = 2; // ダブルバッファ
+	UINT backBufferIndex_ = backBuffers_;
 
 	/*=================================================================
-	
+
 							 ディスクリプタヒープ
 
 	=================================================================*/
@@ -338,7 +338,7 @@ private:
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
 
 	/*=================================================================
-	
+
 								深度バッファ
 
 	=================================================================*/
@@ -347,7 +347,7 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE depthSrvHandleCPU_;
 	D3D12_GPU_DESCRIPTOR_HANDLE depthSrvHandleGPU_;
 	/*=================================================================
-	
+
 								描画設定
 
 	=================================================================*/
@@ -359,7 +359,7 @@ private:
 	D3D12_RESOURCE_BARRIER barrier_{};
 
 	/*=================================================================
-	
+
 								 シェーダー関連
 
 	=================================================================*/
