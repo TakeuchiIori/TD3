@@ -28,13 +28,6 @@ void ImGuiManager::Initialize(WinApp* winApp, DirectXCommon* dxCommon)
 
 	winApp_ = winApp;
 
-	// メモリアロケータのカスタマイズ
-	ImGui::SetAllocatorFunctions(
-		[](size_t size, void* user_data) { return _aligned_malloc(size, 16); },
-		[](void* ptr, void* user_data) { _aligned_free(ptr); },
-		nullptr
-	);
-
 	// ImGuiのコンテキストを生成
 	ImGui::CreateContext();
 
@@ -156,7 +149,6 @@ void ImGuiManager::CustomizeColor()
 {
 #ifdef _DEBUG
 
-	ImGuiIO& io = ImGui::GetIO();
 
 	ImGuiStyle& style = ImGui::GetStyle();
 	ImVec4* colors = style.Colors;
