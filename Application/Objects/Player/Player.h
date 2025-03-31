@@ -93,6 +93,8 @@ private:
 
 	void ExtendBody();
 
+	void ShrinkBody();
+
 
 #ifdef _DEBUG
 	// デバッグ用 (ImGuiとか)

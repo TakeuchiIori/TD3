@@ -55,6 +55,8 @@ public:
 
 	void SetEndPos(const Vector3& pos) { endPos_ = pos; }
 
+	float GetLength() { return Length(endPos_ - startPos_); }
+
 private:
 	Vector3 verticalGrowthScale_ = { 2.0f,0.0f,2.0f };
 	Vector3 horizontalGrowthScale_ = { 0.0f,2.0f,2.0f };

@@ -363,6 +363,19 @@ void Player::ExtendBody()
 	}
 }
 
+void Player::ShrinkBody()
+{
+	if(playerBodys_.back()->GetLength() <= 0)
+	{
+		playerBodys_.pop_back();
+	}
+
+	if (playerBodys_.size() > 0)
+	{
+		playerBodys_.back()->SetEndPos(GetCenterPosition());
+	}
+}
+
 #ifdef _DEBUG
 void Player::DebugPlayer()
 {
@@ -513,4 +526,5 @@ void Player::BehaviorReturnUpdate()
 	{
 		behaviortRquest_ = BehaviorPlayer::Root;
 	}
+	ShrinkBody();
 }
