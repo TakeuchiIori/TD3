@@ -4,6 +4,7 @@
 // Engine
 #include "Systems/Input/Input.h"
 #include "Collision/Sphere/SphereCollider.h"
+#include "Collision/AABB/AABBCollider.h"
 #include "Loaders/Json/JsonManager.h"
 
 
@@ -18,7 +19,7 @@ enum class BehaviorGrass
 };
 
 class Grass :
-	public BaseObject , public SphereCollider
+	public BaseObject , public AABBCollider
 {
 public:
 	Grass() : id_(count_) { ++count_; }
@@ -48,8 +49,7 @@ public:
 public:
 	Vector3 GetCenterPosition() const override { return worldTransform_.translation_; }
 	virtual Vector3 GetEulerRotation() override { return{}; }
-	Vector3 GetScale() const override { return worldTransform_.scale_ / 2.0f; }
-	Matrix4x4 GetWorldMatrix() const override { return worldTransform_.matWorld_; }
+	const WorldTransform& GetWorldTransform() { return worldTransform_; }
 	void OnCollision([[maybe_unused]] Collider* other) override;
 	void EnterCollision([[maybe_unused]] Collider* other) override;
 	void ExitCollision([[maybe_unused]] Collider* other) override;
@@ -141,8 +141,8 @@ private:
 
 	const float deltaTime_ = 1.0f / 60.0f; // 仮対応
 
-	Vector3 defaultScale_ = { 2.0f,2.0f,2.0f };
-	Vector3 growthScale_ = { 2.8f,2.8f,2.8f };
+	Vector3 defaultScale_ = { 1.0f,1.0f,1.0f };
+	Vector3 growthScale_ = { 1.4f,1.4f,1.4f };
 
 	float kGrowthTime_ = 1.0f;
 	float growthTimer_ = 0.0f;

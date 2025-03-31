@@ -14,11 +14,15 @@ void Player::Initialize(Camera* camera)
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = { 2.0f,-1.0f,6.0f };
-	worldTransform_.scale_ = { 2.0f,2.0f,2.0f };
+	worldTransform_.scale_ = { 1.0f,1.0f,1.0f };
 	worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
 	bodyTransform_.Initialize();
 	bodyTransform_.parent_ = &worldTransform_;
 	bodyTransform_.translation_ += bodyOffset_;
+
+
+	worldTransform_.UpdateMatrix();
+	bodyTransform_.UpdateMatrix();
 
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
@@ -51,7 +55,7 @@ void Player::InitJson()
 
 void Player::Update()
 {
-	Beforebehavior_ = behavior_;
+	beforebehavior_ = behavior_;
 
 	// 各行動の初期化
 	BehaviorInitialize();
@@ -138,7 +142,7 @@ void Player::EnterCollision(Collider* other)
 		{
 			if (MaxGrass_ > grassGauge_ && createGrassTimer_ <= 0)
 			{
-				if (dynamic_cast<SphereCollider*>(other)->GetRadius() != /*GetRadius()*/0)
+				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x != /*GetRadius()*/0)
 				{
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
 				}
@@ -180,21 +184,49 @@ void Player::Move()
 	{
 		moveDirection_ = { 0,1,0 };
 		moveHistory_.push_back(worldTransform_.translation_);
+
+		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
+		body->Initialize(BaseObject::camera_);
+		body->SetStartPos(GetCenterPosition());
+		body->SetPos(GetCenterPosition());
+		body->UpExtend();
+		playerBodys_.push_back(std::move(body));
 	}
 	else if (input_->PushKey(DIK_S) && moveDirection_ != Vector3{ 0,-1,0 })
 	{
 		moveDirection_ = { 0,-1,0 };
 		moveHistory_.push_back(worldTransform_.translation_);
+
+		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
+		body->Initialize(BaseObject::camera_);
+		body->SetStartPos(GetCenterPosition());
+		body->SetPos(GetCenterPosition());
+		body->RightExtend();
+		playerBodys_.push_back(std::move(body));
 	}
 	else if (input_->PushKey(DIK_A) && moveDirection_ != Vector3{ -1,0,0 })
 	{
 		moveDirection_ = { -1,0,0 };
 		moveHistory_.push_back(worldTransform_.translation_);
+
+		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
+		body->Initialize(BaseObject::camera_);
+		body->SetStartPos(GetCenterPosition());
+		body->SetPos(GetCenterPosition());
+		body->LeftExtend();
+		playerBodys_.push_back(std::move(body));
 	}
 	else if (input_->PushKey(DIK_D) && moveDirection_ != Vector3{ 1,0,0 })
 	{
 		moveDirection_ = { 1,0,0 };
 		moveHistory_.push_back(worldTransform_.translation_);
+
+		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
+		body->Initialize(BaseObject::camera_);
+		body->SetStartPos(GetCenterPosition());
+		body->SetPos(GetCenterPosition());
+		body->DownExtend();
+		playerBodys_.push_back(std::move(body));
 	}
 	
 	moveDirection_ = Normalize(moveDirection_);
@@ -308,7 +340,7 @@ bool Player::PopGrass()
 
 void Player::ExtendBody()
 {
-	if (Beforebehavior_ == BehaviorPlayer::Root && behavior_ == BehaviorPlayer::Moving)
+	if (beforebehavior_ == BehaviorPlayer::Root && behavior_ == BehaviorPlayer::Moving)
 	{
 		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
 		body->Initialize(BaseObject::camera_);
@@ -342,6 +374,9 @@ void Player::DebugPlayer()
 	ImGui::Text("BoostTimer : %.2f", boostTimer_);
 	ImGui::Text("BoostCT    : %.2f", boostCoolTimer_);
 	ImGui::Text("HistorySize: %d", a);
+	ImGui::Text("createGrassTimer_: %.2f", createGrassTimer_);
+	int b = grassGauge_;
+	ImGui::Text("grassGauge_: %d", b);
 	ImGui::End();
 
 	if (input_->TriggerKey(DIK_N))

@@ -20,13 +20,17 @@ public:
 	/// </summary>
 	void Draw();
 
+	void DrawCollision();
 
-	void PopGrass(Vector3& pos)
+	void hakuGrass(bool pop, Vector3 pos);
+
+	void PopGrass(Vector3 pos, bool madeByPlayer = false)
 	{
 		std::unique_ptr<Grass> grass = std::make_unique<Grass>();
 		grass->Initialize(camera_);
 		grass->SetPos(pos);
 		grass->SetPlayer(player_);
+		grass->SetMadeByPlayer(madeByPlayer);
 		grassList_.push_back(std::move(grass));
 	}
 
@@ -36,5 +40,8 @@ private:
 	Player* player_ = nullptr;
 	std::list<std::unique_ptr<Grass>> grassList_;
 	Camera* camera_ = nullptr;
+
+	std::list<Vector3> popPos_;
+	bool isPop_ = false;
 };
 

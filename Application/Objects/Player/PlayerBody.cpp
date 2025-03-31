@@ -16,18 +16,18 @@ void PlayerBody::Initialize(Camera* camera)
 
 void PlayerBody::Update()
 {
-	worldTransform_.UpdateMatrix();
-	ExtendUpdate();
+	/*worldTransform_.UpdateMatrix();
+	ExtendUpdate();*/
 }
 
 void PlayerBody::Draw()
 {
-	obj_->Draw(camera_, worldTransform_);
+	//obj_->Draw(camera_, worldTransform_);
 }
 
 void PlayerBody::UpExtend()
 {
-	worldTransform_.anchorPoint_ = { 0.0f,1.0f,0.0f };
+	worldTransform_.anchorPoint_ = { 0.0f,-1.0f,0.0f };
 	worldTransform_.scale_ = verticalGrowthScale_;
 	worldTransform_.translation_.y = -1.0f;
 	extendDirection_ = ExtendDirection::Up;

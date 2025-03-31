@@ -64,9 +64,9 @@ void GameScene::Initialize()
     player_->SetMapInfo(mpInfo_->GetMapChipField());
 
 	// 草
-	grass_ = std::make_unique<Grass>();
-	grass_->Initialize(sceneCamera_.get());
-	grass_->SetPlayer(player_.get());
+	grassManager_ = std::make_unique<GrassManager>();
+	grassManager_->SetPlayer(player_.get());
+	grassManager_->Initialize(sceneCamera_.get());
 
     
     // 地面
@@ -138,6 +138,7 @@ void GameScene::Update()
 
 	if (!isDebugCamera_) {
 		player_->Update();
+		grassManager_->hakuGrass(player_->PopGrass(), player_->GetCenterPosition());
 	}
 	player_->SetFPSMode(cameraMode_ == CameraMode::FPS);
 
@@ -162,7 +163,7 @@ void GameScene::Update()
 	// enemy_->Update();
 
 	ground_->Update();
-	grass_->Update();
+	grassManager_->Update();
 
 	particleEmitter_[0]->Emit();
 
@@ -254,7 +255,7 @@ void GameScene::DrawObject()
 
 	player_->Draw();
 
-	grass_->Draw();
+	grassManager_->Draw();
 }
 
 void GameScene::DrawSprite()
@@ -286,7 +287,7 @@ void GameScene::DrawLine()
 		boneLine_->DrawLine();
 	}*/
 	player_->DrawCollision();
-	grass_->DrawCollision();
+	grassManager_->DrawCollision();
 }
 
 

@@ -33,7 +33,7 @@
 
 // Application
 #include "Player/Player.h"
-#include "Grass/Grass.h"
+#include "Grass/GrassManager.h"
 #include "../Stages/StageManager/StageManager.h"
 
 
@@ -199,7 +199,7 @@ private:
     // 3Dモデル
     std::unique_ptr<Player> player_;
 
-    std::unique_ptr<Grass> grass_;
+    std::unique_ptr<GrassManager> grassManager_;
 
     /*=================================================================
 

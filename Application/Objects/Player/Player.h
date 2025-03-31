@@ -55,10 +55,16 @@ public:
 
 
 public:
-	Vector3 GetCenterPosition() const override { return worldTransform_.translation_; }
+	Vector3 GetCenterPosition() const override { 
+		return
+		{
+			bodyTransform_.matWorld_.m[3][0],
+			bodyTransform_.matWorld_.m[3][1],
+			bodyTransform_.matWorld_.m[3][2]
+		};
+	}
 	virtual Vector3 GetEulerRotation() override { return{}; }
-	Vector3 GetScale() const override { return worldTransform_.scale_ / 2.0f; }
-	Matrix4x4 GetWorldMatrix() const override { return worldTransform_.matWorld_; }
+	const WorldTransform& GetWorldTransform() { return worldTransform_; }
 	void OnCollision([[maybe_unused]] Collider* other) override;
 	void EnterCollision([[maybe_unused]] Collider* other) override;
 	void ExitCollision([[maybe_unused]] Collider* other) override;
@@ -83,8 +89,6 @@ private:
 
 
 	void TimerManager();
-
-	bool PopGrass();
 
 
 	void ExtendBody();
@@ -150,9 +154,6 @@ private: // プレイヤーのふるまい
 
 public: // getter&setter
 	/// WorldTransformの取得
-	WorldTransform& GetWorldTransform() { return worldTransform_; }
-
-	/// WorldTransformの取得
 	WorldTransform& GetBodyTransform() { return bodyTransform_; }
 
 	// 一人称視点にした場合横を向いているので操作を切り替えるため
@@ -164,6 +165,8 @@ public: // getter&setter
 	}
 
 	bool IsBoost() { return behavior_ == BehaviorPlayer::Boost; }
+
+	bool PopGrass();
 
 private:
 	Input* input_ = nullptr;
@@ -211,8 +214,8 @@ private:
 	float boostCoolTimer_ = 0;			// 現在のクールタイムトの残り時間
 
 
-	bool kCreateGrassTime_ = 2.0f;
-	bool createGrassTimer_ = 0.0f;
+	float kCreateGrassTime_ = 3.0f;		// 草が詰まるまでの時間
+	float createGrassTimer_ = 0.0f;
 	bool isCreateGrass_ = false;
 
 
@@ -233,7 +236,7 @@ private:
 public:
 	// 振る舞い
 	BehaviorPlayer behavior_ = BehaviorPlayer::Root;
-	BehaviorPlayer Beforebehavior_ = behavior_;
+	BehaviorPlayer beforebehavior_ = behavior_;
 	// 次の振る舞いリクエスト
 	std::optional<BehaviorPlayer> behaviortRquest_ = std::nullopt;
 };
