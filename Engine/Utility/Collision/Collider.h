@@ -35,7 +35,7 @@ public: // ポリモーフィズム
 	virtual void ExitCollision([[maybe_unused]] Collider* other) {}
 
 	virtual Vector3 GetCenterPosition() const = 0;
-	virtual WorldTransform& GetWorldTransform() const = 0;
+	virtual const WorldTransform& GetWorldTransform() = 0;
 	virtual Vector3 GetEulerRotation() = 0;
 
 
