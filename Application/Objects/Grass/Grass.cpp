@@ -15,11 +15,7 @@ void Grass::Initialize(Camera* camera)
 	input_ = Input::GetInstance();
 
 	BaseObject::camera_ = camera;
-	SphereCollider::SetCamera(BaseObject::camera_);
-	SphereCollider::Initialize();
 
-	SetRadius(defaultScale_.x);
-	SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kGrass));
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
@@ -33,10 +29,27 @@ void Grass::Initialize(Camera* camera)
 	obj_->Initialize();
 	obj_->SetModel("unitCube.obj");
 	obj_->SetMaterialColor({ 0.3f,1.0f,0.3f,1.0f });
+
+	SphereCollider::SetCamera(BaseObject::camera_);
+	SphereCollider::Initialize();
+	SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kGrass));
+
+	InitJson();
+}
+
+void Grass::InitJson()
+{
+	jsonManager_ = std::make_unique<JsonManager>("grassObj", "Resources/JSON/");
+
+	jsonCollider_ = std::make_unique<JsonManager>("grassCollider", "Resources/JSON/");
+	SphereCollider::InitJson(jsonCollider_.get());
 }
 
 void Grass::Update()
 {
+	BehaviorInitialize();
+	BehaviorUpdate();
+
 	worldTransform_.UpdateMatrix();
 	SphereCollider::Update();
 
@@ -184,7 +197,6 @@ void Grass::BehaviorGrowthUpdate()
 void Grass::BehaviorRepopInit()
 {
 	worldTransform_.scale_ = defaultScale_;
-	SetRadius(defaultScale_.x);
 }
 
 void Grass::BehaviorRepopUpdate()

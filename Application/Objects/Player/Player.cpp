@@ -10,10 +10,6 @@ void Player::Initialize(Camera* camera)
 	input_ = Input::GetInstance();
 
 	BaseObject::camera_ = camera;
-	SphereCollider::SetCamera(BaseObject::camera_);
-	SphereCollider::Initialize();
-	SetRadius(2.0f);
-	SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kPlayer));
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
@@ -30,8 +26,27 @@ void Player::Initialize(Camera* camera)
 	obj_->SetModel("unitCube.obj");
 	obj_->SetMaterialColor({ 0.3f,0.3f,1.0f,1.0f });
 	
+
+	/*SphereCollider::SetCamera(BaseObject::camera_);
+	SphereCollider::Initialize();*/
+
+	AABBCollider::SetCamera(BaseObject::camera_);
+	AABBCollider::Initialize();
+
+	SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kPlayer));
+
+	InitJson();
 	//colliderRct_.height = 2.0f;
 	//colliderRct_.width = 2.0f;
+}
+
+void Player::InitJson()
+{
+	jsonManager_ = std::make_unique<JsonManager>("playerObj", "Resources/JSON/");
+
+	jsonCollider_ = std::make_unique<JsonManager>("playerCollider", "Resources/JSON/");
+	//SphereCollider::InitJson(jsonCollider_.get());
+	AABBCollider::InitJson(jsonCollider_.get());
 }
 
 void Player::Update()
@@ -46,7 +61,8 @@ void Player::Update()
 
 	TimerManager();
 	UpdateMatrices();
-	SphereCollider::Update();
+	//SphereCollider::Update();
+	AABBCollider::Update();
 	
 #ifdef _DEBUG
 	DebugPlayer();
@@ -64,7 +80,8 @@ void Player::Draw()
 
 void Player::DrawCollision()
 {
-	SphereCollider::Draw();
+	//SphereCollider::Draw();
+	AABBCollider::Draw();
 }
 
 //void Player::OnCollision()
@@ -106,13 +123,17 @@ void Player::MapChipOnCollision(const CollisionInfo& info)
 
 void Player::OnCollision(Collider* other)
 {
+}
+
+void Player::EnterCollision(Collider* other)
+{
 	if (behavior_ != BehaviorPlayer::Return)
 	{
 		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrass)) // 草を食べたら
 		{
 			if (MaxGrass_ > grassGauge_ && createGrassTimer_ <= 0)
 			{
-				if (dynamic_cast<SphereCollider*>(other)->GetRadius() < 2.8f)
+				if (dynamic_cast<SphereCollider*>(other)->GetRadius() != /*GetRadius()*/0)
 				{
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
 				}
@@ -130,10 +151,6 @@ void Player::OnCollision(Collider* other)
 			}
 		}
 	}
-}
-
-void Player::EnterCollision(Collider* other)
-{
 }
 
 void Player::ExitCollision(Collider* other)
@@ -404,7 +421,7 @@ void Player::BehaviorBoostUpdate()
 
 void Player::BehaviorReturnInit()
 {
-	speed_ = defaultSpeed_;
+	speed_ = defaultSpeed_ + boostSpeed_;
 	moveDirection_ = { 0,0,0 };
 }
 

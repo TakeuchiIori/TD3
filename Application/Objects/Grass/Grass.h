@@ -4,6 +4,7 @@
 // Engine
 #include "Systems/Input/Input.h"
 #include "Collision/Sphere/SphereCollider.h"
+#include "Loaders/Json/JsonManager.h"
 
 
 #include "Player/Player.h"
@@ -28,6 +29,8 @@ public:
 	/// 初期化
 	/// </summary>
 	void Initialize(Camera* camera) override;
+
+	void InitJson();
 
 	/// <summary>
 	/// 更新
@@ -131,6 +134,9 @@ private:
 	Player* player_ = nullptr;
 
 	Input* input_ = nullptr;
+
+	std::unique_ptr<JsonManager> jsonManager_;
+	std::unique_ptr<JsonManager> jsonCollider_;
 
 	const float deltaTime_ = 1.0f / 60.0f; // 仮対応
 

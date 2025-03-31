@@ -5,6 +5,8 @@
 #include "PlayerMapCollision.h"
 #include "Systems/MapChip/MapChipCollision.h"
 #include "Collision/Sphere/SphereCollider.h"
+#include "Collision/AABB/AABBCollider.h"
+#include "Loaders/Json/JsonManager.h"
 
 // Application
 #include "BaseObject/BaseObject.h"
@@ -19,7 +21,7 @@ enum class BehaviorPlayer
 };
 
 class Player 
-	: public BaseObject, public SphereCollider
+	: public BaseObject, public AABBCollider
 {
 public:
 	Player(MapChipField* mapChipField)
@@ -34,6 +36,8 @@ public:
 	/// 初期化
 	/// </summary>
 	void Initialize(Camera* camera) override;
+
+	void InitJson();
 
 	/// <summary>
 	/// 更新
@@ -159,6 +163,9 @@ public: // getter&setter
 
 private:
 	Input* input_ = nullptr;
+
+	std::unique_ptr<JsonManager> jsonManager_;
+	std::unique_ptr<JsonManager> jsonCollider_;
 	
 	MapChipCollision mpCollision_;
 	MapChipCollision::ColliderRect colliderRect_;
@@ -171,7 +178,7 @@ private:
 	// 移動
 	Vector3 velocity_ = { 0.0f,0.0f,0.0f };			// 加速度
 	Vector3 moveDirection_ = { 0.0f,0.0f,0.0f };	// 動く向き
-	float defaultSpeed_ = 0.15f;
+	float defaultSpeed_ = 0.05f;
 	float speed_ = defaultSpeed_;							// 動く速度
 	bool isFPSMode_ = false;
 

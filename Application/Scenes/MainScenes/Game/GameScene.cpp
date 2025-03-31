@@ -124,8 +124,9 @@ void GameScene::Update()
 	}
 
 	mpInfo_->Update();
-	CheckAllCollisions();
 	CollisionManager::GetInstance()->Update();
+	CheckAllCollisions();
+	
 
 	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
 		picture_->Update();
@@ -417,15 +418,15 @@ void GameScene::ShowImGui()
 
 void GameScene::CheckAllCollisions() {
 
-	// 衝突マネージャーのリセット
-	CollisionManager::GetInstance()->Reset();
+	//// 衝突マネージャーのリセット
+	//CollisionManager::GetInstance()->Reset();
 
-	// コライダーをリストに登録
-	//CollisionManager::GetInstance()->AddCollider(player_.get());
+	//// コライダーをリストに登録
+	////CollisionManager::GetInstance()->AddCollider(player_.get());
 
 
-	// 衝突判定と応答
-	CollisionManager::GetInstance()->CheckAllCollisions();
+	//// 衝突判定と応答
+	//CollisionManager::GetInstance()->CheckAllCollisions();
 
 }
 void GameScene::InitializeOcclusionQuery()

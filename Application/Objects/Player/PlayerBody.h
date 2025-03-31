@@ -21,6 +21,15 @@ public:
 	void Draw() override;
 
 
+	void UpGrowth();
+
+	void LeftGrowth();
+
+	void RightGrowth();
+
+	void DownGrowth();
+
+
 public:
 	void SetPos(Vector3 pos) { worldTransform_.translation_ = pos; }
 
@@ -28,8 +37,15 @@ public:
 
 	void SetOffsetScale(Vector3& scale) { offsetScale_ = scale; }
 
+	void SetStartPos(Vector3& pos) { startPos_ = pos; }
+
+	void SetEndPos(Vector3& pos) { endPos_ = pos; }
+
 private:
 	Vector3 defaultScale_ = { 2.0f,2.0f,2.0f };
 	Vector3 offsetScale_ = {};
+
+	Vector3 startPos_ = {};
+	Vector3 endPos_ = {};
 };
 
