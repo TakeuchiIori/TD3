@@ -13,16 +13,12 @@ void Player::Initialize(Camera* camera)
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
-	worldTransform_.translation_ = { 2.0f,-1.0f,6.0f };
+	worldTransform_.translation_ = { 2.0f,0.0f,6.0f };
 	worldTransform_.scale_ = { 1.0f,1.0f,1.0f };
 	worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
-	bodyTransform_.Initialize();
-	bodyTransform_.parent_ = &worldTransform_;
-	bodyTransform_.translation_ += bodyOffset_;
 
 
 	worldTransform_.UpdateMatrix();
-	bodyTransform_.UpdateMatrix();
 
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
@@ -81,7 +77,7 @@ void Player::Update()
 
 void Player::Draw()
 {
-	obj_->Draw(BaseObject::camera_, bodyTransform_);
+	obj_->Draw(BaseObject::camera_, worldTransform_);
 	for (const auto& body : playerBodys_) {
 		body->Draw();
 	}
@@ -169,7 +165,6 @@ void Player::ExitCollision(Collider* other)
 void Player::UpdateMatrices()
 {
 	worldTransform_.UpdateMatrix();
-	bodyTransform_.UpdateMatrix();
 	for (const auto& body : playerBodys_) {
 		body->Update();
 	}
@@ -180,11 +175,12 @@ void Player::Move()
 
 	velocity_ = { 0.0f,0.0f,0.0f };
 
-	if (input_->PushKey(DIK_W) && moveDirection_ != Vector3{ 0,1,0 })
+	if (input_->TriggerKey(DIK_W) && moveDirection_ != Vector3{ 0,1,0 })
 	{
 		moveDirection_ = { 0,1,0 };
 		moveHistory_.push_back(worldTransform_.translation_);
 
+		ExtendBody();
 		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
 		body->Initialize(BaseObject::camera_);
 		body->SetStartPos(GetCenterPosition());
@@ -192,23 +188,25 @@ void Player::Move()
 		body->UpExtend();
 		playerBodys_.push_back(std::move(body));
 	}
-	else if (input_->PushKey(DIK_S) && moveDirection_ != Vector3{ 0,-1,0 })
+	else if (input_->TriggerKey(DIK_S) && moveDirection_ != Vector3{ 0,-1,0 })
 	{
 		moveDirection_ = { 0,-1,0 };
 		moveHistory_.push_back(worldTransform_.translation_);
 
+		ExtendBody();
 		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
 		body->Initialize(BaseObject::camera_);
 		body->SetStartPos(GetCenterPosition());
 		body->SetPos(GetCenterPosition());
-		body->RightExtend();
+		body->DownExtend();
 		playerBodys_.push_back(std::move(body));
 	}
-	else if (input_->PushKey(DIK_A) && moveDirection_ != Vector3{ -1,0,0 })
+	else if (input_->TriggerKey(DIK_A) && moveDirection_ != Vector3{ -1,0,0 })
 	{
 		moveDirection_ = { -1,0,0 };
 		moveHistory_.push_back(worldTransform_.translation_);
 
+		ExtendBody();
 		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
 		body->Initialize(BaseObject::camera_);
 		body->SetStartPos(GetCenterPosition());
@@ -216,16 +214,17 @@ void Player::Move()
 		body->LeftExtend();
 		playerBodys_.push_back(std::move(body));
 	}
-	else if (input_->PushKey(DIK_D) && moveDirection_ != Vector3{ 1,0,0 })
+	else if (input_->TriggerKey(DIK_D) && moveDirection_ != Vector3{ 1,0,0 })
 	{
 		moveDirection_ = { 1,0,0 };
 		moveHistory_.push_back(worldTransform_.translation_);
 
+		ExtendBody();
 		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
 		body->Initialize(BaseObject::camera_);
 		body->SetStartPos(GetCenterPosition());
 		body->SetPos(GetCenterPosition());
-		body->DownExtend();
+		body->RightExtend();
 		playerBodys_.push_back(std::move(body));
 	}
 	
@@ -377,6 +376,7 @@ void Player::DebugPlayer()
 	ImGui::Text("createGrassTimer_: %.2f", createGrassTimer_);
 	int b = grassGauge_;
 	ImGui::Text("grassGauge_: %d", b);
+	ImGui::DragFloat3("pos", &worldTransform_.translation_.x);
 	ImGui::End();
 
 	if (input_->TriggerKey(DIK_N))

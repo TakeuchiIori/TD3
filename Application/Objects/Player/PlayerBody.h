@@ -14,6 +14,10 @@ class PlayerBody :
     public BaseObject
 {
 public:
+	PlayerBody() : id_(count_) { ++count_; }
+	~PlayerBody() override { --count_; }
+
+public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -59,5 +63,11 @@ private:
 	Vector3 endPos_ = {};
 
 	ExtendDirection extendDirection_ = ExtendDirection::Up;
+
+
+
+
+	static int count_;    // 現在のインスタンス数
+	int id_;              // 各インスタンスのID
 };
 

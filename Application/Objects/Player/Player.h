@@ -58,9 +58,9 @@ public:
 	Vector3 GetCenterPosition() const override { 
 		return
 		{
-			bodyTransform_.matWorld_.m[3][0],
-			bodyTransform_.matWorld_.m[3][1],
-			bodyTransform_.matWorld_.m[3][2]
+			worldTransform_.matWorld_.m[3][0],
+			worldTransform_.matWorld_.m[3][1],
+			worldTransform_.matWorld_.m[3][2]
 		};
 	}
 	virtual Vector3 GetEulerRotation() override { return{}; }
@@ -153,8 +153,6 @@ private: // プレイヤーのふるまい
 
 
 public: // getter&setter
-	/// WorldTransformの取得
-	WorldTransform& GetBodyTransform() { return bodyTransform_; }
 
 	// 一人称視点にした場合横を向いているので操作を切り替えるため
 	void SetFPSMode(bool isFPS) { isFPSMode_ = isFPS; }
@@ -177,10 +175,6 @@ private:
 	MapChipCollision mpCollision_;
 	MapChipCollision::ColliderRect colliderRect_;
 
-	// 体のトランスフォーム
-	WorldTransform bodyTransform_;
-	// 体のオフセット
-	Vector3 bodyOffset_ = { 0.0f,0.5f,0.0f };
 
 	// 移動
 	Vector3 velocity_ = { 0.0f,0.0f,0.0f };			// 加速度

@@ -1,11 +1,19 @@
 #include "PlayerBody.h"
 
+
+#ifdef _DEBUG
+#include "imgui.h"
+#endif // _DEBUG
+
+int PlayerBody::count_ = 0;
+
 void PlayerBody::Initialize(Camera* camera)
 {
 	camera_ = camera;
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
+	worldTransform_.useAnchorPoint_ = true;
 
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
@@ -16,44 +24,56 @@ void PlayerBody::Initialize(Camera* camera)
 
 void PlayerBody::Update()
 {
-	/*worldTransform_.UpdateMatrix();
-	ExtendUpdate();*/
+	worldTransform_.UpdateMatrix();
+	ExtendUpdate();
+
+#ifdef _DEBUG
+	std::string sid = std::to_string(id_);
+	const char* id = sid.c_str();
+	ImGui::Begin("PlayerBody");
+	ImGui::DragFloat3(id, &worldTransform_.translation_.x);
+
+
+
+	ImGui::End();
+#endif // _DEBUG
+
 }
 
 void PlayerBody::Draw()
 {
-	//obj_->Draw(camera_, worldTransform_);
+	obj_->Draw(camera_, worldTransform_);
 }
 
 void PlayerBody::UpExtend()
 {
-	worldTransform_.anchorPoint_ = { 0.0f,-1.0f,0.0f };
+	worldTransform_.anchorPoint_ = { 0.0f,-0.5f,0.0f };
 	worldTransform_.scale_ = verticalGrowthScale_;
-	worldTransform_.translation_.y = -1.0f;
+	worldTransform_.translation_.y -= 0.5f;
 	extendDirection_ = ExtendDirection::Up;
 }
 
 void PlayerBody::LeftExtend()
 {
-	worldTransform_.anchorPoint_ = { 1.0f,0.0f,0.0f };
+	worldTransform_.anchorPoint_ = { 0.5f,0.0f,0.0f };
 	worldTransform_.scale_ = horizontalGrowthScale_;
-	worldTransform_.translation_.x = +1.0f;
+	worldTransform_.translation_.x += 0.5f;
 	extendDirection_ = ExtendDirection::Left;
 }
 
 void PlayerBody::RightExtend()
 {
-	worldTransform_.anchorPoint_ = { -1.0f,0.0f,0.0f };
+	worldTransform_.anchorPoint_ = { -0.5f,0.0f,0.0f };
 	worldTransform_.scale_ = horizontalGrowthScale_;
-	worldTransform_.translation_.x = -1.0f; 
+	worldTransform_.translation_.x -= 0.5f;
 	extendDirection_ = ExtendDirection::Right;
 }
 
 void PlayerBody::DownExtend()
 {
-	worldTransform_.anchorPoint_ = { 0.0f,1.0f,0.0f };
+	worldTransform_.anchorPoint_ = { 0.0f,0.5f,0.0f };
 	worldTransform_.scale_ = verticalGrowthScale_;
-	worldTransform_.translation_.y = +1.0f;
+	worldTransform_.translation_.y += 0.5f;
 	extendDirection_ = ExtendDirection::Down;
 }
 
@@ -64,22 +84,22 @@ void PlayerBody::ExtendUpdate()
 	{
 	default:
 	case ExtendDirection::Up:
-		worldTransform_.scale_ = verticalGrowthScale_ + (worldTransform_.anchorPoint_ * length);
+		worldTransform_.scale_ = verticalGrowthScale_ + (Vector3{ 0.0f,1.0f,0.0f } * length);
 
 		break;
 
 	case ExtendDirection::Left:
-		worldTransform_.scale_ = horizontalGrowthScale_ + (worldTransform_.anchorPoint_ * length);
+		worldTransform_.scale_ = horizontalGrowthScale_ + (Vector3{ 1.0f,0.0f,0.0f } * length);
 
 		break;
 
 	case ExtendDirection::Right:
-		worldTransform_.scale_ = horizontalGrowthScale_ + (worldTransform_.anchorPoint_ * length);
+		worldTransform_.scale_ = horizontalGrowthScale_ + (Vector3{ 1.0f,0.0f,0.0f } * length);
 
 		break;
 
 	case ExtendDirection::Down:
-		worldTransform_.scale_ = verticalGrowthScale_ + (worldTransform_.anchorPoint_ * length);
+		worldTransform_.scale_ = verticalGrowthScale_ + (Vector3{ 0.0f,1.0f,0.0f } * length);
 
 		break;
 	}
