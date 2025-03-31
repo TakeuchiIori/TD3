@@ -14,8 +14,8 @@ void Player::Initialize(Camera* camera)
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = { 2.0f,0.0f,6.0f };
-	worldTransform_.scale_ = { 1.0f,1.0f,1.0f };
-	worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
+	worldTransform_.scale_ = { 0.99f,0.99f,0.99f };
+	//worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
 
 
 	worldTransform_.UpdateMatrix();
@@ -87,6 +87,9 @@ void Player::DrawCollision()
 {
 	//SphereCollider::Draw();
 	AABBCollider::Draw();
+	for (const auto& body : playerBodys_) {
+		body->DrawCollision();
+	}
 }
 
 //void Player::OnCollision()
@@ -128,6 +131,18 @@ void Player::MapChipOnCollision(const CollisionInfo& info)
 
 void Player::OnCollision(Collider* other)
 {
+
+	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody)) // 体に当たったら
+	{
+		if (behavior_ == BehaviorPlayer::Moving)
+		{
+			worldTransform_.translation_ += moveDirection_ * -defaultSpeed_;
+		}
+		else if (behavior_ == BehaviorPlayer::Boost)
+		{
+			worldTransform_.translation_ += moveDirection_ * -(defaultSpeed_ + boostSpeed_);
+		}
+	}
 }
 
 void Player::EnterCollision(Collider* other)
@@ -175,11 +190,15 @@ void Player::Move()
 
 	velocity_ = { 0.0f,0.0f,0.0f };
 
-	if (input_->TriggerKey(DIK_W) && moveDirection_ != Vector3{ 0,1,0 })
+	if (input_->TriggerKey(DIK_W) && 
+		moveDirection_ != Vector3{ 0,1,0 } &&
+		moveDirection_ != Vector3{ 0,-1,0 })
 	{
 		moveDirection_ = { 0,1,0 };
 		moveHistory_.push_back(worldTransform_.translation_);
+		worldTransform_.rotation_.z = 0;
 
+		// 体の出現
 		ExtendBody();
 		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
 		body->Initialize(BaseObject::camera_);
@@ -188,10 +207,14 @@ void Player::Move()
 		body->UpExtend();
 		playerBodys_.push_back(std::move(body));
 	}
-	else if (input_->TriggerKey(DIK_S) && moveDirection_ != Vector3{ 0,-1,0 })
+	else if (input_->TriggerKey(DIK_S) && 
+		moveDirection_ != Vector3{ 0,-1,0 } &&
+		moveDirection_ != Vector3{ 0,1,0 })
 	{
 		moveDirection_ = { 0,-1,0 };
 		moveHistory_.push_back(worldTransform_.translation_);
+
+		worldTransform_.rotation_.z = std::numbers::pi_v<float>;
 
 		ExtendBody();
 		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
@@ -201,10 +224,14 @@ void Player::Move()
 		body->DownExtend();
 		playerBodys_.push_back(std::move(body));
 	}
-	else if (input_->TriggerKey(DIK_A) && moveDirection_ != Vector3{ -1,0,0 })
+	else if (input_->TriggerKey(DIK_A) && 
+		moveDirection_ != Vector3{ -1,0,0 } &&
+		moveDirection_ != Vector3{ 1,0,0 })
 	{
 		moveDirection_ = { -1,0,0 };
 		moveHistory_.push_back(worldTransform_.translation_);
+
+		worldTransform_.rotation_.z = std::numbers::pi_v<float> / 2.0f;
 
 		ExtendBody();
 		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
@@ -214,10 +241,15 @@ void Player::Move()
 		body->LeftExtend();
 		playerBodys_.push_back(std::move(body));
 	}
-	else if (input_->TriggerKey(DIK_D) && moveDirection_ != Vector3{ 1,0,0 })
+	else if (input_->TriggerKey(DIK_D) &&
+		moveDirection_ != Vector3{ 1,0,0 } &&
+		moveDirection_ != Vector3{ -1,0,0 })
 	{
 		moveDirection_ = { 1,0,0 };
 		moveHistory_.push_back(worldTransform_.translation_);
+
+
+		worldTransform_.rotation_.z = 3.0f * std::numbers::pi_v<float> / 2.0f;
 
 		ExtendBody();
 		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();

@@ -9,7 +9,7 @@ int PlayerBody::count_ = 0;
 
 void PlayerBody::Initialize(Camera* camera)
 {
-	camera_ = camera;
+	BaseObject::camera_ = camera;
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
@@ -20,12 +20,30 @@ void PlayerBody::Initialize(Camera* camera)
 	obj_->Initialize();
 	obj_->SetModel("unitCube.obj");
 	obj_->SetMaterialColor({ 1.0f,1.0f,0.3f,1.0f });
+
+	AABBCollider::SetCamera(BaseObject::camera_);
+	AABBCollider::Initialize();
+
+	SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody));
+
+	InitJson();
+}
+
+void PlayerBody::InitJson()
+{
+	jsonManager_ = std::make_unique<JsonManager>("playerBodyObj", "Resources/JSON/");
+
+	jsonCollider_ = std::make_unique<JsonManager>("playerBodyCollider", "Resources/JSON/");
+	//SphereCollider::InitJson(jsonCollider_.get());
+	AABBCollider::InitJson(jsonCollider_.get());
 }
 
 void PlayerBody::Update()
 {
 	worldTransform_.UpdateMatrix();
 	ExtendUpdate();
+
+	AABBCollider::Update();
 
 #ifdef _DEBUG
 	std::string sid = std::to_string(id_);
@@ -42,39 +60,56 @@ void PlayerBody::Update()
 
 void PlayerBody::Draw()
 {
-	obj_->Draw(camera_, worldTransform_);
+	obj_->Draw(BaseObject::camera_, worldTransform_);
+}
+
+void PlayerBody::DrawCollision()
+{
+	AABBCollider::Draw();
 }
 
 void PlayerBody::UpExtend()
 {
-	worldTransform_.anchorPoint_ = { 0.0f,-0.5f,0.0f };
+	worldTransform_.anchorPoint_ = { 0.0f,-1.0f,0.0f };
 	worldTransform_.scale_ = verticalGrowthScale_;
-	worldTransform_.translation_.y -= 0.5f;
+	//worldTransform_.translation_.y -= 1.0f;
 	extendDirection_ = ExtendDirection::Up;
 }
 
 void PlayerBody::LeftExtend()
 {
-	worldTransform_.anchorPoint_ = { 0.5f,0.0f,0.0f };
+	worldTransform_.anchorPoint_ = { 1.0f,0.0f,0.0f };
 	worldTransform_.scale_ = horizontalGrowthScale_;
-	worldTransform_.translation_.x += 0.5f;
+	//worldTransform_.translation_.x += 1.0f;
 	extendDirection_ = ExtendDirection::Left;
 }
 
 void PlayerBody::RightExtend()
 {
-	worldTransform_.anchorPoint_ = { -0.5f,0.0f,0.0f };
+	worldTransform_.anchorPoint_ = { -1.0f,0.0f,0.0f };
 	worldTransform_.scale_ = horizontalGrowthScale_;
-	worldTransform_.translation_.x -= 0.5f;
+	//worldTransform_.translation_.x -= 1.0f;
 	extendDirection_ = ExtendDirection::Right;
 }
 
 void PlayerBody::DownExtend()
 {
-	worldTransform_.anchorPoint_ = { 0.0f,0.5f,0.0f };
+	worldTransform_.anchorPoint_ = { 0.0f,1.0f,0.0f };
 	worldTransform_.scale_ = verticalGrowthScale_;
-	worldTransform_.translation_.y += 0.5f;
+	//worldTransform_.translation_.y += 1.0f;
 	extendDirection_ = ExtendDirection::Down;
+}
+
+void PlayerBody::OnCollision(Collider* other)
+{
+}
+
+void PlayerBody::EnterCollision(Collider* other)
+{
+}
+
+void PlayerBody::ExitCollision(Collider* other)
+{
 }
 
 void PlayerBody::ExtendUpdate()
@@ -84,22 +119,22 @@ void PlayerBody::ExtendUpdate()
 	{
 	default:
 	case ExtendDirection::Up:
-		worldTransform_.scale_ = verticalGrowthScale_ + (Vector3{ 0.0f,1.0f,0.0f } * length);
+		worldTransform_.scale_ = verticalGrowthScale_ + (Vector3{ 0.0f,0.5f,0.0f } * length);
 
 		break;
 
 	case ExtendDirection::Left:
-		worldTransform_.scale_ = horizontalGrowthScale_ + (Vector3{ 1.0f,0.0f,0.0f } * length);
+		worldTransform_.scale_ = horizontalGrowthScale_ + (Vector3{ 0.5f,0.0f,0.0f } * length);
 
 		break;
 
 	case ExtendDirection::Right:
-		worldTransform_.scale_ = horizontalGrowthScale_ + (Vector3{ 1.0f,0.0f,0.0f } * length);
+		worldTransform_.scale_ = horizontalGrowthScale_ + (Vector3{ 0.5f,0.0f,0.0f } * length);
 
 		break;
 
 	case ExtendDirection::Down:
-		worldTransform_.scale_ = verticalGrowthScale_ + (Vector3{ 0.0f,1.0f,0.0f } * length);
+		worldTransform_.scale_ = verticalGrowthScale_ + (Vector3{ 0.0f,0.5f,0.0f } * length);
 
 		break;
 	}
