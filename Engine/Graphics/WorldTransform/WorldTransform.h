@@ -55,6 +55,10 @@ public:
 	/// </summary>
 	void UpdateMatrix();
 
+	const Vector3& GetAnchorPoint() const;
+
+	void SetAnchorPoint(const Vector3& anchorPoint);
+
 	/// <summary>
 	/// 定数バッファの取得
 	/// </summary>
@@ -70,9 +74,6 @@ public:
 
 	void SetMapWorld(const Matrix4x4& world) { transformData_->World = world; }
 	const Matrix4x4& GetMatWorld() { return matWorld_; }
-
-	const Vector3& GetAnchorPoint() const { return anchorPoint_; }
-	void SetAnchorPoint(const Vector3& anchorPoint) { this->anchorPoint_ = anchorPoint; }
 
 private:
 	// 定数バッファ
