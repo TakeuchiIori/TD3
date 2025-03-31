@@ -3,7 +3,7 @@
 void SphereCollider::InitJson(JsonManager* jsonManager)
 {
 	// 衝突球のオフセットや半径を JSON に登録
-	//jsonManager->SetCategory("Colliders");
+	jsonManager->SetCategory("Colliders");
 	jsonManager->Register("Collider Offset X", &sphereOffset_.center.x);
 	jsonManager->Register("Collider Offset Y", &sphereOffset_.center.y);
 	jsonManager->Register("Collider Offset Z", &sphereOffset_.center.z);

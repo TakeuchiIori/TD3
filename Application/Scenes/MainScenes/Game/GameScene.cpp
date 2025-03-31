@@ -35,7 +35,7 @@ void GameScene::Initialize()
 
 	CollisionManager::GetInstance()->Initialize();
 
-	stageManager_.Initialize(sceneCamera_.get());
+	//stageManager_.Initialize(sceneCamera_.get());
 
 	picture_ = std::make_unique<Picture>();
 	picture_->Initialize();
