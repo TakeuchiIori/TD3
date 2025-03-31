@@ -33,8 +33,7 @@ void Line::DrawLine()
 	// WVP行列を更新
 	if (camera_) {
 		transformationMatrix_->WVP = camera_->GetViewProjectionMatrix();
-	}
-	else {
+	} else {
 		transformationMatrix_->WVP = MakeIdentity4x4();
 	}
 
@@ -47,7 +46,7 @@ void Line::DrawLine()
 	commandList->SetGraphicsRootConstantBufferView(1, transformationResource_->GetGPUVirtualAddress());
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	commandList->DrawInstanced(index, index / 2, 0, 0); // ラインは2つの頂点で構成
-	
+
 	index = 0u;
 }
 
@@ -90,64 +89,6 @@ void Line::DrawSphere(const Vector3& center, float radius, int resolution)
 	}
 }
 
-///// <summary>
-///// 球を描画（緯度経度ベース）
-///// </summary>
-//void Line::DrawSphere(const Vector3& center, float radius, int resolution)
-//{
-//	const int latitudeBands = resolution;   // 緯度の分割数
-//	const int longitudeBands = resolution;  // 経度の分割数
-//
-//	for (int lat = 0; lat <= latitudeBands; ++lat) {
-//		float theta = lat * std::numbers::pi_v<float> / latitudeBands; // 0 ~ π
-//		float sinTheta = sinf(theta);
-//		float cosTheta = cosf(theta);
-//
-//		for (int lon = 0; lon < longitudeBands; ++lon) {
-//			float phi1 = lon * 2.0f * std::numbers::pi_v<float> / longitudeBands;
-//			float phi2 = (lon + 1) * 2.0f * std::numbers::pi_v<float> / longitudeBands;
-//
-//			// 緯度リングの一部（横方向）
-//			Vector3 p1 = {
-//				center.x + radius * sinTheta * cosf(phi1),
-//				center.y + radius * cosTheta,
-//				center.z + radius * sinTheta * sinf(phi1)
-//			};
-//			Vector3 p2 = {
-//				center.x + radius * sinTheta * cosf(phi2),
-//				center.y + radius * cosTheta,
-//				center.z + radius * sinTheta * sinf(phi2)
-//			};
-//
-//			RegsterLine(p1, p2);
-//		}
-//	}
-//
-//	for (int lon = 0; lon < longitudeBands; ++lon) {
-//		float phi = lon * 2.0f * std::numbers::pi_v<float> / longitudeBands;
-//		float cosPhi = cosf(phi);
-//		float sinPhi = sinf(phi);
-//
-//		for (int lat = 0; lat < latitudeBands; ++lat) {
-//			float theta1 = lat * std::numbers::pi_v<float> / latitudeBands;
-//			float theta2 = (lat + 1) * std::numbers::pi_v<float> / latitudeBands;
-//
-//			Vector3 p1 = {
-//				center.x + radius * sinf(theta1) * cosPhi,
-//				center.y + radius * cosf(theta1),
-//				center.z + radius * sinf(theta1) * sinPhi
-//			};
-//			Vector3 p2 = {
-//				center.x + radius * sinf(theta2) * cosPhi,
-//				center.y + radius * cosf(theta2),
-//				center.z + radius * sinf(theta2) * sinPhi
-//			};
-//
-//			RegsterLine(p1, p2);
-//		}
-//	}
-//}
-//
 
 /// <summary>
 /// AABBを描画
@@ -221,14 +162,6 @@ void Line::DrawOBB(const Vector3& center, const Vector3& rotationEuler, const Ve
 	}
 }
 
-void Line::DrawOBB(const Vector3& center, const Quaternion& rotation, const Vector3& size)
-{
-
-}
-
-
-
-
 
 void Line::CrateVetexResource()
 {
@@ -250,7 +183,7 @@ void Line::CrateMaterialResource()
 void Line::CreateTransformResource()
 {
 	// WVP行列リソースを作成
-	
+
 	transformationResource_ = dxCommon_->CreateBufferResource(sizeof(Matrix4x4));
 	transformationResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrix_));
 	transformationMatrix_->WVP = MakeIdentity4x4();
