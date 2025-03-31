@@ -45,6 +45,8 @@ public:
 	/// </summary>
 	void Draw() override;
 
+	void DrawCollision();
+
 	void MapChipOnCollision(const CollisionInfo& info);
 
 

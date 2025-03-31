@@ -39,6 +39,8 @@ public:
 	/// </summary>
 	void Draw() override;
 
+	void DrawCollision();
+
 
 public:
 	Vector3 GetCenterPosition() const override { return worldTransform_.translation_; }

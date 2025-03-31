@@ -284,6 +284,8 @@ void GameScene::DrawLine()
 		test_->DrawSkeleton(test_->GetModel()->GetSkeleton(), *boneLine_);
 		boneLine_->DrawLine();
 	}*/
+	player_->DrawCollision();
+	grass_->DrawCollision();
 }
 
 

@@ -62,6 +62,11 @@ void Player::Draw()
 	}
 }
 
+void Player::DrawCollision()
+{
+	SphereCollider::Draw();
+}
+
 //void Player::OnCollision()
 //{
 //	if (false) // 草を食べたら

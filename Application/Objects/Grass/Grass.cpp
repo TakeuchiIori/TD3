@@ -51,6 +51,11 @@ void Grass::Draw()
 	obj_->Draw(BaseObject::camera_, worldTransform_);
 }
 
+void Grass::DrawCollision()
+{
+	SphereCollider::Draw();
+}
+
 void Grass::OnCollision(Collider* other)
 {
 }
