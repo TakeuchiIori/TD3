@@ -124,9 +124,12 @@ void GameScene::Initialize()
 /// </summary>
 void GameScene::Update()
 {
+#ifdef _DEBUG
 	if ((Input::GetInstance()->TriggerKey(DIK_LCONTROL)) || Input::GetInstance()->IsPadTriggered(0, GamePadButton::RT)) {
 		isDebugCamera_ = !isDebugCamera_;
 	}
+#endif // _DEBUG
+
 
 	mpInfo_->Update();
 	
