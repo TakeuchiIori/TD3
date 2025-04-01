@@ -1,5 +1,9 @@
 #include "Ground.h"
+#ifdef _DEBUG
 #include "imgui.h"
+
+#endif // _DEBUG
+
 
 void Ground::Initialize(Camera* camera)
 {
@@ -20,9 +24,13 @@ void Ground::Update()
 
 	worldTransform_.UpdateMatrix();
 
+#ifdef _DEBUG
+
 	ImGui::Begin("Ground");
 	ImGui::DragFloat3("Position", &worldTransform_.translation_.x, 0.01f);
 	ImGui::End();
+
+#endif // _DEBUG
 }
 
 void Ground::Draw()

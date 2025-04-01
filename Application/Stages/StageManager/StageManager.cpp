@@ -1,5 +1,9 @@
 #include "StageManager.h"
+#ifdef _DEBUG
 #include "imgui.h"
+
+#endif // _DEBUG
+
 
 void StageManager::Initialize(Camera* camera)
 {
