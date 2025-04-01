@@ -1,4 +1,5 @@
 #include "SphereCollider.h"
+#include "MathFunc.h"
 
 void SphereCollider::InitJson(JsonManager* jsonManager)
 {
@@ -43,7 +44,7 @@ void SphereCollider::Initialize()
 
 void SphereCollider::Update()
 {
-	sphereOffset_.center = GetWorldTransform().scale_;
+	radius_ = Magnitude(GetWorldTransform().scale_);
 	sphere_.center = GetCenterPosition() + sphereOffset_.center;
 	sphere_.radius = radius_ + sphereOffset_.radius;
 }
