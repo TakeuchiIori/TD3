@@ -79,7 +79,7 @@ void SideEnemy::DrawCollision()
 void SideEnemy::OnEnterCollision(BaseCollider* self, BaseCollider* other) {
 
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) ||
-		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kNextFramePlayer))
+		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody))
 	{
 		isAlive_ = false;
 	}
@@ -87,7 +87,7 @@ void SideEnemy::OnEnterCollision(BaseCollider* self, BaseCollider* other) {
 
 void SideEnemy::OnCollision(BaseCollider* self, BaseCollider* other) {
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) ||
-		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kNextFramePlayer))
+		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody))
 	{
 		isAlive_ = false;
 	}

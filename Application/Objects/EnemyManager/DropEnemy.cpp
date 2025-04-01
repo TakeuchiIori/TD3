@@ -78,7 +78,7 @@ void DropEnemy::DrawCollision()
 void DropEnemy::OnEnterCollision(BaseCollider* self, BaseCollider* other) {
 
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) ||
-		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kNextFramePlayer))
+		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody))
 	{
 		isAlive_ = false;
 	}
@@ -87,7 +87,7 @@ void DropEnemy::OnEnterCollision(BaseCollider* self, BaseCollider* other) {
 void DropEnemy::OnCollision(BaseCollider* self, BaseCollider* other) {
 
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) ||
-		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kNextFramePlayer))
+		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody))
 	{
 		isAlive_ = false;
 	}
