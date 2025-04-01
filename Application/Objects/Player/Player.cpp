@@ -174,21 +174,16 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 			}
 		}
 
-		//if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kNextFramePlayer))
-		//{
-		//	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody)) // 体に当たったら
-		//	{
-		//		isCollisionBody = true;
-		//		/*if (behavior_ == BehaviorPlayer::Moving)
-		//		{
-		//			worldTransform_.translation_ += moveDirection_ * -defaultSpeed_;
-		//		}
-		//		else if (behavior_ == BehaviorPlayer::Boost)
-		//		{
-		//			worldTransform_.translation_ += moveDirection_ * -(defaultSpeed_ + boostSpeed_);
-		//		}*/
-		//	}
-		//}
+
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
+		{
+			if (HP_ > 0 && invincibleTimer_ <= 0)
+			{
+				HP_--;
+				invincibleTimer_ = kInvincibleTime_;
+			}
+		}
+
 	}
 }
 
@@ -201,14 +196,7 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody)) // 体に当たったら
 			{
 				isCollisionBody = true;
-				/*if (behavior_ == BehaviorPlayer::Moving)
-				{
-					worldTransform_.translation_ += moveDirection_ * -defaultSpeed_;
-				}
-				else if (behavior_ == BehaviorPlayer::Boost)
-				{
-					worldTransform_.translation_ += moveDirection_ * -(defaultSpeed_ + boostSpeed_);
-				}*/
+				TakeDamage();
 			}
 		}
 	}
@@ -320,6 +308,7 @@ void Player::Move()
 	{
 		newPos = worldTransform_.translation_;
 		velocity_ = { 0,0,0 };
+		TakeDamage();
 	}
 	else
 	{
@@ -389,6 +378,10 @@ void Player::TimerManager()
 	{
 		createGrassTimer_ -= deltaTime_;
 	}
+	if (0 < invincibleTimer_)
+	{
+		invincibleTimer_ -= deltaTime_;
+	}
 }
 
 bool Player::PopGrass()
@@ -440,6 +433,22 @@ void Player::ShrinkBody()
 	}
 }
 
+void Player::TakeDamage()
+{
+	if (HP_ > 0 && invincibleTimer_ <= 0)
+	{
+		HP_--;
+		if (HP_ <= 0)
+		{
+			extendTimer_ = 0;
+		}
+		else
+		{
+			invincibleTimer_ = kInvincibleTime_;
+		}
+	}
+}
+
 #ifdef _DEBUG
 void Player::DebugPlayer()
 {
@@ -454,8 +463,8 @@ void Player::DebugPlayer()
 	int b = grassGauge_;
 	ImGui::Text("grassGauge_: %d", b);
 	ImGui::Text("isCollisionBody: %d", isCollisionBody);
-	ImGui::DragFloat3("pos", &worldTransform_.translation_.x);
-	ImGui::DragFloat3("pos2", &nextWorldTransform_.translation_.x);
+	int c = HP_;
+	ImGui::Text("HP : %d", c);
 	ImGui::End();
 
 	if (input_->TriggerKey(DIK_N))
@@ -519,6 +528,7 @@ void Player::BehaviorRootInit()
 	speed_ = 0;
 	playerBodys_.clear();
 	isCollisionBody = false;
+	HP_ = kMaxHP_;
 }
 
 void Player::BehaviorRootUpdate()

@@ -105,6 +105,8 @@ private:
 
 	void ShrinkBody();
 
+	void TakeDamage();
+
 
 #ifdef _DEBUG
 	// デバッグ用 (ImGuiとか)
@@ -237,7 +239,11 @@ private:
 	const float deltaTime_ = 1.0f / 60.0f; // 仮対応
 
 	// ヒットポイント
-	int32_t HP_ = 3;
+	int32_t kMaxHP_ = 3;
+	int32_t HP_ = kMaxHP_;
+
+	float kInvincibleTime_ = 2.0f;
+	float invincibleTimer_ = 0.0f;
 
 
 	//PlayerMapCollision mapCollision_;
