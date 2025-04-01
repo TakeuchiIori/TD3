@@ -24,6 +24,11 @@ CollisionManager* CollisionManager::GetInstance()
 	return &instance;
 }
 
+CollisionManager::~CollisionManager()
+{
+	Reset();
+}
+
 
 inline float ProjectOBB(const OBB& obb, const Vector3& axis, const Vector3 axes[3]) {
 	return	obb.size.x  * fabs(Dot(axes[0], axis)) +
@@ -41,6 +46,16 @@ bool Collision::Check(const SphereCollider* a, const SphereCollider* b)
 
 bool Collision::Check(const SphereCollider* sphere, const AABBCollider* aabb)
 {
+	Vector3 center = sphere->GetCenterPosition();
+	float radius = sphere->GetRadius();
+
+	// 値が正常かチェック
+	if (std::isnan(center.x) || std::isnan(center.y) || std::isnan(center.z) ||
+		std::isnan(radius) || radius < 0.0f || !std::isfinite(radius)) {
+		return false;
+	}
+
+
 	Vector3 closest = Clamp(sphere->GetCenterPosition(), aabb->GetAABB().min, aabb->GetAABB().max);
 	Vector3 diff = closest - sphere->GetCenterPosition();
 	return Length(diff) <= sphere->GetRadius() * sphere->GetRadius();
@@ -48,6 +63,15 @@ bool Collision::Check(const SphereCollider* sphere, const AABBCollider* aabb)
 
 bool Collision::Check(const SphereCollider* sphere, const OBBCollider* obb)
 {
+	Vector3 center = sphere->GetCenterPosition();
+	float radius = sphere->GetRadius();
+
+	// 値が正常かチェック
+	if (std::isnan(center.x) || std::isnan(center.y) || std::isnan(center.z) ||
+		std::isnan(radius) || radius < 0.0f || !std::isfinite(radius)) {
+		return false;
+	}
+
 	const OBB& ob = obb->GetOBB();
 
 	// 回転行列を作成（オイラー角 → 回転行列）
@@ -177,8 +201,7 @@ bool Collision::Check(const OBBCollider* a, const OBBCollider* b)
 	return Check(a->GetOBB(), b->GetOBB());
 }
 
-bool Collision::Check(Collider* a, Collider* b)
-{
+bool Collision::Check(BaseCollider* a, BaseCollider* b) {
 	// ここで dynamic_cast してペアを判定
 	if (auto sa = dynamic_cast<SphereCollider*>(a)) {
 		if (auto sb = dynamic_cast<SphereCollider*>(b)) return Check(sa, sb);
@@ -199,7 +222,6 @@ bool Collision::Check(Collider* a, Collider* b)
 
 
 
-
 void CollisionManager::Initialize() {
 	isDrawCollider_ = false;
 }
@@ -215,45 +237,45 @@ void CollisionManager::Update()
 void CollisionManager::Reset() {
 	// リストを空っぽにする
 	colliders_.clear();
-
+	collidingPairs_.clear();
 }
 
-void CollisionManager::CheckCollisionPair(Collider* a, Collider* b) {
+void CollisionManager::CheckCollisionPair(BaseCollider* a, BaseCollider* b) {
 	// 順序を統一してペアのキーにする（ポインタの小さい順）
-	auto key = std::minmax(a, b);
-	bool isNowColliding = Collision::Check(a, b); // ← BaseCollider* 用のオーバーロードが必要
-	bool wasColliding = collidingPairs_.contains(key);
+    auto key = std::minmax(a, b);
+    bool isNowColliding = Collision::Check(a, b); // ← BaseCollider* 用のオーバーロードが必要
+    bool wasColliding = collidingPairs_.contains(key);
 
-	if (isNowColliding) {
-		if (!wasColliding) {
-			a->EnterCollision(b);
-			b->EnterCollision(a);
-			collidingPairs_.insert(key);
-		}
-		a->OnCollision(b);
-		b->OnCollision(a);
-	} else {
-		if (wasColliding) {
-			a->ExitCollision(b);
-			b->ExitCollision(a);
-			collidingPairs_.erase(key);
-		}
-	}
+    if (isNowColliding) {
+        if (!wasColliding) {
+            a->CallOnEnterCollision(b);
+            b->CallOnEnterCollision(a);
+            collidingPairs_.insert(key);
+        }
+        a->CallOnCollision(b);
+        b->CallOnCollision(a);
+    } else {
+        if (wasColliding) {
+            a->CallOnExitCollision(b);
+            b->CallOnExitCollision(a);
+            collidingPairs_.erase(key);
+        }
+    }
 }
 
 
 void CollisionManager::CheckAllCollisions() {
 	// リスト内のペアを総当たり
-	std::list<Collider*>::iterator itrA = colliders_.begin();
+	std::list<BaseCollider*>::iterator itrA = colliders_.begin();
 	for (; itrA != colliders_.end(); ++itrA) {
-		Collider* colliderA = *itrA;
+		BaseCollider* colliderA = *itrA;
 
 		// イテレーターBはイテレーターAの次の要素から回す（重複判定を回避）
-		std::list<Collider*>::iterator itrB = itrA;
+		std::list<BaseCollider*>::iterator itrB = itrA;
 		itrB++;
 
 		for (; itrB != colliders_.end(); ++itrB) {
-			Collider* colliderB = *itrB;
+			BaseCollider* colliderB = *itrB;
 
 			// ペアの当たり判定
 			CheckCollisionPair(colliderA, colliderB);
@@ -263,15 +285,15 @@ void CollisionManager::CheckAllCollisions() {
 
 
 
-void CollisionManager::AddCollider(Collider* collider) {
+void CollisionManager::AddCollider(BaseCollider* collider) {
 	if (!collider) return;
 	colliders_.push_back(collider);
-	std::cout << "Collider added: " << collider->GetTypeID() << std::endl;
+	std::cout << "BaseCollider added: " << collider->GetTypeID() << std::endl;
 }
 
-void CollisionManager::RemoveCollider(Collider* collider)
+void CollisionManager::RemoveCollider(BaseCollider* collider)
 {
 	if (!collider) return;
 	colliders_.remove(collider);
-	std::cout << "Collider removed: " << collider->GetTypeID() << std::endl;
+	std::cout << "BaseCollider removed: " << collider->GetTypeID() << std::endl;
 }

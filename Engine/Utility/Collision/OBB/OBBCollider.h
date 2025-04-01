@@ -1,8 +1,8 @@
 #pragma once
-#include "../Collider.h"
+#include "../Core/BaseCollider.h"
 #include "MathFunc.h"
 
-class OBBCollider : public Collider
+class OBBCollider : public BaseCollider
 {
 public:
 	/*===============================================================//
@@ -15,14 +15,9 @@ public:
 
 	~OBBCollider() = default;
 	void InitJson(JsonManager* jsonManager) override;
-	Vector3 GetCenterPosition() const override = 0;
-	const WorldTransform& GetWorldTransform() = 0;
-	virtual Vector3 GetEulerRotation() = 0;
-	
-	void OnCollision([[maybe_unused]] Collider* other) override = 0;
-	void EnterCollision([[maybe_unused]] Collider* other) override = 0;
-	void ExitCollision([[maybe_unused]] Collider* other) override = 0;
-
+	Vector3 GetCenterPosition() const override;
+	const WorldTransform& GetWorldTransform() override;
+	Vector3 GetEulerRotation() const override;
 
 	/*===============================================================//
 

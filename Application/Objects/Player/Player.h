@@ -8,6 +8,13 @@
 #include "Collision/AABB/AABBCollider.h"
 #include "Loaders/Json/JsonManager.h"
 
+// Collision
+#include "Collision/Sphere/SphereCollider.h"
+#include "Collision/OBB/OBBCollider.h"
+#include "Collision/AABB/AABBCollider.h"
+#include "Collision/Core/ColliderFactory.h"
+
+
 // Application
 #include "BaseObject/BaseObject.h"
 #include "PlayerBody.h"
@@ -21,7 +28,7 @@ enum class BehaviorPlayer
 };
 
 class Player 
-	: public BaseObject, public AABBCollider
+	: public BaseObject
 {
 public:
 	Player(MapChipField* mapChipField)
@@ -36,7 +43,7 @@ public:
 	/// 初期化
 	/// </summary>
 	void Initialize(Camera* camera) override;
-
+	void InitCollision();
 	void InitJson();
 
 	/// <summary>
@@ -55,7 +62,7 @@ public:
 
 
 public:
-	Vector3 GetCenterPosition() const override { 
+	Vector3 GetCenterPosition() const { 
 		return
 		{
 			worldTransform_.matWorld_.m[3][0],
@@ -63,11 +70,14 @@ public:
 			worldTransform_.matWorld_.m[3][2]
 		};
 	}
-	virtual Vector3 GetEulerRotation() override { return{}; }
+	//virtual Vector3 GetEulerRotation() override { return{}; }
 	const WorldTransform& GetWorldTransform() { return worldTransform_; }
-	void OnCollision([[maybe_unused]] Collider* other) override;
-	void EnterCollision([[maybe_unused]] Collider* other) override;
-	void ExitCollision([[maybe_unused]] Collider* other) override;
+
+	// 衝突イベント（共通で受け取る）
+	void OnEnterCollision(BaseCollider* self, BaseCollider* other);
+	void OnCollision(BaseCollider* self, BaseCollider* other);
+	void OnExitCollision(BaseCollider* self, BaseCollider* other);
+
 
 
 
@@ -173,6 +183,10 @@ private:
 
 	std::unique_ptr<JsonManager> jsonManager_;
 	std::unique_ptr<JsonManager> jsonCollider_;
+
+	//std::shared_ptr<OBBCollider> obbCollider_;
+	std::shared_ptr<AABBCollider> aabbCollider_;
+	//std::shared_ptr<SphereCollider> sphereCollider_;
 	
 	MapChipCollision mpCollision_;
 	MapChipCollision::ColliderRect colliderRect_;

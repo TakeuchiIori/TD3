@@ -30,14 +30,21 @@ void Player::Initialize(Camera* camera)
 	/*SphereCollider::SetCamera(BaseObject::camera_);
 	SphereCollider::Initialize();*/
 
-	AABBCollider::SetCamera(BaseObject::camera_);
-	AABBCollider::Initialize();
-
-	SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kPlayer));
-
+	InitCollision();
 	InitJson();
 	//colliderRct_.height = 2.0f;
 	//colliderRct_.width = 2.0f;
+}
+
+void Player::InitCollision()
+{
+	aabbCollider_ = ColliderFactory::Create<AABBCollider>(
+		this,
+		&worldTransform_,
+		camera_,
+		static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)
+	);
+
 }
 
 void Player::InitJson()
@@ -45,8 +52,7 @@ void Player::InitJson()
 	jsonManager_ = std::make_unique<JsonManager>("playerObj", "Resources/JSON/");
 
 	jsonCollider_ = std::make_unique<JsonManager>("playerCollider", "Resources/JSON/");
-	//SphereCollider::InitJson(jsonCollider_.get());
-	AABBCollider::InitJson(jsonCollider_.get());
+	aabbCollider_->InitJson(jsonCollider_.get());
 }
 
 void Player::Update()
@@ -66,8 +72,8 @@ void Player::Update()
 	TimerManager();
 
 	UpdateMatrices();
-	//SphereCollider::Update();
-	AABBCollider::Update();
+	
+	aabbCollider_->Update();
 	
 #ifdef _DEBUG
 	DebugPlayer();
@@ -85,8 +91,7 @@ void Player::Draw()
 
 void Player::DrawCollision()
 {
-	//SphereCollider::Draw();
-	AABBCollider::Draw();
+	aabbCollider_->Draw();
 	for (const auto& body : playerBodys_) {
 		body->DrawCollision();
 	}
@@ -129,23 +134,11 @@ void Player::MapChipOnCollision(const CollisionInfo& info)
 	}
 }
 
-void Player::OnCollision(Collider* other)
-{
 
-	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody)) // 体に当たったら
-	{
-		if (behavior_ == BehaviorPlayer::Moving)
-		{
-			worldTransform_.translation_ += moveDirection_ * -defaultSpeed_;
-		}
-		else if (behavior_ == BehaviorPlayer::Boost)
-		{
-			worldTransform_.translation_ += moveDirection_ * -(defaultSpeed_ + boostSpeed_);
-		}
-	}
-}
 
-void Player::EnterCollision(Collider* other)
+
+
+void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
 	if (behavior_ != BehaviorPlayer::Return)
 	{
@@ -156,8 +149,7 @@ void Player::EnterCollision(Collider* other)
 				if (dynamic_cast<SphereCollider*>(other)->GetWorldTransform().scale_.x != /*GetRadius()*/0)
 				{
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
-				}
-				else
+				} else
 				{
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + largeGrassTime_);
 				}
@@ -173,7 +165,22 @@ void Player::EnterCollision(Collider* other)
 	}
 }
 
-void Player::ExitCollision(Collider* other)
+void Player::OnCollision(BaseCollider* self, BaseCollider* other)
+{
+	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody)) // 体に当たったら
+	{
+		if (behavior_ == BehaviorPlayer::Moving)
+		{
+			worldTransform_.translation_ += moveDirection_ * -defaultSpeed_;
+		}
+		else if (behavior_ == BehaviorPlayer::Boost)
+		{
+			worldTransform_.translation_ += moveDirection_ * -(defaultSpeed_ + boostSpeed_);
+		}
+	}
+}
+
+void Player::OnExitCollision(BaseCollider* self, BaseCollider* other)
 {
 }
 

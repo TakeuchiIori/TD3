@@ -13,9 +13,28 @@ void AABBCollider::InitJson(JsonManager* jsonManager)
 	
 }
 
+Vector3 AABBCollider::GetCenterPosition() const
+{
+	Vector3 newPos;
+	newPos.x = wt_->matWorld_.m[3][0];
+	newPos.y = wt_->matWorld_.m[3][1];
+	newPos.z = wt_->matWorld_.m[3][2];
+	return newPos;
+}
+
+const WorldTransform& AABBCollider::GetWorldTransform()
+{
+	return *wt_;
+}
+
+Vector3 AABBCollider::GetEulerRotation() const
+{
+	return wt_ ? wt_->rotation_ : Vector3{};
+}
+
 void AABBCollider::Initialize()
 {
-	Collider::Initialize();
+	BaseCollider::Initialize();
 
 	aabb_.min = { 0.0f,0.0f,0.0f };
 	aabb_.max = { 0.0f,0.0f,0.0f };
