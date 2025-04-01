@@ -42,6 +42,8 @@ public:
 	/// </summary>
 	virtual void Reset(Vector3& pos) = 0;
 
+	bool IsDead() const { return !isAlive_; }
+
 public:
 
 	/// <summary>
@@ -58,6 +60,7 @@ public:
 
 protected:
 
+	bool isAlive_ = true;
 	//std::shared_ptr<OBBCollider> obbCollider_;
 	std::shared_ptr<AABBCollider> aabbCollider_;
 	//std::shared_ptr<SphereCollider> sphereCollider_;

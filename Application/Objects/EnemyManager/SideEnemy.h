@@ -12,6 +12,8 @@ public:
 		worldTransform_.translation_ = { 0.0f, 0.0f, 0.0f };
 	}
 
+	~SideEnemy();
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -62,7 +64,11 @@ private:
 	void InitJson();
 
 private:
-
+	/*=======================================================
+	
+						  移動関連
+	
+	==========================================================*/
 	Vector3 velocity_ = { 0.0f,0.0f,0.0f };
 	float moveRange_ = 5.0f;
 	float speed_ = 0.05f;
@@ -71,6 +77,5 @@ private:
 
 	MapChipCollision mpCollision_;
 	MapChipCollision::ColliderRect colliderRect_;
-
 	Vector3 startPos_;
 };

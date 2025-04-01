@@ -20,17 +20,10 @@ void EnemyManager::Update()
 		enemy->Update();
 	}
 
-	// スポーンタイマー処理
-	spawnTimer_ += 1.0f / 60.0f; // 60FPS換算
+	RemoveDeadEnemies();
 
-	if (spawnTimer_ >= spawnInterval_) {
-		
-		Vector3 playerPos = player_->GetCenterPosition();
-		// 敵を出現
-		SpawnEnemiesAroundPlayer(playerPos, spawnDropCount_, spawnSideCount_);
-
-		spawnTimer_ = 0.0f; // タイマーリセット
-	}
+	Spawn();
+	
 }
 
 
@@ -46,6 +39,20 @@ void EnemyManager::DrawCollisions()
 	for (auto& enemy : enemies_) {
 		enemy->DrawCollision();
 	}
+}
+
+void EnemyManager::RemoveDeadEnemies()
+{
+	enemies_.erase(
+		std::remove_if(
+			enemies_.begin(),
+			enemies_.end(),
+			[](const std::unique_ptr<BaseEnemy>& enemy) {
+				return enemy->IsDead();
+			}
+		),
+		enemies_.end()
+	);
 }
 
 void EnemyManager::ResetAll()
@@ -70,6 +77,21 @@ void EnemyManager::AddSideEnemy(const Vector3& pos)
 	enemy->Initialize(camera_);
 	enemy->SetTranslate(pos);
 	enemies_.emplace_back(std::move(enemy));
+}
+
+void EnemyManager::Spawn()
+{
+	// スポーンタイマー処理
+	spawnTimer_ += 1.0f / 60.0f; // 60FPS換算
+
+	if (spawnTimer_ >= spawnInterval_) {
+
+		Vector3 playerPos = player_->GetCenterPosition();
+		// 敵を出現
+		SpawnEnemiesAroundPlayer(playerPos, spawnDropCount_, spawnSideCount_);
+
+		spawnTimer_ = 0.0f; // タイマーリセット
+	}
 }
 
 void EnemyManager::SpawnEnemiesAroundPlayer(const Vector3& playerPos, int dropCount, int sideCount)

@@ -28,6 +28,11 @@ public:
 	void DrawCollisions();
 
 	/// <summary>
+	/// 死亡フラグのたった敵の削除
+	/// </summary>
+	void RemoveDeadEnemies();
+
+	/// <summary>
 	/// 全リセット
 	/// </summary>
 	void ResetAll();
@@ -38,6 +43,11 @@ public:
 	void AddDropEnemy(const Vector3& pos);
 	void AddSideEnemy(const Vector3& pos);
 
+	/// <summary>
+	/// 敵の出現
+	/// </summary>
+	/// <param name="pos"></param>
+	void Spawn();
 
 	/// <summary>
 	/// プレイヤー位置に基づいて敵をまとめて生成
@@ -47,7 +57,10 @@ public:
 	/// <param name="sideCount">横移動型敵の数</param>
 	void SpawnEnemiesAroundPlayer(const Vector3& playerPos, int dropCount, int sideCount);
 
-
+	/// <summary>
+	/// プレイヤーのセット
+	/// </summary>
+	/// <param name="player"></param>
 	void SetPlayer(Player* player) { player_ = player; }
 
 private:

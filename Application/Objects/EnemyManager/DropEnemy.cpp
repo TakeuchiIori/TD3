@@ -2,6 +2,7 @@
 
 DropEnemy::~DropEnemy()
 {
+	aabbCollider_->~AABBCollider();
 }
 
 void DropEnemy::Initialize(Camera* camera)
@@ -16,7 +17,7 @@ void DropEnemy::Initialize(Camera* camera)
 	worldTransform_.Initialize();
 
 	InitCollision();
-	InitJson();
+	//InitJson();
 }
 
 void DropEnemy::InitCollision()
@@ -40,6 +41,11 @@ void DropEnemy::InitJson()
 
 void DropEnemy::Update()
 {
+	if (!isAlive_) {
+		aabbCollider_->~AABBCollider();
+		return;
+	}
+
 	Move();
 
 
@@ -56,6 +62,7 @@ void DropEnemy::Update()
 	);
 	worldTransform_.translation_ = newPos;
 	worldTransform_.UpdateMatrix();
+	aabbCollider_->Update();
 }
 
 void DropEnemy::Draw()
@@ -68,13 +75,32 @@ void DropEnemy::DrawCollision()
 	aabbCollider_->Draw();
 }
 
-void DropEnemy::OnEnterCollision(BaseCollider* self, BaseCollider* other) {}
-void DropEnemy::OnCollision(BaseCollider* self, BaseCollider* other) {}
-void DropEnemy::OnExitCollision(BaseCollider* self, BaseCollider* other) {}
+void DropEnemy::OnEnterCollision(BaseCollider* self, BaseCollider* other) {
+
+	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) ||
+		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kNextFramePlayer))
+	{
+		isAlive_ = false;
+	}
+}
+
+void DropEnemy::OnCollision(BaseCollider* self, BaseCollider* other) {
+
+	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) ||
+		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kNextFramePlayer))
+	{
+		isAlive_ = false;
+	}
+}
+
+void DropEnemy::OnExitCollision(BaseCollider* self, BaseCollider* other) {
+
+
+}
 void DropEnemy::MapChipOnCollision(const CollisionInfo& info) {
 	switch (info.blockType) {
 	case MapChipType::kBlock:
-		
+		isAlive_ = false;
 		
 		break;
 	default:
