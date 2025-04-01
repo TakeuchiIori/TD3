@@ -7,10 +7,25 @@
 
 // Math
 #include "Vector4.h"
+
+/// <summary>
+/// オフスクリーン描画タイプ
+/// </summary>
+
+
 class DirectXCommon;
 class OffScreen
 {
 public:
+
+	enum class OffScreenEffectType {
+		Copy,
+		GaussSmoothing,
+		DepthOutline,
+		Sepia,
+		Grayscale,
+		Vignette
+	};
 
 	/// <summary>
 	/// 初期化
@@ -27,6 +42,20 @@ public:
 	/// </summary>
 	/// <param name="projectionMatrix"></param>
 	void SetProjection(Matrix4x4 projectionMatrix) { projectionInverse_ = projectionMatrix; }
+
+	/// <summary>
+	/// エフェクトの種類を設定する
+	/// </summary>
+	/// <param name="type">エフェクトの種類</param>
+	void SetEffectType(OffScreenEffectType type) { effectType_ = type; }
+
+	/// <summary>
+	/// 現在のエフェクトタイプを取得
+	/// </summary>
+	OffScreenEffectType GetEffectType() const { return effectType_; }
+
+
+
 private:
 
 	void CreateBoxFilterResource();
@@ -60,5 +89,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	Material* materialData_ = nullptr;
 	Matrix4x4 projectionInverse_;
+
+	OffScreenEffectType effectType_ = OffScreenEffectType::DepthOutline;
 };
 

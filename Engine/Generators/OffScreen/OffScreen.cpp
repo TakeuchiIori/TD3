@@ -1,33 +1,82 @@
 #include "OffScreen.h"
 #include "../Core/DX/DirectXCommon.h"
 #include "PipelineManager/PipelineManager.h"
+
 void OffScreen::Initialize()
 {
 	dxCommon_ = DirectXCommon::GetInstance();
-	/*rootSignature_  = PipelineManager::GetInstance()->GetRootSignature("OffScreen_GaussSmoothing");
-	pipelineState_  = PipelineManager::GetInstance()->GetPipeLineStateObject("OffScreen_GaussSmoothing");*/
-	rootSignature_ = PipelineManager::GetInstance()->GetRootSignature("OffScreen_DepthOutLine");
-	pipelineState_ = PipelineManager::GetInstance()->GetPipeLineStateObject("OffScreen_DepthOutLine");
 
-	//CreateBoxFilterResource();
-	//CreateGaussFilterResource();
+	switch (effectType_) {
+	case OffScreenEffectType::Copy:
+		rootSignature_ = PipelineManager::GetInstance()->GetRootSignature("OffScreen");
+		pipelineState_ = PipelineManager::GetInstance()->GetPipeLineStateObject("OffScreen");
+		break;
+	case OffScreenEffectType::GaussSmoothing:
+		rootSignature_ = PipelineManager::GetInstance()->GetRootSignature("OffScreen_GaussSmoothing");
+		pipelineState_ = PipelineManager::GetInstance()->GetPipeLineStateObject("OffScreen_GaussSmoothing");
+		break;
+	case OffScreenEffectType::DepthOutline:
+		rootSignature_ = PipelineManager::GetInstance()->GetRootSignature("OffScreen_DepthOutLine");
+		pipelineState_ = PipelineManager::GetInstance()->GetPipeLineStateObject("OffScreen_DepthOutLine");
+		break;
+	case OffScreenEffectType::Sepia:
+		rootSignature_ = PipelineManager::GetInstance()->GetRootSignature("OffScreen_Sepia");
+		pipelineState_ = PipelineManager::GetInstance()->GetPipeLineStateObject("OffScreen_Sepia");
+		break;
+	case OffScreenEffectType::Grayscale:
+		rootSignature_ = PipelineManager::GetInstance()->GetRootSignature("OffScreen_Grayscale");
+		pipelineState_ = PipelineManager::GetInstance()->GetPipeLineStateObject("OffScreen_Grayscale");
+		break;
+	case OffScreenEffectType::Vignette:
+		rootSignature_ = PipelineManager::GetInstance()->GetRootSignature("OffScreen_Vignette");
+		pipelineState_ = PipelineManager::GetInstance()->GetPipeLineStateObject("OffScreen_Vignette");
+		break;
+	}
+
 	CreateMaterialResource();
 }
 
 
+
+
 void OffScreen::Draw()
 {
+	// 共通設定
 	materialData_->Inverse = Inverse(projectionInverse_);
 	dxCommon_->GetCommandList()->SetPipelineState(pipelineState_.Get());
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, dxCommon_->GetOffScreenGPUHandle());
 
-	//dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, gaussResource_->GetGPUVirtualAddress());
-	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, dxCommon_->GetDepthGPUHandle());
-	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(2, materialResource_->GetGPUVirtualAddress());
+	switch (effectType_) {
+	case OffScreenEffectType::Copy:
+		// RootParameter = 1つ: テクスチャのみ
+		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, dxCommon_->GetOffScreenGPUHandle());
+		break;
+
+	case OffScreenEffectType::GaussSmoothing:
+		// RootParameter = 2つ: テクスチャ + ガウスパラメータ
+		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, dxCommon_->GetOffScreenGPUHandle());
+		dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, gaussResource_->GetGPUVirtualAddress());
+		break;
+
+	case OffScreenEffectType::DepthOutline:
+		// RootParameter = 3つ: テクスチャ + Depth + Material
+		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, dxCommon_->GetOffScreenGPUHandle());
+		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, dxCommon_->GetDepthGPUHandle());
+		dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(2, materialResource_->GetGPUVirtualAddress());
+		break;
+
+	case OffScreenEffectType::Sepia:
+	case OffScreenEffectType::Grayscale:
+	case OffScreenEffectType::Vignette:
+		// BaseOffScreen系: RootParameter = 1つのみ（テクスチャ）
+		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, dxCommon_->GetOffScreenGPUHandle());
+		break;
+	}
+
 	dxCommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 }
+
 
 void OffScreen::CreateBoxFilterResource()
 {
