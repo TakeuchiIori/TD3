@@ -34,6 +34,12 @@ public:
 	/// </summary>
 	void DrawCollisions();
 
+	/// <summary>
+	/// マップチップで敵を生成
+	/// </summary>
+	/// <param name="field"></param>
+	void SpawnFromMapChip(MapChipField* field);
+
 private:
 
 	/// <summary>
@@ -51,12 +57,6 @@ private:
 	/// </summary>
 	void AddDropEnemy(const Vector3& pos);
 	void AddSideEnemy(const Vector3& pos);
-
-	/// <summary>
-	/// マップチップで敵を生成
-	/// </summary>
-	/// <param name="field"></param>
-	void SpawnFromMapChip(MapChipField* field);
 
 	/// <summary>
 	/// 出現チェック

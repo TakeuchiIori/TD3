@@ -24,6 +24,7 @@ void MapChipInfo::Initialize()
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
 	obj_->SetModel("cube.obj");
+	obj_->SetMaterialColor(Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 
 	GenerateBlocks();
 }
@@ -54,6 +55,7 @@ void MapChipInfo::Update()
 
 void MapChipInfo::Draw()
 {
+
 	for (std::vector<WorldTransform*>& wt : wt_) {
 		for (WorldTransform* worldTransformBlock : wt) {
 			if (!worldTransformBlock)
@@ -150,6 +152,38 @@ void MapChipInfo::ImGui()
 
 
 	ImGui::End();
+
+	//// ImGui テーブルで 2Dマップを表現！
+	//ImGui::Begin("MapChip Grid");
+
+	//if (ImGui::BeginTable("MapChipTable", MapChipField::GetNumBlockHorizontal())) {
+	//	for (int y = 0; y < MapChipField::GetNumBlockVertical(); ++y) {
+	//		ImGui::TableNextRow();
+	//		for (int x = 0; x < MapChipField::GetNumBlockHorizontal(); ++x) {
+	//			ImGui::TableSetColumnIndex(x);
+
+	//			// 現在のチップ
+	//			MapChipType type = mpField_->GetMapChipTypeByIndex(x, y);
+	//			const char* label = ""; // 表示ラベル
+	//			switch (type) {
+	//			case MapChipType::kBlank: label = " "; break;
+	//			case MapChipType::kBlock: label = "■"; break;
+	//			case MapChipType::kDropEnemy: label = "▼"; break;
+	//			case MapChipType::kSideEnemy: label = "→"; break;
+	//			case MapChipType::kBody: label = "◎"; break;
+	//			}
+
+	//			// ボタンとして描画＆クリックで選択
+	//			if (ImGui::Button(label, ImVec2(20, 20))) {
+	//				editX = x;
+	//				editY = y;
+	//			}
+	//		}
+	//	}
+	//	ImGui::EndTable();
+	//}
+	//ImGui::End();
+
 }
 
 

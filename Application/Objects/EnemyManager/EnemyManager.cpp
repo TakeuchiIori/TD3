@@ -104,6 +104,7 @@ void EnemyManager::SpawnFromMapChip(MapChipField* field)
 			case MapChipType::kSideEnemy:
 				pos.y += 1.0f;
 				AddSideEnemy(pos); // 横敵は即出現
+				field->SetMapChipTypeByIndex(x, y, MapChipType::kBlank); // チップ消す
 				break;
 
 			default:

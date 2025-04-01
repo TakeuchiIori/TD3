@@ -71,7 +71,7 @@ private:
 	//MapChipCollision* mpCollision_ = nullptr;
 	std::unique_ptr<Object3d> obj_;
 
-
+	MapChipType selectedType_;
 
 	std::string currentCsvFileName_;
 
