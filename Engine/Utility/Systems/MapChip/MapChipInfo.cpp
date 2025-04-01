@@ -1,4 +1,5 @@
 #include "MapChipInfo.h"
+#include "imgui.h"
 
 // Math
 #include "Matrix4x4.h"
@@ -29,6 +30,8 @@ void MapChipInfo::Initialize()
 
 void MapChipInfo::Update()
 {
+
+	ImGui();
 
 	for (std::vector<WorldTransform*>& row : wt_) {
 		for (WorldTransform* wt : row) {
@@ -89,3 +92,65 @@ void MapChipInfo::GenerateBlocks()
 		}
 	}
 }
+
+void MapChipInfo::ImGui()
+{
+	// --- ImGui UI ---
+	ImGui::Begin("MapChip Control");
+
+	// 現在のCSVファイル表示
+	ImGui::Text("Current CSV: %s", currentCsvFileName_.c_str());
+
+	// 入力用バッファ（外に出してもOK）
+	static char csvPathBuffer[256] = "Resources/images/MapChip.csv";
+
+	// ファイル名入力と読み込みボタン
+	ImGui::InputText("CSV Path", csvPathBuffer, IM_ARRAYSIZE(csvPathBuffer));
+	if (ImGui::Button("Load CSV")) {
+		currentCsvFileName_ = std::string(csvPathBuffer);
+		mpField_->LoadMapChipCsv(currentCsvFileName_);
+		GenerateBlocks(); // 再生成！
+	}
+
+	// インデックス指定でマップチップ編集
+	static int editX = 0;
+	static int editY = 0;
+	static int selectedType = 0;
+
+	ImGui::InputInt("X Index", &editX);
+	ImGui::InputInt("Y Index", &editY);
+	ImGui::Combo("Chip Type", &selectedType, "Blank\0Block\0Body\0DropEnemy\0SideEnemy\0");
+
+	if (ImGui::Button("Set Chip")) {
+		if (editX >= 0 && editX < MapChipField::GetNumBlockHorizontal() &&
+			editY >= 0 && editY < MapChipField::GetNumBlockVertical()) {
+			mpField_->SetMapChipTypeByIndex(editX, editY, static_cast<MapChipType>(selectedType));
+			GenerateBlocks(); // 表示再構築（または最小限更新）
+		}
+	}
+
+	if (ImGui::Button("Save CSV")) {
+		try {
+			mpField_->SaveMapChipCsv(currentCsvFileName_);
+		}
+		catch (const std::exception& e) {
+			ImGui::OpenPopup("Save Error");
+		}
+	}
+
+	// Popup 定義は毎フレーム書く必要あり
+	if (ImGui::BeginPopup("Save Error")) {
+		ImGui::Text("Save failed!");
+		if (ImGui::Button("OK")) {
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
+
+
+
+	ImGui::End();
+}
+
+
+

@@ -15,11 +15,13 @@
 #include "Vector3.h"
 
 enum class MapChipType {
-    kBlank, // 空白
-    kBlock, // ブロック
-    // 将来的に拡張しやすいよう、ここに新しいタイプを追加できます
-    kBody,
+    kBlank = 0,
+    kBlock = 1,
+    kDropEnemy = 2,
+    kSideEnemy = 3,
+    kBody = 4,
 };
+
 
 class MapChipField {
 public: // 構造体
@@ -118,4 +120,5 @@ public:
     // ブロックの個数
     static inline uint32_t GetNumBlockVertical() { return kNumBlockVertical; }
     static inline uint32_t GetNumBlockHorizontal() { return kNumBlockHorizontal; }
+    void SaveMapChipCsv(const std::string& filePath) const;
 };

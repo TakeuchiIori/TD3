@@ -11,6 +11,8 @@ void EnemyManager::Initialize(Camera* camera, MapChipField* mapChipField)
 	spawnInterval_ = 3.0f;     // 3秒間隔で生成
 	spawnDropCount_ = 2;       // 毎回2体ずつ
 	spawnSideCount_ = 2;
+
+	SpawnFromMapChip(mapChipField);
 }
 
 void EnemyManager::Update()
@@ -21,9 +23,11 @@ void EnemyManager::Update()
 	}
 
 	RemoveDeadEnemies();
-
-	Spawn();
 	
+
+	CheckSpawnDropEnemy();
+
+
 }
 
 
@@ -79,43 +83,52 @@ void EnemyManager::AddSideEnemy(const Vector3& pos)
 	enemies_.emplace_back(std::move(enemy));
 }
 
-void EnemyManager::Spawn()
+void EnemyManager::SpawnFromMapChip(MapChipField* field)
 {
-	// スポーンタイマー処理
-	spawnTimer_ += 1.0f / 60.0f; // 60FPS換算
+	int mapWidth = field->GetNumBlockHorizontal();
+	int mapHeight = field->GetNumBlockVertical();
 
-	if (spawnTimer_ >= spawnInterval_) {
+	for (int y = 0; y < mapHeight; ++y) {
+		for (int x = 0; x < mapWidth; ++x) {
 
-		Vector3 playerPos = player_->GetCenterPosition();
-		// 敵を出現
-		SpawnEnemiesAroundPlayer(playerPos, spawnDropCount_, spawnSideCount_);
+			MapChipType type = field->GetMapChipTypeByIndex(x, y);
+			Vector3 pos = field->GetMapChipPositionByIndex(x, y);
 
-		spawnTimer_ = 0.0f; // タイマーリセット
+			switch (type) {
+			case MapChipType::kDropEnemy:
+				pos.y += 2.0f;
+				dropSpawnPoints_.push_back({ pos, false }); // ← ここで予約
+				field->SetMapChipTypeByIndex(x, y, MapChipType::kBlank); // チップ消す
+				break;
+
+			case MapChipType::kSideEnemy:
+				pos.y += 1.0f;
+				AddSideEnemy(pos); // 横敵は即出現
+				break;
+
+			default:
+				break;
+			}
+		}
 	}
 }
 
-void EnemyManager::SpawnEnemiesAroundPlayer(const Vector3& playerPos, int dropCount, int sideCount)
+void EnemyManager::CheckSpawnDropEnemy()
 {
-	
+	// DropEnemy 出現チェック
+	for (auto& point : dropSpawnPoints_) {
+		if (point.triggered) continue;
 
-	// 落下型の敵を配置
-	for (int i = 0; i < dropCount; ++i) {
-		Vector3 pos = {
-			playerPos.x + (i - dropCount / 2) * 2.0f,  // 横に広げて配置
-			playerPos.y + 10.0f,                      // プレイヤーの上から
-			playerPos.z
-		};
-		AddDropEnemy(pos);
-	}
+		float dx = point.position.x - player_->GetWorldTransform().translation_.x;
+		float dy = point.position.y - player_->GetWorldTransform().translation_.y;
+		float distSq = dx * dx + dy * dy;
 
-	// 横移動型の敵を配置
-	for (int i = 0; i < sideCount; ++i) {
-		Vector3 pos = {
-			playerPos.x + (i - sideCount / 2) * 3.0f,  // 横に広げて配置
-			playerPos.y,                               // 同じ高さ
-			playerPos.z
-		};
-		AddSideEnemy(pos);
+		if (distSq <= triggerDistance_ * triggerDistance_) {
+			AddDropEnemy(point.position);
+			point.triggered = true;
+		}
 	}
 }
+
+
 

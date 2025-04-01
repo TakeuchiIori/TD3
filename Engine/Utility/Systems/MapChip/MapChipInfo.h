@@ -47,6 +47,10 @@ private:
 	/// </summary>
 	void GenerateBlocks();
 
+	/// <summary>
+	/// imgui
+	/// </summary>
+	void ImGui();
 
 public:
 
@@ -66,5 +70,10 @@ private:
 	std::unique_ptr<MapChipField> mpField_ ;
 	//MapChipCollision* mpCollision_ = nullptr;
 	std::unique_ptr<Object3d> obj_;
+
+
+
+	std::string currentCsvFileName_;
+
 };
 

@@ -7,6 +7,13 @@ class Player;
 class EnemyManager
 {
 public:
+
+	struct EnemySpawnPoint {
+		Vector3 position;
+		bool triggered = false;
+	};
+
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -27,6 +34,8 @@ public:
 	/// </summary>
 	void DrawCollisions();
 
+private:
+
 	/// <summary>
 	/// 死亡フラグのたった敵の削除
 	/// </summary>
@@ -44,18 +53,18 @@ public:
 	void AddSideEnemy(const Vector3& pos);
 
 	/// <summary>
-	/// 敵の出現
+	/// マップチップで敵を生成
 	/// </summary>
-	/// <param name="pos"></param>
-	void Spawn();
+	/// <param name="field"></param>
+	void SpawnFromMapChip(MapChipField* field);
 
 	/// <summary>
-	/// プレイヤー位置に基づいて敵をまとめて生成
+	/// 出現チェック
 	/// </summary>
-	/// <param name="playerPos">プレイヤーの座標</param>
-	/// <param name="dropCount">落下型敵の数</param>
-	/// <param name="sideCount">横移動型敵の数</param>
-	void SpawnEnemiesAroundPlayer(const Vector3& playerPos, int dropCount, int sideCount);
+	void CheckSpawnDropEnemy();
+
+public:
+
 
 	/// <summary>
 	/// プレイヤーのセット
@@ -75,6 +84,7 @@ private:
 	float spawnInterval_ = 3.0f; // 3秒間隔
 	int spawnDropCount_ = 2;
 	int spawnSideCount_ = 2;
-
+	const float triggerDistance_ = 10.0f;
+	std::vector<EnemySpawnPoint> dropSpawnPoints_;
 
 };

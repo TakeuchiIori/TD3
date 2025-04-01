@@ -5,6 +5,9 @@ MapChipField::MapChipField() {
     RegisterMapChipType("0", MapChipType::kBlank);
     RegisterMapChipType("1", MapChipType::kBlock);
 
+    RegisterMapChipType("2", MapChipType::kDropEnemy);
+    RegisterMapChipType("3", MapChipType::kSideEnemy);
+
     // マップチップデータの初期化
     ResetMapChipData();
 }
@@ -18,6 +21,24 @@ void MapChipField::ResetMapChipData() {
 
 void MapChipField::RegisterMapChipType(const std::string& key, MapChipType type) {
     mapChipTable_[key] = type;
+}
+
+void MapChipField::SaveMapChipCsv(const std::string& filePath) const
+{
+    std::ofstream ofs(filePath);
+    if (!ofs.is_open()) {
+        throw std::runtime_error("マップチップCSVの保存に失敗しました: " + filePath);
+    }
+
+    for (const auto& row : mapChipData_.data) {
+        for (size_t i = 0; i < row.size(); ++i) {
+            ofs << static_cast<int>(row[i]);
+            if (i < row.size() - 1) {
+                ofs << ",";
+            }
+        }
+        ofs << "\n";
+    }
 }
 
 void MapChipField::LoadMapChipCsv(const std::string& filePath) {
