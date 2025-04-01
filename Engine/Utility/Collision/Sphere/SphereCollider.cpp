@@ -10,6 +10,25 @@ void SphereCollider::InitJson(JsonManager* jsonManager)
 	jsonManager->Register("Collider Radius", &radius_);
 }
 
+Vector3 SphereCollider::GetCenterPosition() const
+{
+	Vector3 newPos;
+	newPos.x = wt_->matWorld_.m[3][0];
+	newPos.y = wt_->matWorld_.m[3][1];
+	newPos.z = wt_->matWorld_.m[3][2];
+	return newPos;
+}
+
+const WorldTransform& SphereCollider::GetWorldTransform()
+{
+	return *wt_;
+}
+
+Vector3 SphereCollider::GetEulerRotation() const
+{
+	return wt_ ? wt_->rotation_ : Vector3{};
+}
+
 void SphereCollider::Initialize()
 {
 	BaseCollider::Initialize();

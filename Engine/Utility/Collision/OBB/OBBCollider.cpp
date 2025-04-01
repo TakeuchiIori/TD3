@@ -16,6 +16,25 @@ void OBBCollider::InitJson(JsonManager* jsonManager)
 	jsonManager->Register("OBB Offset Euler (degrees)", &obbEulerOffset_);
 }
 
+Vector3 OBBCollider::GetCenterPosition() const
+{
+	Vector3 newPos;
+	newPos.x = wt_->matWorld_.m[3][0];
+	newPos.y = wt_->matWorld_.m[3][1];
+	newPos.z = wt_->matWorld_.m[3][2];
+	return newPos;
+}
+
+const WorldTransform& OBBCollider::GetWorldTransform()
+{
+	return *wt_;
+}
+
+Vector3 OBBCollider::GetEulerRotation() const
+{
+	return wt_ ? wt_->rotation_ : Vector3{};
+}
+
 void OBBCollider::Initialize()
 {
 	BaseCollider::Initialize();

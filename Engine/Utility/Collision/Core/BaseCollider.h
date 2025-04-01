@@ -78,14 +78,14 @@ public: // アクセッサ
 	/// ワールドトランスフォームのセット
 	/// </summary>
 	/// <param name="worldTransform"></param>
-	void SetTransform(const WorldTransform* worldTransform) { worldTransform_ = worldTransform; }
+	void SetTransform(const WorldTransform* worldTransform) { wt_ = worldTransform; }
 
 protected:
 	Line* line_ = nullptr;
-	const WorldTransform* worldTransform_ = nullptr;
+	Camera* camera_ = nullptr;
+	const WorldTransform* wt_ = nullptr;
 	uint32_t typeID_ = 0u;
 private:
-	Camera* camera_ = nullptr;
 	bool isActive_ = true;
 	CollisionCallback enterCallback_;
 	CollisionCallback collisionCallback_;

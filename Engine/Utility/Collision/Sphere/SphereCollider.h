@@ -15,9 +15,9 @@ public:
 
 	~SphereCollider() = default;
 	void InitJson(JsonManager* jsonManager) override;
-	Vector3 GetCenterPosition() const override = 0;
-	const WorldTransform& GetWorldTransform() = 0;
-	virtual Vector3 GetEulerRotation() = 0;
+	Vector3 GetCenterPosition() const override;
+	const WorldTransform& GetWorldTransform() override;
+	Vector3 GetEulerRotation() const override;
 
 	/*===============================================================//
 

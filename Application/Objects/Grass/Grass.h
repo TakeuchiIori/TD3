@@ -7,6 +7,11 @@
 #include "Collision/AABB/AABBCollider.h"
 #include "Loaders/Json/JsonManager.h"
 
+// Collision
+#include "Collision/Sphere/SphereCollider.h"
+#include "Collision/OBB/OBBCollider.h"
+#include "Collision/AABB/AABBCollider.h"
+#include "Collision/Core/ColliderFactory.h"
 
 #include "Player/Player.h"
 
@@ -19,7 +24,7 @@ enum class BehaviorGrass
 };
 
 class Grass :
-	public BaseObject , public SphereCollider
+	public BaseObject
 {
 public:
 	Grass() : id_(count_) { ++count_; }
@@ -30,7 +35,7 @@ public:
 	/// 初期化
 	/// </summary>
 	void Initialize(Camera* camera) override;
-
+	void InitCollision();
 	void InitJson();
 
 	/// <summary>
@@ -47,13 +52,14 @@ public:
 
 
 public:
-	Vector3 GetCenterPosition() const override { return worldTransform_.translation_; }
-	virtual Vector3 GetEulerRotation() override { return{}; }
+	Vector3 GetCenterPosition() const { return worldTransform_.translation_; }
+	//virtual Vector3 GetEulerRotation() override { return{}; }
 	const WorldTransform& GetWorldTransform() { return worldTransform_; }
-	void OnCollision([[maybe_unused]] Collider* other) override;
-	void EnterCollision([[maybe_unused]] Collider* other) override;
-	void ExitCollision([[maybe_unused]] Collider* other) override;
 
+	// 衝突イベント（共通で受け取る）
+	void OnEnterCollision(BaseCollider* self, BaseCollider* other);
+	void OnCollision(BaseCollider* self, BaseCollider* other);
+	void OnExitCollision(BaseCollider* self, BaseCollider* other);
 
 private:
 #ifdef _DEBUG
@@ -133,8 +139,11 @@ public: // getter & setter
 
 private:
 	Player* player_ = nullptr;
-
 	Input* input_ = nullptr;
+
+	//std::shared_ptr<OBBCollider> obbCollider_;
+	//std::shared_ptr<AABBCollider> aabbCollider_;
+	std::shared_ptr<SphereCollider> sphereCollider_;
 
 	std::unique_ptr<JsonManager> jsonManager_;
 	std::unique_ptr<JsonManager> jsonCollider_;

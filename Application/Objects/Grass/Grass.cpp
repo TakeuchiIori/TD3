@@ -31,11 +31,19 @@ void Grass::Initialize(Camera* camera)
 	obj_->SetModel("unitCube.obj");
 	obj_->SetMaterialColor({ 0.3f,1.0f,0.3f,1.0f });
 
-	SphereCollider::SetCamera(BaseObject::camera_);
-	SphereCollider::Initialize();
-	SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kGrass));
-
+	InitCollision();
 	InitJson();
+}
+
+void Grass::InitCollision()
+{
+	// OBB
+	sphereCollider_ = ColliderFactory::Create<SphereCollider>(
+		this,
+		&worldTransform_,
+		camera_,
+		static_cast<uint32_t>(CollisionTypeIdDef::kGrass)
+	);
 }
 
 void Grass::InitJson()
@@ -43,7 +51,7 @@ void Grass::InitJson()
 	jsonManager_ = std::make_unique<JsonManager>("grassObj", "Resources/JSON/");
 
 	jsonCollider_ = std::make_unique<JsonManager>("grassCollider", "Resources/JSON/");
-	SphereCollider::InitJson(jsonCollider_.get());
+	sphereCollider_->InitJson(jsonCollider_.get());
 }
 
 void Grass::Update()
@@ -52,7 +60,7 @@ void Grass::Update()
 	BehaviorUpdate();
 
 	worldTransform_.UpdateMatrix();
-	SphereCollider::Update();
+	sphereCollider_->Update();
 
 
 #ifdef _DEBUG
@@ -67,16 +75,12 @@ void Grass::Draw()
 
 void Grass::DrawCollision()
 {
-	SphereCollider::Draw();
+	sphereCollider_->Draw();
 }
 
-void Grass::OnCollision(Collider* other)
+void Grass::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
-}
-
-void Grass::EnterCollision(Collider* other)
-{
-	if(player_->behavior_ != BehaviorPlayer::Return)
+	if (player_->behavior_ != BehaviorPlayer::Return)
 	{
 		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
 		{
@@ -89,13 +93,17 @@ void Grass::EnterCollision(Collider* other)
 	}
 }
 
-void Grass::ExitCollision(Collider* other)
+void Grass::OnCollision(BaseCollider* self, BaseCollider* other)
+{
+}
+
+void Grass::OnExitCollision(BaseCollider* self, BaseCollider* other)
 {
 	if (player_->behavior_ == BehaviorPlayer::Return)
 	{
 		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
 		{
-			if(!isMadeByPlayer_)
+			if (!isMadeByPlayer_)
 			{
 				behaviortRquest_ = BehaviorGrass::Repop;
 			}
