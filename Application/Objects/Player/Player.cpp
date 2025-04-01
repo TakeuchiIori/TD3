@@ -431,7 +431,7 @@ void Player::ShrinkBody()
 
 void Player::TakeDamage()
 {
-	if (HP_ > 0 && invincibleTimer_ <= 0)
+	if (HP_ > 0 && invincibleTimer_ <= 0 && behavior_ != BehaviorPlayer::Boost)
 	{
 		HP_--;
 		if (HP_ <= 0)
