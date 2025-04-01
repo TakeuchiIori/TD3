@@ -88,6 +88,11 @@ private:
 	// 移動
 	void Move();
 
+	void UpBody();
+	void DownBody();
+	void LeftBody();
+	void RightBody();
+
 	// 移動へ移行
 	void EntryMove();
 

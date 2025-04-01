@@ -221,70 +221,25 @@ void Player::Move()
 		moveDirection_ != Vector3{ 0,1,0 } &&
 		moveDirection_ != Vector3{ 0,-1,0 })
 	{
-		moveDirection_ = { 0,1,0 };
-		moveHistory_.push_back(worldTransform_.translation_);
-		worldTransform_.rotation_.z = 0;
-
-		// 体の出現
-		ExtendBody();
-		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
-		body->Initialize(BaseObject::camera_);
-		body->SetStartPos(GetCenterPosition());
-		body->SetPos(GetCenterPosition());
-		body->UpExtend();
-		playerBodys_.push_back(std::move(body));
+		UpBody();
 	}
 	else if ((input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN)) &&
 		moveDirection_ != Vector3{ 0,-1,0 } &&
 		moveDirection_ != Vector3{ 0,1,0 })
 	{
-		moveDirection_ = { 0,-1,0 };
-		moveHistory_.push_back(worldTransform_.translation_);
-
-		worldTransform_.rotation_.z = std::numbers::pi_v<float>;
-
-		ExtendBody();
-		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
-		body->Initialize(BaseObject::camera_);
-		body->SetStartPos(GetCenterPosition());
-		body->SetPos(GetCenterPosition());
-		body->DownExtend();
-		playerBodys_.push_back(std::move(body));
+		DownBody();
 	}
 	else if ((input_->TriggerKey(DIK_A) || input_->TriggerKey(DIK_LEFT)) &&
 		moveDirection_ != Vector3{ -1,0,0 } &&
 		moveDirection_ != Vector3{ 1,0,0 })
 	{
-		moveDirection_ = { -1,0,0 };
-		moveHistory_.push_back(worldTransform_.translation_);
-
-		worldTransform_.rotation_.z = std::numbers::pi_v<float> / 2.0f;
-
-		ExtendBody();
-		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
-		body->Initialize(BaseObject::camera_);
-		body->SetStartPos(GetCenterPosition());
-		body->SetPos(GetCenterPosition());
-		body->LeftExtend();
-		playerBodys_.push_back(std::move(body));
+		LeftBody();
 	}
 	else if ((input_->TriggerKey(DIK_D) || input_->TriggerKey(DIK_RIGHT)) &&
 		moveDirection_ != Vector3{ 1,0,0 } &&
 		moveDirection_ != Vector3{ -1,0,0 })
 	{
-		moveDirection_ = { 1,0,0 };
-		moveHistory_.push_back(worldTransform_.translation_);
-
-
-		worldTransform_.rotation_.z = 3.0f * std::numbers::pi_v<float> / 2.0f;
-
-		ExtendBody();
-		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
-		body->Initialize(BaseObject::camera_);
-		body->SetStartPos(GetCenterPosition());
-		body->SetPos(GetCenterPosition());
-		body->RightExtend();
-		playerBodys_.push_back(std::move(body));
+		RightBody();
 	}
 
 	moveDirection_ = Normalize(moveDirection_);
@@ -327,6 +282,71 @@ void Player::Move()
 
 	ExtendBody();
 
+}
+
+void Player::UpBody()
+{
+	moveDirection_ = { 0,1,0 };
+	moveHistory_.push_back(worldTransform_.translation_);
+	worldTransform_.rotation_.z = 0;
+
+	// 体の出現
+	ExtendBody();
+	std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
+	body->Initialize(BaseObject::camera_);
+	body->SetStartPos(GetCenterPosition());
+	body->SetPos(GetCenterPosition());
+	body->UpExtend();
+	playerBodys_.push_back(std::move(body));
+}
+
+void Player::DownBody()
+{
+	moveDirection_ = { 0,-1,0 };
+	moveHistory_.push_back(worldTransform_.translation_);
+
+	worldTransform_.rotation_.z = std::numbers::pi_v<float>;
+
+	ExtendBody();
+	std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
+	body->Initialize(BaseObject::camera_);
+	body->SetStartPos(GetCenterPosition());
+	body->SetPos(GetCenterPosition());
+	body->DownExtend();
+	playerBodys_.push_back(std::move(body));
+}
+
+void Player::LeftBody()
+{
+	moveDirection_ = { -1,0,0 };
+	moveHistory_.push_back(worldTransform_.translation_);
+
+	worldTransform_.rotation_.z = std::numbers::pi_v<float> / 2.0f;
+
+	ExtendBody();
+	std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
+	body->Initialize(BaseObject::camera_);
+	body->SetStartPos(GetCenterPosition());
+	body->SetPos(GetCenterPosition());
+	body->LeftExtend();
+	playerBodys_.push_back(std::move(body));
+}
+
+void Player::RightBody()
+{
+	moveDirection_ = { 1,0,0 };
+	moveHistory_.push_back(worldTransform_.translation_);
+
+
+	worldTransform_.rotation_.z = 3.0f * std::numbers::pi_v<float> / 2.0f;
+
+	ExtendBody();
+	std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
+	body->Initialize(BaseObject::camera_);
+	body->SetStartPos(GetCenterPosition());
+	body->SetPos(GetCenterPosition());
+	body->RightExtend();
+	playerBodys_.push_back(std::move(body));
 }
 
 void Player::EntryMove()
