@@ -232,7 +232,7 @@ void CollisionManager::Update()
 	///カメラ外だったら判定をしない(全て)
 	for (BaseCollider* collider : colliders_) {
 		if (!collider) continue;
-		if (!collider->IsActive()) continue;
+		if (!collider->GetIsActive()) continue;
 
 		const Camera* cam = collider->camera_;
 		if (!cam) continue;
@@ -289,7 +289,7 @@ void CollisionManager::CheckAllCollisions() {
 		BaseCollider* colliderA = *itrA;
 
 		// 無効なコライダーはスキップ
-		if (!colliderA || !colliderA->IsActive() || !colliderA->IsCollisionEnabled()) continue;
+		if (!colliderA || !colliderA->GetIsActive() || !colliderA->IsCollisionEnabled()) continue;
 
 		std::list<BaseCollider*>::iterator itrB = itrA;
 		itrB++;
@@ -298,7 +298,7 @@ void CollisionManager::CheckAllCollisions() {
 			BaseCollider* colliderB = *itrB;
 
 			// 無効なコライダーはスキップ
-			if (!colliderB || !colliderB->IsActive() || !colliderB->IsCollisionEnabled()) continue;
+			if (!colliderB || !colliderB->GetIsActive() || !colliderB->IsCollisionEnabled()) continue;
 
 			// ペアの当たり判定
 			CheckCollisionPair(colliderA, colliderB);
