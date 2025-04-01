@@ -259,6 +259,10 @@ private:
 
 	std::list <std::unique_ptr<PlayerBody>> playerBodys_;
 
+	// コントローラー用
+	Vector2 stick = {};
+	float threshold = 0.5f;
+
 public:
 	// 振る舞い
 	BehaviorPlayer behavior_ = BehaviorPlayer::Root;

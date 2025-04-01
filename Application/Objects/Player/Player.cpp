@@ -1,5 +1,7 @@
 #include "Player.h"
 
+#include <cmath>
+
 #ifdef _DEBUG
 #include "imgui.h"
 #include "string"
@@ -213,9 +215,17 @@ void Player::UpdateMatrices()
 
 void Player::Move()
 {
-
 	velocity_ = { 0.0f,0.0f,0.0f };
 	beforeDirection_ = moveDirection_;
+
+	if (input_->IsControllerConnected())
+	{
+	}
+	stick = input_->GetLeftStickInput(0);
+	if (std::abs(stick.x) < threshold && std::abs(stick.y) < threshold) {
+		stick = {};
+	}
+
 
 	if ((input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP)) &&
 		moveDirection_ != Vector3{ 0,1,0 } &&
@@ -240,6 +250,34 @@ void Player::Move()
 		moveDirection_ != Vector3{ -1,0,0 })
 	{
 		RightBody();
+	}
+	else  if (std::abs(stick.x) > std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
+	{
+		if (stick.x > 0 &&
+			moveDirection_ != Vector3{ 1,0,0 } &&
+			moveDirection_ != Vector3{ -1,0,0 })
+		{
+			RightBody();
+		}
+		else if(moveDirection_ != Vector3{ -1,0,0 } &&
+				moveDirection_ != Vector3{ 1,0,0 })
+		{
+			LeftBody();
+		}
+	}
+	else if(stick.x != 0 || stick.y != 0)
+	{
+		if (stick.y > 0 &&
+			moveDirection_ != Vector3{ 0,1,0 } &&
+			moveDirection_ != Vector3{ 0,-1,0 })
+		{
+			UpBody();
+		}
+		else if(moveDirection_ != Vector3{ 0,-1,0 } &&
+				moveDirection_ != Vector3{ 0,1,0 })
+		{
+			DownBody();
+		}
 	}
 
 	moveDirection_ = Normalize(moveDirection_);
@@ -351,7 +389,9 @@ void Player::RightBody()
 
 void Player::EntryMove()
 {
-	if (input_->TriggerKey(DIK_SPACE))
+	if (input_->TriggerKey(DIK_SPACE) || 
+		input_->IsPadTriggered(0, GamePadButton::X) || 
+		input_->IsPadTriggered(0, GamePadButton::Start))
 	{
 		behaviortRquest_ = BehaviorPlayer::Moving;
 		moveDirection_ = { 0,1,0 };
