@@ -229,17 +229,21 @@ void CollisionManager::Initialize() {
 void CollisionManager::Update()
 {
 
-	// 各コライダーを有効・無効判定
+	///カメラ外だったら判定をしない(全て)
 	for (BaseCollider* collider : colliders_) {
 		if (!collider) continue;
+		if (!collider->IsActive()) continue;
 
 		const Camera* cam = collider->camera_;
 		if (!cam) continue;
 
 		Vector3 center = collider->GetCenterPosition();
 		bool isVisible = IsColliderInView(center, cam);
-		collider->SetActive(isVisible);
+
+		// ここで無効化するのは当たり判定だけ！
+		collider->SetCollisionEnabled(isVisible);
 	}
+
 
 	// 有効なものだけで衝突判定を実行
 	CheckAllCollisions();
@@ -277,19 +281,24 @@ void CollisionManager::CheckCollisionPair(BaseCollider* a, BaseCollider* b) {
 	}
 }
 
-
 void CollisionManager::CheckAllCollisions() {
+
 	// リスト内のペアを総当たり
 	std::list<BaseCollider*>::iterator itrA = colliders_.begin();
 	for (; itrA != colliders_.end(); ++itrA) {
 		BaseCollider* colliderA = *itrA;
 
-		// イテレーターBはイテレーターAの次の要素から回す（重複判定を回避）
+		// 無効なコライダーはスキップ
+		if (!colliderA || !colliderA->IsActive() || !colliderA->IsCollisionEnabled()) continue;
+
 		std::list<BaseCollider*>::iterator itrB = itrA;
 		itrB++;
 
 		for (; itrB != colliders_.end(); ++itrB) {
 			BaseCollider* colliderB = *itrB;
+
+			// 無効なコライダーはスキップ
+			if (!colliderB || !colliderB->IsActive() || !colliderB->IsCollisionEnabled()) continue;
 
 			// ペアの当たり判定
 			CheckCollisionPair(colliderA, colliderB);
@@ -298,7 +307,8 @@ void CollisionManager::CheckAllCollisions() {
 }
 
 
-static bool IsColliderInView(const Vector3& position, const Camera* camera) {
+
+bool CollisionManager::IsColliderInView(const Vector3& position, const Camera* camera) {
 	Vector3 clipPos = Transform(position, camera->GetViewProjectionMatrix());
 
 	// 正規化デバイス座標系（NDC）での可視範囲は -1 ~ +1

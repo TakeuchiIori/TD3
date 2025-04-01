@@ -80,6 +80,15 @@ public: // アクセッサ
 	/// <param name="worldTransform"></param>
 	void SetTransform(const WorldTransform* worldTransform) { wt_ = worldTransform; }
 
+	/// <summary>
+	/// 判定取得・セット
+	/// </summary>
+	/// <param name="enabled"></param>
+	void SetCollisionEnabled(bool enabled) { isCollisionEnabled_ = enabled; }
+	bool IsCollisionEnabled() const { return isCollisionEnabled_; }
+	
+	bool isCollisionEnabled_ = true; //当たり判定オンオフ切り替え用
+
 	Camera* camera_ = nullptr;
 protected:
 	Line* line_ = nullptr;
