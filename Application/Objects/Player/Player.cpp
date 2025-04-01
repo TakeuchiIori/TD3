@@ -13,7 +13,7 @@ void Player::Initialize(Camera* camera)
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
-	worldTransform_.translation_ = { 2.0f,0.0f,6.0f };
+	worldTransform_.translation_ = { 2.0f,6.0f,0.0f };
 	worldTransform_.scale_ = { 0.99f,0.99f,0.99f };
 	//worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
 	nextWorldTransform_.Initialize();

@@ -18,6 +18,7 @@
 #include "../Transitions/Fade/Fade.h"
 #include "Systems/MapChip/MapChipInfo.h"
 #include "Systems/UI/UIBase.h"
+#include "EnemyManager/EnemyManager.h"
 
 // Math
 #include "Vector3.h"
@@ -198,7 +199,7 @@ private:
 
     // 3Dモデル
     std::unique_ptr<Player> player_;
-
+    std::unique_ptr<EnemyManager> enemyManager_;
     std::unique_ptr<GrassManager> grassManager_;
 
     /*=================================================================
