@@ -186,15 +186,20 @@ private:
 
 	//std::shared_ptr<OBBCollider> obbCollider_;
 	std::shared_ptr<AABBCollider> aabbCollider_;
+	std::shared_ptr<AABBCollider> nextAabbCollider_;
+	WorldTransform nextWorldTransform_;
 	//std::shared_ptr<SphereCollider> sphereCollider_;
 	
 	MapChipCollision mpCollision_;
 	MapChipCollision::ColliderRect colliderRect_;
 
+	bool isCollisionBody = false;
+
 
 	// 移動
 	Vector3 velocity_ = { 0.0f,0.0f,0.0f };			// 加速度
 	Vector3 moveDirection_ = { 0.0f,0.0f,0.0f };	// 動く向き
+	Vector3 beforeDirection_ = { 0.0f,0.0f,0.0f };	// 動く向き
 	float defaultSpeed_ = 0.05f;
 	float speed_ = defaultSpeed_;							// 動く速度
 	bool isFPSMode_ = false;

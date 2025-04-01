@@ -7,6 +7,12 @@
 // Engine
 #include "Collision/AABB/AABBCollider.h"
 #include "Loaders/Json/JsonManager.h"
+#include <memory>
+#include <WorldTransform/WorldTransform.h>
+#include <Collision/Core/BaseCollider.h>
+#include <Systems/Camera/Camera.h>
+#include <MathFunc.h>
+#include <Vector3.h>
 
 enum ExtendDirection
 {
@@ -17,11 +23,11 @@ enum ExtendDirection
 };
 
 class PlayerBody :
-    public BaseObject, public AABBCollider
+    public BaseObject
 {
 public:
 	PlayerBody() : id_(count_) { ++count_; }
-	~PlayerBody() override { --count_; }
+	~PlayerBody() override;
 
 public:
 	/// <summary>
@@ -29,6 +35,7 @@ public:
 	/// </summary>
 	void Initialize(Camera* camera) override;
 
+	void InitCollision();
 	void InitJson();
 
 	/// <summary>
@@ -54,7 +61,7 @@ public:
 
 
 public:
-	Vector3 GetCenterPosition() const override {
+	Vector3 GetCenterPosition() const {
 		return
 		{
 			worldTransform_.matWorld_.m[3][0],
@@ -62,11 +69,13 @@ public:
 			worldTransform_.matWorld_.m[3][2]
 		};
 	}
-	virtual Vector3 GetEulerRotation() override { return{}; }
+	//virtual Vector3 GetEulerRotation() override { return{}; }
 	const WorldTransform& GetWorldTransform() { return worldTransform_; }
-	void OnCollision([[maybe_unused]] Collider* other) override;
-	void EnterCollision([[maybe_unused]] Collider* other) override;
-	void ExitCollision([[maybe_unused]] Collider* other) override;
+
+	// 衝突イベント（共通で受け取る）
+	void OnEnterCollision(BaseCollider* self, BaseCollider* other);
+	void OnCollision(BaseCollider* self, BaseCollider* other);
+	void OnExitCollision(BaseCollider* self, BaseCollider* other);
 
 
 private:
@@ -93,6 +102,8 @@ private:
 
 	ExtendDirection extendDirection_ = ExtendDirection::Up;
 
+
+	std::shared_ptr<AABBCollider> aabbCollider_;
 
 	std::unique_ptr<JsonManager> jsonManager_;
 	std::unique_ptr<JsonManager> jsonCollider_;

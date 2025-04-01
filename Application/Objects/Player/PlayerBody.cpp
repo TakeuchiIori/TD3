@@ -1,11 +1,18 @@
 #include "PlayerBody.h"
 
+#include "Collision/Core/ColliderFactory.h"
 
 #ifdef _DEBUG
 #include "imgui.h"
 #endif // _DEBUG
 
 int PlayerBody::count_ = 0;
+
+PlayerBody::~PlayerBody()
+{
+	--count_;
+	aabbCollider_->~AABBCollider();
+}
 
 void PlayerBody::Initialize(Camera* camera)
 {
@@ -21,12 +28,18 @@ void PlayerBody::Initialize(Camera* camera)
 	obj_->SetModel("unitCube.obj");
 	obj_->SetMaterialColor({ 1.0f,1.0f,0.3f,1.0f });
 
-	AABBCollider::SetCamera(BaseObject::camera_);
-	AABBCollider::Initialize();
-
-	SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody));
-
+	InitCollision();
 	InitJson();
+}
+
+void PlayerBody::InitCollision()
+{
+	aabbCollider_ = ColliderFactory::Create<AABBCollider>(
+		this,
+		&worldTransform_,
+		camera_,
+		static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody)
+	);
 }
 
 void PlayerBody::InitJson()
@@ -35,7 +48,7 @@ void PlayerBody::InitJson()
 
 	jsonCollider_ = std::make_unique<JsonManager>("playerBodyCollider", "Resources/JSON/");
 	//SphereCollider::InitJson(jsonCollider_.get());
-	AABBCollider::InitJson(jsonCollider_.get());
+	aabbCollider_->InitJson(jsonCollider_.get());
 }
 
 void PlayerBody::Update()
@@ -43,7 +56,7 @@ void PlayerBody::Update()
 	worldTransform_.UpdateMatrix();
 	ExtendUpdate();
 
-	AABBCollider::Update();
+	aabbCollider_->Update();
 
 #ifdef _DEBUG
 	std::string sid = std::to_string(id_);
@@ -65,7 +78,7 @@ void PlayerBody::Draw()
 
 void PlayerBody::DrawCollision()
 {
-	AABBCollider::Draw();
+	aabbCollider_->Draw();
 }
 
 void PlayerBody::UpExtend()
@@ -100,15 +113,15 @@ void PlayerBody::DownExtend()
 	extendDirection_ = ExtendDirection::Down;
 }
 
-void PlayerBody::OnCollision(Collider* other)
+void PlayerBody::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
 }
 
-void PlayerBody::EnterCollision(Collider* other)
+void PlayerBody::OnCollision(BaseCollider* self, BaseCollider* other)
 {
 }
 
-void PlayerBody::ExitCollision(Collider* other)
+void PlayerBody::OnExitCollision(BaseCollider* self, BaseCollider* other)
 {
 }
 
