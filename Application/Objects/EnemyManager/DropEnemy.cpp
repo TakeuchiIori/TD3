@@ -116,7 +116,7 @@ void DropEnemy::MapChipOnCollision(const CollisionInfo& info) {
 void DropEnemy::Move()
 {
 	constexpr float gravity = -0.16f;
-	constexpr float terminalVelocity = -0.3f;
+	constexpr float terminalVelocity = -0.05f;
 
 	velocity_.y += gravity;
 	if (velocity_.y < terminalVelocity) {

@@ -7,10 +7,7 @@ void EnemyManager::Initialize(Camera* camera, MapChipField* mapChipField)
 	mapChipField_ = mapChipField;
 	enemies_.clear();
 
-	spawnTimer_ = 0.0f;
-	spawnInterval_ = 3.0f;     // 3秒間隔で生成
-	spawnDropCount_ = 2;       // 毎回2体ずつ
-	spawnSideCount_ = 2;
+	InitJson();
 
 	SpawnFromMapChip(mapChipField);
 }
@@ -43,6 +40,13 @@ void EnemyManager::DrawCollisions()
 	for (auto& enemy : enemies_) {
 		enemy->DrawCollision();
 	}
+}
+
+void EnemyManager::InitJson()
+{
+	jsonManager_ = std::make_unique<JsonManager>("EnemyManager", "Resources/JSON/EnemyManager");
+	jsonManager_->SetCategory("EnemyManager");
+	jsonManager_->Register("Playerdistance", &triggerDistance_);
 }
 
 void EnemyManager::RemoveDeadEnemies()
