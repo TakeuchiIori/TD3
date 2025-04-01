@@ -10,6 +10,12 @@
 
 int Grass::count_ = 0;
 
+Grass::~Grass()
+{
+	--count_;
+	sphereCollider_->~SphereCollider();
+}
+
 void Grass::Initialize(Camera* camera)
 {
 	input_ = Input::GetInstance();
