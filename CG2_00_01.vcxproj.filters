@@ -101,6 +101,10 @@
     <ClCompile Include="Engine\Utility\Collision\Core\ContactRecord.cpp" />
     <ClCompile Include="Engine\Utility\Collision\Core\Effect.cpp" />
     <ClCompile Include="Application\Objects\Grass\GrassManager.cpp" />
+    <ClCompile Include="Application\Objects\EnemyManager\DropEnemy.cpp" />
+    <ClCompile Include="Application\Objects\EnemyManager\SideEnemy.cpp" />
+    <ClCompile Include="Application\Objects\EnemyManager\BaseEnemy.cpp" />
+    <ClCompile Include="Application\Objects\EnemyManager\EnemyManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -202,6 +206,10 @@
     <ClInclude Include="Engine\Utility\Collision\Core\ContactRecord.h" />
     <ClInclude Include="Engine\Utility\Collision\Core\Effect.h" />
     <ClInclude Include="Application\Objects\Grass\GrassManager.h" />
+    <ClInclude Include="Application\Objects\EnemyManager\DropEnemy.h" />
+    <ClInclude Include="Application\Objects\EnemyManager\SideEnemy.h" />
+    <ClInclude Include="Application\Objects\EnemyManager\BaseEnemy.h" />
+    <ClInclude Include="Application\Objects\EnemyManager\EnemyManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />

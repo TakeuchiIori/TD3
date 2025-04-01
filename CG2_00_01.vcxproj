@@ -115,6 +115,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Stages\BaseStage\BaseStage.cpp" />
     <ClCompile Include="Application\Objects\StageObject\BaseFloorObject\BaseFloorObject.cpp" />
     <ClCompile Include="Application\SystemsApp\Cameras\DebugCamera\DebugCamera.cpp" />
+    <ClCompile Include="Application\Objects\EnemyManager\DropEnemy.cpp" />
+    <ClCompile Include="Application\Objects\EnemyManager\BaseEnemy.cpp" />
+    <ClCompile Include="Application\Objects\EnemyManager\EnemyManager.cpp" />
     <ClCompile Include="Engine\Generators\OffScreen\OffScreen.cpp" />
     <ClCompile Include="Engine\Utility\Collision\AABB\AABBCollider.cpp" />
     <ClCompile Include="Engine\Utility\Collision\Core\BaseCollider.cpp" />
@@ -199,6 +202,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Objects\StageObject\StageObjectManager\StageObjectManager.cpp" />
     <ClCompile Include="Application\Objects\Player\PlayerMapCollision.cpp" />
     <ClCompile Include="Application\Objects\Player\PlayerBody.cpp" />
+    <ClCompile Include="Application\Objects\EnemyManager\SideEnemy.cpp" />
     <ClCompile Include="TestStage.cpp" />
     <ClCompile Include="Application\SystemsApp\Picture\Picture.cpp" />
   </ItemGroup>
@@ -209,6 +213,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Stages\BaseStage\BaseStage.h" />
     <ClInclude Include="Application\Objects\StageObject\BaseFloorObject\BaseFloorObject.h" />
     <ClInclude Include="Application\SystemsApp\Cameras\DebugCamera\DebugCamera.h" />
+    <ClInclude Include="Application\Objects\EnemyManager\DropEnemy.h" />
+    <ClInclude Include="Application\Objects\EnemyManager\BaseEnemy.h" />
+    <ClInclude Include="Application\Objects\EnemyManager\EnemyManager.h" />
     <ClInclude Include="Engine\Generators\OffScreen\OffScreen.h" />
     <ClInclude Include="Engine\Utility\Collision\AABB\AABBCollider.h" />
     <ClInclude Include="Engine\Utility\Collision\Core\BaseCollider.h" />
@@ -300,6 +307,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Objects\Player\PlayerMapCollision.h" />
     <ClInclude Include="Application\Objects\Player\PlayerBody.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Application\Objects\EnemyManager\SideEnemy.h" />
     <ClInclude Include="TestStage.h" />
     <ClInclude Include="Application\SystemsApp\Picture\Picture.h" />
   </ItemGroup>

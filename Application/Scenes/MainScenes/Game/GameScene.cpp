@@ -63,6 +63,11 @@ void GameScene::Initialize()
 
     player_->SetMapInfo(mpInfo_->GetMapChipField());
 
+	// 敵
+	enemyManager_ = std::make_unique<EnemyManager>();
+	enemyManager_->Initialize(sceneCamera_.get(), mpInfo_->GetMapChipField());
+	enemyManager_->SetPlayer(player_.get());
+
 	// 草
 	grassManager_ = std::make_unique<GrassManager>();
 	grassManager_->SetPlayer(player_.get());
@@ -160,7 +165,7 @@ void GameScene::Update()
 		sceneCamera_->SetFovY(sceneCamera_->GetFovY() + 0.001f);
 	}
 
-	// enemy_->Update();
+	enemyManager_->Update();
 
 	ground_->Update();
 	grassManager_->Update();
@@ -254,6 +259,7 @@ void GameScene::DrawObject()
     //stageManager_.Draw();
 
 	player_->Draw();
+	enemyManager_->Draw();
 
 	grassManager_->Draw();
 }
