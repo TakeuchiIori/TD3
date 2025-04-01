@@ -269,6 +269,9 @@ void JsonManager::ImGuiManager()
 
 void JsonManager::ChildReset(std::string parentFileName, std::string childName)
 {
+
+
+
 	auto it = instances.find(selectedClass);
 	if (it != instances.end()) {
 		JsonManager* instance = it->second;
@@ -298,7 +301,9 @@ void JsonManager::ChildReset(std::string parentFileName, std::string childName)
 			// 各 child_ のチェックボックスと対応する変数表示
 			for (auto& CHPair : instance->child_)
 			{
+#ifdef _DEBUG
 				ImGui::Checkbox(CHPair.first.c_str(), &CHPair.second);
+#endif
 				if (CHPair.second) // ON の場合
 				{
 					for (auto& var : groupedVars[CHPair.first])
@@ -309,6 +314,7 @@ void JsonManager::ChildReset(std::string parentFileName, std::string childName)
 			}
 		}
 	}
+
 }
 
 void JsonManager::ClearRegister(std::string parentFileName)

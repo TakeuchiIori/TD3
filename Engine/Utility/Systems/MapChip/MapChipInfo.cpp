@@ -1,5 +1,9 @@
 #include "MapChipInfo.h"
+#ifdef _DEBUG
 #include "imgui.h"
+
+#endif // _DEBUG
+
 
 // Math
 #include "Matrix4x4.h"
@@ -97,6 +101,8 @@ void MapChipInfo::GenerateBlocks()
 
 void MapChipInfo::ImGui()
 {
+#ifdef _DEBUG
+
 	// --- ImGui UI ---
 	ImGui::Begin("MapChip Control");
 
@@ -184,6 +190,7 @@ void MapChipInfo::ImGui()
 	//}
 	//ImGui::End();
 
+#endif // _DEBUG
 }
 
 
