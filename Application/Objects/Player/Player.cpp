@@ -1,5 +1,7 @@
 #include "Player.h"
 
+#include <cmath>
+
 #ifdef _DEBUG
 #include "imgui.h"
 #include "string"
@@ -174,21 +176,12 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 			}
 		}
 
-		//if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kNextFramePlayer))
-		//{
-		//	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody)) // 体に当たったら
-		//	{
-		//		isCollisionBody = true;
-		//		/*if (behavior_ == BehaviorPlayer::Moving)
-		//		{
-		//			worldTransform_.translation_ += moveDirection_ * -defaultSpeed_;
-		//		}
-		//		else if (behavior_ == BehaviorPlayer::Boost)
-		//		{
-		//			worldTransform_.translation_ += moveDirection_ * -(defaultSpeed_ + boostSpeed_);
-		//		}*/
-		//	}
-		//}
+
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
+		{
+			TakeDamage();
+		}
+
 	}
 }
 
@@ -201,14 +194,7 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody)) // 体に当たったら
 			{
 				isCollisionBody = true;
-				/*if (behavior_ == BehaviorPlayer::Moving)
-				{
-					worldTransform_.translation_ += moveDirection_ * -defaultSpeed_;
-				}
-				else if (behavior_ == BehaviorPlayer::Boost)
-				{
-					worldTransform_.translation_ += moveDirection_ * -(defaultSpeed_ + boostSpeed_);
-				}*/
+				TakeDamage();
 			}
 		}
 	}
@@ -229,78 +215,69 @@ void Player::UpdateMatrices()
 
 void Player::Move()
 {
-
 	velocity_ = { 0.0f,0.0f,0.0f };
 	beforeDirection_ = moveDirection_;
 
-	if (input_->TriggerKey(DIK_W) && 
+	if (input_->IsControllerConnected())
+	{
+	}
+	stick = input_->GetLeftStickInput(0);
+	if (std::abs(stick.x) < threshold && std::abs(stick.y) < threshold) {
+		stick = {};
+	}
+
+
+	if ((input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP)) &&
 		moveDirection_ != Vector3{ 0,1,0 } &&
 		moveDirection_ != Vector3{ 0,-1,0 })
 	{
-		moveDirection_ = { 0,1,0 };
-		moveHistory_.push_back(worldTransform_.translation_);
-		worldTransform_.rotation_.z = 0;
-
-		// 体の出現
-		ExtendBody();
-		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
-		body->Initialize(BaseObject::camera_);
-		body->SetStartPos(GetCenterPosition());
-		body->SetPos(GetCenterPosition());
-		body->UpExtend();
-		playerBodys_.push_back(std::move(body));
+		UpBody();
 	}
-	else if (input_->TriggerKey(DIK_S) && 
+	else if ((input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN)) &&
 		moveDirection_ != Vector3{ 0,-1,0 } &&
 		moveDirection_ != Vector3{ 0,1,0 })
 	{
-		moveDirection_ = { 0,-1,0 };
-		moveHistory_.push_back(worldTransform_.translation_);
-
-		worldTransform_.rotation_.z = std::numbers::pi_v<float>;
-
-		ExtendBody();
-		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
-		body->Initialize(BaseObject::camera_);
-		body->SetStartPos(GetCenterPosition());
-		body->SetPos(GetCenterPosition());
-		body->DownExtend();
-		playerBodys_.push_back(std::move(body));
+		DownBody();
 	}
-	else if (input_->TriggerKey(DIK_A) && 
+	else if ((input_->TriggerKey(DIK_A) || input_->TriggerKey(DIK_LEFT)) &&
 		moveDirection_ != Vector3{ -1,0,0 } &&
 		moveDirection_ != Vector3{ 1,0,0 })
 	{
-		moveDirection_ = { -1,0,0 };
-		moveHistory_.push_back(worldTransform_.translation_);
-
-		worldTransform_.rotation_.z = std::numbers::pi_v<float> / 2.0f;
-
-		ExtendBody();
-		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
-		body->Initialize(BaseObject::camera_);
-		body->SetStartPos(GetCenterPosition());
-		body->SetPos(GetCenterPosition());
-		body->LeftExtend();
-		playerBodys_.push_back(std::move(body));
+		LeftBody();
 	}
-	else if (input_->TriggerKey(DIK_D) &&
+	else if ((input_->TriggerKey(DIK_D) || input_->TriggerKey(DIK_RIGHT)) &&
 		moveDirection_ != Vector3{ 1,0,0 } &&
 		moveDirection_ != Vector3{ -1,0,0 })
 	{
-		moveDirection_ = { 1,0,0 };
-		moveHistory_.push_back(worldTransform_.translation_);
-
-
-		worldTransform_.rotation_.z = 3.0f * std::numbers::pi_v<float> / 2.0f;
-
-		ExtendBody();
-		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
-		body->Initialize(BaseObject::camera_);
-		body->SetStartPos(GetCenterPosition());
-		body->SetPos(GetCenterPosition());
-		body->RightExtend();
-		playerBodys_.push_back(std::move(body));
+		RightBody();
+	}
+	else  if (std::abs(stick.x) > std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
+	{
+		if (stick.x > 0 &&
+			moveDirection_ != Vector3{ 1,0,0 } &&
+			moveDirection_ != Vector3{ -1,0,0 })
+		{
+			RightBody();
+		}
+		else if(moveDirection_ != Vector3{ -1,0,0 } &&
+				moveDirection_ != Vector3{ 1,0,0 })
+		{
+			LeftBody();
+		}
+	}
+	else if(stick.x != 0 || stick.y != 0)
+	{
+		if (stick.y > 0 &&
+			moveDirection_ != Vector3{ 0,1,0 } &&
+			moveDirection_ != Vector3{ 0,-1,0 })
+		{
+			UpBody();
+		}
+		else if(moveDirection_ != Vector3{ 0,-1,0 } &&
+				moveDirection_ != Vector3{ 0,1,0 })
+		{
+			DownBody();
+		}
 	}
 
 	moveDirection_ = Normalize(moveDirection_);
@@ -320,6 +297,7 @@ void Player::Move()
 	{
 		newPos = worldTransform_.translation_;
 		velocity_ = { 0,0,0 };
+		TakeDamage();
 	}
 	else
 	{
@@ -344,16 +322,83 @@ void Player::Move()
 
 }
 
+void Player::UpBody()
+{
+	moveDirection_ = { 0,1,0 };
+	moveHistory_.push_back(worldTransform_.translation_);
+	worldTransform_.rotation_.z = 0;
+
+	// 体の出現
+	ExtendBody();
+	std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
+	body->Initialize(BaseObject::camera_);
+	body->SetStartPos(GetCenterPosition());
+	body->SetPos(GetCenterPosition());
+	body->UpExtend();
+	playerBodys_.push_back(std::move(body));
+}
+
+void Player::DownBody()
+{
+	moveDirection_ = { 0,-1,0 };
+	moveHistory_.push_back(worldTransform_.translation_);
+
+	worldTransform_.rotation_.z = std::numbers::pi_v<float>;
+
+	ExtendBody();
+	std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
+	body->Initialize(BaseObject::camera_);
+	body->SetStartPos(GetCenterPosition());
+	body->SetPos(GetCenterPosition());
+	body->DownExtend();
+	playerBodys_.push_back(std::move(body));
+}
+
+void Player::LeftBody()
+{
+	moveDirection_ = { -1,0,0 };
+	moveHistory_.push_back(worldTransform_.translation_);
+
+	worldTransform_.rotation_.z = std::numbers::pi_v<float> / 2.0f;
+
+	ExtendBody();
+	std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
+	body->Initialize(BaseObject::camera_);
+	body->SetStartPos(GetCenterPosition());
+	body->SetPos(GetCenterPosition());
+	body->LeftExtend();
+	playerBodys_.push_back(std::move(body));
+}
+
+void Player::RightBody()
+{
+	moveDirection_ = { 1,0,0 };
+	moveHistory_.push_back(worldTransform_.translation_);
+
+
+	worldTransform_.rotation_.z = 3.0f * std::numbers::pi_v<float> / 2.0f;
+
+	ExtendBody();
+	std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
+	body->Initialize(BaseObject::camera_);
+	body->SetStartPos(GetCenterPosition());
+	body->SetPos(GetCenterPosition());
+	body->RightExtend();
+	playerBodys_.push_back(std::move(body));
+}
+
 void Player::EntryMove()
 {
-#ifdef _DEBUG
-	if (input_->TriggerKey(DIK_SPACE))
+	if (input_->TriggerKey(DIK_SPACE) || 
+		input_->IsPadTriggered(0, GamePadButton::X) || 
+		input_->IsPadTriggered(0, GamePadButton::Start))
 	{
 		behaviortRquest_ = BehaviorPlayer::Moving;
 		moveDirection_ = { 0,1,0 };
 		extendTimer_ = kTimeLimit_;
 		moveHistory_.push_back(worldTransform_.translation_);
 	}
+#ifdef _DEBUG
 #endif // _DEBUG
 }
 
@@ -361,11 +406,11 @@ void Player::EntryBoost()
 {
 	if(0 >= boostCoolTimer_)
 	{
-#ifdef _DEBUG
-		if (input_->TriggerKey(DIK_B))
+		if (input_->TriggerKey(DIK_E) || input_->IsPadTriggered(0, GamePadButton::A))
 		{
 			behaviortRquest_ = BehaviorPlayer::Boost;
 		}
+#ifdef _DEBUG
 #endif // _DEBUG
 	}
 }
@@ -388,6 +433,10 @@ void Player::TimerManager()
 	if (0 < createGrassTimer_)
 	{
 		createGrassTimer_ -= deltaTime_;
+	}
+	if (0 < invincibleTimer_)
+	{
+		invincibleTimer_ -= deltaTime_;
 	}
 }
 
@@ -440,12 +489,28 @@ void Player::ShrinkBody()
 	}
 }
 
+void Player::TakeDamage()
+{
+	if (HP_ > 0 && invincibleTimer_ <= 0 && behavior_ != BehaviorPlayer::Boost)
+	{
+		HP_--;
+		if (HP_ <= 0)
+		{
+			extendTimer_ = 0;
+		}
+		else
+		{
+			invincibleTimer_ = kInvincibleTime_;
+		}
+	}
+}
+
 #ifdef _DEBUG
 void Player::DebugPlayer()
 {
 	int a = static_cast<int>(moveHistory_.size());
 	ImGui::Begin("DebugPlayer");
-	ImGui::Text("Start : SPACE  |  Boost : B  |  Return : N");
+	ImGui::Text("Start : SPACE  |  Boost : E or Pad:A  |  Return : N");
 	ImGui::Text("TimeLimit  : %.2f", extendTimer_);
 	ImGui::Text("BoostTimer : %.2f", boostTimer_);
 	ImGui::Text("BoostCT    : %.2f", boostCoolTimer_);
@@ -454,8 +519,8 @@ void Player::DebugPlayer()
 	int b = grassGauge_;
 	ImGui::Text("grassGauge_: %d", b);
 	ImGui::Text("isCollisionBody: %d", isCollisionBody);
-	ImGui::DragFloat3("pos", &worldTransform_.translation_.x);
-	ImGui::DragFloat3("pos2", &nextWorldTransform_.translation_.x);
+	int c = HP_;
+	ImGui::Text("HP : %d", c);
 	ImGui::End();
 
 	if (input_->TriggerKey(DIK_N))
@@ -519,6 +584,7 @@ void Player::BehaviorRootInit()
 	speed_ = 0;
 	playerBodys_.clear();
 	isCollisionBody = false;
+	HP_ = kMaxHP_;
 }
 
 void Player::BehaviorRootUpdate()
