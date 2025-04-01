@@ -80,9 +80,10 @@ public: // アクセッサ
 	/// <param name="worldTransform"></param>
 	void SetTransform(const WorldTransform* worldTransform) { wt_ = worldTransform; }
 
+	Camera* camera_ = nullptr;
 protected:
 	Line* line_ = nullptr;
-	Camera* camera_ = nullptr;
+	
 	const WorldTransform* wt_ = nullptr;
 	uint32_t typeID_ = 0u;
 private:
