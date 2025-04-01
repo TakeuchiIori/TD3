@@ -1,6 +1,6 @@
 #pragma once
 // Engine
-#include "Collider.h"
+#include "BaseCollider.h"
 #include "Object3D/Object3d.h"
 #include "WorldTransform./WorldTransform.h"
 
@@ -11,9 +11,9 @@
 #include "MathFunc.h"
 // Collision.h
 #pragma once
-#include "Sphere/SphereCollider.h"
-#include "AABB/AABBCollider.h"
-#include "OBB/OBBCollider.h"
+#include "../Sphere/SphereCollider.h"
+#include "../AABB/AABBCollider.h"
+#include "../OBB/OBBCollider.h"
 #include <set>
 
 namespace Collision {
@@ -40,7 +40,8 @@ namespace Collision {
 	bool Check(const OBBCollider* a, const OBBCollider* b);
 
 	// Base - Base
-	bool Check(Collider* a, Collider* b);
+	bool Check(BaseCollider* a, BaseCollider* b);
+
 }
 
 class CollisionManager {
@@ -54,7 +55,7 @@ public: // 基本的な関数
 	// コンストラクタ
 	// デストラクタ
 	CollisionManager() = default;
-	~CollisionManager() = default;
+	~CollisionManager();
 
 	
 	/// <summary>
@@ -76,7 +77,7 @@ public:
 	/// <summary>
 	/// コライダー2つの衝突判定と応答
 	/// </summary>
-	void CheckCollisionPair(Collider* a, Collider* b);
+	void CheckCollisionPair(BaseCollider* a, BaseCollider* b);
 
 	/// <summary>
 	/// 全ての当たり判定チェック
@@ -86,12 +87,12 @@ public:
 	/// <summary>
 	/// リストに登録
 	/// </summary>
-	void AddCollider(Collider* collider);
+	void AddCollider(BaseCollider* collider);
 
 	/// <summary>
 	/// コライダーの削除
 	/// </summary>
-	void RemoveCollider(Collider* collider);
+	void RemoveCollider(BaseCollider* collider);
 
 private:
 
@@ -100,8 +101,10 @@ private:
 	CollisionManager& operator=(const CollisionManager&) = delete;
 
 	// コライダー
-	std::list<Collider*> colliders_;
-	std::set<std::pair<Collider*, Collider*>> collidingPairs_;
+	std::list<BaseCollider*> colliders_;
+	// 衝突中のペアを記録（片方が削除される場合の処理も必要）
+	std::set<std::pair<BaseCollider*, BaseCollider*>> collidingPairs_;
+
 	// bool型
 	bool isDrawCollider_ = false;
 };

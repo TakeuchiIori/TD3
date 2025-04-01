@@ -12,7 +12,7 @@ void SphereCollider::InitJson(JsonManager* jsonManager)
 
 void SphereCollider::Initialize()
 {
-	Collider::Initialize();
+	BaseCollider::Initialize();
 
 	sphere_.center = { 0.0f,0.0f,0.0f };
 	sphereOffset_.center = { 0.0f,0.0f,0.0f };
