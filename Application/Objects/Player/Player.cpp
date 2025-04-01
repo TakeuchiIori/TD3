@@ -177,11 +177,7 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 
 		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
 		{
-			if (HP_ > 0 && invincibleTimer_ <= 0)
-			{
-				HP_--;
-				invincibleTimer_ = kInvincibleTime_;
-			}
+			TakeDamage();
 		}
 
 	}
