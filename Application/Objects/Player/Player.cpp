@@ -217,7 +217,7 @@ void Player::Move()
 	velocity_ = { 0.0f,0.0f,0.0f };
 	beforeDirection_ = moveDirection_;
 
-	if (input_->TriggerKey(DIK_W) && 
+	if ((input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP)) &&
 		moveDirection_ != Vector3{ 0,1,0 } &&
 		moveDirection_ != Vector3{ 0,-1,0 })
 	{
@@ -234,7 +234,7 @@ void Player::Move()
 		body->UpExtend();
 		playerBodys_.push_back(std::move(body));
 	}
-	else if (input_->TriggerKey(DIK_S) && 
+	else if ((input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN)) &&
 		moveDirection_ != Vector3{ 0,-1,0 } &&
 		moveDirection_ != Vector3{ 0,1,0 })
 	{
@@ -251,7 +251,7 @@ void Player::Move()
 		body->DownExtend();
 		playerBodys_.push_back(std::move(body));
 	}
-	else if (input_->TriggerKey(DIK_A) && 
+	else if ((input_->TriggerKey(DIK_A) || input_->TriggerKey(DIK_LEFT)) &&
 		moveDirection_ != Vector3{ -1,0,0 } &&
 		moveDirection_ != Vector3{ 1,0,0 })
 	{
@@ -268,7 +268,7 @@ void Player::Move()
 		body->LeftExtend();
 		playerBodys_.push_back(std::move(body));
 	}
-	else if (input_->TriggerKey(DIK_D) &&
+	else if ((input_->TriggerKey(DIK_D) || input_->TriggerKey(DIK_RIGHT)) &&
 		moveDirection_ != Vector3{ 1,0,0 } &&
 		moveDirection_ != Vector3{ -1,0,0 })
 	{
@@ -331,7 +331,6 @@ void Player::Move()
 
 void Player::EntryMove()
 {
-#ifdef _DEBUG
 	if (input_->TriggerKey(DIK_SPACE))
 	{
 		behaviortRquest_ = BehaviorPlayer::Moving;
@@ -339,6 +338,7 @@ void Player::EntryMove()
 		extendTimer_ = kTimeLimit_;
 		moveHistory_.push_back(worldTransform_.translation_);
 	}
+#ifdef _DEBUG
 #endif // _DEBUG
 }
 
@@ -346,11 +346,11 @@ void Player::EntryBoost()
 {
 	if(0 >= boostCoolTimer_)
 	{
-#ifdef _DEBUG
-		if (input_->TriggerKey(DIK_B))
+		if (input_->TriggerKey(DIK_E) || input_->IsPadTriggered(0, GamePadButton::A))
 		{
 			behaviortRquest_ = BehaviorPlayer::Boost;
 		}
+#ifdef _DEBUG
 #endif // _DEBUG
 	}
 }
@@ -450,7 +450,7 @@ void Player::DebugPlayer()
 {
 	int a = static_cast<int>(moveHistory_.size());
 	ImGui::Begin("DebugPlayer");
-	ImGui::Text("Start : SPACE  |  Boost : B  |  Return : N");
+	ImGui::Text("Start : SPACE  |  Boost : E or Pad:A  |  Return : N");
 	ImGui::Text("TimeLimit  : %.2f", extendTimer_);
 	ImGui::Text("BoostTimer : %.2f", boostTimer_);
 	ImGui::Text("BoostCT    : %.2f", boostCoolTimer_);
