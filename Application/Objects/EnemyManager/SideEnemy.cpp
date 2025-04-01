@@ -1,5 +1,10 @@
 #include "SideEnemy.h"
 
+SideEnemy::~SideEnemy()
+{
+	aabbCollider_->~AABBCollider();
+}
+
 void SideEnemy::Initialize(Camera* camera)
 {
 	camera_ = camera;
@@ -13,7 +18,7 @@ void SideEnemy::Initialize(Camera* camera)
 	startPos_ = worldTransform_.translation_;
 
 	InitCollision();
-	InitJson();
+	//InitJson();
 }
 
 void SideEnemy::InitCollision()
@@ -37,6 +42,12 @@ void SideEnemy::InitJson()
 
 void SideEnemy::Update()
 {
+	if (!isAlive_) {
+		aabbCollider_->~AABBCollider();
+		return;
+	}
+
+
 	Move();
 
 	Vector3 newPos = worldTransform_.translation_ + velocity_;
@@ -52,6 +63,7 @@ void SideEnemy::Update()
 	);
 	worldTransform_.translation_ = newPos;
 	worldTransform_.UpdateMatrix();
+	aabbCollider_->Update();
 }
 
 void SideEnemy::Draw()
@@ -64,22 +76,43 @@ void SideEnemy::DrawCollision()
 	aabbCollider_->Draw();
 }
 
-void SideEnemy::OnEnterCollision(BaseCollider* self, BaseCollider* other) {}
-void SideEnemy::OnCollision(BaseCollider* self, BaseCollider* other) {}
-void SideEnemy::OnExitCollision(BaseCollider* self, BaseCollider* other) {}
+void SideEnemy::OnEnterCollision(BaseCollider* self, BaseCollider* other) {
+
+	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) ||
+		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody))
+	{
+		isAlive_ = false;
+	}
+}
+
+void SideEnemy::OnCollision(BaseCollider* self, BaseCollider* other) {
+	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) ||
+		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody))
+	{
+		isAlive_ = false;
+	}
+}
+
+void SideEnemy::OnExitCollision(BaseCollider* self, BaseCollider* other) {
+
+}
+
 void SideEnemy::MapChipOnCollision(const CollisionInfo& info) {
 	switch (info.blockType) {
 	case MapChipType::kBlock:
 
-		moveRight_ = !moveRight_;
+		
 		break;
 	default:
 		break;
 	}
 
 	// 衝突方向に応じた処理
-	if (info.direction == 4) {  // 下方向の衝突 = 着地
-		//isGrounded_ = true;
+	if (info.direction == 2) {  // 下方向の衝突 = 着地
+		moveRight_ = true;
+	}
+	if (info.direction == 1) {  // 下方向の衝突 = 着地
+		moveRight_ = false;
 	}
 }
 

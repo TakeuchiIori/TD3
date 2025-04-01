@@ -129,8 +129,8 @@ void GameScene::Update()
 	}
 
 	mpInfo_->Update();
-	CollisionManager::GetInstance()->Update();
-	CheckAllCollisions();
+	
+	//CheckAllCollisions();
 	
 
 	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
@@ -194,7 +194,7 @@ void GameScene::Update()
 
 	// ライティング
 	LightManager::GetInstance()->ShowLightingEditor();
-
+	CollisionManager::GetInstance()->Update();
 
 	sprite_->Update();
 	uiBase_->Update();
@@ -294,6 +294,7 @@ void GameScene::DrawLine()
 	}*/
 	player_->DrawCollision();
 	grassManager_->DrawCollision();
+	enemyManager_->DrawCollisions();
 }
 
 

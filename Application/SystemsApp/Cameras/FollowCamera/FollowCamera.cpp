@@ -66,8 +66,11 @@ void FollowCamera::FollowProsess()
 	Matrix4x4 rotate = MakeRotateMatrixXYZ(rotate_);
 
 	offset = TransformNormal(offset, rotate);
+	
+	// このゲーム用にX、Z軸は無視する
+	Vector3 targetTranslate = Vector3(0.0f, target_->translation_.y, 0);
 
-	translate_ = target_->translation_ + offset;
+	translate_ = targetTranslate + offset;
 
 	matView_ = Inverse(MakeAffineMatrix(scale_, rotate_, translate_));
 }
