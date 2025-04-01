@@ -28,7 +28,7 @@ class Grass :
 {
 public:
 	Grass() : id_(count_) { ++count_; }
-	~Grass() override { --count_; }
+	~Grass() override;
 
 public:
 	/// <summary>

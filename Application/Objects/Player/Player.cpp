@@ -14,11 +14,14 @@ void Player::Initialize(Camera* camera)
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = { 2.0f,6.0f,0.0f };
-	worldTransform_.scale_ = { 1.0f,1.0f,1.0f };
-	worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
-
+	worldTransform_.scale_ = { 0.99f,0.99f,0.99f };
+	//worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
+	nextWorldTransform_.Initialize();
+	nextWorldTransform_.translation_ = worldTransform_.translation_;
+	nextWorldTransform_.scale_ = worldTransform_.scale_;
 
 	worldTransform_.UpdateMatrix();
+	nextWorldTransform_.UpdateMatrix();
 
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
@@ -45,6 +48,12 @@ void Player::InitCollision()
 		static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)
 	);
 
+	nextAabbCollider_ = ColliderFactory::Create<AABBCollider>(
+		this,
+		&nextWorldTransform_,
+		camera_,
+		static_cast<uint32_t>(CollisionTypeIdDef::kNextFramePlayer)
+	);
 }
 
 void Player::InitJson()
@@ -74,6 +83,7 @@ void Player::Update()
 	UpdateMatrices();
 	
 	aabbCollider_->Update();
+	nextAabbCollider_->Update();
 	
 #ifdef _DEBUG
 	DebugPlayer();
@@ -92,6 +102,10 @@ void Player::Draw()
 void Player::DrawCollision()
 {
 	aabbCollider_->Draw();
+	nextAabbCollider_->Draw();
+	for (const auto& body : playerBodys_) {
+		body->DrawCollision();
+	}
 }
 
 //void Player::OnCollision()
@@ -159,11 +173,45 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 				isCreateGrass_ = true;
 			}
 		}
+
+		//if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kNextFramePlayer))
+		//{
+		//	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody)) // 体に当たったら
+		//	{
+		//		isCollisionBody = true;
+		//		/*if (behavior_ == BehaviorPlayer::Moving)
+		//		{
+		//			worldTransform_.translation_ += moveDirection_ * -defaultSpeed_;
+		//		}
+		//		else if (behavior_ == BehaviorPlayer::Boost)
+		//		{
+		//			worldTransform_.translation_ += moveDirection_ * -(defaultSpeed_ + boostSpeed_);
+		//		}*/
+		//	}
+		//}
 	}
 }
 
 void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 {
+	if (behavior_ == BehaviorPlayer::Moving || behavior_ == BehaviorPlayer::Boost)
+	{
+		if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kNextFramePlayer))
+		{
+			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody)) // 体に当たったら
+			{
+				isCollisionBody = true;
+				/*if (behavior_ == BehaviorPlayer::Moving)
+				{
+					worldTransform_.translation_ += moveDirection_ * -defaultSpeed_;
+				}
+				else if (behavior_ == BehaviorPlayer::Boost)
+				{
+					worldTransform_.translation_ += moveDirection_ * -(defaultSpeed_ + boostSpeed_);
+				}*/
+			}
+		}
+	}
 }
 
 void Player::OnExitCollision(BaseCollider* self, BaseCollider* other)
@@ -173,6 +221,7 @@ void Player::OnExitCollision(BaseCollider* self, BaseCollider* other)
 void Player::UpdateMatrices()
 {
 	worldTransform_.UpdateMatrix();
+	nextWorldTransform_.UpdateMatrix();
 	for (const auto& body : playerBodys_) {
 		body->Update();
 	}
@@ -182,12 +231,17 @@ void Player::Move()
 {
 
 	velocity_ = { 0.0f,0.0f,0.0f };
+	beforeDirection_ = moveDirection_;
 
-	if (input_->TriggerKey(DIK_W) && moveDirection_ != Vector3{ 0,1,0 })
+	if (input_->TriggerKey(DIK_W) && 
+		moveDirection_ != Vector3{ 0,1,0 } &&
+		moveDirection_ != Vector3{ 0,-1,0 })
 	{
 		moveDirection_ = { 0,1,0 };
 		moveHistory_.push_back(worldTransform_.translation_);
+		worldTransform_.rotation_.z = 0;
 
+		// 体の出現
 		ExtendBody();
 		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
 		body->Initialize(BaseObject::camera_);
@@ -196,10 +250,14 @@ void Player::Move()
 		body->UpExtend();
 		playerBodys_.push_back(std::move(body));
 	}
-	else if (input_->TriggerKey(DIK_S) && moveDirection_ != Vector3{ 0,-1,0 })
+	else if (input_->TriggerKey(DIK_S) && 
+		moveDirection_ != Vector3{ 0,-1,0 } &&
+		moveDirection_ != Vector3{ 0,1,0 })
 	{
 		moveDirection_ = { 0,-1,0 };
 		moveHistory_.push_back(worldTransform_.translation_);
+
+		worldTransform_.rotation_.z = std::numbers::pi_v<float>;
 
 		ExtendBody();
 		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
@@ -209,10 +267,14 @@ void Player::Move()
 		body->DownExtend();
 		playerBodys_.push_back(std::move(body));
 	}
-	else if (input_->TriggerKey(DIK_A) && moveDirection_ != Vector3{ -1,0,0 })
+	else if (input_->TriggerKey(DIK_A) && 
+		moveDirection_ != Vector3{ -1,0,0 } &&
+		moveDirection_ != Vector3{ 1,0,0 })
 	{
 		moveDirection_ = { -1,0,0 };
 		moveHistory_.push_back(worldTransform_.translation_);
+
+		worldTransform_.rotation_.z = std::numbers::pi_v<float> / 2.0f;
 
 		ExtendBody();
 		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
@@ -222,10 +284,15 @@ void Player::Move()
 		body->LeftExtend();
 		playerBodys_.push_back(std::move(body));
 	}
-	else if (input_->TriggerKey(DIK_D) && moveDirection_ != Vector3{ 1,0,0 })
+	else if (input_->TriggerKey(DIK_D) &&
+		moveDirection_ != Vector3{ 1,0,0 } &&
+		moveDirection_ != Vector3{ -1,0,0 })
 	{
 		moveDirection_ = { 1,0,0 };
 		moveHistory_.push_back(worldTransform_.translation_);
+
+
+		worldTransform_.rotation_.z = 3.0f * std::numbers::pi_v<float> / 2.0f;
 
 		ExtendBody();
 		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
@@ -235,40 +302,29 @@ void Player::Move()
 		body->RightExtend();
 		playerBodys_.push_back(std::move(body));
 	}
-	
+
 	moveDirection_ = Normalize(moveDirection_);
 
-	if(isFPSMode_) // カメラをプレイヤー視点にしたとき
+	if (isFPSMode_) // カメラをプレイヤー視点にしたとき
 	{
 		moveDirection_ = TransformNormal(moveDirection_, MakeRotateMatrixY(worldTransform_.rotation_.y));
 	}
 
 	velocity_ += moveDirection_ * speed_;
 
-	//mapCollision_.DetectAndResolveCollision(colliderRct_, worldTransform_.translation_, velocity_, collisionFlag_);
 
+	Vector3 newPos = worldTransform_.translation_;
+	newPos = worldTransform_.translation_ + velocity_;
 
-	
-
-	/*if (mapCollision_.GetIsPopBody()) {
-		std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
-		body->Initialize(camera_);
-		body->SetPos(mapCollision_.GetPopPos());
-		playerBodys_.push_back(move(body));
-	}*/
-
-	Vector3 newPos = worldTransform_.translation_ + velocity_;
-
-	/*if (mapCollision_.GetIsCollision())
+	if (isCollisionBody && beforeDirection_ == moveDirection_)
 	{
-		moveDirection_ = { 0,0,0 };
-		if (mapCollision_.GetIsCollisionBody()) {
-			for (size_t i = playerBodys_.size(); 2 < playerBodys_.size();) {
-				mapCollision_.ElasePos(playerBodys_.begin()->get()->GetPos());
-				playerBodys_.pop_front();
-			}
-		}
-	}*/
+		newPos = worldTransform_.translation_;
+		velocity_ = { 0,0,0 };
+	}
+	else
+	{
+		isCollisionBody = false;
+	}
 
 	mpCollision_.DetectAndResolveCollision(
 		colliderRect_,  // 衝突判定用矩形
@@ -282,7 +338,7 @@ void Player::Move()
 	);
 
 	worldTransform_.translation_ = newPos;
-
+	nextWorldTransform_.translation_ = newPos + velocity_;
 
 	ExtendBody();
 
@@ -373,14 +429,14 @@ void Player::ExtendBody()
 
 void Player::ShrinkBody()
 {
-	if(playerBodys_.back()->GetLength() <= 0)
-	{
-		playerBodys_.pop_back();
-	}
 
 	if (playerBodys_.size() > 0)
 	{
 		playerBodys_.back()->SetEndPos(GetCenterPosition());
+	}
+	if (playerBodys_.back()->GetLength() <= 0)
+	{
+		playerBodys_.pop_back();
 	}
 }
 
@@ -397,7 +453,9 @@ void Player::DebugPlayer()
 	ImGui::Text("createGrassTimer_: %.2f", createGrassTimer_);
 	int b = grassGauge_;
 	ImGui::Text("grassGauge_: %d", b);
+	ImGui::Text("isCollisionBody: %d", isCollisionBody);
 	ImGui::DragFloat3("pos", &worldTransform_.translation_.x);
+	ImGui::DragFloat3("pos2", &nextWorldTransform_.translation_.x);
 	ImGui::End();
 
 	if (input_->TriggerKey(DIK_N))
@@ -459,6 +517,8 @@ void Player::BehaviorUpdate()
 void Player::BehaviorRootInit()
 {
 	speed_ = 0;
+	playerBodys_.clear();
+	isCollisionBody = false;
 }
 
 void Player::BehaviorRootUpdate()
@@ -513,6 +573,7 @@ void Player::BehaviorReturnInit()
 {
 	speed_ = defaultSpeed_ + boostSpeed_;
 	moveDirection_ = { 0,0,0 };
+	isCollisionBody = false;
 }
 
 void Player::BehaviorReturnUpdate()
@@ -534,5 +595,6 @@ void Player::BehaviorReturnUpdate()
 	{
 		behaviortRquest_ = BehaviorPlayer::Root;
 	}
+	nextWorldTransform_.translation_ = worldTransform_.translation_;
 	ShrinkBody();
 }

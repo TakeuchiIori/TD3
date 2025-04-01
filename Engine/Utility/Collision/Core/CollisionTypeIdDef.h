@@ -6,6 +6,7 @@ enum class CollisionTypeIdDef : uint32_t
 {
 	kDefault = 0,	// デフォルト
 	kPlayer,		// プレイヤー
+	kNextFramePlayer,
 	kPlayerBody,	// プレイヤー体
 	kGrass,			// 草
 	kEnemy,			// 敵
