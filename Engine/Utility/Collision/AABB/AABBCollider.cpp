@@ -15,7 +15,7 @@ void AABBCollider::InitJson(JsonManager* jsonManager)
 
 void AABBCollider::Initialize()
 {
-	Collider::Initialize();
+	BaseCollider::Initialize();
 
 	aabb_.min = { 0.0f,0.0f,0.0f };
 	aabb_.max = { 0.0f,0.0f,0.0f };
