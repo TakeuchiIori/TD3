@@ -167,6 +167,9 @@ public: // アクセッサ
 
 	void SetCamera(Camera* camera) { this->camera_ = camera; }
 
+	void SetTextureFilePath(const std::string& filePath) { this->filePath_ = filePath; }
+	std::string GetTextureFilePath() { return filePath_; }
+
 private: // メンバ変数
 
 	SpriteCommon* spriteCommon_ = nullptr;

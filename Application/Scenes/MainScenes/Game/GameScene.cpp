@@ -99,7 +99,7 @@ void GameScene::Initialize()
 
 
 	sprite_ = std::make_unique<Sprite>();
-	sprite_->Initialize("Resources/Textures/KoboRB.png");
+	sprite_->Initialize("Resources/Textures/BackGround/KoboRB.png");
 	sprite_->SetSize(Vector2{ 100.0f,500.0f });
 	// sprite_->SetTextureSize(Vector2{ 1280,720 });
 
@@ -199,8 +199,8 @@ void GameScene::Update()
 	CollisionManager::GetInstance()->Update();
 
 	sprite_->Update();
-	uiBase_->Update();
-	uiSub_->Update();
+	//uiBase_->Update();
+	//uiSub_->Update();
 	gameScreen_->Update();
 
 }
@@ -270,8 +270,8 @@ void GameScene::DrawObject()
 void GameScene::DrawSprite()
 {
 	sprite_->Draw();
-	uiBase_->Draw();
-	uiSub_->Draw();
+	//uiBase_->Draw();
+	//uiSub_->Draw();
 	gameScreen_->Draw();
 }
 

@@ -25,7 +25,7 @@ public:
 
 private:
 
-	std::unique_ptr<UIBase> background_;
+	std::unique_ptr<UIBase> background_[2];
 
 };
 
