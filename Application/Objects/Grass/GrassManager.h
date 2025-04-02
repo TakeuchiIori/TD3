@@ -22,6 +22,14 @@ public:
 
 	void DrawCollision();
 
+	void Repop()
+	{
+		for (const auto& g : grassList_)
+		{
+			g->Repop();
+		}
+	}
+
 	void hakuGrass(bool pop, Vector3 pos);
 
 	void PopGrass(Vector3 pos, bool madeByPlayer = false)
