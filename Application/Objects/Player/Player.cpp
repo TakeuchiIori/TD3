@@ -110,18 +110,6 @@ void Player::DrawCollision()
 	}
 }
 
-//void Player::OnCollision()
-//{
-//	if (false) // 草を食べたら
-//	{
-//		if (MaxGrassGauge_ > grassGauge_)
-//		{
-//			grassGauge_++;
-//			extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
-//		}
-//	}
-//}
-
 void Player::MapChipOnCollision(const CollisionInfo& info)
 {// 衝突したブロックの種類に応じた処理
 	switch (info.blockType) {
@@ -159,7 +147,7 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 		{
 			if (MaxGrass_ > grassGauge_ && createGrassTimer_ <= 0)
 			{
-				if (dynamic_cast<SphereCollider*>(other)->GetWorldTransform().scale_.x != /*GetRadius()*/0)
+				if (dynamic_cast<SphereCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.3f)
 				{
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
 				} else
