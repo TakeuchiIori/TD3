@@ -18,6 +18,7 @@
 #include "../Transitions/Fade/Fade.h"
 #include "Systems/MapChip/MapChipInfo.h"
 #include "Systems/UI/UIBase.h"
+#include "EnemyManager/EnemyManager.h"
 
 // Math
 #include "Vector3.h"
@@ -30,11 +31,10 @@
 // App
 #include "../SystemsApp/Picture/Picture.h"
 #include "../../../SystemsApp/Cameras/PlayerCamera/PlayerCamera.h"
-
-// Application
 #include "Player/Player.h"
+#include "Grass/GrassManager.h"
 #include "../Stages/StageManager/StageManager.h"
-
+#include "../SpriteApp/ScreenApp/GameScreen.h"
 
 enum class CameraMode
 {
@@ -181,6 +181,7 @@ private:
     Vector3 weaponPos;
     std::unique_ptr<Sprite> sprite_;
     std::vector<std::unique_ptr<Sprite>> sprites;
+	std::unique_ptr<GameScreen> gameScreen_;
 
     /*=================================================================
 
@@ -197,6 +198,8 @@ private:
 
     // 3Dモデル
     std::unique_ptr<Player> player_;
+    std::unique_ptr<EnemyManager> enemyManager_;
+    std::unique_ptr<GrassManager> grassManager_;
 
     /*=================================================================
 
