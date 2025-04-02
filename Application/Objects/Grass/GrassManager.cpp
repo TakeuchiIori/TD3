@@ -50,7 +50,7 @@ void GrassManager::hakuGrass(bool pop, Vector3 pos)
 	{
 		for (Vector3 Pos : popPos_) 
 		{
-			PopGrass(Pos, true);
+			PopGrass(Pos);
 		}
 		popPos_.clear();
 		isPop_ = false;
