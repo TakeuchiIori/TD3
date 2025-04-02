@@ -145,7 +145,7 @@ void GameScene::Update()
 
 	if (!isDebugCamera_) {
 		player_->Update();
-		grassManager_->hakuGrass(player_->PopGrass(), player_->GetCenterPosition());
+		grassManager_->hakuGrass(player_->IsPopGrass(), player_->GetCenterPosition());
 	}
 	player_->SetFPSMode(cameraMode_ == CameraMode::FPS);
 

@@ -190,7 +190,19 @@ public: // getter&setter
 			behavior_ == BehaviorPlayer::Root;
 	}
 
-	bool PopGrass();
+	bool IsPopGrass();
+
+	int32_t GetGrassGauge() { return grassGauge_; }
+
+	int32_t GetMaxGrassGauge() { return MaxGrass_; }
+
+	float GetMaxGrassTime() { return kCreateGrassTime_; }
+	float GetGrassTimer() { return createGrassTimer_; }
+
+	float GetTimeLimit() { return extendTimer_; }
+
+	int32_t GetMaxHP() { return kMaxHP_; }
+	int32_t GetHP() { return HP_; }
 
 private:
 	Input* input_ = nullptr;
@@ -214,7 +226,7 @@ private:
 	Vector3 velocity_ = { 0.0f,0.0f,0.0f };			// 加速度
 	Vector3 moveDirection_ = { 0.0f,0.0f,0.0f };	// 動く向き
 	Vector3 beforeDirection_ = { 0.0f,0.0f,0.0f };	// 動く向き
-	float defaultSpeed_ = 0.05f;
+	float defaultSpeed_ = 0.1f;
 	float speed_ = defaultSpeed_;							// 動く速度
 	bool isFPSMode_ = false;
 

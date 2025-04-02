@@ -78,7 +78,7 @@ void Player::Update()
 
 	ExtendBody();
 
-	PopGrass();
+	IsPopGrass();
 
 	TimerManager();
 
@@ -437,7 +437,7 @@ void Player::TimerManager()
 	}
 }
 
-bool Player::PopGrass()
+bool Player::IsPopGrass()
 {
 	if (0 >= createGrassTimer_ && isCreateGrass_)
 	{
