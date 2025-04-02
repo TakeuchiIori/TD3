@@ -46,8 +46,6 @@ void GameScene::Initialize()
 	followCamera_.Initialize();
 	debugCamera_.Initialize();
 
-	playerCamera_ = std::make_unique<PlayerCamera>();
-	playerCamera_->Initialize();
 
 	// 各オブジェクトの初期化
 	mpInfo_ = std::make_unique<MapChipInfo>();
@@ -57,8 +55,6 @@ void GameScene::Initialize()
 	player_ = std::make_unique<Player>(mpInfo_->GetMapChipField());
 	player_->Initialize(sceneCamera_.get());
 	followCamera_.SetTarget(player_->GetWorldTransform());
-	playerCamera_->SetTarget(player_->GetWorldTransform());
-
 
 
     player_->SetMapInfo(mpInfo_->GetMapChipField());
@@ -373,13 +369,7 @@ void GameScene::UpdateCamera()
 	break;
 	case CameraMode::FPS:
 	{
-
-		playerCamera_->Update();
-		sceneCamera_->viewMatrix_ = playerCamera_->matView_;
-		sceneCamera_->transform_.translate = playerCamera_->translate_;
-		sceneCamera_->transform_.rotate = playerCamera_->rotate_;
-
-		sceneCamera_->UpdateMatrix();
+		//sceneCamera_->UpdateMatrix();
 	}
 	break;
 
