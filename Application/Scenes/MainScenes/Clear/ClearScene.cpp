@@ -10,7 +10,7 @@
 void ClearScene::Initialize()
 {
     sprite_ = std::make_unique<Sprite>();
-    sprite_->Initialize("Resources/Textures/KoboClear.png");
+    sprite_->Initialize("Resources/Textures/BackGround/KoboClear.png");
     sprite_->SetSize(Vector2{ 1280.0f,720.0f });
     sprite_->SetTextureSize(Vector2{ 1280,720 });
 
