@@ -35,6 +35,12 @@ float Normalize(const float& v) {
 }
 
 
+float UniformScaleFromVector(const Vector3& v) {
+    float average = (v.x + v.y + v.z) / 3.0f;
+    return average;
+}
+
+
 Vector4 Normalize(const Vector4& v) {
     float mag = Magnitude(v);
     return { v.x / mag, v.y / mag, v.z / mag , v.w / mag };

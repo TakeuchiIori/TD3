@@ -70,6 +70,8 @@ float Magnitude(const Vector4& v);
 // スカラー値を正規化する関数
 float Normalize(const float& v);
 
+float UniformScaleFromVector(const Vector3& v);
+
 // Vector4を正規化する関数
 Vector4 Normalize(const Vector4& v);
 
