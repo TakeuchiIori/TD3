@@ -15,10 +15,13 @@
 #include "Vector3.h"
 
 enum class MapChipType {
-    kBlank, // 空白
-    kBlock, // ブロック
-    // 将来的に拡張しやすいよう、ここに新しいタイプを追加できます
+    kBlank = 0,
+    kBlock = 1,
+    kDropEnemy = 2,
+    kSideEnemy = 3,
+    kBody = 4,
 };
+
 
 class MapChipField {
 public: // 構造体
@@ -61,6 +64,12 @@ public:
     MapChipType GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex) const;
 
     /// <summary>
+    /// マップチップの種別を取得
+    /// </summary>
+    /// <returns>指定位置のマップチップタイプ</returns>
+    void SetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex, MapChipType type);
+
+    /// <summary>
     /// 座標を取得
     /// </summary>
     /// <returns>マップチップの世界座標</returns>
@@ -99,8 +108,8 @@ private:
     static inline const float blockSize = 2.0f;
 
     // ブロックの個数
-    static inline const uint32_t kNumBlockVertical = 20;      // 縦
-    static inline const uint32_t kNumBlockHorizontal = 100;   // 横  
+    static inline const uint32_t kNumBlockVertical = 50;      // 縦
+    static inline const uint32_t kNumBlockHorizontal = 16;   // 横  
 
 public:
 
@@ -111,4 +120,5 @@ public:
     // ブロックの個数
     static inline uint32_t GetNumBlockVertical() { return kNumBlockVertical; }
     static inline uint32_t GetNumBlockHorizontal() { return kNumBlockHorizontal; }
+    void SaveMapChipCsv(const std::string& filePath) const;
 };

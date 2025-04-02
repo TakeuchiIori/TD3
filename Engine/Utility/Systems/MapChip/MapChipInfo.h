@@ -16,6 +16,8 @@ class MapChipInfo
 {
 public:
 
+	~MapChipInfo();
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -45,25 +47,33 @@ private:
 	/// </summary>
 	void GenerateBlocks();
 
+	/// <summary>
+	/// imgui
+	/// </summary>
+	void ImGui();
 
 public:
 
-	void SetMapChipField(MapChipField* mpField) { mpField_ = mpField; }
+	void SetMapChipField(MapChipField* mpField) { mpField_ = std::unique_ptr<MapChipField>(mpField);; }
 	void SetWorldTransform(std::vector<std::vector<WorldTransform*>> wt) { wt_ = wt; }
-	void SetObject(Object3d* obj) { obj_ = obj; }
 
-	MapChipField* GetMapChipField() { return mpField_; }
+	MapChipField* GetMapChipField() { return mpField_.get(); }
 
 private:
 	/*=======================================================================
-	
+
 								  ポインタなど
 
 	========================================================================*/
 	Camera* camera_ = nullptr;
 	std::vector<std::vector<WorldTransform*>> wt_;
-	MapChipField* mpField_ = nullptr;
+	std::unique_ptr<MapChipField> mpField_ ;
 	//MapChipCollision* mpCollision_ = nullptr;
-	Object3d* obj_ = nullptr;
+	std::unique_ptr<Object3d> obj_;
+
+	MapChipType selectedType_;
+
+	std::string currentCsvFileName_;
+
 };
 

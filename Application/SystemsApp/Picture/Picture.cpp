@@ -171,7 +171,7 @@ void Picture::TakeCameraViewScreenshot() {
     // ※実際のゲームエンジンでは、ここでカメラの視点からシーンを再レンダリングすることも可能
     
     auto swapChainResources = dxCommon_->GetOffScreenResource();
-    UINT backBufferIndex = dxCommon_->GetCurrentBackBufferIndex();
+    //UINT backBufferIndex = dxCommon_->GetCurrentBackBufferIndex();
     
     // リソースバリア設定
     D3D12_RESOURCE_BARRIER barriers[2] = {};

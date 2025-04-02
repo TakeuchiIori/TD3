@@ -35,6 +35,12 @@ float Normalize(const float& v) {
 }
 
 
+float UniformScaleFromVector(const Vector3& v) {
+    float average = (v.x + v.y + v.z) / 3.0f;
+    return average;
+}
+
+
 Vector4 Normalize(const Vector4& v) {
     float mag = Magnitude(v);
     return { v.x / mag, v.y / mag, v.z / mag , v.w / mag };
@@ -74,5 +80,10 @@ bool IsCollision(const AABB& aabb, const Sphere& sphere) {
     float distanceSquared = difference.x * difference.x + difference.y * difference.y + difference.z * difference.z;
 
     return distanceSquared < (sphere.radius * sphere.radius);
+}
+
+float DegToRad(float degrees)
+{
+    return degrees * (3.14159265f / 180.0f);
 }
 

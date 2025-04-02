@@ -40,7 +40,7 @@ void DebugCamera::UpdateInput()
 
     // ===== マウスによる操作 =====
     Vector2 currentMousePos = input->GetMousePosition();
-    
+
     // 右クリックで回転
     if (input->IsPressMouse(1)) {
         if (!isDragging_) {
@@ -58,8 +58,7 @@ void DebugCamera::UpdateInput()
 
         // 上下回転が一定範囲を超えないように制限
         rotate_.x = std::max(-1.5f, std::min(1.5f, rotate_.x));
-    }  
-    else if (input->IsPressMouse(0)) {
+    } else if (input->IsPressMouse(0)) {
         if (!isDragging_) {
             isDragging_ = true;
             prevMousePos_ = currentMousePos;
@@ -70,7 +69,7 @@ void DebugCamera::UpdateInput()
         float deltaY = currentMousePos.y - prevMousePos_.y;
 
         // 移動量に応じてカメラの位置を変更
-        Vector3 moveDelta = { -deltaX * moveSpeed_ * 0.1f, deltaY * moveSpeed_ * 0.1f, 0.0f };
+        Vector3 moveDelta = { -deltaX * moveSpeed_ * 0.1f, 0.0f, deltaY * moveSpeed_ * 0.1f };
 
         // カメラの回転に応じた移動ベクトルを計算
         Matrix4x4 rotMat = MakeRotateMatrixXYZ(rotate_);
@@ -90,7 +89,7 @@ void DebugCamera::UpdateInput()
     int32_t wheel = input->GetWheel();
     if (wheel != 0) {
         Vector3 forward = TransformNormal({ 0, 0, 1.0f }, MakeRotateMatrixXYZ(rotate_));
-        translate_ += forward * wheel * moveSpeed_ * 0.1f;
+        translate_ += forward * static_cast<float>(wheel) * moveSpeed_ * 0.1f;
     }
 
     // ===== キーボードによる操作 =====
@@ -167,7 +166,8 @@ void DebugCamera::UpdateInput()
 void DebugCamera::InitJson()
 {
     // JSON管理クラスを初期化
-    jsonManager_ = std::make_unique<JsonManager>("DebugCamera", "Resources/JSON");
+    jsonManager_ = std::make_unique<JsonManager>("DebugCamera", "Resources/Json/Cameras");
+    jsonManager_->SetCategory("Cameras");
     jsonManager_->Register("Translate", &translate_);
     jsonManager_->Register("Rotate", &rotate_);
     jsonManager_->Register("RotateSpeed", &rotateSpeed_);

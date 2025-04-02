@@ -5,6 +5,9 @@ MapChipField::MapChipField() {
     RegisterMapChipType("0", MapChipType::kBlank);
     RegisterMapChipType("1", MapChipType::kBlock);
 
+    RegisterMapChipType("2", MapChipType::kDropEnemy);
+    RegisterMapChipType("3", MapChipType::kSideEnemy);
+
     // マップチップデータの初期化
     ResetMapChipData();
 }
@@ -18,6 +21,24 @@ void MapChipField::ResetMapChipData() {
 
 void MapChipField::RegisterMapChipType(const std::string& key, MapChipType type) {
     mapChipTable_[key] = type;
+}
+
+void MapChipField::SaveMapChipCsv(const std::string& filePath) const
+{
+    std::ofstream ofs(filePath);
+    if (!ofs.is_open()) {
+        throw std::runtime_error("マップチップCSVの保存に失敗しました: " + filePath);
+    }
+
+    for (const auto& row : mapChipData_.data) {
+        for (size_t i = 0; i < row.size(); ++i) {
+            ofs << static_cast<int>(row[i]);
+            if (i < row.size() - 1) {
+                ofs << ",";
+            }
+        }
+        ofs << "\n";
+    }
 }
 
 void MapChipField::LoadMapChipCsv(const std::string& filePath) {
@@ -92,18 +113,23 @@ MapChipType MapChipField::GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex
     return mapChipData_.data[yIndex][xIndex];
 }
 
+void MapChipField::SetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex, MapChipType type)
+{
+    mapChipData_.data[yIndex][xIndex] = type;
+}
+
 Vector3 MapChipField::GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex) {
     return Vector3(
         kBlockWidth * xIndex,
-        0,
-        kBlockHeight * (kNumBlockVertical - 1 - yIndex)
+        kBlockHeight * (kNumBlockVertical -1 - yIndex),
+        0
     );
 }
 
 MapChipField::IndexSet MapChipField::GetMapChipIndexSetByPosition(const Vector3& position) const {
     IndexSet indexSet = {};
     indexSet.xIndex = static_cast<uint32_t>((position.x + kBlockWidth / 2) / kBlockWidth);
-    indexSet.yIndex = kNumBlockVertical - 1 - static_cast<uint32_t>((position.z + kBlockHeight / 2) / kBlockHeight);
+    indexSet.yIndex = kNumBlockVertical - 1 - static_cast<uint32_t>((position.y + kBlockHeight / 2) / kBlockHeight);
 
     // 範囲外チェック
     if (indexSet.xIndex >= kNumBlockHorizontal) {
@@ -123,7 +149,7 @@ MapChipField::Rect MapChipField::GetRectByIndex(uint32_t xIndex, uint32_t yIndex
     Rect rect;
     rect.left   = center.x - kBlockWidth / 2.0f;
     rect.right  = center.x + kBlockWidth / 2.0f;
-    rect.bottom = center.z - kBlockHeight / 2.0f;
-    rect.top    = center.z + kBlockHeight / 2.0f;
+    rect.bottom = center.y - kBlockHeight / 2.0f;
+    rect.top    = center.y + kBlockHeight / 2.0f;
     return rect;
 }

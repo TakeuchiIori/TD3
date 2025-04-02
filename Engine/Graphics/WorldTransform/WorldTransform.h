@@ -24,6 +24,9 @@ public:
 		Vector3 translate;
 	};
 
+	// アンカーポイント
+	Vector3 anchorPoint_ = { 0, 0, 0 };
+	bool useAnchorPoint_ = false;
 	// ローカルスケール
 	Vector3 scale_ = { 1, 1, 1 };
 	// X,Y,Z軸回りのローカル回転角
@@ -44,14 +47,16 @@ public:
 	void Initialize();
 
 	/// <summary>
-	/// 定数バッファ生成
-	/// </summary>
-	void CreateConstBuffer();
-
-	/// <summary>
 	/// 行列を転送する
 	/// </summary>
 	void UpdateMatrix();
+
+	/// <summary>
+	/// アンカーポイントの設定・取得
+	/// </summary>
+	/// <returns></returns>
+	const Vector3& GetAnchorPoint() const;
+	void SetAnchorPoint(const Vector3& anchorPoint);
 
 	/// <summary>
 	/// 定数バッファの取得
@@ -60,14 +65,30 @@ public:
 	const Microsoft::WRL::ComPtr<ID3D12Resource>& GetConstBuffer() const { return constBuffer_; }
 
 	/// <summary>
-	/// マップのセット
+	/// マップの設定・取得
 	/// </summary>
 	/// <param name="wvp">WVP行列</param>
 	TransformationMatrix* GetTransformData() { return transformData_; }
 	void SetMapWVP(const Matrix4x4& wvp) { transformData_->WVP = wvp; }
-
 	void SetMapWorld(const Matrix4x4& world) { transformData_->World = world; }
 	const Matrix4x4& GetMatWorld() { return matWorld_; }
+
+
+private:
+
+	/// <summary>
+	/// 定数バッファ生成
+	/// </summary>
+	void CreateConstBuffer();
+
+	/// <summary>
+	/// スケール・回転を適用した座標を計算
+	/// </summary>
+	/// <param name="point"></param>
+	/// <param name="scale"></param>
+	/// <param name="rotation"></param>
+	/// <returns></returns>
+	Vector3 ScaleRotateToAnchor(const Vector3& point, const Vector3& scale, const Vector3& rotation);
 
 private:
 	// 定数バッファ

@@ -8,7 +8,7 @@
 #include "Object3D/Object3dCommon.h"
 #include "PipelineManager/SkinningManager.h"
 #include "Loaders/Model/Model.h"
-#include "Collision/CollisionManager.h"
+#include "Collision/Core/CollisionManager.h"
 #include <Systems/GameTime/HitStop.h>
 #include <cstdlib>
 #include <ctime>
@@ -30,12 +30,12 @@ void GameScene::Initialize()
 	sceneCamera_ = cameraManager_.AddCamera();
 	//playerCamera_ = cameraManager_.AddCamera();
 
-	// 初期カメラモード設定
-	cameraMode_ = CameraMode::DEFAULT;
+    // 初期カメラモード設定
+    cameraMode_ = CameraMode::FOLLOW;
 
 	CollisionManager::GetInstance()->Initialize();
 
-	stageManager_.Initialize(sceneCamera_.get());
+	//stageManager_.Initialize(sceneCamera_.get());
 
 	picture_ = std::make_unique<Picture>();
 	picture_->Initialize();
@@ -50,18 +50,33 @@ void GameScene::Initialize()
 	playerCamera_->Initialize();
 
 	// 各オブジェクトの初期化
-	player_ = std::make_unique<Player>();
-	player_->Initialize(sceneCamera_.get());
-	followCamera_.SetTarget(player_->GetWorldTransform());
-	playerCamera_->SetTarget(player_->GetWorldTransform());
-
 	mpInfo_ = std::make_unique<MapChipInfo>();
 	mpInfo_->Initialize();
 	mpInfo_->SetCamera(sceneCamera_.get());
 
-	// 地面
-	ground_ = std::make_unique<Ground>();
-	ground_->Initialize(sceneCamera_.get());
+	player_ = std::make_unique<Player>(mpInfo_->GetMapChipField());
+	player_->Initialize(sceneCamera_.get());
+	followCamera_.SetTarget(player_->GetWorldTransform());
+	playerCamera_->SetTarget(player_->GetWorldTransform());
+
+
+
+    player_->SetMapInfo(mpInfo_->GetMapChipField());
+
+	// 敵
+	enemyManager_ = std::make_unique<EnemyManager>();
+	enemyManager_->SetPlayer(player_.get());
+	enemyManager_->Initialize(sceneCamera_.get(), mpInfo_->GetMapChipField());
+
+	// 草
+	grassManager_ = std::make_unique<GrassManager>();
+	grassManager_->SetPlayer(player_.get());
+	grassManager_->Initialize(sceneCamera_.get());
+
+    
+    // 地面
+    ground_ = std::make_unique<Ground>();
+    ground_->Initialize(sceneCamera_.get());
 
 	test_ = std::make_unique<Object3d>();
 	test_->Initialize();
@@ -102,6 +117,9 @@ void GameScene::Initialize()
 
 	uiSub_ = std::make_unique<UIBase>("UISub");
 	uiSub_->Initialize("Resources/JSON/UI/Sub.json");
+
+	gameScreen_ = std::make_unique<GameScreen>();
+	gameScreen_->Initialize();
 }
 
 /// <summary>
@@ -109,24 +127,29 @@ void GameScene::Initialize()
 /// </summary>
 void GameScene::Update()
 {
+#ifdef _DEBUG
 	if ((Input::GetInstance()->TriggerKey(DIK_LCONTROL)) || Input::GetInstance()->IsPadTriggered(0, GamePadButton::RT)) {
 		isDebugCamera_ = !isDebugCamera_;
 	}
+#endif // _DEBUG
+
 
 	mpInfo_->Update();
-	CheckAllCollisions();
-	CollisionManager::GetInstance()->UpdateWorldTransform();
+	
+	//CheckAllCollisions();
+	
 
 	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
 		picture_->Update();
-	}
-	stageManager_.Update();
+    }
+    //stageManager_.Update();
 
 	test_->UpdateAnimation();
 	testWorldTransform_.UpdateMatrix();
 
 	if (!isDebugCamera_) {
 		player_->Update();
+		grassManager_->hakuGrass(player_->PopGrass(), player_->GetCenterPosition());
 	}
 	player_->SetFPSMode(cameraMode_ == CameraMode::FPS);
 
@@ -148,10 +171,10 @@ void GameScene::Update()
 		sceneCamera_->SetFovY(sceneCamera_->GetFovY() + 0.001f);
 	}
 
-	// enemy_->Update();
+	enemyManager_->Update();
 
 	ground_->Update();
-
+	grassManager_->Update();
 
 	particleEmitter_[0]->Emit();
 
@@ -177,11 +200,12 @@ void GameScene::Update()
 
 	// ライティング
 	LightManager::GetInstance()->ShowLightingEditor();
-
+	CollisionManager::GetInstance()->Update();
 
 	sprite_->Update();
 	uiBase_->Update();
 	uiSub_->Update();
+	gameScreen_->Update();
 
 }
 
@@ -197,7 +221,7 @@ void GameScene::Draw()
 	Object3dCommon::GetInstance()->DrawPreference();
 	LightManager::GetInstance()->SetCommandList();
 	DrawObject();
-	///line_->UpdateVertices(start_, end_);
+	///line_->RegisterLine(start_, end_);
 	///line_->DrawLine();
 
 	//---------
@@ -228,8 +252,6 @@ void GameScene::DrawOffScreen()
 
 void GameScene::DrawObject()
 {
-	CollisionManager::GetInstance()->Draw();
-
 	mpInfo_->Draw();
 	// オクルージョンクエリ開始
 	uint32_t queryIndex = 0;
@@ -239,12 +261,14 @@ void GameScene::DrawObject()
 	ground_->Draw();
 	commandList_->EndQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
 
+	
 
-
-	stageManager_.Draw();
+    //stageManager_.Draw();
 
 	player_->Draw();
+	enemyManager_->Draw();
 
+	grassManager_->Draw();
 }
 
 void GameScene::DrawSprite()
@@ -252,6 +276,7 @@ void GameScene::DrawSprite()
 	sprite_->Draw();
 	uiBase_->Draw();
 	uiSub_->Draw();
+	gameScreen_->Draw();
 }
 
 void GameScene::DrawAnimation()
@@ -275,6 +300,9 @@ void GameScene::DrawLine()
 		test_->DrawSkeleton(test_->GetModel()->GetSkeleton(), *boneLine_);
 		boneLine_->DrawLine();
 	}*/
+	player_->DrawCollision();
+	grassManager_->DrawCollision();
+	enemyManager_->DrawCollisions();
 }
 
 
@@ -406,15 +434,15 @@ void GameScene::ShowImGui()
 
 void GameScene::CheckAllCollisions() {
 
-	// 衝突マネージャーのリセット
-	CollisionManager::GetInstance()->Reset();
+	//// 衝突マネージャーのリセット
+	//CollisionManager::GetInstance()->Reset();
 
-	// コライダーをリストに登録
-	//CollisionManager::GetInstance()->AddCollider(player_.get());
+	//// コライダーをリストに登録
+	////CollisionManager::GetInstance()->AddCollider(player_.get());
 
 
-	// 衝突判定と応答
-	CollisionManager::GetInstance()->CheckAllCollisions();
+	//// 衝突判定と応答
+	//CollisionManager::GetInstance()->CheckAllCollisions();
 
 }
 void GameScene::InitializeOcclusionQuery()

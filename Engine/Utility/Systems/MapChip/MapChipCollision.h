@@ -21,7 +21,7 @@ struct CollisionInfo {
     uint32_t yIndex = 0;
     // 衝突したブロックのタイプ
     MapChipType blockType = MapChipType::kBlank;
-    // 衝突方向 (0:None, 1:左, 2:右, 3:上, 4:下)
+    // 衝突方向 (0:None, 1:左, 2:右, 3:下の面, 4:上の面)
     CollisionDirection direction;
     // 衝突の深さ（めり込み量）
     float penetrationDepth = 0.0f;
@@ -60,13 +60,15 @@ public:
     // コンストラクタ
     MapChipCollision(MapChipField* mapChipField) : mapChipField_(mapChipField) {}
 
+    void SetMap(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
+
     // 指定した位置と速度をもとに衝突判定と解決を行う
     // colliderRect: 衝突判定に使用する矩形
     // position: 現在位置（参照渡しで修正可能）
     // velocity: 現在速度（参照渡しで修正可能）
     // checkFlags: チェックする方向のフラグ
     // collisionCallback: 衝突時に呼び出されるコールバック関数
-    void DetectAndResolveCollision(
+    virtual void DetectAndResolveCollision(
         const ColliderRect& colliderRect,
         Vector3& position,
         Vector3& velocity,
@@ -74,6 +76,6 @@ public:
         std::function<void(const CollisionInfo&)> collisionCallback = nullptr);
 
 
-private:
+protected:
     MapChipField* mapChipField_;
 };
