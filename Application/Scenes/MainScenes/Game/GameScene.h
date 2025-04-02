@@ -31,12 +31,10 @@
 // App
 #include "../SystemsApp/Picture/Picture.h"
 #include "../../../SystemsApp/Cameras/PlayerCamera/PlayerCamera.h"
-
-// Application
 #include "Player/Player.h"
 #include "Grass/GrassManager.h"
 #include "../Stages/StageManager/StageManager.h"
-
+#include "../SpriteApp/ScreenApp/GameScreen.h"
 
 enum class CameraMode
 {
@@ -183,6 +181,7 @@ private:
     Vector3 weaponPos;
     std::unique_ptr<Sprite> sprite_;
     std::vector<std::unique_ptr<Sprite>> sprites;
+	std::unique_ptr<GameScreen> gameScreen_;
 
     /*=================================================================
 
