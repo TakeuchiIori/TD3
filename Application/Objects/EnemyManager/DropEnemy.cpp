@@ -1,4 +1,5 @@
 #include "DropEnemy.h"
+#include "../Player/Player.h"
 
 DropEnemy::~DropEnemy()
 {
@@ -77,10 +78,12 @@ void DropEnemy::DrawCollision()
 
 void DropEnemy::OnEnterCollision(BaseCollider* self, BaseCollider* other) {
 
-	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) ||
-		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody))
+	// プレイヤーの期間中は跳ね返るだけでダメージ無し
+	if ((other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) ||
+		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody)) &&
+		player_->behavior_ == BehaviorPlayer::Return)
 	{
-		isAlive_ = false;
+		isInversion_ = isInversion_ ? false : true;
 	}
 }
 
@@ -89,7 +92,7 @@ void DropEnemy::OnCollision(BaseCollider* self, BaseCollider* other) {
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) ||
 		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody))
 	{
-		isAlive_ = false;
+		//isAlive_ = false;
 	}
 }
 
@@ -100,7 +103,7 @@ void DropEnemy::OnExitCollision(BaseCollider* self, BaseCollider* other) {
 void DropEnemy::MapChipOnCollision(const CollisionInfo& info) {
 	switch (info.blockType) {
 	case MapChipType::kBlock:
-		isAlive_ = false;
+		
 		
 		break;
 	default:
@@ -108,8 +111,11 @@ void DropEnemy::MapChipOnCollision(const CollisionInfo& info) {
 	}
 
 	// 衝突方向に応じた処理
-	if (info.direction == 4) {  // 下方向の衝突 = 着地
-		//isGrounded_ = true;
+	if (info.direction == 3) {  // 下の面
+		isInversion_ = false;
+	}
+	if (info.direction == 4) {  // 上の面
+		isInversion_ = true;
 	}
 }
 
@@ -120,7 +126,7 @@ void DropEnemy::Move()
 
 	velocity_.y += gravity;
 	if (velocity_.y < terminalVelocity) {
-		velocity_.y = terminalVelocity;
+		velocity_.y = (isInversion_ ? -terminalVelocity : terminalVelocity);
 	}
 }
 

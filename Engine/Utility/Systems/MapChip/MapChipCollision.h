@@ -21,7 +21,7 @@ struct CollisionInfo {
     uint32_t yIndex = 0;
     // 衝突したブロックのタイプ
     MapChipType blockType = MapChipType::kBlank;
-    // 衝突方向 (0:None, 1:左, 2:右, 3:上, 4:下)
+    // 衝突方向 (0:None, 1:左, 2:右, 3:下の面, 4:上の面)
     CollisionDirection direction;
     // 衝突の深さ（めり込み量）
     float penetrationDepth = 0.0f;

@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseEnemy.h"
 
+class Player;
 class SideEnemy : public BaseEnemy
 {
 public:
@@ -57,6 +58,12 @@ public:
 	/// </summary>
 	void SetTranslate(Vector3 pos);
 
+	/// <summary>
+	/// プレイヤーのセット
+	/// </summary>
+	/// <param name="player"></param>
+	void SetPlayer(Player* player) { player_ = player; }
+
 private:
 
 	void Move();
@@ -75,6 +82,12 @@ private:
 	float defaultSpeed_ = 0.05f;
 	bool moveRight_ = true;
 
+	/*=======================================================
+
+							プレイヤー
+
+	==========================================================*/
+	Player* player_ = nullptr;
 	MapChipCollision mpCollision_;
 	MapChipCollision::ColliderRect colliderRect_;
 	Vector3 startPos_;

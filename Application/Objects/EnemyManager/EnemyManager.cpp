@@ -75,6 +75,7 @@ void EnemyManager::AddDropEnemy(const Vector3& pos)
 {
 	auto enemy = std::make_unique<DropEnemy>(mapChipField_);
 	enemy->Initialize(camera_);
+	enemy->SetPlayer(player_);
 	enemy->SetTranslate(pos);
 	enemies_.emplace_back(std::move(enemy));
 }
@@ -83,6 +84,7 @@ void EnemyManager::AddSideEnemy(const Vector3& pos)
 {
 	auto enemy = std::make_unique<SideEnemy>(mapChipField_);
 	enemy->Initialize(camera_);
+	enemy->SetPlayer(player_);
 	enemy->SetTranslate(pos);
 	enemies_.emplace_back(std::move(enemy));
 }

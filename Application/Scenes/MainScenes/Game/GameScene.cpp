@@ -65,8 +65,8 @@ void GameScene::Initialize()
 
 	// 敵
 	enemyManager_ = std::make_unique<EnemyManager>();
-	enemyManager_->Initialize(sceneCamera_.get(), mpInfo_->GetMapChipField());
 	enemyManager_->SetPlayer(player_.get());
+	enemyManager_->Initialize(sceneCamera_.get(), mpInfo_->GetMapChipField());
 
 	// 草
 	grassManager_ = std::make_unique<GrassManager>();

@@ -76,6 +76,7 @@ public:
 	/// </summary>
 	/// <param name="player"></param>
 	void SetPlayer(Player* player) { player_ = player; }
+	//Player* GetPlayer() { return player_; }
 
 private:
 	Camera* camera_ = nullptr;

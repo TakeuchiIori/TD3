@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseEnemy.h"
 
+class Player;
 class DropEnemy : public BaseEnemy
 {
 public:
@@ -57,6 +58,12 @@ public:
 	/// </summary>
 	void SetTranslate(Vector3 pos);
 
+	/// <summary>
+	/// プレイヤーのセット
+	/// </summary>
+	/// <param name="player"></param>
+	void SetPlayer(Player* player) { player_ = player; }
+
 
 private:
 
@@ -87,7 +94,14 @@ private:
 	float defaultSpeed_ = 0.05f;
 	float speed_ = defaultSpeed_;
 	bool isMove_ = false;
+	bool isInversion_ = false;
 
+	/*=======================================================
+
+							プレイヤー
+
+	==========================================================*/
+	Player* player_ = nullptr;
 	// マップチップとの当たり判定
 	MapChipCollision mpCollision_;
 	MapChipCollision::ColliderRect colliderRect_;

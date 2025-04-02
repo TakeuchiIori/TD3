@@ -1,4 +1,5 @@
 #include "SideEnemy.h"
+#include "../Player/Player.h"
 
 SideEnemy::~SideEnemy()
 {
@@ -78,18 +79,21 @@ void SideEnemy::DrawCollision()
 
 void SideEnemy::OnEnterCollision(BaseCollider* self, BaseCollider* other) {
 
-	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) ||
-		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody))
-	{
-		isAlive_ = false;
-	}
+	//if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) ||
+	//	other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody))
+	//{
+	//	isAlive_ = false;
+	//}
 }
 
 void SideEnemy::OnCollision(BaseCollider* self, BaseCollider* other) {
-	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) ||
-		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody))
+
+	// プレイヤーの期間中は跳ね返るだけでダメージ無し
+	if ((other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) || 
+		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody)) && 
+		player_->behavior_ == BehaviorPlayer::Return)
 	{
-		isAlive_ = false;
+		moveRight_ = moveRight_ ? false : true;
 	}
 }
 
@@ -108,11 +112,11 @@ void SideEnemy::MapChipOnCollision(const CollisionInfo& info) {
 	}
 
 	// 衝突方向に応じた処理
-	if (info.direction == 2) {  // 下方向の衝突 = 着地
-		moveRight_ = true;
-	}
 	if (info.direction == 1) {  // 下方向の衝突 = 着地
 		moveRight_ = false;
+	}
+	if (info.direction == 2) {  // 下方向の衝突 = 着地
+		moveRight_ = true;
 	}
 }
 
