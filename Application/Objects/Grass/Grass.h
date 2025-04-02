@@ -50,6 +50,8 @@ public:
 
 	void DrawCollision();
 
+	void Repop() { behaviortRquest_ = BehaviorGrass::Repop; }
+
 
 public:
 	Vector3 GetCenterPosition() const { return worldTransform_.translation_; }

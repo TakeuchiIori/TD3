@@ -8,6 +8,7 @@ enum class CollisionTypeIdDef : uint32_t
 	kPlayer,		// プレイヤー
 	kNextFramePlayer,
 	kPlayerBody,	// プレイヤー体
+	kStuckGrass,	// 草が詰まった場所
 	kGrass,			// 草
 	kEnemy,			// 敵
 	kNone			// 当たり判定なし

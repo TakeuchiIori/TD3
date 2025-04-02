@@ -105,16 +105,16 @@ void Grass::OnCollision(BaseCollider* self, BaseCollider* other)
 
 void Grass::OnExitCollision(BaseCollider* self, BaseCollider* other)
 {
-	if (player_->behavior_ == BehaviorPlayer::Return)
-	{
-		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
-		{
-			if (!isMadeByPlayer_)
-			{
-				behaviortRquest_ = BehaviorGrass::Repop;
-			}
-		}
-	}
+	//if (player_->behavior_ == BehaviorPlayer::Return)
+	//{
+	//	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
+	//	{
+	//		if (!isMadeByPlayer_)
+	//		{
+	//			behaviortRquest_ = BehaviorGrass::Repop;
+	//		}
+	//	}
+	//}
 }
 
 

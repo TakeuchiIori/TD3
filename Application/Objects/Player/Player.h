@@ -18,6 +18,7 @@
 // Application
 #include "BaseObject/BaseObject.h"
 #include "PlayerBody.h"
+#include "StuckGrass.h"
 
 enum class BehaviorPlayer
 {
@@ -183,6 +184,12 @@ public: // getter&setter
 
 	bool IsBoost() { return behavior_ == BehaviorPlayer::Boost; }
 
+	bool EndReturn()
+	{
+		return beforebehavior_ == BehaviorPlayer::Return &&
+			behavior_ == BehaviorPlayer::Root;
+	}
+
 	bool PopGrass();
 
 private:
@@ -258,6 +265,8 @@ private:
 	//MapChipCollision::CollisionFlag collisionFlag_ = MapChipCollision::CollisionFlag::None;
 
 	std::list <std::unique_ptr<PlayerBody>> playerBodys_;
+
+	std::list<std::unique_ptr<StuckGrass>> stuckGrassList_;
 
 	// コントローラー用
 	Vector2 stick = {};

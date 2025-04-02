@@ -149,15 +149,9 @@ void GameScene::Update()
 	}
 	player_->SetFPSMode(cameraMode_ == CameraMode::FPS);
 
-	if (Input::GetInstance()->TriggerKey(DIK_L))
+	if (player_->EndReturn())
 	{
-		if (cameraMode_ == CameraMode::FPS)
-		{
-			cameraMode_ = CameraMode::FOLLOW;
-		} else
-		{
-			cameraMode_ = CameraMode::FPS;
-		}
+		grassManager_->Repop();
 	}
 
 	if (Input::GetInstance()->PushKey(DIK_UP)) {
