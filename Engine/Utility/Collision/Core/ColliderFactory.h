@@ -27,7 +27,7 @@ public:
 		// コールバック関数の登録
 		collider->SetOnEnterCollision([owner](BaseCollider* self, BaseCollider* other) {
 			if (owner) {
-				owner->OnCollision(self, other);
+				owner->OnEnterCollision(self, other);
 			}
 			});
 		collider->SetOnCollision([owner](BaseCollider* self, BaseCollider* other) {

@@ -1,7 +1,7 @@
 #pragma once
 #include "DropEnemy.h"
 #include "SideEnemy.h"
-
+#include "Loaders/Json/JsonManager.h"
 
 class Player;
 class EnemyManager
@@ -43,6 +43,11 @@ public:
 private:
 
 	/// <summary>
+	/// json
+	/// </summary>
+	void InitJson();
+
+	/// <summary>
 	/// 死亡フラグのたった敵の削除
 	/// </summary>
 	void RemoveDeadEnemies();
@@ -71,6 +76,7 @@ public:
 	/// </summary>
 	/// <param name="player"></param>
 	void SetPlayer(Player* player) { player_ = player; }
+	//Player* GetPlayer() { return player_; }
 
 private:
 	Camera* camera_ = nullptr;
@@ -78,13 +84,8 @@ private:
 	MapChipField* mapChipField_ = nullptr;
 	std::vector<std::unique_ptr<BaseEnemy>> enemies_;
 
-
-
-	float spawnTimer_ = 0.0f;
-	float spawnInterval_ = 3.0f; // 3秒間隔
-	int spawnDropCount_ = 2;
-	int spawnSideCount_ = 2;
-	const float triggerDistance_ = 10.0f;
+	float triggerDistance_ = 20.0f;
 	std::vector<EnemySpawnPoint> dropSpawnPoints_;
+	std::unique_ptr< JsonManager> jsonManager_;
 
 };

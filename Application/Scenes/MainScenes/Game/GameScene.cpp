@@ -65,8 +65,8 @@ void GameScene::Initialize()
 
 	// 敵
 	enemyManager_ = std::make_unique<EnemyManager>();
-	enemyManager_->Initialize(sceneCamera_.get(), mpInfo_->GetMapChipField());
 	enemyManager_->SetPlayer(player_.get());
+	enemyManager_->Initialize(sceneCamera_.get(), mpInfo_->GetMapChipField());
 
 	// 草
 	grassManager_ = std::make_unique<GrassManager>();
@@ -117,6 +117,9 @@ void GameScene::Initialize()
 
 	uiSub_ = std::make_unique<UIBase>("UISub");
 	uiSub_->Initialize("Resources/JSON/UI/Sub.json");
+
+	gameScreen_ = std::make_unique<GameScreen>();
+	gameScreen_->Initialize();
 }
 
 /// <summary>
@@ -202,6 +205,7 @@ void GameScene::Update()
 	sprite_->Update();
 	uiBase_->Update();
 	uiSub_->Update();
+	gameScreen_->Update();
 
 }
 
@@ -272,6 +276,7 @@ void GameScene::DrawSprite()
 	sprite_->Draw();
 	uiBase_->Draw();
 	uiSub_->Draw();
+	gameScreen_->Draw();
 }
 
 void GameScene::DrawAnimation()
