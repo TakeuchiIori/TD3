@@ -5,7 +5,9 @@ void GrassManager::Initialize(Camera* camera)
 	camera_ = camera;
 
 	PopGrass({ 8.0f,12.0f,0.0f });
-	PopGrass({ 10.0f,8.0f,0.0f });
+	PopGrass({ 18.0f,8.0f,0.0f });
+	PopGrass({ 22.0f,16.0f,0.0f });
+	PopGrass({ 19.0f,19.0f,0.0f });
 }
 
 void GrassManager::Update()
