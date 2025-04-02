@@ -30,10 +30,8 @@
 
 // App
 #include "../SystemsApp/Picture/Picture.h"
-#include "../../../SystemsApp/Cameras/PlayerCamera/PlayerCamera.h"
 #include "Player/Player.h"
 #include "Grass/GrassManager.h"
-#include "../Stages/StageManager/StageManager.h"
 #include "../SpriteApp/ScreenApp/GameScreen.h"
 
 enum class CameraMode
@@ -153,7 +151,6 @@ private:
     TopDownCamera topDownCamera_;
     DebugCamera debugCamera_;
     bool isDebugCamera_ = false;
-    std::unique_ptr<PlayerCamera> playerCamera_;
 
 
     /*=================================================================
@@ -192,9 +189,6 @@ private:
     std::unique_ptr<Picture> picture_;
     WorldTransform testWorldTransform_;
     std::unique_ptr<Ground> ground_;
-
-    StageManager stageManager_;
-
 
     // 3Dモデル
     std::unique_ptr<Player> player_;
