@@ -144,8 +144,8 @@ private:
 	Input* input_ = nullptr;
 
 	//std::shared_ptr<OBBCollider> obbCollider_;
-	//std::shared_ptr<AABBCollider> aabbCollider_;
-	std::shared_ptr<SphereCollider> sphereCollider_;
+	std::shared_ptr<AABBCollider> aabbCollider_;
+	//std::shared_ptr<SphereCollider> sphereCollider_;
 
 	std::unique_ptr<JsonManager> jsonManager_;
 	std::unique_ptr<JsonManager> jsonCollider_;
@@ -161,6 +161,8 @@ private:
 	bool isLarge_ = false;
 
 	bool isMadeByPlayer_ = false;
+
+	int enter = 0;
 
 
 	// 振る舞い
