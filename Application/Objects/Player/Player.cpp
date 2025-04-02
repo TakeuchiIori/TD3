@@ -29,7 +29,7 @@ void Player::Initialize(Camera* camera)
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
 	obj_->SetModel("unitCube.obj");
-	obj_->SetMaterialColor({ 0.3f,0.3f,1.0f,1.0f });
+	obj_->SetMaterialColor({ 0.90625f,0.87109f,0.125f,1.0f });
 	
 
 	/*SphereCollider::SetCamera(BaseObject::camera_);
