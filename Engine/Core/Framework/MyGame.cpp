@@ -17,7 +17,7 @@ void MyGame::Initialize()
 #ifdef _DEBUG
 	SceneManager::GetInstance()->ChangeScene("Game");
 #else
-	SceneManager::GetInstance()->ChangeScene("Title");
+	SceneManager::GetInstance()->ChangeScene("Game");
 #endif
 	// パーティクルマネージャ生成
 	ParticleManager::GetInstance()->Initialize(srvManager_);
