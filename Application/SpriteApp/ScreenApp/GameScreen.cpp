@@ -118,12 +118,12 @@ void GameScreen::Update()
 		playerPos = Transform(playerPos, matViewProjectionViewport);
 		playerPos += offset_;
 		grass_[0]->SetPosition(playerPos);
-		grass_[1]->SetPosition(playerPos + offsetGrass_);
+		//grass_[1]->SetPosition(playerPos + offsetGrass_);
 
 		if (i == 1) {
 			float gauge = static_cast<float>(player_->GetGrassGauge());
 			float maxGauge = static_cast<float>(player_->GetMaxGrassGauge());
-			float ratio = std::clamp(gauge / maxGauge, 0.0f, 1.0f);  // 0.0〜1.0
+			float ratio = std::clamp(gauge / maxGauge, 0.0f, 100.0f);  // 0.0〜1.0
 
 			Vector4 bottomColor{};
 			Vector4 topColor{};
@@ -153,11 +153,28 @@ void GameScreen::Update()
 		//	grass_[1]->SetGradientFillRatio(ratio); // ← 追加！
 
 			
-			grass_[1]->SetScale({ 1.0f, ratio });
+			//grass_[1]->SetScale({ 1.0f, ratio });
 			// UVスケールとUVトランスレートを設定
+			//grass_[1]->SetUVScale({ 1.0f, ratio });
+			//grass_[1]->SetUVTranslate({ 0.0f,1.0f - ratio });
+
+			Vector2 baseSize = { 51.5f, 50.0f }; // 草画像の本来のサイズ
+
+			// 補正用オフセット計算（比率1.0なら0、0.5なら半分ズレる）
+			float yOffset = baseSize.y * (1.0f - ratio);
+			Vector3 position = playerPos + offsetGrass_;
+			position.y -= yOffset;
+
+			grass_[1]->SetPosition(position);
+			// UV設定（比率に応じて縦方向に縮小 & 下から満ちる）
 			grass_[1]->SetUVScale({ 1.0f, ratio });
-			grass_[1]->SetUVTranslate({ 0.0f,1.0f - ratio });
-			grass_[1]->SetPosition(playerPos + offsetGrass_);
+			grass_[1]->SetUVTranslate({ 0.0f, 1.0f - ratio });
+
+			// アンカーを下に固定（下から伸びてくるイメージ）
+			//grass_[1]->SetAnchorPoint({ 0.5f, 1.0f });
+
+
+			//grass_[1]->SetScale(baseSize);
 		}
 
 

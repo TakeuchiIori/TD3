@@ -61,6 +61,9 @@ void Player::InitCollision()
 void Player::InitJson()
 {
 	jsonManager_ = std::make_unique<JsonManager>("playerObj", "Resources/JSON/");
+	jsonManager_->SetCategory("Objects");
+	jsonManager_->Register("草の取得数",&grassGauge_);
+	jsonManager_->Register("草の最大数", &MaxGrass_);
 
 	jsonCollider_ = std::make_unique<JsonManager>("playerCollider", "Resources/JSON/");
 	aabbCollider_->InitJson(jsonCollider_.get());
