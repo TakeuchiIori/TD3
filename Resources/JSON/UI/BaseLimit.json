@@ -1,0 +1,48 @@
+{
+    "anchorPoint": {
+        "x": 0.0,
+        "y": 0.0
+    },
+    "color": {
+        "a": 1.0,
+        "b": 0.2015143185853958,
+        "g": 0.2015143185853958,
+        "r": 0.9627907276153564
+    },
+    "flipX": false,
+    "flipY": false,
+    "name": "BaseLimit",
+    "position": {
+        "x": 491.0,
+        "y": 579.0,
+        "z": 0.0
+    },
+    "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "scale": {
+        "x": 300.0,
+        "y": 200.0
+    },
+    "textureLeftTop": {
+        "x": 0.0,
+        "y": 0.0
+    },
+    "texturePath": "./Resources/Textures/In_Game/countBase.png",
+    "textureSize": {
+        "x": 300.0,
+        "y": 200.0
+    },
+    "uvRect": {
+        "leftTop": {
+            "x": 0.0,
+            "y": 0.0
+        },
+        "size": {
+            "x": 300.0,
+            "y": 200.0
+        }
+    }
+}

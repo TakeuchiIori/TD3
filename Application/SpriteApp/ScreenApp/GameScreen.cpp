@@ -19,7 +19,7 @@ void GameScreen::Initialize()
 	background_[1] = std::make_unique<UIBase>("GameScreen_2");
 	background_[1]->Initialize("Resources/JSON/UI/GameScreen_2.json");
 
-	
+
 	///////////////////////////////////////////////////////////////////////////
 	// 
 	// UIの初期化
@@ -49,6 +49,14 @@ void GameScreen::Initialize()
 
 	//grass_[0]->SetCamera(camera_);
 	//grass_[1]->SetCamera(camera_);
+
+
+	baseLimit_ = std::make_unique<UIBase>("BaseLimit");
+	baseLimit_->Initialize("Resources/JSON/UI/BaseLimit.json");
+
+	// GameScreen::Initialize 内
+
+
 
 }
 
@@ -98,6 +106,8 @@ void GameScreen::Update()
 	}
 
 
+	baseLimit_->Update();
+
 
 }
 
@@ -129,6 +139,8 @@ void GameScreen::Draw()
 		grass_[i]->Draw();
 	}
 
+
+	baseLimit_->Draw();
 
 }
 
