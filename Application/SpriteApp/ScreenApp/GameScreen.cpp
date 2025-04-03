@@ -42,27 +42,24 @@ void GameScreen::Initialize()
 	option_[5] = std::make_unique<UIBase>("Controller_5");
 	option_[5]->Initialize("Resources/JSON/UI/Controller_5.json");
 
+	///////////////////////////////////////////////////////////////////////////
+	// 
+	// 草の初期化
+	// 
+	///////////////////////////////////////////////////////////////////////////
 	grass_[0] = std::make_unique<UIBase>("Grass_0");
 	grass_[0]->Initialize("Resources/JSON/UI/Grass_0.json");
 	grass_[1] = std::make_unique<UIBase>("Grass_1");
 	grass_[1]->Initialize("Resources/JSON/UI/Grass_1.json");
 
-	//grass_[0]->SetCamera(camera_);
-	//grass_[1]->SetCamera(camera_);
-
+	///////////////////////////////////////////////////////////////////////////
+	// 
+	// 制限時間の初期化
+	// 
+	///////////////////////////////////////////////////////////////////////////
 
 	baseLimit_ = std::make_unique<UIBase>("BaseLimit");
 	baseLimit_->Initialize("Resources/JSON/UI/BaseLimit.json");
-
-	// GameScreen::Initialize 内
-
-// 数字スプライトの初期化
-	for (int i = 0; i < 10; ++i) {
-		numberSprites_[i] = std::make_unique<Sprite>();
-		numberSprites_[i]->Initialize("Resources/Textures/Each_Number/" + std::to_string(i) + ".png");
-		numberSprites_[i]->SetAnchorPoint({ 0.5f, 0.5f });
-		//numberSprites_[i]->SetSize({ 30.0f, 40.0f });
-	}
 	for (int i = 0; i < 10; ++i) {
 		digitTexturePaths_[i] = "Resources/Textures/Each_Number/" + std::to_string(i) + ".png";
 	}
@@ -79,6 +76,10 @@ void GameScreen::Initialize()
 		timeSprites_[i]->SetAnchorPoint({ 0.5f, 0.5f });
 		timeSprites_[i]->SetSize({ 60.0f, 80.0f });
 	}
+
+
+
+
 }
 
 void GameScreen::Update()
@@ -126,39 +127,13 @@ void GameScreen::Update()
 		grass_[i]->Update();
 	}
 
-
+	///////////////////////////////////////////////////////////////////////////
+	// 
+	// 制限時間の更新処理
+	// 
+	///////////////////////////////////////////////////////////////////////////
 	baseLimit_->Update();
-
-	// 時間をfloatで取得（例：9.83）
-	float time = player_->GetTimeLimit();
-	if (time > 10.0f) time = 10.0f;  // 最大10秒
-
-	int seconds = static_cast<int>(time);          // 整数部（9）
-	int fraction = static_cast<int>(time * 100) % 100; // 小数部2桁（83）
-
-	// 桁ごとに数字を分解
-	int secTens = seconds / 10;
-	int secOnes = seconds % 10;
-	int fracTens = fraction / 10;
-	int fracOnes = fraction % 10;
-
-	// テクスチャを変更
-	timeSprites_[0]->ChangeTexture(digitTexturePaths_[secTens]);
-	timeSprites_[1]->ChangeTexture(digitTexturePaths_[secOnes]);
-	timeSprites_[2]->ChangeTexture(colonTexturePath_);
-	timeSprites_[3]->ChangeTexture(digitTexturePaths_[fracTens]);
-	timeSprites_[4]->ChangeTexture(digitTexturePaths_[fracOnes]);
-
-	// 配置と更新（中央寄せしたい場合は位置調整OK）
-	Vector2 basePos = { 560.0f, 680.0f };
-	float spacing = 40.0f;
-	for (int i = 0; i < 5; ++i) {
-		timeSprites_[i]->SetPosition({ basePos.x + spacing * i, basePos.y, 0.0f });
-		timeSprites_[i]->Update();
-	}
-
-
-
+	UpdateLimit();
 
 
 }
@@ -199,6 +174,38 @@ void GameScreen::Draw()
 	}
 
 
+
+}
+
+void GameScreen::UpdateLimit()
+{
+	// 時間をfloatで取得（例：9.83）
+	float time = player_->GetTimeLimit();
+	if (time > 10.0f) time = 10.0f;  // 最大10秒
+
+	int seconds = static_cast<int>(time);          // 整数部（9）
+	int fraction = static_cast<int>(time * 100) % 100; // 小数部2桁（83）
+
+	// 桁ごとに数字を分解
+	int secTens = seconds / 10;
+	int secOnes = seconds % 10;
+	int fracTens = fraction / 10;
+	int fracOnes = fraction % 10;
+
+	// テクスチャを変更
+	timeSprites_[0]->ChangeTexture(digitTexturePaths_[secTens]);
+	timeSprites_[1]->ChangeTexture(digitTexturePaths_[secOnes]);
+	timeSprites_[2]->ChangeTexture(colonTexturePath_);
+	timeSprites_[3]->ChangeTexture(digitTexturePaths_[fracTens]);
+	timeSprites_[4]->ChangeTexture(digitTexturePaths_[fracOnes]);
+
+	// 配置と更新
+	Vector2 basePos = { 560.0f, 680.0f };
+	float spacing = 40.0f;
+	for (int i = 0; i < 5; ++i) {
+		timeSprites_[i]->SetPosition({ basePos.x + spacing * i, basePos.y, 0.0f });
+		timeSprites_[i]->Update();
+	}
 
 }
 

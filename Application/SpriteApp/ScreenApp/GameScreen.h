@@ -26,10 +26,9 @@ public:
 	
 
 	/// <summary>
-	/// ゲージ比率を指定して上から下に減る表示を行う
+	/// 制限時間の更新
 	/// </summary>
-	//void SetVerticalGaugeRatio(float ratio);
-
+	void UpdateLimit();
 
 public:
 
@@ -54,18 +53,11 @@ private:
 
 	std::unique_ptr<UIBase> baseLimit_;
 
-	// 数字スプライト (0~9)
-	std::array<std::unique_ptr<Sprite>, 10> numberSprites_;
 
-	// コロンスプライト
+	// 制限時間関連
 	std::unique_ptr<Sprite> colonSprite_;
-
-	// 表示専用のスプライト（5文字 = MM:SS）
 	std::array<std::unique_ptr<Sprite>, 5> timeSprites_;
-
 	std::array<std::string, 10> digitTexturePaths_;
-
-	// コロン用テクスチャパス
 	std::string colonTexturePath_ = "Resources/Textures/Each_Number/a.png";
 
 };
