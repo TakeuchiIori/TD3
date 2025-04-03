@@ -54,5 +54,6 @@ private:
 
 	std::unique_ptr<UIBase> baseLimit_;
 
+	std::array<UIBase*, 4> limitNum_;
 };
 
