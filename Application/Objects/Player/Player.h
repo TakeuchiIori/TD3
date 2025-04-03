@@ -204,7 +204,7 @@ public: // getter&setter
 	int32_t GetMaxHP() { return kMaxHP_; }	// 最大HPの取得
 	int32_t GetHP() { return HP_; }			// 現在のHPの取得
 
-	bool CanSpitting() { return canSpitting_; }
+	bool CanSpitting() { return canSpitting_; }// 唾を吐けるか
 
 private:
 	Input* input_ = nullptr;

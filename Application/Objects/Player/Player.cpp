@@ -198,7 +198,7 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 				canSpitting_ = true;
 				if (input_->TriggerKey(DIK_Q))
 				{
-					// 草を吐く
+					// 唾を吐く
 				}
 			}
 		}
