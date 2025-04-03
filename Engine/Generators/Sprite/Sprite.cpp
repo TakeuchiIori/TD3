@@ -219,6 +219,19 @@ void Sprite::TransformResource()
 	transformationMatrixData_->World = MakeIdentity4x4();
 }
 
+void Sprite::SetUVRectRatio(const Vector2& leftTopRatio, const Vector2& sizeRatio)
+{
+	const auto& metadata = TextureManager::GetInstance()->GetMetaData(filePath_);
+	textureLeftTop_ = {
+		leftTopRatio.x * metadata.width,
+		leftTopRatio.y * metadata.height
+	};
+	textureSize_ = {
+		sizeRatio.x * metadata.width,
+		sizeRatio.y * metadata.height
+	};
+}
+
 /// <summary>
 /// アンカーポイントを変更しつつ、見た目の位置を維持する
 /// </summary>

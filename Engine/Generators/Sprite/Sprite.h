@@ -171,6 +171,8 @@ public: // アクセッサ
 		textureSize_ = size;
 	}
 
+	void SetUVRectRatio(const Vector2& leftTopRatio, const Vector2& sizeRatio);
+
 	/// <summary>
 /// アンカーポイントを変更しつつ、見た目の位置を維持する
 /// </summary>

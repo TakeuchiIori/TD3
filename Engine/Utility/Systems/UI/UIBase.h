@@ -193,6 +193,7 @@ public:
     /// </summary>
     void SetAnchorPointFixPosition(const Vector2& newAnchor);
 
+    void SetUVRectRatio(const Vector2& leftTopRatio, const Vector2& sizeRatio);
 
 
 protected:

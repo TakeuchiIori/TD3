@@ -680,6 +680,12 @@ void UIBase::SetAnchorPointFixPosition(const Vector2& newAnchor) {
     sprite_->SetPosition(pos);
 }
 
+void UIBase::SetUVRectRatio(const Vector2& leftTopRatio, const Vector2& sizeRatio)
+{
+    if(sprite_)
+		sprite_->SetUVRectRatio(leftTopRatio, sizeRatio);
+}
+
 nlohmann::json UIBase::CreateJSONFromCurrentState() {
     nlohmann::json data;
 
