@@ -201,8 +201,10 @@ public: // getter&setter
 
 	float GetTimeLimit() { return extendTimer_; }
 
-	int32_t GetMaxHP() { return kMaxHP_; }
-	int32_t GetHP() { return HP_; }
+	int32_t GetMaxHP() { return kMaxHP_; }	// 最大HPの取得
+	int32_t GetHP() { return HP_; }			// 現在のHPの取得
+
+	bool CanSpitting() { return canSpitting_; }
 
 private:
 	Input* input_ = nullptr;
@@ -258,6 +260,8 @@ private:
 	float kCreateGrassTime_ = 3.0f;		// 草が詰まるまでの時間
 	float createGrassTimer_ = 0.0f;
 	bool isCreateGrass_ = false;
+
+	bool canSpitting_ = false;			// 唾を吐けるか
 
 
 	const float deltaTime_ = 1.0f / 60.0f; // 仮対応

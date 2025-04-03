@@ -191,11 +191,29 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 				TakeDamage();
 			}
 		}
+		if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+		{
+			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrowthArea)) // 草の成長エリア
+			{
+				canSpitting_ = true;
+				if (input_->TriggerKey(DIK_Q))
+				{
+					// 草を吐く
+				}
+			}
+		}
 	}
 }
 
 void Player::OnExitCollision(BaseCollider* self, BaseCollider* other)
 {
+	if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+	{
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrowthArea)) // 草の成長エリア
+		{
+			canSpitting_ = false;
+		}
+	}
 }
 
 void Player::UpdateMatrices()

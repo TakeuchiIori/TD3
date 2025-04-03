@@ -31,6 +31,11 @@ void Grass::Initialize(Camera* camera)
 	worldTransform_.translation_ = { 8.0f,5.0f,6.0f };
 	worldTransform_.UpdateMatrix();
 
+	growthAreaWT_.Initialize();
+	growthAreaWT_.scale_ = { 2.0f,2.0f,2.0f };
+	growthAreaWT_.translation_ = worldTransform_.translation_;
+	growthAreaWT_.UpdateMatrix();
+
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
@@ -43,12 +48,17 @@ void Grass::Initialize(Camera* camera)
 
 void Grass::InitCollision()
 {
-	// OBB
 	aabbCollider_ = ColliderFactory::Create<AABBCollider>(
 		this,
 		&worldTransform_,
 		camera_,
 		static_cast<uint32_t>(CollisionTypeIdDef::kGrass)
+	);
+	aabbGrowthCollider_ = ColliderFactory::Create<AABBCollider>(
+		this,
+		&growthAreaWT_,
+		camera_,
+		static_cast<uint32_t>(CollisionTypeIdDef::kGrowthArea)
 	);
 }
 
@@ -66,7 +76,10 @@ void Grass::Update()
 	BehaviorUpdate();
 
 	worldTransform_.UpdateMatrix();
+	growthAreaWT_.translation_ = worldTransform_.translation_;
+	growthAreaWT_.UpdateMatrix();
 	aabbCollider_->Update();
+	aabbGrowthCollider_->Update();
 
 
 #ifdef _DEBUG
@@ -82,11 +95,12 @@ void Grass::Draw()
 void Grass::DrawCollision()
 {
 	aabbCollider_->Draw();
+	aabbGrowthCollider_->Draw();
 }
 
 void Grass::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
-	if(aabbCollider_->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrass))
+	if(self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrass))
 	{
 		if (player_->behavior_ != BehaviorPlayer::Return)
 		{
@@ -95,6 +109,7 @@ void Grass::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 				worldTransform_.scale_ = { 0.0f,0.0f,0.0f };
 				aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
 				enter++;
+				behaviortRquest_ = BehaviorGrass::Eaten;
 			}
 		}
 	}
@@ -102,20 +117,29 @@ void Grass::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 
 void Grass::OnCollision(BaseCollider* self, BaseCollider* other)
 {
+	if(!isLarge_)
+	{
+		if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrowthArea))
+		{
+			if (behavior_ != BehaviorGrass::Eaten)
+			{
+				if (player_->behavior_ != BehaviorPlayer::Return)
+				{
+					if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
+					{
+						if (input_->TriggerKey(DIK_Q))
+						{
+							behaviortRquest_ = BehaviorGrass::Growth;
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 void Grass::OnExitCollision(BaseCollider* self, BaseCollider* other)
 {
-	//if (player_->behavior_ == BehaviorPlayer::Return)
-	//{
-	//	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
-	//	{
-	//		if (!isMadeByPlayer_)
-	//		{
-	//			behaviortRquest_ = BehaviorGrass::Repop;
-	//		}
-	//	}
-	//}
 }
 
 
@@ -145,6 +169,9 @@ void Grass::BehaviorInitialize()
 		default:
 			BehaviorRootInit();
 			break;
+		case BehaviorGrass::Eaten:
+			BehaviorEatenInit();
+			break;
 		case BehaviorGrass::Growth:
 			BehaviorGrowthInit();
 			break;
@@ -168,6 +195,9 @@ void Grass::BehaviorUpdate()
 	default:
 		BehaviorRootUpdate();
 		break;
+	case BehaviorGrass::Eaten:
+		BehaviorEatenUpdate();
+		break;
 	case BehaviorGrass::Growth:
 		BehaviorGrowthUpdate();
 		break;
@@ -189,24 +219,36 @@ void Grass::BehaviorRootUpdate()
 {
 }
 
+void Grass::BehaviorEatenInit()
+{
+}
+
+void Grass::BehaviorEatenUpdate()
+{
+}
+
 void Grass::BehaviorGrowthInit()
 {
+	growthWait_ = true;
 	growthTimer_ = kGrowthTime_;
 }
 
 void Grass::BehaviorGrowthUpdate()
 {
-	if (0 < growthTimer_)
+	if(!growthWait_)
 	{
-		growthTimer_ -= deltaTime_;
-		float t = 1.0f - growthTimer_ / kGrowthTime_;
+		if (0 < growthTimer_)
+		{
+			growthTimer_ -= deltaTime_;
+			float t = 1.0f - growthTimer_ / kGrowthTime_;
 
-		worldTransform_.scale_ = Lerp(defaultScale_, growthScale_, t);
-	}
-	else
-	{
-		isLarge_ = true;
-		behaviortRquest_ = BehaviorGrass::Root;
+			worldTransform_.scale_ = Lerp(defaultScale_, growthScale_, t);
+		}
+		else
+		{
+			isLarge_ = true;
+			behaviortRquest_ = BehaviorGrass::Root;
+		}
 	}
 }
 
