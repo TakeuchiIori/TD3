@@ -5,16 +5,16 @@
     },
     "color": {
         "a": 1.0,
-        "b": 0.2015143185853958,
-        "g": 0.2015143185853958,
-        "r": 0.9627907276153564
+        "b": 1.0,
+        "g": 1.0,
+        "r": 1.0
     },
     "flipX": false,
     "flipY": false,
-    "name": "BaseLimit",
+    "name": "Number_8",
     "position": {
-        "x": 488.0,
-        "y": 579.0,
+        "x": 0.0,
+        "y": 0.0,
         "z": 0.0
     },
     "rotation": {
@@ -23,17 +23,17 @@
         "z": 0.0
     },
     "scale": {
-        "x": 308.0,
-        "y": 210.0
+        "x": 16.0,
+        "y": 16.0
     },
     "textureLeftTop": {
         "x": 0.0,
         "y": 0.0
     },
-    "texturePath": "./Resources/Textures/In_Game/countBase.png",
+    "texturePath": "./Resources/images/white.png",
     "textureSize": {
-        "x": 300.0,
-        "y": 200.0
+        "x": 16.0,
+        "y": 16.0
     },
     "uvRect": {
         "leftTop": {
@@ -41,8 +41,8 @@
             "y": 0.0
         },
         "size": {
-            "x": 300.0,
-            "y": 200.0
+            "x": 16.0,
+            "y": 16.0
         }
     }
 }
