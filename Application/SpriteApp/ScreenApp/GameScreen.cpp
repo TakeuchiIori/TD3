@@ -117,41 +117,29 @@ void GameScreen::Update()
 		Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
 		playerPos = Transform(playerPos, matViewProjectionViewport);
 		playerPos += offset_;
-
-		// grass[0] = 背景草、常にフル表示
 		grass_[0]->SetPosition(playerPos);
+		grass_[1]->SetPosition(playerPos + offsetGrass_);
 
-		// grass[1] = 草ゲージの草、ゲージに応じて描画範囲調整
 		if (i == 1) {
 			float gauge = static_cast<float>(player_->GetGrassGauge());
 			float maxGauge = static_cast<float>(player_->GetMaxGrassGauge());
 			float ratio = std::clamp(gauge / maxGauge, 0.0f, 1.0f);  // 安全のためクランプ
 
-			// ベースサイズ（草画像のフルサイズ）
-			Vector2 baseSize = { 64.0f, 64.0f }; // ※ここは草画像の本来のサイズに合わせて調整
+			// 草を上半分だけ表示したい場合は、UVのYサイズを調整
+			// 画像の下からratio分を表示する（縦に満ちる）
+			Vector2 uvLeftTop = { 0.0f, 1.0f - ratio };      // 下から描画開始
+			Vector2 uvSize = { 1.0f, ratio };                // 描画する高さ
 
-			// サイズを比率に応じて縮める（縦方向のみ）
-			Vector2 displaySize = baseSize;
-			displaySize.y *= ratio;
-			grass_[1]->SetScale(displaySize);
-
-			// UV設定（下から伸びるように）
-			Vector2 uvLeftTop = { 0.0f, 1.0f - ratio };
-			Vector2 uvSize = { 1.0f, ratio };
 			grass_[1]->SetUVRectRatio(uvLeftTop, uvSize);
-
-			// Anchorを下端に合わせる
-			grass_[1]->SetAnchorPoint({ 0.5f, 1.0f });
-
-			// 表示位置（rootに合わせて配置）
-			Vector3 gaugePos = playerPos + offsetGrass_;
-			grass_[1]->SetPosition(gaugePos);
+			//grass_[i]->Update();
 		}
 
-		// 更新
-		grass_[i]->Update();
-	}
 
+
+
+		grass_[i]->Update();
+
+	}
 
 	///////////////////////////////////////////////////////////////////////////
 	// 
