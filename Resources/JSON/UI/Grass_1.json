@@ -13,8 +13,8 @@
     "flipY": false,
     "name": "Grass_1",
     "position": {
-        "x": 431.7666015625,
-        "y": 605.8411865234375,
+        "x": 713.2550048828125,
+        "y": 605.841064453125,
         "z": 0.999790608882904
     },
     "rotation": {
@@ -23,8 +23,8 @@
         "z": 0.0
     },
     "scale": {
-        "x": 50.0,
-        "y": 50.0
+        "x": 39.0,
+        "y": 44.5
     },
     "textureLeftTop": {
         "x": 0.0,
@@ -33,7 +33,7 @@
     "texturePath": "./Resources/Textures/In_Game/grassGauge_fill.png",
     "textureSize": {
         "x": 200.0,
-        "y": 200.0
+        "y": 196.0
     },
     "uvRect": {
         "leftTop": {
@@ -42,7 +42,7 @@
         },
         "size": {
             "x": 200.0,
-            "y": 200.0
+            "y": 196.0
         }
     }
 }

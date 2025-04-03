@@ -105,61 +105,32 @@ private: // メンバ関数
 
 public: // アクセッサ
 
-	/*===============================================//
-						  座標
-	//===============================================*/
 	const Vector3& GetPosition()const { return position_; }
 	void SetPosition(const Vector3& position) { position_ = position; }
 
-	/*===============================================//
-						  回転
-	//===============================================*/
 	Vector3 GetRotation()const { return rotation_; }
 	void SetRotation(Vector3 rotation) { rotation_ = rotation; }
 
-	/*===============================================//
-						  拡縮
-	//===============================================*/
 	const Vector2& GetSize() { return size_; }
 	void SetSize(const Vector2& size) { size_ = size; }
 
-	/*===============================================//
-					　	 色を変更
-	//===============================================*/
 	const Vector4& GetColor()const { return materialData_->color; }
 	void SetColor(const Vector4& color) { materialData_->color = color; }
-
-	/*===============================================//
-				　		アルファ値の変更
-	//===============================================*/
-
 	void SetAlpha(const float& alpha) { materialData_->color.w = alpha; }
 
-	/*===============================================//
-					　アンカーポイント
-	//===============================================*/
-	// getter
+
 	const Vector2& GetAnchorPoint()const { return anchorPoint_; }
-	// setter
 	void SetAnchorPoint(const Vector2& anchorPoint) { this->anchorPoint_ = anchorPoint; }
 
-	/*===============================================//
-					　    フリップ
-	//===============================================*/
-	// getter
+
 	const bool& GetIsFlipX()const { return isFlipX_; }
 	const bool& GetIsFlipY()const { return isFlipY_; }
-	// setter
 	void SetIsFlipX(const bool& isFlipX) { this->isFlipX_ = isFlipX; }
 	void SetIsFlipY(const bool& isFlipY) { this->isFlipY_ = isFlipY; }
 
-	/*===============================================//
-					　テクスチャ範囲指定
-	//===============================================*/
-	// getter
+
 	const Vector2& GetTextureLeftTop() const { return textureLeftTop_; }
 	const Vector2& GetTextureSize() const { return textureSize_; }
-	// setter
 	void SetTextureLeftTop(const Vector2& textureLeftTop) { this->textureLeftTop_ = textureLeftTop; }
 	void SetTextureSize(const Vector2& textureSize) { this->textureSize_ = textureSize; }
 
@@ -171,13 +142,11 @@ public: // アクセッサ
 		textureSize_ = size;
 	}
 
-	void SetUVRectRatio(const Vector2& leftTopRatio, const Vector2& sizeRatio);
-
 	/// <summary>
-/// アンカーポイントを変更しつつ、見た目の位置を維持する
-/// </summary>
+	/// アンカーポイントを変更しつつ、見た目の位置を維持する
+	/// </summary>
 	void SetAnchorPointFixPosition(const Vector2& newAnchor);
-
+	void SetUVRectRatio(const Vector2& leftTopRatio, const Vector2& sizeRatio);
 
 	/// <summary>
 	/// UV矩形を取得（左上 + サイズ）
@@ -186,11 +155,8 @@ public: // アクセッサ
 		return { textureLeftTop_, textureSize_ };
 	}
 
-	// SrvManagerのセッター
 	void SetSrvManager(SrvManager* srvManager) { this->srvManagaer_ = srvManager; }
-
 	void SetCamera(Camera* camera) { this->camera_ = camera; }
-
 	void SetTextureFilePath(const std::string& filePath) { this->filePath_ = filePath; }
 	std::string GetTextureFilePath() { return filePath_; }
 
@@ -199,23 +165,16 @@ private: // メンバ変数
 	SpriteCommon* spriteCommon_ = nullptr;
 	SrvManager* srvManagaer_;
 	Camera* camera_;
-	/*===============================================//
-						Resouurces
-	//===============================================*/
 
-	// 頂点
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 
-	// インデックス
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
 
-	// マテリアル
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	Material* materialData_ = nullptr;
 
-	// 座標変換
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
 	TransformationMatrix* transformationMatrixData_ = nullptr;
 
@@ -232,7 +191,7 @@ private: // メンバ変数
 
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
-	// テクスチャ番号
+
 	uint32_t textureIndex_ = 0;
 	std::string filePath_;
 
@@ -246,7 +205,6 @@ private: // メンバ変数
 	Vector3 rotation_ = { 0.0f,0.0f,0.0f };
 	Vector2 size_ = { 100.0f,100.0f };
 	const float numVertices_ = 6.0f;
-
 	// アンカーポイント
 	Vector2 anchorPoint_ = { 0.0f,0.0f };
 
