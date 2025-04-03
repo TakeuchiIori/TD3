@@ -239,14 +239,14 @@ private:
 
 
 	// ゲージ
-	int32_t MaxGrass_ = 2;
+	int32_t MaxGrass_ = 4;				// 暫定対応
 	int32_t grassGauge_ = 0;
 
 	// 時間制限 : 単位(sec)
 	float kTimeLimit_ = 10.0f;			// タイマーの限界値
 	float extendTimer_ = 0;				// 伸びられる残り時間
-	float grassTime_ = 3.0f;			// 草を食べて追加される時間
-	float largeGrassTime_ = 6.0f;		// 大きい草
+	float grassTime_ = 3.0f / 2.0f;			// 草を食べて追加される時間
+	float largeGrassTime_ = 6.0f / 2.0f;		// 大きい草
 
 	float kBoostTime_ = 1.5f;			// ブーストの最大効果時間
 	float boostTimer_ = 0;				// 現在のブーストの残り時間
