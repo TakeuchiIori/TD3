@@ -176,8 +176,8 @@ private:
 
     =================================================================*/
     Vector3 weaponPos;
-    std::unique_ptr<Sprite> sprite_;
-    std::vector<std::unique_ptr<Sprite>> sprites;
+    //std::unique_ptr<Sprite> sprite_;
+    //std::vector<std::unique_ptr<Sprite>> sprites;
 	std::unique_ptr<GameScreen> gameScreen_;
 
     /*=================================================================
@@ -213,8 +213,6 @@ private:
     std::unique_ptr<MapChipInfo> mpInfo_;
     bool isClear_ = false;
 
-    std::unique_ptr<UIBase> uiBase_;
-    std::unique_ptr<UIBase> uiSub_;
 
 private:
     /*=================================================================

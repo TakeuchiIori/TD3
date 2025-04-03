@@ -314,6 +314,25 @@ void UIBase::ImGUi() {
             sprite_->SetAnchorPoint(anchor);
             modified = true;
         }
+
+        // UV矩形（左上＋サイズ）
+        if (ImGui::CollapsingHeader("UV矩形", ImGuiTreeNodeFlags_DefaultOpen)) {
+            auto uv = GetUVRect();
+            Vector2 leftTop = uv.first;
+            Vector2 size = uv.second;
+
+            if (ImGui::DragFloat2("UV左上", &leftTop.x, 1.0f)) {
+                SetUVRect(leftTop, size);
+                modified = true;
+            }
+
+            if (ImGui::DragFloat2("UVサイズ", &size.x, 1.0f)) {
+                SetUVRect(leftTop, size);
+                modified = true;
+            }
+        }
+
+
     }
 
     // ホットリロード設定
@@ -600,6 +619,47 @@ Vector2 UIBase::GetAnchorPoint() const {
     return { 0.0f, 0.0f };
 }
 
+void UIBase::SetUVRect(const Vector2& leftTop, const Vector2& size) {
+    if (sprite_) {
+        sprite_->SetUVRect(leftTop, size);
+    }
+}
+
+std::pair<Vector2, Vector2> UIBase::GetUVRect() const {
+    if (sprite_) {
+        return sprite_->GetUVRect();
+    }
+    return { {0.0f, 0.0f}, {1.0f, 1.0f} };
+}
+
+/// <summary>
+/// 上から下に向かってゲージが減っていくようにUVと描画サイズを調整
+/// </summary>
+void UIBase::SetVerticalGaugeRatio(float ratio) {
+    if (!sprite_) return;
+
+    ratio = std::clamp(ratio, 0.0f, 1.0f);
+
+    // 初期値（必要なら保存しておく）
+    Vector2 baseUV = sprite_->GetTextureLeftTop();
+    Vector2 baseSize = sprite_->GetTextureSize();
+    Vector2 drawSize = sprite_->GetSize();
+    Vector3 position = sprite_->GetPosition();
+
+    // 新しいUVとサイズ
+    Vector2 newSize = { baseSize.x, baseSize.y * ratio };
+    Vector2 newLeftTop = { baseUV.x, baseUV.y + (baseSize.y * (1.0f - ratio)) };
+    sprite_->SetUVRect(newLeftTop, newSize);
+
+    Vector2 newDrawSize = { drawSize.x, drawSize.y * ratio };
+    sprite_->SetSize(newDrawSize);
+
+    // 上詰めのために位置を下げる
+    Vector3 newPos = position;
+    newPos.y += (drawSize.y * (1.0f - ratio)) * 0.5f;
+    sprite_->SetPosition(newPos);
+}
+
 nlohmann::json UIBase::CreateJSONFromCurrentState() {
     nlohmann::json data;
 
@@ -662,6 +722,16 @@ nlohmann::json UIBase::CreateJSONFromCurrentState() {
             {"y", sprite_->GetTextureSize().y}
         };
     }
+
+    // UV矩形（leftTop + size）
+    if (sprite_) {
+        auto uv = sprite_->GetUVRect();
+        data["uvRect"] = {
+            {"leftTop", { {"x", uv.first.x}, {"y", uv.first.y} }},
+            {"size",    { {"x", uv.second.x}, {"y", uv.second.y} }}
+        };
+    }
+
 
     return data;
 }
@@ -764,6 +834,17 @@ void UIBase::ApplyJSONToState(const nlohmann::json& data) {
             size.y = data["textureSize"]["y"];
             sprite_->SetTextureSize(size);
         }
+
+        // UV矩形
+        if (data.contains("uvRect")) {
+            Vector2 leftTop, size;
+            leftTop.x = data["uvRect"]["leftTop"]["x"];
+            leftTop.y = data["uvRect"]["leftTop"]["y"];
+            size.x = data["uvRect"]["size"]["x"];
+            size.y = data["uvRect"]["size"]["y"];
+            sprite_->SetUVRect(leftTop, size);
+        }
+
     }
 }
 
