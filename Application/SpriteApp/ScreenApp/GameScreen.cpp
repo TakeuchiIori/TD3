@@ -56,8 +56,10 @@ void GameScreen::Initialize()
 
 	// GameScreen::Initialize 内
 
-
-
+	for (int i = 0; i < 4; i++) {
+		limitNum_[i] = new UIBase("LimitNum_" + std::to_string(i));
+		limitNum_[i]->Initialize("Resources/JSON/UI/LimitNum_" + std::to_string(i) + ".json");
+	}
 }
 
 void GameScreen::Update()
@@ -108,6 +110,10 @@ void GameScreen::Update()
 
 	baseLimit_->Update();
 
+	for (uint32_t i = 0; i < 4; i++)
+	{
+		limitNum_[i]->Update();
+	}
 
 }
 
@@ -141,6 +147,11 @@ void GameScreen::Draw()
 
 
 	baseLimit_->Draw();
+
+	for (uint32_t i = 0; i < 4; i++)
+	{
+		limitNum_[i]->Draw();
+	}
 
 }
 

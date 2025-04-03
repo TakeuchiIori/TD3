@@ -1,0 +1,48 @@
+{
+    "anchorPoint": {
+        "x": 0.0,
+        "y": 0.0
+    },
+    "color": {
+        "a": 1.0,
+        "b": 1.0,
+        "g": 1.0,
+        "r": 1.0
+    },
+    "flipX": false,
+    "flipY": false,
+    "name": "LimitNum_0",
+    "position": {
+        "x": 541.0,
+        "y": 642.0,
+        "z": 0.0
+    },
+    "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "scale": {
+        "x": 65.5,
+        "y": 133.0
+    },
+    "textureLeftTop": {
+        "x": -57.0,
+        "y": -97.0
+    },
+    "texturePath": "./Resources/Textures/Number/number.png",
+    "textureSize": {
+        "x": 68.0,
+        "y": 149.0
+    },
+    "uvRect": {
+        "leftTop": {
+            "x": -57.0,
+            "y": -97.0
+        },
+        "size": {
+            "x": 68.0,
+            "y": 149.0
+        }
+    }
+}
