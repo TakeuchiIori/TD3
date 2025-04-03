@@ -79,6 +79,15 @@ public:
 
     ===================================================================*/
 
+
+    // --- UV変換（スクロール / 拡大縮小 / 回転）用 ---
+
+
+    void SetUVTranslate(const Vector2& uvTranslate) { sprite_->uvTranslate_ = uvTranslate; }
+    void SetUVScale(const Vector2& uvScale) { sprite_->uvScale_ = uvScale; }
+    void SetUVRotate(float uvRotate) { sprite_->uvRotate_ = uvRotate; }
+
+
     /// <summary>
     ///  JSONファイルに現在の設定を保存
     /// </summary>
@@ -192,9 +201,18 @@ public:
     /// アンカーポイントを変更しつつ、見た目の位置を維持する
     /// </summary>
     void SetAnchorPointFixPosition(const Vector2& newAnchor);
-
     void SetUVRectRatio(const Vector2& leftTopRatio, const Vector2& sizeRatio);
 
+
+    /// <summary>
+    /// 上下の頂点カラーを設定（グラデーション）
+    /// </summary>
+        void SetGradientColor(const Vector4& bottom, const Vector4& top) {
+			sprite_->SetGradientColor(bottom, top);
+        }
+        void SetGradientFillRatio(float ratio) {
+			sprite_->SetGradientFillRatio(ratio);
+        }
 
 protected:
     std::unique_ptr<Sprite> sprite_;                     // スプライト本体

@@ -123,19 +123,47 @@ void GameScreen::Update()
 		if (i == 1) {
 			float gauge = static_cast<float>(player_->GetGrassGauge());
 			float maxGauge = static_cast<float>(player_->GetMaxGrassGauge());
-			float ratio = std::clamp(gauge / maxGauge, 0.0f, 1.0f);  // 安全のためクランプ
+			float ratio = std::clamp(gauge / maxGauge, 0.0f, 1.0f);  // 0.0〜1.0
 
-			// 草を上半分だけ表示したい場合は、UVのYサイズを調整
-			// 画像の下からratio分を表示する（縦に満ちる）
-			Vector2 uvLeftTop = { 0.0f, 1.0f - ratio };      // 下から描画開始
-			Vector2 uvSize = { 1.0f, ratio };                // 描画する高さ
+			Vector4 bottomColor{};
+			Vector4 topColor{};
 
-			grass_[1]->SetUVRectRatio(uvLeftTop, uvSize);
-			//grass_[i]->Update();
+			if (ratio < 0.5f) {
+				// 緑 → 黄
+				float t = ratio / 0.5f; // 0〜1に再マッピング
+				bottomColor = { 0.0f, 1.0f, 0.0f, 1.0f }; // 緑
+				topColor = {
+					1.0f * t,             // 赤が増える
+					1.0f,                 // 緑そのまま
+					0.0f, 1.0f
+				}; // 緑→黄
+			} else {
+				// 黄 → 赤
+				float t = (ratio - 0.5f) / 0.5f;
+				bottomColor = { 1.0f, 1.0f, 0.0f, 1.0f }; // 黄
+				topColor = {
+					1.0f,             // 赤
+					1.0f - t,         // 緑が減る
+					0.0f, 1.0f
+				}; // 黄→赤
+			}
+
+			// スプライトに色設定
+		//	grass_[1]->SetGradientColor(bottomColor, topColor);
+		//	grass_[1]->SetGradientFillRatio(ratio); // ← 追加！
+
+			
+			grass_[1]->SetScale({ 1.0f, ratio });
+			// UVスケールとUVトランスレートを設定
+			grass_[1]->SetUVScale({ 1.0f, ratio });
+			grass_[1]->SetUVTranslate({ 0.0f,1.0f - ratio });
+			grass_[1]->SetPosition(playerPos + offsetGrass_);
 		}
 
 
-
+		ImGui::Begin("Grass");
+		ImGui::DragFloat3("offsetGrass_", &offsetGrass_.x, 0.1f);
+		ImGui::End();
 
 		grass_[i]->Update();
 

@@ -24,6 +24,7 @@ public: // 構造体
 		Vector4 position;
 		Vector2 texcoord;
 		Vector3 normal;
+		Vector4 color;
 	};
 
 	// マテリアルデータ
@@ -33,6 +34,11 @@ public: // 構造体
 		float padding[3];
 		Matrix4x4 uvTransform;
 	};
+
+	Vector2 uvTranslate_ = { 0.0f,0.0f };
+	Vector2 uvScale_ = { 1.0f,1.0f };
+	float uvRotate_ = 0.0f;
+
 
 	// 座標変換データ
 	struct TransformationMatrix {
@@ -101,6 +107,9 @@ private: // メンバ関数
 	void TransformResource();
 
 
+	void UpdateUVMatrix();
+
+
 
 
 public: // アクセッサ
@@ -160,6 +169,32 @@ public: // アクセッサ
 	void SetTextureFilePath(const std::string& filePath) { this->filePath_ = filePath; }
 	std::string GetTextureFilePath() { return filePath_; }
 
+	/// <summary>
+	/// 上下の頂点カラーを設定（グラデーション）
+	/// </summary>
+	void SetGradientColor(const Vector4& bottom, const Vector4& top) {
+		bottomColor_ = bottom;
+		topColor_ = top;
+	}
+
+	void SetGradientFillRatio(float ratio) {
+		ratio_ = std::clamp(ratio, 0.0f, 1.0f);
+	}
+	
+	// UVオフセット（移動）
+	const Vector2& GetUVTranslate() const { return uvTranslate_; }
+	void SetUVTranslate(const Vector2& uvTranslate) { uvTranslate_ = uvTranslate; }
+
+	// UVスケール（拡大縮小）
+	const Vector2& GetUVScale() const { return uvScale_; }
+	void SetUVScale(const Vector2& uvScale) { uvScale_ = uvScale; }
+
+	// UV回転
+	float GetUVRotate() const { return uvRotate_; }
+	void SetUVRotate(float uvRotate) { uvRotate_ = uvRotate; }
+
+
+
 private: // メンバ変数
 
 	SpriteCommon* spriteCommon_ = nullptr;
@@ -212,7 +247,11 @@ private: // メンバ変数
 	bool isFlipX_ = false;
 	// 上下フリップ
 	bool isFlipY_ = false;
+
+	Vector4 bottomColor_ = { 1.0f, 1.0f, 1.0f, 1.0f };
+	Vector4 topColor_ = { 0.0f, 0.0f, 0.0f, 1.0f };
 public:
 	EulerTransform transform_;
+	float ratio_ = 1.0f; 
 };
 

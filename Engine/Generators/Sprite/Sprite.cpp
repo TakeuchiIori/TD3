@@ -35,7 +35,10 @@ void Sprite::Update()
 	/// ※アンカーポイントを考慮するため更新内にある
 	CreateVertex();
 
-	transform_.translate = { position_.x,position_.y,position_.z };
+	// UVの更新
+	UpdateUVMatrix();
+
+	transform_.translate = { position_.x,position_.y,0.0f };
 	transform_.rotate = { rotation_.x,rotation_.y,rotation_.z };
 	transform_.scale = { size_.x,size_.y,1.0f };
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
@@ -138,31 +141,25 @@ void Sprite::CreateVertex()
 	vertexData[5].position = { right, bottom, 0.0f, 1.0f };  // 右下
 	vertexData[5].texcoord = { tex_right, tex_bottom };
 
-	vertexData[0].normal = { 0.0f,0.0f,-1.0f };
-	vertexData[1].normal = { 0.0f,0.0f,-1.0f };
-	vertexData[2].normal = { 0.0f,0.0f,-1.0f };
-	vertexData[3].normal = { 0.0f,0.0f,-1.0f };
-	vertexData[4].normal = { 0.0f,0.0f,-1.0f };
-	vertexData[5].normal = { 0.0f,0.0f,-1.0f };
+	for (int i = 0; i < numVertices_; ++i) {
+		vertexData[i].normal = { 0.0f,0.0f,-1.0f };
+	}
 
-	//// 1枚目の三角形
-	//vertexData[0].position = { 0.0f,360.0f,0.0f,1.0f };   //左下
-	//vertexData[0].texcoord = { 0.0f,1.0f };
-	//vertexData[1].position = { 0.0f,0.0f,0.0f,1.0f };     //左上
-	//vertexData[1].texcoord = { 0.0f,0.0f };
-	//vertexData[2].position = { 640.0f,360.0f,0.0f,1.0f }; //右下
-	//vertexData[2].texcoord = { 1.0f,1.0f };
-	////2枚目の三角形
-	//vertexData[3].position = { 640.0f,0.0f,0.0f,1.0f };   //右上
-	//vertexData[3].texcoord = { 1.0f,0.0f };
-	//vertexData[4].position = { 0.0f, 0.0f, 0.0f, 1.0f };  //左上
-	//vertexData[4].texcoord = { 0.0f, 0.0f };
-	//vertexData[5].position = { 640.0f,360.0f,0.0f,1.0f }; //右下
-	//vertexData[5].texcoord = { 1.0f,1.0f };
-	//// 書き込むためのアドレスを取得
-	//vertexData[0].normal = { 0.0f,0.0f,-1.0f };
+	// ゲージ値を受け取って（たとえばクラスに ratio_ を持たせる）
+	// 下 → 完全表示、上 → 徐々に透明 → 非表示
 
-	//vertexResource_->Unmap(0, nullptr);
+	// alpha をゲージに応じて補間
+	float alphaTop = std::clamp(ratio_ * 2.0f, 0.0f, 1.0f);    // 上はゲージが半分以上で出現
+	float alphaBottom = std::clamp((ratio_ - 0.2f) * 2.0f, 0.0f, 1.0f); // 少し早めに出す
+
+	vertexData[0].color = Vector4(bottomColor_.x, bottomColor_.y, bottomColor_.z, alphaBottom); // 左下
+	vertexData[1].color = Vector4(topColor_.x, topColor_.y, topColor_.z, alphaTop);             // 左上
+	vertexData[2].color = Vector4(bottomColor_.x, bottomColor_.y, bottomColor_.z, alphaBottom); // 右下
+	vertexData[3].color = Vector4(topColor_.x, topColor_.y, topColor_.z, alphaTop);             // 右上
+	vertexData[4].color = vertexData[1].color;
+	vertexData[5].color = vertexData[2].color;
+
+
 }
 
 void Sprite::IndexResource()
@@ -201,7 +198,8 @@ void Sprite::MaterialResource()
 	// マテリアルデータの初期化
 	materialData_->color = { 1.0f,1.0f, 1.0f, 1.0f };
 	materialData_->enableLighting = false;
-	materialData_->uvTransform = MakeIdentity4x4();
+	
+
 
 
 	TransformResource();
@@ -217,6 +215,14 @@ void Sprite::TransformResource()
 	// 単位行列を書き込む
 	transformationMatrixData_->WVP = MakeIdentity4x4();
 	transformationMatrixData_->World = MakeIdentity4x4();
+}
+
+void Sprite::UpdateUVMatrix()
+{
+	Vector3 s = { uvScale_.x,uvScale_.y,1.0f };
+	Vector3 r = { 0.0f,0.0f,uvRotate_ };
+	Vector3 t = { uvTranslate_.x,uvTranslate_.y,0.0f };
+	materialData_->uvTransform = MakeAffineMatrix(s, r, t);
 }
 
 void Sprite::SetUVRectRatio(const Vector2& leftTopRatio, const Vector2& sizeRatio)
@@ -280,10 +286,6 @@ void Sprite::ChangeTexture(const std::string textureFilePath)
 	// 新しいテクスチャのインデックスを取得
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
 
-	//filePath_ = textureFilePath;
-	//filePath_ = textureFilePath;
-	// SRVのハンドルを更新
-	//textureSrvHandleGPU = TextureManager::GetInstance()->GetsrvHandleGPU(textureFilePath);
 }
 
 
