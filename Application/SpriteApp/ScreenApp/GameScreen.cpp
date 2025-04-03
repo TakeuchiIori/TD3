@@ -51,7 +51,7 @@ void GameScreen::Initialize()
 	grass_[0]->Initialize("Resources/JSON/UI/Grass_0.json");
 	grass_[1] = std::make_unique<UIBase>("Grass_1");
 	grass_[1]->Initialize("Resources/JSON/UI/Grass_1.json");
-
+	
 	///////////////////////////////////////////////////////////////////////////
 	// 
 	// 制限時間の初期化
@@ -117,14 +117,34 @@ void GameScreen::Update()
 		Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
 		playerPos = Transform(playerPos, matViewProjectionViewport);
 		playerPos += offset_;
-		grass_[i]->SetPosition(playerPos);
+		grass_[0]->SetPosition(playerPos);
+		grass_[1]->SetPosition(playerPos + offsetGrass_);
 
 		if (i == 1) {
-			float ratio = static_cast<float>(player_->GetGrassGauge());
-			grass_[1]->SetVerticalGaugeRatio(ratio);
+			//// 草のテクスチャのサイズ（ピクセル）
+			Vector2 texSize = grass_[1]->GetTextureSize();
+
+			// 草ゲージ（0.0〜1.0）
+			float ratio = std::clamp(player_->GetGrassGauge() / 2.0f, 0.0f, 1.0f);
+
+			// アンカー：左下に補正付きで設定（初期化時に1回でもOK）
+			//grass_[1]->SetAnchorPointFixPosition({ 0.0f, 1.0f });
+
+			// 描画サイズを変更（Y方向だけ変える）
+			Vector2 newSize = { texSize.x, texSize.y * ratio };
+			grass_[1]->SetTextureSize(newSize);
+
+			// UVも下から比率分だけ表示
+			Vector2 uvLeftTop = { 0.0f, texSize.y * (1.0f - ratio) };
+			Vector2 uvSize = { texSize.x, texSize.y * ratio };
+			//grass_[1]->SetUVRect(uvLeftTop, uvSize);
 		}
 
+
+
+
 		grass_[i]->Update();
+
 	}
 
 	///////////////////////////////////////////////////////////////////////////

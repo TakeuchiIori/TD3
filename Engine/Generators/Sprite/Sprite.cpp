@@ -219,6 +219,35 @@ void Sprite::TransformResource()
 	transformationMatrixData_->World = MakeIdentity4x4();
 }
 
+/// <summary>
+/// アンカーポイントを変更しつつ、見た目の位置を維持する
+/// </summary>
+void Sprite::SetAnchorPointFixPosition(const Vector2& newAnchor) {
+	Vector2 oldAnchor = anchorPoint_;
+	Vector2 offset = {
+		(newAnchor.x - oldAnchor.x),
+		(newAnchor.y - oldAnchor.y)
+	};
+
+	// フリップを考慮
+	if (isFlipX_) {
+		offset.x = -offset.x;
+	}
+	if (isFlipY_) {
+		offset.y = -offset.y;
+	}
+
+	offset.x *= size_.x;
+	offset.y *= size_.y;
+
+	position_.x += offset.x;
+	position_.y += offset.y;
+
+	anchorPoint_ = newAnchor;
+}
+
+
+
 void Sprite::AdjustTaxtureSize()
 {
 	// テクスチャメタデータを取得

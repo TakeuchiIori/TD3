@@ -182,6 +182,19 @@ public:
     /// </summary>
     void SetVerticalGaugeRatio(float ratio);
 
+	void SetScale(Vector3 scale) {
+		if (sprite_) {
+			sprite_->transform_.scale = scale;
+		}
+	}
+
+    /// <summary>
+    /// アンカーポイントを変更しつつ、見た目の位置を維持する
+    /// </summary>
+    void SetAnchorPointFixPosition(const Vector2& newAnchor);
+
+
+
 protected:
     std::unique_ptr<Sprite> sprite_;                     // スプライト本体
     std::string configPath_;                             // JSON設定ファイルパス

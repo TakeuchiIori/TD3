@@ -172,6 +172,12 @@ public: // アクセッサ
 	}
 
 	/// <summary>
+/// アンカーポイントを変更しつつ、見た目の位置を維持する
+/// </summary>
+	void SetAnchorPointFixPosition(const Vector2& newAnchor);
+
+
+	/// <summary>
 	/// UV矩形を取得（左上 + サイズ）
 	/// </summary>
 	std::pair<Vector2, Vector2> GetUVRect() const {
@@ -246,7 +252,7 @@ private: // メンバ変数
 	bool isFlipX_ = false;
 	// 上下フリップ
 	bool isFlipY_ = false;
-
+public:
 	EulerTransform transform_;
 };
 
