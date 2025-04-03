@@ -25,7 +25,7 @@ void TitleScene::Initialize()
 
 
     sprite_ = std::make_unique<Sprite>();
-    sprite_->Initialize("Resources/Textures/KoboTitle.png");
+    sprite_->Initialize("Resources/Textures/BackGround/KoboTitle.png");
     sprite_->SetSize(Vector2{ 1280.0f,720.0f });
     sprite_->SetTextureSize(Vector2{ 1280,720 });
 
@@ -51,7 +51,7 @@ void TitleScene::Update()
     //if (sceneManager_->IsTransitioning()) {
     //    return;
     //}
-    if (Input::GetInstance()->PushKey(DIK_SPACE)) {
+    if (Input::GetInstance()->PushKey(DIK_SPACE) || Input::GetInstance()->IsPadPressed(0,GamePadButton::A)) {
         sceneManager_->ChangeScene("Game");
     }
 

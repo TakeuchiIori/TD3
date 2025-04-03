@@ -11,10 +11,10 @@
     },
     "flipX": false,
     "flipY": false,
-    "name": "GameScreen",
+    "name": "KeyBoard_1",
     "position": {
-        "x": 0.0,
-        "y": 0.0,
+        "x": 1150.0,
+        "y": 445.0,
         "z": 0.0
     },
     "rotation": {
@@ -23,16 +23,16 @@
         "z": 0.0
     },
     "scale": {
-        "x": 352.0,
-        "y": 721.5
+        "x": 100.0,
+        "y": 100.0
     },
     "textureLeftTop": {
         "x": 0.0,
         "y": 0.0
     },
-    "texturePath": "./Resources/Textures/BackGround/screen.png",
+    "texturePath": "./Resources/Textures/Option/Ekey.png",
     "textureSize": {
-        "x": 16.0,
-        "y": 16.0
+        "x": 100.0,
+        "y": 100.0
     }
 }

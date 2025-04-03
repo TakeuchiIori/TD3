@@ -25,7 +25,12 @@ public:
 
 private:
 
-	std::unique_ptr<UIBase> background_;
+	std::unique_ptr<UIBase> background_[2];
+	uint32_t numBGs_ = 2;
 
+	std::unique_ptr<UIBase> option_[6];
+	uint32_t numOptions_ = 6;
+	uint32_t keyBoardOption_ = 3;
+	uint32_t controllerOption_ = 4;
 };
 

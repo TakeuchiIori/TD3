@@ -99,14 +99,14 @@ void GameScene::Initialize()
 
 
 	sprite_ = std::make_unique<Sprite>();
-	sprite_->Initialize("Resources/Textures/KoboRB.png");
+	sprite_->Initialize("Resources/Textures/BackGround/KoboRB.png");
 	sprite_->SetSize(Vector2{ 100.0f,500.0f });
 	// sprite_->SetTextureSize(Vector2{ 1280,720 });
 
 	ParticleManager::GetInstance()->SetCamera(sceneCamera_.get());
 
 
-	InitializeOcclusionQuery();
+	//InitializeOcclusionQuery();
 
 	uiBase_ = std::make_unique<UIBase>("UIButton");
 	uiBase_->Initialize("Resources/JSON/UI/Button.json");
@@ -193,8 +193,8 @@ void GameScene::Update()
 	CollisionManager::GetInstance()->Update();
 
 	sprite_->Update();
-	uiBase_->Update();
-	uiSub_->Update();
+	//uiBase_->Update();
+	//uiSub_->Update();
 	gameScreen_->Update();
 
 }
@@ -244,12 +244,12 @@ void GameScene::DrawObject()
 {
 	mpInfo_->Draw();
 	// オクルージョンクエリ開始
-	uint32_t queryIndex = 0;
+	//uint32_t queryIndex = 0;
 
 	// Ground のオクルージョンチェック
-	commandList_->BeginQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
+	//commandList_->BeginQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
 	ground_->Draw();
-	commandList_->EndQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
+	//commandList_->EndQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
 
 	
 
@@ -264,22 +264,22 @@ void GameScene::DrawObject()
 void GameScene::DrawSprite()
 {
 	sprite_->Draw();
-	uiBase_->Draw();
-	uiSub_->Draw();
+	//uiBase_->Draw();
+	//uiSub_->Draw();
 	gameScreen_->Draw();
 }
 
 void GameScene::DrawAnimation()
 {
 	// オクルージョンクエリ開始
-	uint32_t queryIndex = 1;
+	//uint32_t queryIndex = 1;
 
 	// Ground のオクルージョンチェック
-	commandList_->BeginQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
+	//commandList_->BeginQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
 	test_->Draw(sceneCamera_.get(), testWorldTransform_);
-	commandList_->EndQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
+	//commandList_->EndQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
 
-	ResolvedOcclusionQuery();
+	//ResolvedOcclusionQuery();
 
 }
 
@@ -407,11 +407,11 @@ void GameScene::ShowImGui()
 	//particleEmitter_[0]->SetCount(particleCount_);
 
 
-	ImGui::End();
+	//ImGui::End();
 
-	ImGui::Begin("Occlusion Query");
-	ImGui::Text("Occlusion Ground: %lld", occlusionResults_[0]);
-	ImGui::Text("Occlusion AnimationModel: %lld", occlusionResults_[1]);
+	//ImGui::Begin("Occlusion Query");
+	//ImGui::Text("Occlusion Ground: %lld", occlusionResults_[0]);
+	//ImGui::Text("Occlusion AnimationModel: %lld", occlusionResults_[1]);
 	ImGui::End();
 #endif // _DEBUG
 }

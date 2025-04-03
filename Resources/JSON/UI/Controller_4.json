@@ -11,7 +11,7 @@
     },
     "flipX": false,
     "flipY": false,
-    "name": "GameScreen",
+    "name": "Controller_4",
     "position": {
         "x": 0.0,
         "y": 0.0,
@@ -23,14 +23,14 @@
         "z": 0.0
     },
     "scale": {
-        "x": 352.0,
-        "y": 721.5
+        "x": 16.0,
+        "y": 16.0
     },
     "textureLeftTop": {
         "x": 0.0,
         "y": 0.0
     },
-    "texturePath": "./Resources/Textures/BackGround/screen.png",
+    "texturePath": "./Resources/images/white.png",
     "textureSize": {
         "x": 16.0,
         "y": 16.0

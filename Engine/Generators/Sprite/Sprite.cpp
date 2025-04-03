@@ -238,6 +238,8 @@ void Sprite::ChangeTexture(const std::string textureFilePath)
 	// 新しいテクスチャのインデックスを取得
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
 
+	//filePath_ = textureFilePath;
+	//filePath_ = textureFilePath;
 	// SRVのハンドルを更新
 	//textureSrvHandleGPU = TextureManager::GetInstance()->GetsrvHandleGPU(textureFilePath);
 }
