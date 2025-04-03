@@ -25,6 +25,12 @@ public:
 	void Draw();
 	
 
+	/// <summary>
+/// ゲージ比率を指定して上から下に減る表示を行う
+/// </summary>
+	//void SetVerticalGaugeRatio(float ratio);
+
+
 public:
 
 	void SetPlayer(Player* player) { player_ = player; }
@@ -45,5 +51,11 @@ private:
 	std::unique_ptr<UIBase> grass_[2];
 	uint32_t numGrass_ = 2;
 	Vector3 offset_ = Vector3(20.0f, -40.0f, 0.0f);
+
+	//Vector2 originalUVPos = sprite_->GetTextureLeftTop();
+	//Vector2 originalUVSize = sprite_->GetTextureSize();
+	//Vector2 originalDrawSize = sprite_->GetSize();
+	//Vector2 originalPosition = sprite_->GetPosition();
+
 };
 

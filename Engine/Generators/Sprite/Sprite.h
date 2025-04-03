@@ -162,6 +162,22 @@ public: // アクセッサ
 	// setter
 	void SetTextureLeftTop(const Vector2& textureLeftTop) { this->textureLeftTop_ = textureLeftTop; }
 	void SetTextureSize(const Vector2& textureSize) { this->textureSize_ = textureSize; }
+
+	/// <summary>
+	/// UV矩形を設定（左上 + サイズ）
+	/// </summary>
+	void SetUVRect(const Vector2& leftTop, const Vector2& size) {
+		textureLeftTop_ = leftTop;
+		textureSize_ = size;
+	}
+
+	/// <summary>
+	/// UV矩形を取得（左上 + サイズ）
+	/// </summary>
+	std::pair<Vector2, Vector2> GetUVRect() const {
+		return { textureLeftTop_, textureSize_ };
+	}
+
 	// SrvManagerのセッター
 	void SetSrvManager(SrvManager* srvManager) { this->srvManagaer_ = srvManager; }
 

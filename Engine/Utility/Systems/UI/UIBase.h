@@ -166,6 +166,22 @@ public:
     void SetAnchorPoint(const Vector2& anchor);
     Vector2 GetAnchorPoint() const;
 
+    /// <summary>
+    /// UV矩形を設定（左上座標 + サイズ）
+    /// </summary>
+    void SetUVRect(const Vector2& leftTop, const Vector2& size);
+
+    /// <summary>
+    /// UV矩形を取得（左上座標 + サイズ）
+    /// </summary>
+    std::pair<Vector2, Vector2> GetUVRect() const;
+
+
+    /// <summary>
+    /// 上から下に向かってゲージが減っていくようにUVと描画サイズを調整
+    /// </summary>
+    void SetVerticalGaugeRatio(float ratio);
+
 protected:
     std::unique_ptr<Sprite> sprite_;                     // スプライト本体
     std::string configPath_;                             // JSON設定ファイルパス

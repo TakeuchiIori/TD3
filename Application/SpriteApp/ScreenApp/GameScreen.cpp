@@ -83,16 +83,16 @@ void GameScreen::Update()
 	for (UINT32 i = 0; i < numGrass_; i++)
 	{
 		Vector3 playerPos = player_->GetWorldTransform().translation_;
-		
 		Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
-
 		Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
-
 		playerPos = Transform(playerPos, matViewProjectionViewport);
-		
 		playerPos += offset_;
-
 		grass_[i]->SetPosition(playerPos);
+
+		if (i == 1) {
+			float ratio = static_cast<float>(player_->GetGrassGauge());
+			grass_[1]->SetVerticalGaugeRatio(ratio);
+		}
 
 		grass_[i]->Update();
 	}
@@ -131,3 +131,4 @@ void GameScreen::Draw()
 
 
 }
+
