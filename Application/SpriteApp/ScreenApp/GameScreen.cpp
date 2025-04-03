@@ -163,7 +163,7 @@ void GameScreen::Update()
 			// 補正用オフセット計算（比率1.0なら0、0.5なら半分ズレる）
 			float yOffset = baseSize.y * (1.0f - ratio);
 			Vector3 position = playerPos + offsetGrass_;
-			position.y -= yOffset;
+			position.y += yOffset;
 
 			grass_[1]->SetPosition(position);
 			// UV設定（比率に応じて縦方向に縮小 & 下から満ちる）
