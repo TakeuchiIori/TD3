@@ -42,27 +42,24 @@ void GameScreen::Initialize()
 	option_[5] = std::make_unique<UIBase>("Controller_5");
 	option_[5]->Initialize("Resources/JSON/UI/Controller_5.json");
 
+	///////////////////////////////////////////////////////////////////////////
+	// 
+	// 草の初期化
+	// 
+	///////////////////////////////////////////////////////////////////////////
 	grass_[0] = std::make_unique<UIBase>("Grass_0");
 	grass_[0]->Initialize("Resources/JSON/UI/Grass_0.json");
 	grass_[1] = std::make_unique<UIBase>("Grass_1");
 	grass_[1]->Initialize("Resources/JSON/UI/Grass_1.json");
-
-	//grass_[0]->SetCamera(camera_);
-	//grass_[1]->SetCamera(camera_);
-
+	
+	///////////////////////////////////////////////////////////////////////////
+	// 
+	// 制限時間の初期化
+	// 
+	///////////////////////////////////////////////////////////////////////////
 
 	baseLimit_ = std::make_unique<UIBase>("BaseLimit");
 	baseLimit_->Initialize("Resources/JSON/UI/BaseLimit.json");
-
-	// GameScreen::Initialize 内
-
-// 数字スプライトの初期化
-	for (int i = 0; i < 10; ++i) {
-		numberSprites_[i] = std::make_unique<Sprite>();
-		numberSprites_[i]->Initialize("Resources/Textures/Each_Number/" + std::to_string(i) + ".png");
-		numberSprites_[i]->SetAnchorPoint({ 0.5f, 0.5f });
-		//numberSprites_[i]->SetSize({ 30.0f, 40.0f });
-	}
 	for (int i = 0; i < 10; ++i) {
 		digitTexturePaths_[i] = "Resources/Textures/Each_Number/" + std::to_string(i) + ".png";
 	}
@@ -79,6 +76,10 @@ void GameScreen::Initialize()
 		timeSprites_[i]->SetAnchorPoint({ 0.5f, 0.5f });
 		timeSprites_[i]->SetSize({ 60.0f, 80.0f });
 	}
+
+
+
+
 }
 
 void GameScreen::Update()
@@ -116,49 +117,82 @@ void GameScreen::Update()
 		Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
 		playerPos = Transform(playerPos, matViewProjectionViewport);
 		playerPos += offset_;
-		grass_[i]->SetPosition(playerPos);
+		grass_[0]->SetPosition(playerPos);
+		//grass_[1]->SetPosition(playerPos + offsetGrass_);
 
 		if (i == 1) {
-			float ratio = static_cast<float>(player_->GetGrassGauge());
-			grass_[1]->SetVerticalGaugeRatio(ratio);
+			float gauge = static_cast<float>(player_->GetGrassGauge());
+			float maxGauge = static_cast<float>(player_->GetMaxGrassGauge());
+			float ratio = std::clamp(gauge / maxGauge, 0.0f, 100.0f);  // 0.0〜1.0
+
+			Vector4 bottomColor{};
+			Vector4 topColor{};
+
+			if (ratio < 0.5f) {
+				// 緑 → 黄
+				float t = ratio / 0.5f; // 0〜1に再マッピング
+				bottomColor = { 0.0f, 1.0f, 0.0f, 1.0f }; // 緑
+				topColor = {
+					1.0f * t,             // 赤が増える
+					1.0f,                 // 緑そのまま
+					0.0f, 1.0f
+				}; // 緑→黄
+			} else {
+				// 黄 → 赤
+				float t = (ratio - 0.5f) / 0.5f;
+				bottomColor = { 1.0f, 1.0f, 0.0f, 1.0f }; // 黄
+				topColor = {
+					1.0f,             // 赤
+					1.0f - t,         // 緑が減る
+					0.0f, 1.0f
+				}; // 黄→赤
+			}
+
+			// スプライトに色設定
+		//	grass_[1]->SetGradientColor(bottomColor, topColor);
+		//	grass_[1]->SetGradientFillRatio(ratio); // ← 追加！
+
+			
+			//grass_[1]->SetScale({ 1.0f, ratio });
+			// UVスケールとUVトランスレートを設定
+			//grass_[1]->SetUVScale({ 1.0f, ratio });
+			//grass_[1]->SetUVTranslate({ 0.0f,1.0f - ratio });
+
+			Vector2 baseSize = { 51.5f, 50.0f }; // 草画像の本来のサイズ
+
+			// 補正用オフセット計算（比率1.0なら0、0.5なら半分ズレる）
+			float yOffset = baseSize.y * (1.0f - ratio);
+			Vector3 position = playerPos + offsetGrass_;
+			position.y += yOffset;
+
+			grass_[1]->SetPosition(position);
+			// UV設定（比率に応じて縦方向に縮小 & 下から満ちる）
+			grass_[1]->SetUVScale({ 1.0f, ratio });
+			grass_[1]->SetUVTranslate({ 0.0f, 1.0f - ratio });
+
+			// アンカーを下に固定（下から伸びてくるイメージ）
+			//grass_[1]->SetAnchorPoint({ 0.5f, 1.0f });
+
+
+			//grass_[1]->SetScale(baseSize);
 		}
 
+
+		ImGui::Begin("Grass");
+		ImGui::DragFloat3("offsetGrass_", &offsetGrass_.x, 0.1f);
+		ImGui::End();
+
 		grass_[i]->Update();
+
 	}
 
-
+	///////////////////////////////////////////////////////////////////////////
+	// 
+	// 制限時間の更新処理
+	// 
+	///////////////////////////////////////////////////////////////////////////
 	baseLimit_->Update();
-
-	// 時間をfloatで取得（例：9.83）
-	float time = player_->GetTimeLimit();
-	if (time > 10.0f) time = 10.0f;  // 最大10秒
-
-	int seconds = static_cast<int>(time);          // 整数部（9）
-	int fraction = static_cast<int>(time * 100) % 100; // 小数部2桁（83）
-
-	// 桁ごとに数字を分解
-	int secTens = seconds / 10;
-	int secOnes = seconds % 10;
-	int fracTens = fraction / 10;
-	int fracOnes = fraction % 10;
-
-	// テクスチャを変更
-	timeSprites_[0]->ChangeTexture(digitTexturePaths_[secTens]);
-	timeSprites_[1]->ChangeTexture(digitTexturePaths_[secOnes]);
-	timeSprites_[2]->ChangeTexture(colonTexturePath_);
-	timeSprites_[3]->ChangeTexture(digitTexturePaths_[fracTens]);
-	timeSprites_[4]->ChangeTexture(digitTexturePaths_[fracOnes]);
-
-	// 配置と更新（中央寄せしたい場合は位置調整OK）
-	Vector2 basePos = { 560.0f, 680.0f };
-	float spacing = 40.0f;
-	for (int i = 0; i < 5; ++i) {
-		timeSprites_[i]->SetPosition({ basePos.x + spacing * i, basePos.y, 0.0f });
-		timeSprites_[i]->Update();
-	}
-
-
-
+	UpdateLimit();
 
 
 }
@@ -199,6 +233,38 @@ void GameScreen::Draw()
 	}
 
 
+
+}
+
+void GameScreen::UpdateLimit()
+{
+	// 時間をfloatで取得（例：9.83）
+	float time = player_->GetTimeLimit();
+	if (time > 10.0f) time = 10.0f;  // 最大10秒
+
+	int seconds = static_cast<int>(time);          // 整数部（9）
+	int fraction = static_cast<int>(time * 100) % 100; // 小数部2桁（83）
+
+	// 桁ごとに数字を分解
+	int secTens = seconds / 10;
+	int secOnes = seconds % 10;
+	int fracTens = fraction / 10;
+	int fracOnes = fraction % 10;
+
+	// テクスチャを変更
+	timeSprites_[0]->ChangeTexture(digitTexturePaths_[secTens]);
+	timeSprites_[1]->ChangeTexture(digitTexturePaths_[secOnes]);
+	timeSprites_[2]->ChangeTexture(colonTexturePath_);
+	timeSprites_[3]->ChangeTexture(digitTexturePaths_[fracTens]);
+	timeSprites_[4]->ChangeTexture(digitTexturePaths_[fracOnes]);
+
+	// 配置と更新
+	Vector2 basePos = { 560.0f, 680.0f };
+	float spacing = 40.0f;
+	for (int i = 0; i < 5; ++i) {
+		timeSprites_[i]->SetPosition({ basePos.x + spacing * i, basePos.y, 0.0f });
+		timeSprites_[i]->Update();
+	}
 
 }
 

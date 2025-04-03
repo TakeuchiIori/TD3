@@ -311,7 +311,7 @@ void UIBase::ImGUi() {
         // アンカーポイント設定（0.0〜1.0の範囲）
         Vector2 anchor = sprite_->GetAnchorPoint();
         if (ImGui::DragFloat2("アンカーポイント", &anchor.x, 0.01f, 0.0f, 1.0f)) {
-            sprite_->SetAnchorPoint(anchor);
+            sprite_->SetAnchorPointFixPosition(anchor); 
             modified = true;
         }
 
@@ -638,7 +638,7 @@ std::pair<Vector2, Vector2> UIBase::GetUVRect() const {
 void UIBase::SetVerticalGaugeRatio(float ratio) {
     if (!sprite_) return;
 
-    ratio = std::clamp(ratio, 0.0f, 1.0f);
+    ratio = std::clamp(ratio / 2, 0.0f, 1.0f);
 
     // 初期値（必要なら保存しておく）
     Vector2 baseUV = sprite_->GetTextureLeftTop();
@@ -658,6 +658,32 @@ void UIBase::SetVerticalGaugeRatio(float ratio) {
     Vector3 newPos = position;
     newPos.y += (drawSize.y * (1.0f - ratio)) * 0.5f;
     sprite_->SetPosition(newPos);
+}
+
+void UIBase::SetAnchorPointFixPosition(const Vector2& newAnchor) {
+    if (!sprite_) return;
+
+    Vector2 oldAnchor = sprite_->GetAnchorPoint();
+    Vector2 size = sprite_->GetSize();
+
+    // アンカー差分によるオフセット
+    Vector2 offset = {
+        (newAnchor.x - oldAnchor.x) * size.x,
+        (newAnchor.y - oldAnchor.y) * size.y
+    };
+
+    Vector3 pos = sprite_->GetPosition();
+    pos.x += offset.x;
+    pos.y += offset.y;
+
+    sprite_->SetAnchorPoint(newAnchor);
+    sprite_->SetPosition(pos);
+}
+
+void UIBase::SetUVRectRatio(const Vector2& leftTopRatio, const Vector2& sizeRatio)
+{
+    if(sprite_)
+		sprite_->SetUVRectRatio(leftTopRatio, sizeRatio);
 }
 
 nlohmann::json UIBase::CreateJSONFromCurrentState() {
@@ -814,19 +840,13 @@ void UIBase::ApplyJSONToState(const nlohmann::json& data) {
             sprite_->SetTextureLeftTop(leftTop);
         }
 
-        //if (data.contains("textureSize")) {
-        //    Vector2 size;
-        //    size.x = data["textureSize"]["x"];
-        //    size.y = data["textureSize"]["y"];
-        //    //sprite_->SetTextureSize(size);
-        //}
-
         if (data.contains("anchorPoint")) {
             Vector2 anchor;
             anchor.x = data["anchorPoint"]["x"];
             anchor.y = data["anchorPoint"]["y"];
-            sprite_->SetAnchorPoint(anchor);
+            SetAnchorPointFixPosition(anchor);  // UIBase経由で補正付き変更
         }
+
 
         if (data.contains("textureSize")) {
             Vector2 size;
