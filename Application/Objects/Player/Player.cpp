@@ -78,7 +78,7 @@ void Player::Update()
 
 	ExtendBody();
 
-	PopGrass();
+	IsPopGrass();
 
 	TimerManager();
 
@@ -99,6 +99,9 @@ void Player::Draw()
 	for (const auto& body : playerBodys_) {
 		body->Draw();
 	}
+	for (const auto& body : stuckGrassList_) {
+		body->Draw();
+	}
 }
 
 void Player::DrawCollision()
@@ -106,6 +109,9 @@ void Player::DrawCollision()
 	aabbCollider_->Draw();
 	nextAabbCollider_->Draw();
 	for (const auto& body : playerBodys_) {
+		body->DrawCollision();
+	}
+	for (const auto& body : stuckGrassList_) {
 		body->DrawCollision();
 	}
 }
@@ -147,7 +153,7 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 		{
 			if (MaxGrass_ > grassGauge_ && createGrassTimer_ <= 0)
 			{
-				if (dynamic_cast<SphereCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.3f)
+				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.3f)
 				{
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
 				} else
@@ -197,6 +203,9 @@ void Player::UpdateMatrices()
 	worldTransform_.UpdateMatrix();
 	nextWorldTransform_.UpdateMatrix();
 	for (const auto& body : playerBodys_) {
+		body->Update();
+	}
+	for (const auto& body : stuckGrassList_) {
 		body->Update();
 	}
 }
@@ -428,10 +437,15 @@ void Player::TimerManager()
 	}
 }
 
-bool Player::PopGrass()
+bool Player::IsPopGrass()
 {
 	if (0 >= createGrassTimer_ && isCreateGrass_)
 	{
+		std::unique_ptr<StuckGrass> stuck = std::make_unique<StuckGrass>();
+		stuck->Initialize(camera_);
+		stuck->SetPlayer(this);
+		stuck->SetPos(worldTransform_.translation_);
+		stuckGrassList_.push_back(std::move(stuck));
 		isCreateGrass_ = false;
 		return true;
 	}
@@ -644,9 +658,15 @@ void Player::BehaviorReturnUpdate()
 			worldTransform_.translation_ = moveHistory_.back();
 			moveHistory_.pop_back();
 		}
+
+		stuckGrassList_.remove_if([](const std::unique_ptr<StuckGrass>& s)
+			{
+				return s->IsDelete();
+			});
 	}
 	else
 	{
+		stuckGrassList_.clear();
 		behaviortRquest_ = BehaviorPlayer::Root;
 	}
 	nextWorldTransform_.translation_ = worldTransform_.translation_;

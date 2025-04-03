@@ -201,6 +201,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Objects\Player\PlayerBody.cpp" />
     <ClCompile Include="Application\Objects\EnemyManager\SideEnemy.cpp" />
     <ClCompile Include="Application\SystemsApp\Picture\Picture.cpp" />
+    <ClCompile Include="Application\Objects\Player\StuckGrass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -302,6 +303,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="resource.h" />
     <ClInclude Include="Application\Objects\EnemyManager\SideEnemy.h" />
     <ClInclude Include="Application\SystemsApp\Picture\Picture.h" />
+    <ClInclude Include="Application\Objects\Player\StuckGrass.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">

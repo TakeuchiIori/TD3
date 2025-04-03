@@ -13,7 +13,7 @@ int Grass::count_ = 0;
 Grass::~Grass()
 {
 	--count_;
-	sphereCollider_->~SphereCollider();
+	aabbCollider_->~AABBCollider();
 }
 
 void Grass::Initialize(Camera* camera)
@@ -44,7 +44,7 @@ void Grass::Initialize(Camera* camera)
 void Grass::InitCollision()
 {
 	// OBB
-	sphereCollider_ = ColliderFactory::Create<SphereCollider>(
+	aabbCollider_ = ColliderFactory::Create<AABBCollider>(
 		this,
 		&worldTransform_,
 		camera_,
@@ -57,7 +57,7 @@ void Grass::InitJson()
 	jsonManager_ = std::make_unique<JsonManager>("grassObj", "Resources/JSON/");
 
 	jsonCollider_ = std::make_unique<JsonManager>("grassCollider", "Resources/JSON/");
-	sphereCollider_->InitJson(jsonCollider_.get());
+	aabbCollider_->InitJson(jsonCollider_.get());
 }
 
 void Grass::Update()
@@ -66,7 +66,7 @@ void Grass::Update()
 	BehaviorUpdate();
 
 	worldTransform_.UpdateMatrix();
-	sphereCollider_->Update();
+	aabbCollider_->Update();
 
 
 #ifdef _DEBUG
@@ -81,19 +81,20 @@ void Grass::Draw()
 
 void Grass::DrawCollision()
 {
-	sphereCollider_->Draw();
+	aabbCollider_->Draw();
 }
 
 void Grass::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
-	if (player_->behavior_ != BehaviorPlayer::Return)
+	if(aabbCollider_->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrass))
 	{
-		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
+		if (player_->behavior_ != BehaviorPlayer::Return)
 		{
-			worldTransform_.scale_ = { 0.0f,0.0f,0.0f };
-			if (isMadeByPlayer_)
+			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
 			{
-				behaviortRquest_ = BehaviorGrass::Delete;
+				worldTransform_.scale_ = { 0.0f,0.0f,0.0f };
+				aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
+				enter++;
 			}
 		}
 	}
@@ -105,16 +106,16 @@ void Grass::OnCollision(BaseCollider* self, BaseCollider* other)
 
 void Grass::OnExitCollision(BaseCollider* self, BaseCollider* other)
 {
-	if (player_->behavior_ == BehaviorPlayer::Return)
-	{
-		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
-		{
-			if (!isMadeByPlayer_)
-			{
-				behaviortRquest_ = BehaviorGrass::Repop;
-			}
-		}
-	}
+	//if (player_->behavior_ == BehaviorPlayer::Return)
+	//{
+	//	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
+	//	{
+	//		if (!isMadeByPlayer_)
+	//		{
+	//			behaviortRquest_ = BehaviorGrass::Repop;
+	//		}
+	//	}
+	//}
 }
 
 
@@ -124,7 +125,7 @@ void Grass::DebugGrass()
 	float t = 1.0f - (growthTimer_ / kGrowthTime_);
 	ImGui::Begin("DebugGrass");
 	ImGui::DragFloat("t", &t);
-
+	ImGui::Text("%d", enter);
 
 	ImGui::End();
 }
@@ -181,6 +182,7 @@ void Grass::BehaviorUpdate()
 
 void Grass::BehaviorRootInit()
 {
+	aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kGrass));
 }
 
 void Grass::BehaviorRootUpdate()

@@ -145,19 +145,13 @@ void GameScene::Update()
 
 	if (!isDebugCamera_) {
 		player_->Update();
-		grassManager_->hakuGrass(player_->PopGrass(), player_->GetCenterPosition());
+		grassManager_->hakuGrass(player_->IsPopGrass(), player_->GetCenterPosition());
 	}
 	player_->SetFPSMode(cameraMode_ == CameraMode::FPS);
 
-	if (Input::GetInstance()->TriggerKey(DIK_L))
+	if (player_->EndReturn())
 	{
-		if (cameraMode_ == CameraMode::FPS)
-		{
-			cameraMode_ = CameraMode::FOLLOW;
-		} else
-		{
-			cameraMode_ = CameraMode::FPS;
-		}
+		grassManager_->Repop();
 	}
 
 	if (Input::GetInstance()->PushKey(DIK_UP)) {
