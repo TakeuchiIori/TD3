@@ -54,6 +54,19 @@ private:
 
 	std::unique_ptr<UIBase> baseLimit_;
 
-	std::array<UIBase*, 4> limitNum_;
+	// 数字スプライト (0~9)
+	std::array<std::unique_ptr<Sprite>, 10> numberSprites_;
+
+	// コロンスプライト
+	std::unique_ptr<Sprite> colonSprite_;
+
+	// 表示専用のスプライト（5文字 = MM:SS）
+	std::array<std::unique_ptr<Sprite>, 5> timeSprites_;
+
+	std::array<std::string, 10> digitTexturePaths_;
+
+	// コロン用テクスチャパス
+	std::string colonTexturePath_ = "Resources/Textures/Each_Number/a.png";
+
 };
 

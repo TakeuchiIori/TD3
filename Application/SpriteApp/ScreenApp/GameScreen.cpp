@@ -56,9 +56,28 @@ void GameScreen::Initialize()
 
 	// GameScreen::Initialize 内
 
-	for (int i = 0; i < 4; i++) {
-		limitNum_[i] = new UIBase("LimitNum_" + std::to_string(i));
-		limitNum_[i]->Initialize("Resources/JSON/UI/LimitNum_" + std::to_string(i) + ".json");
+// 数字スプライトの初期化
+	for (int i = 0; i < 10; ++i) {
+		numberSprites_[i] = std::make_unique<Sprite>();
+		numberSprites_[i]->Initialize("Resources/Textures/Each_Number/" + std::to_string(i) + ".png");
+		numberSprites_[i]->SetAnchorPoint({ 0.5f, 0.5f });
+		//numberSprites_[i]->SetSize({ 30.0f, 40.0f });
+	}
+	for (int i = 0; i < 10; ++i) {
+		digitTexturePaths_[i] = "Resources/Textures/Each_Number/" + std::to_string(i) + ".png";
+	}
+	// コロンスプライトの初期化
+	colonSprite_ = std::make_unique<Sprite>();
+	colonSprite_->Initialize("Resources/Textures/Each_Number/a.png");  // "a.png" = コロン
+	colonSprite_->SetAnchorPoint({ 0.0f, 0.0f });
+
+	// 表示用スプライト5個分を生成（00:00）
+	for (int i = 0; i < 5; ++i) {
+		timeSprites_[i] = std::make_unique<Sprite>();
+		// 初期は全部0.pngで初期化しておく（あとで切り替え）
+		timeSprites_[i]->Initialize("Resources/Textures/Each_Number/0.png");
+		timeSprites_[i]->SetAnchorPoint({ 0.5f, 0.5f });
+		timeSprites_[i]->SetSize({ 60.0f, 80.0f });
 	}
 }
 
@@ -110,10 +129,37 @@ void GameScreen::Update()
 
 	baseLimit_->Update();
 
-	for (uint32_t i = 0; i < 4; i++)
-	{
-		limitNum_[i]->Update();
+	// 時間をfloatで取得（例：9.83）
+	float time = player_->GetTimeLimit();
+	if (time > 10.0f) time = 10.0f;  // 最大10秒
+
+	int seconds = static_cast<int>(time);          // 整数部（9）
+	int fraction = static_cast<int>(time * 100) % 100; // 小数部2桁（83）
+
+	// 桁ごとに数字を分解
+	int secTens = seconds / 10;
+	int secOnes = seconds % 10;
+	int fracTens = fraction / 10;
+	int fracOnes = fraction % 10;
+
+	// テクスチャを変更
+	timeSprites_[0]->ChangeTexture(digitTexturePaths_[secTens]);
+	timeSprites_[1]->ChangeTexture(digitTexturePaths_[secOnes]);
+	timeSprites_[2]->ChangeTexture(colonTexturePath_);
+	timeSprites_[3]->ChangeTexture(digitTexturePaths_[fracTens]);
+	timeSprites_[4]->ChangeTexture(digitTexturePaths_[fracOnes]);
+
+	// 配置と更新（中央寄せしたい場合は位置調整OK）
+	Vector2 basePos = { 560.0f, 680.0f };
+	float spacing = 40.0f;
+	for (int i = 0; i < 5; ++i) {
+		timeSprites_[i]->SetPosition({ basePos.x + spacing * i, basePos.y, 0.0f });
+		timeSprites_[i]->Update();
 	}
+
+
+
+
 
 }
 
@@ -148,10 +194,11 @@ void GameScreen::Draw()
 
 	baseLimit_->Draw();
 
-	for (uint32_t i = 0; i < 4; i++)
-	{
-		limitNum_[i]->Draw();
+	for (const auto& sprite : timeSprites_) {
+		sprite->Draw();
 	}
+
+
 
 }
 
