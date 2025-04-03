@@ -98,24 +98,14 @@ void GameScene::Initialize()
 	//Audio::GetInstance()->SetVolume(sourceVoice, 0.8f); // 80%の音量に設定
 
 
-	sprite_ = std::make_unique<Sprite>();
-	sprite_->Initialize("Resources/Textures/BackGround/KoboRB.png");
-	sprite_->SetSize(Vector2{ 100.0f,500.0f });
-	// sprite_->SetTextureSize(Vector2{ 1280,720 });
-
 	ParticleManager::GetInstance()->SetCamera(sceneCamera_.get());
 
 
-	//InitializeOcclusionQuery();
-
-	uiBase_ = std::make_unique<UIBase>("UIButton");
-	uiBase_->Initialize("Resources/JSON/UI/Button.json");
-
-	uiSub_ = std::make_unique<UIBase>("UISub");
-	uiSub_->Initialize("Resources/JSON/UI/Sub.json");
-
 	gameScreen_ = std::make_unique<GameScreen>();
+	gameScreen_->SetCamera(sceneCamera_.get());
+	gameScreen_->SetPlayer(player_.get());
 	gameScreen_->Initialize();
+	
 }
 
 /// <summary>
@@ -192,9 +182,6 @@ void GameScene::Update()
 	LightManager::GetInstance()->ShowLightingEditor();
 	CollisionManager::GetInstance()->Update();
 
-	sprite_->Update();
-	//uiBase_->Update();
-	//uiSub_->Update();
 	gameScreen_->Update();
 
 }
@@ -263,9 +250,6 @@ void GameScene::DrawObject()
 
 void GameScene::DrawSprite()
 {
-	sprite_->Draw();
-	//uiBase_->Draw();
-	//uiSub_->Draw();
 	gameScreen_->Draw();
 }
 

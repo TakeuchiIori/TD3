@@ -1,5 +1,11 @@
 #include "GameScreen.h"
 #include "Systems/Input/Input.h"
+#include "./Player/Player.h"
+#include "Systems/Camera/Camera.h"
+#include "../Core/WinApp/WinApp.h"
+// Math 
+#include "MathFunc.h"
+#include "Matrix4x4.h"
 
 void GameScreen::Initialize()
 {
@@ -36,8 +42,13 @@ void GameScreen::Initialize()
 	option_[5] = std::make_unique<UIBase>("Controller_5");
 	option_[5]->Initialize("Resources/JSON/UI/Controller_5.json");
 
+	grass_[0] = std::make_unique<UIBase>("Grass_0");
+	grass_[0]->Initialize("Resources/JSON/UI/Grass_0.json");
+	grass_[1] = std::make_unique<UIBase>("Grass_1");
+	grass_[1]->Initialize("Resources/JSON/UI/Grass_1.json");
 
-
+	//grass_[0]->SetCamera(camera_);
+	//grass_[1]->SetCamera(camera_);
 
 }
 
@@ -63,6 +74,31 @@ void GameScreen::Update()
 	{
 		option_[i]->Update();
 	}
+
+	///////////////////////////////////////////////////////////////////////////
+	// 
+	// 草のUIの更新処理
+	// 
+	///////////////////////////////////////////////////////////////////////////
+	for (UINT32 i = 0; i < numGrass_; i++)
+	{
+		Vector3 playerPos = player_->GetWorldTransform().translation_;
+		
+		Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
+
+		Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
+
+		playerPos = Transform(playerPos, matViewProjectionViewport);
+		
+		playerPos += offset_;
+
+		grass_[i]->SetPosition(playerPos);
+
+		grass_[i]->Update();
+	}
+
+
+
 }
 
 void GameScreen::Draw()
@@ -71,6 +107,7 @@ void GameScreen::Draw()
 	{
 		background_[i]->Draw();
 	}
+
 
 	if (Input::GetInstance()->IsControllerConnected())
 	{
@@ -87,7 +124,10 @@ void GameScreen::Draw()
 		}
 	}
 
-
+	for (uint32_t i = 0; i < numGrass_; i++)
+	{
+		grass_[i]->Draw();
+	}
 
 
 }
