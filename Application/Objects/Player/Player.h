@@ -241,7 +241,7 @@ private:
 
 
 	// ゲージ
-	int32_t MaxGrass_ = 4;				// 暫定対応
+	int32_t MaxGrass_ = 2;				// 暫定対応
 	int32_t grassGauge_ = 0;
 
 	// 時間制限 : 単位(sec)
