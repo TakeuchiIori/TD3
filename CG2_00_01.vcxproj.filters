@@ -202,6 +202,7 @@
     <ClInclude Include="Application\Objects\Player\StuckGrass.h" />
     <ClInclude Include="Application\CheckPoint\CheckPoint.h" />
     <ClInclude Include="Application\Stage\Stage.h" />
+    <ClInclude Include="Engine\Utility\Collision\Core\CollisionDirection.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />
