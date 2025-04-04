@@ -47,33 +47,22 @@ private:
 	/// </summary>
 	void GenerateBlocks();
 
-	/// <summary>
-	/// imgui
-	/// </summary>
-	void ImGui();
 
 public:
 
-	void SetMapChipField(MapChipField* mpField) { mpField_ = std::unique_ptr<MapChipField>(mpField);; }
+	void SetMapChipField(MapChipField* mpField) { mpField_ = mpField; }
 	void SetWorldTransform(std::vector<std::vector<WorldTransform*>> wt) { wt_ = wt; }
-
-	MapChipField* GetMapChipField() { return mpField_.get(); }
+	MapChipField* GetMapChipField() { return mpField_; }
 
 private:
 	/*=======================================================================
-
+	
 								  ポインタなど
 
 	========================================================================*/
 	Camera* camera_ = nullptr;
 	std::vector<std::vector<WorldTransform*>> wt_;
-	std::unique_ptr<MapChipField> mpField_ ;
-	//MapChipCollision* mpCollision_ = nullptr;
-	std::unique_ptr<Object3d> obj_;
-
-	MapChipType selectedType_;
-
-	std::string currentCsvFileName_;
-
+	MapChipField* mpField_ = nullptr;
+	std::vector<std::vector<Object3d*>> objects_;
 };
 
