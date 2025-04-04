@@ -147,7 +147,7 @@ void Player::MapChipOnCollision(const CollisionInfo& info)
 
 void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
-	if (behavior_ != BehaviorPlayer::Return)
+	if (behavior_ != BehaviorPlayer::Return && self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
 	{
 		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrass)) // 草を食べたら
 		{
