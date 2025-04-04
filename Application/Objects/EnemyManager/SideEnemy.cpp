@@ -101,6 +101,10 @@ void SideEnemy::OnExitCollision(BaseCollider* self, BaseCollider* other) {
 
 }
 
+void SideEnemy::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
+{
+}
+
 void SideEnemy::MapChipOnCollision(const CollisionInfo& info) {
 	switch (info.blockType) {
 	case MapChipType::kBlock:

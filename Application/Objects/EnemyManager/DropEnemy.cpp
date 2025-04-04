@@ -100,6 +100,10 @@ void DropEnemy::OnExitCollision(BaseCollider* self, BaseCollider* other) {
 
 
 }
+void DropEnemy::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
+{
+}
+
 void DropEnemy::MapChipOnCollision(const CollisionInfo& info) {
 	switch (info.blockType) {
 	case MapChipType::kBlock:

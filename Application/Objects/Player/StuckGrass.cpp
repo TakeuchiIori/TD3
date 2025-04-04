@@ -83,3 +83,7 @@ void StuckGrass::OnCollision(BaseCollider* self, BaseCollider* other)
 void StuckGrass::OnExitCollision(BaseCollider* self, BaseCollider* other)
 {
 }
+
+void StuckGrass::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
+{
+}
