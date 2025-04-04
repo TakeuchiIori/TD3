@@ -18,6 +18,7 @@
 enum class BehaviorGrass
 {
 	Root,
+	Eaten,
 	Growth,
 	Repop,
 	Delete,
@@ -50,7 +51,17 @@ public:
 
 	void DrawCollision();
 
-	void Repop() { behaviortRquest_ = BehaviorGrass::Repop; }
+	void Repop() 
+	{ 
+		if(behavior_ != BehaviorGrass::Growth)
+		{
+			behaviortRquest_ = BehaviorGrass::Repop;
+		}
+		else
+		{
+			growthWait_ = false;
+		}
+	}
 
 
 public:
@@ -92,6 +103,16 @@ private: // プレイヤーのふるまい
 	/// 通常状態更新
 	/// </summary>
 	void BehaviorRootUpdate();
+
+
+	/// <summary>
+	/// 通常状態初期化
+	/// </summary>
+	void BehaviorEatenInit();
+	/// <summary>
+	/// 通常状態更新
+	/// </summary>
+	void BehaviorEatenUpdate();
 
 
 	/// <summary>
@@ -145,7 +166,10 @@ private:
 
 	//std::shared_ptr<OBBCollider> obbCollider_;
 	std::shared_ptr<AABBCollider> aabbCollider_;
+	std::shared_ptr<AABBCollider> aabbGrowthCollider_;
 	//std::shared_ptr<SphereCollider> sphereCollider_;
+
+	WorldTransform growthAreaWT_;
 
 	std::unique_ptr<JsonManager> jsonManager_;
 	std::unique_ptr<JsonManager> jsonCollider_;
@@ -155,8 +179,9 @@ private:
 	Vector3 defaultScale_ = { 1.0f,1.0f,1.0f };
 	Vector3 growthScale_ = { 1.4f,1.4f,1.4f };
 
-	float kGrowthTime_ = 1.0f;
+	float kGrowthTime_ = 0.5f;
 	float growthTimer_ = 0.0f;
+	bool growthWait_ = false;
 
 	bool isLarge_ = false;
 
