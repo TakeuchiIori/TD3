@@ -219,6 +219,41 @@ void Player::OnExitCollision(BaseCollider* self, BaseCollider* other)
 	}
 }
 
+
+
+////////////////////////////////////////////////////////////
+//
+//
+// 				こんな感じに使うよっていう例置いとく
+//
+// 
+///////////////////////////////////////////////////////////
+void Player::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
+{
+	if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
+	{
+		switch (dir)
+		{
+		case HitDirection::None:
+			break;
+		case HitDirection::Top:
+			break;
+		case HitDirection::Bottom:
+			break;
+		case HitDirection::Left:
+			break;
+		case HitDirection::Right:
+			break;
+		case HitDirection::Front:
+			break;
+		case HitDirection::Back:
+			break;
+		default:
+			break;
+		}
+	}
+}
+
 void Player::UpdateMatrices()
 {
 	worldTransform_.UpdateMatrix();

@@ -14,9 +14,21 @@
 #include "../Sphere/SphereCollider.h"
 #include "../AABB/AABBCollider.h"
 #include "../OBB/OBBCollider.h"
+#include "CollisionDirection.h"
 #include <set>
 
+
+
 namespace Collision {
+
+
+	/////////////////////////////////////////////////////////////////////
+	//
+	// 
+	//							衝突チェック
+	//
+	//
+	/////////////////////////////////////////////////////////////////////
 
 	// Sphere - Sphere
 	bool Check(const SphereCollider* a, const SphereCollider* b);
@@ -42,7 +54,29 @@ namespace Collision {
 	// Base - Base
 	bool Check(BaseCollider* a, BaseCollider* b);
 
+	/////////////////////////////////////////////////////////////////////
+	//
+	// 
+	//						衝突方向のチェック
+	//
+	//
+	/////////////////////////////////////////////////////////////////////
+
+	// AABB - AABB
+	bool CheckHitDirection(const AABB& a, const AABB& b, HitDirection* hitDirection);
+
+	// AABB - OBB
+	bool CheckHitDirection(const AABB& aabb, const OBB& obb, HitDirection* hitDirection);
+
+	// OBB - OBB
+	bool CheckHitDirection(const OBB& obbA, const OBB& obbB, HitDirection* hitDirection);
+
+	HitDirection ConvertVectorToHitDirection(const Vector3& dir);
+
+	HitDirection InverseHitDirection(HitDirection hitdirection);
+
 }
+
 
 class CollisionManager {
 public: // 基本的な関数

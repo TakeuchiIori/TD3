@@ -125,6 +125,10 @@ void PlayerBody::OnExitCollision(BaseCollider* self, BaseCollider* other)
 {
 }
 
+void PlayerBody::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
+{
+}
+
 void PlayerBody::ExtendUpdate()
 {
 	float length = Length(endPos_ - startPos_);

@@ -9,6 +9,7 @@
 #include "Collision/OBB/OBBCollider.h"
 #include "Collision/AABB/AABBCollider.h"
 #include "Collision/Core/ColliderFactory.h"
+#include "Collision/Core/CollisionDirection.h"
 
 class BaseEnemy : public BaseObject
 {
@@ -54,6 +55,7 @@ public:
 	virtual void OnEnterCollision(BaseCollider* self, BaseCollider* other) = 0;
 	virtual void OnCollision(BaseCollider* self, BaseCollider* other) = 0;
 	virtual void OnExitCollision(BaseCollider* self, BaseCollider* other) = 0;
+	virtual void OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir) = 0;
 	virtual void MapChipOnCollision(const CollisionInfo& info) = 0;
 
 

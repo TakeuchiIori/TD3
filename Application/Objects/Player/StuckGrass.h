@@ -5,6 +5,7 @@
 // Engine
 #include "Collision/AABB/AABBCollider.h"
 #include <Collision/Core/BaseCollider.h>
+#include "Collision/Core/CollisionDirection.h"
 #include <MathFunc.h>
 #include <Vector3.h>
 
@@ -54,6 +55,7 @@ public:
 	void OnEnterCollision(BaseCollider* self, BaseCollider* other);
 	void OnCollision(BaseCollider* self, BaseCollider* other);
 	void OnExitCollision(BaseCollider* self, BaseCollider* other);
+	void OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir);
 
 public:
 	void SetPos(const Vector3 pos) { worldTransform_.translation_ = pos; }

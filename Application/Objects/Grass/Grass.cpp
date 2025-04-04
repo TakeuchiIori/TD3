@@ -142,6 +142,10 @@ void Grass::OnExitCollision(BaseCollider* self, BaseCollider* other)
 {
 }
 
+void Grass::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
+{
+}
+
 
 #ifdef _DEBUG
 void Grass::DebugGrass()
