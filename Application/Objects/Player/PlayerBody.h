@@ -6,6 +6,7 @@
 
 // Engine
 #include "Collision/AABB/AABBCollider.h"
+#include "Collision/Core/CollisionDirection.h"
 #include "Loaders/Json/JsonManager.h"
 #include <memory>
 #include <WorldTransform/WorldTransform.h>
@@ -76,7 +77,7 @@ public:
 	void OnEnterCollision(BaseCollider* self, BaseCollider* other);
 	void OnCollision(BaseCollider* self, BaseCollider* other);
 	void OnExitCollision(BaseCollider* self, BaseCollider* other);
-
+	void OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir);
 
 private:
 	void ExtendUpdate();
