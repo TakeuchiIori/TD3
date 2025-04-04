@@ -410,7 +410,7 @@ void CollisionManager::Update()
 
 		// ここで無効化するのは当たり判定だけ！
 		// trueなら判定を取る : falseなら取らない
-		if (!collider->IsCheckOutsideCamera()) {
+		if (collider->IsCheckOutsideCamera()) {
 			collider->SetCollisionEnabled(isVisible);
 		}
 	}
