@@ -117,6 +117,12 @@ public:
 	bool IsCollisionEnabled() const { return isCollisionEnabled_; }
 
 	/// <summary>
+	/// カメラ外の判定
+	/// </summary>
+	/// <returns></returns>
+	bool IsCheckOutsideCamera() const { return checkOutsideCamera; }
+
+	/// <summary>
 	/// 当たり判定そのもの有効フラグ
 	/// </summary>
 	bool GetIsActive() const { return isActive_; }
@@ -139,7 +145,8 @@ protected:
 
 public:
 
-	bool isCollisionEnabled_ = true;		// 当たり判定有効フラグ
+	bool isCollisionEnabled_ = true;		// 当たり判定有効
+	bool checkOutsideCamera = true;			// カメラ外に行ったら判定をしない
 	Camera* camera_ = nullptr;				// カメラ参照（ライン描画用）
 
 private:
