@@ -196,7 +196,7 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrowthArea)) // 草の成長エリア
 			{
 				canSpitting_ = true;
-				if (input_->TriggerKey(DIK_Q))
+				if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
 				{
 					// 唾を吐く
 				}
@@ -302,7 +302,10 @@ void Player::Move()
 		moveDirection_ = TransformNormal(moveDirection_, MakeRotateMatrixY(worldTransform_.rotation_.y));
 	}
 
-	velocity_ += moveDirection_ * speed_;
+	if(beforeDirection_ == moveDirection_)
+	{
+		velocity_ += moveDirection_ * speed_;
+	}
 
 
 	Vector3 newPos = worldTransform_.translation_;
@@ -602,6 +605,7 @@ void Player::BehaviorUpdate()
 void Player::BehaviorRootInit()
 {
 	speed_ = 0;
+	grassGauge_ = 0;
 	playerBodys_.clear();
 	isCollisionBody = false;
 	HP_ = kMaxHP_;
