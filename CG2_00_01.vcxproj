@@ -117,6 +117,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Objects\EnemyManager\EnemyManager.cpp" />
     <ClCompile Include="Application\CheckPoint\CheckPoint.cpp" />
     <ClCompile Include="Engine\Generators\OffScreen\OffScreen.cpp" />
+    <ClCompile Include="Engine\Graphics\Culling\OcclusionCullingManager.cpp" />
     <ClCompile Include="Engine\Utility\Collision\AABB\AABBCollider.cpp" />
     <ClCompile Include="Engine\Utility\Collision\Core\BaseCollider.cpp" />
     <ClCompile Include="Engine\Utility\Collision\Core\ColliderFactory.cpp" />
@@ -211,6 +212,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Objects\EnemyManager\EnemyManager.h" />
     <ClInclude Include="Application\CheckPoint\CheckPoint.h" />
     <ClInclude Include="Engine\Generators\OffScreen\OffScreen.h" />
+    <ClInclude Include="Engine\Graphics\Culling\OcclusionCullingManager.h" />
     <ClInclude Include="Engine\Utility\Collision\AABB\AABBCollider.h" />
     <ClInclude Include="Engine\Utility\Collision\Core\BaseCollider.h" />
     <ClInclude Include="Engine\Utility\Collision\Core\ColliderFactory.h" />

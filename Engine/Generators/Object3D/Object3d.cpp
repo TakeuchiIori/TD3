@@ -17,6 +17,11 @@
 #include "imgui.h"
 #endif // _DEBUG
 
+Object3d::Object3d()
+{
+	queryIndex_ = OcclusionCullingManager::GetInstance()->AddOcclusionQuery();
+}
+
 void Object3d::Initialize()
 {
 	// 引数で受け取ってメンバ変数に記録する
@@ -33,47 +38,64 @@ void Object3d::UpdateAnimation()
 }
 
 
-void Object3d::Draw(Camera* camera,WorldTransform& worldTransform)
+/// <summary>
+///  オブジェクトの描画（オクルージョンカリング対応）
+/// </summary>
+void Object3d::Draw(Camera* camera, WorldTransform& worldTransform)
 {
+	// クエリ開始（常に行う）
+	OcclusionCullingManager::GetInstance()->BeginOcclusionQuery(queryIndex_);
 
-	Matrix4x4 worldViewProjectionMatrix;
-	Matrix4x4 worldMatrix;
-	if (model_) {
-		if (camera) {
-			const Matrix4x4& viewProjectionMatrix = camera->GetViewProjectionMatrix();
+	// 数フレーム前のクエリ結果を参照して描画判定
+	const int kLatency = 1;
+	bool shouldDraw = true;
 
-			// 
-			if (!model_->GetModelData().hasBones) {
-				worldViewProjectionMatrix = worldTransform.GetMatWorld() * model_->GetModelData().rootNode.localMatrix * viewProjectionMatrix;
-				worldMatrix = worldTransform.GetMatWorld() * model_->GetModelData().rootNode.localMatrix;
+	if (OcclusionCullingManager::GetInstance()->IsQueryResultAvailable(queryIndex_, kLatency)) {
+		shouldDraw = OcclusionCullingManager::GetInstance()->ShouldDrawWithLatency(queryIndex_, kLatency,0);
+	}
+
+	if (shouldDraw) {
+		Matrix4x4 worldViewProjectionMatrix;
+		Matrix4x4 worldMatrix;
+
+		if (model_) {
+			if (camera) {
+				const Matrix4x4& viewProjectionMatrix = camera->GetViewProjectionMatrix();
+
+				if (!model_->GetModelData().hasBones) {
+					worldViewProjectionMatrix = worldTransform.GetMatWorld() * model_->GetModelData().rootNode.localMatrix * viewProjectionMatrix;
+					worldMatrix = worldTransform.GetMatWorld() * model_->GetModelData().rootNode.localMatrix;
+				}
+				else {
+					worldViewProjectionMatrix = worldTransform.GetMatWorld() * viewProjectionMatrix;
+					worldMatrix = worldTransform.GetMatWorld();
+				}
 			}
 			else {
-				worldViewProjectionMatrix = worldTransform.GetMatWorld() * viewProjectionMatrix;
+				worldViewProjectionMatrix = worldTransform.GetMatWorld();
 				worldMatrix = worldTransform.GetMatWorld();
 			}
 		}
-		else {
 
-			worldViewProjectionMatrix = worldTransform.GetMatWorld();
-			worldMatrix = worldTransform.GetMatWorld(); // 初期化が必要
+		worldTransform.SetMapWVP(worldViewProjectionMatrix);
+		worldTransform.SetMapWorld(worldMatrix);
+
+		// マテリアル
+		object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+		// TransformationMatrixCB
+		object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, worldTransform.GetConstBuffer()->GetGPUVirtualAddress());
+		// カメラ
+		object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
+
+		if (model_) {
+			model_->Draw();
 		}
 	}
 
-	worldTransform.SetMapWVP(worldViewProjectionMatrix);
-	worldTransform.SetMapWorld(worldMatrix);
-
-	// マテリアル
-	object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-	// TransformatonMatrixCB
-	object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, worldTransform.GetConstBuffer()->GetGPUVirtualAddress());
-	// カメラ
-	object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
-
-	// 3Dモデルが割り当てられていれば描画する
-	if (model_) {
-		model_->Draw();
-	}
+	// クエリ終了
+	OcclusionCullingManager::GetInstance()->EndOcclusionQuery(queryIndex_);
 }
+
 
 void Object3d::DrawSkeleton(Line& line)
 {

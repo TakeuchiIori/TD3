@@ -10,6 +10,9 @@
 #include "Loaders/Model/Model.h"
 #include "Collision/Core/CollisionManager.h"
 #include <Systems/GameTime/HitStop.h>
+#include "../Graphics/Culling/OcclusionCullingManager.h"
+
+// C++
 #include <cstdlib>
 #include <ctime>
 
@@ -106,6 +109,10 @@ void GameScene::Initialize()
 	gameScreen_->SetPlayer(player_.get());
 	gameScreen_->Initialize();
 	
+	//=====================================================//
+	/*                  これより下は触るな危険　　　　　　　   　*/
+	//=====================================================//
+	OcclusionCullingManager::GetInstance()->Initialize();
 }
 
 /// <summary>
@@ -121,8 +128,6 @@ void GameScene::Update()
 
 
 	mpInfo_->Update();
-	
-	//CheckAllCollisions();
 	
 
 	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
@@ -209,6 +214,7 @@ void GameScene::Draw()
 	DrawAnimation();
 	DrawLine();
 
+	OcclusionCullingManager::GetInstance()->ResolvedOcclusionQuery();
 }
 
 void GameScene::DrawOffScreen()
@@ -230,21 +236,9 @@ void GameScene::DrawOffScreen()
 void GameScene::DrawObject()
 {
 	mpInfo_->Draw();
-	// オクルージョンクエリ開始
-	//uint32_t queryIndex = 0;
-
-	// Ground のオクルージョンチェック
-	//commandList_->BeginQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
 	ground_->Draw();
-	//commandList_->EndQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
-
-	
-
-    //stageManager_.Draw();
-
 	player_->Draw();
 	enemyManager_->Draw();
-
 	grassManager_->Draw();
 }
 
@@ -255,25 +249,11 @@ void GameScene::DrawSprite()
 
 void GameScene::DrawAnimation()
 {
-	// オクルージョンクエリ開始
-	//uint32_t queryIndex = 1;
-
-	// Ground のオクルージョンチェック
-	//commandList_->BeginQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
 	test_->Draw(sceneCamera_.get(), testWorldTransform_);
-	//commandList_->EndQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
-
-	//ResolvedOcclusionQuery();
-
 }
 
 void GameScene::DrawLine()
 {
-	// 骨描画
-   /* if (test_ && test_->GetModel()->GetSkeleton().joints.size() > 0) {
-		test_->DrawSkeleton(test_->GetModel()->GetSkeleton(), *boneLine_);
-		boneLine_->DrawLine();
-	}*/
 	player_->DrawCollision();
 	grassManager_->DrawCollision();
 	enemyManager_->DrawCollisions();
@@ -388,107 +368,6 @@ void GameScene::ShowImGui()
 			particleCount_ -= 1;
 		}
 	}
-	//particleEmitter_[0]->SetCount(particleCount_);
-
-
-	//ImGui::End();
-
-	//ImGui::Begin("Occlusion Query");
-	//ImGui::Text("Occlusion Ground: %lld", occlusionResults_[0]);
-	//ImGui::Text("Occlusion AnimationModel: %lld", occlusionResults_[1]);
 	ImGui::End();
 #endif // _DEBUG
-}
-
-void GameScene::CheckAllCollisions() {
-
-	//// 衝突マネージャーのリセット
-	//CollisionManager::GetInstance()->Reset();
-
-	//// コライダーをリストに登録
-	////CollisionManager::GetInstance()->AddCollider(player_.get());
-
-
-	//// 衝突判定と応答
-	//CollisionManager::GetInstance()->CheckAllCollisions();
-
-}
-void GameScene::InitializeOcclusionQuery()
-{
-	ID3D12Device* device = DirectXCommon::GetInstance()->GetDevice().Get();
-	commandList_ = DirectXCommon::GetInstance()->GetCommandList().Get();
-
-	// クエリの数をオブジェクト数に合わせる
-	occlusionResults_.resize(queryCount_, 0);
-
-	D3D12_QUERY_HEAP_DESC queryHeapDesc = {};
-	queryHeapDesc.Count = queryCount_;
-	queryHeapDesc.Type = D3D12_QUERY_HEAP_TYPE_OCCLUSION;
-	queryHeapDesc.NodeMask = 0;
-
-	// クエリヒープ作成
-	HRESULT hr = device->CreateQueryHeap(&queryHeapDesc, IID_PPV_ARGS(&queryHeap_));
-	if (FAILED(hr)) {
-		throw std::runtime_error("Failed to create Query Heap.");
-	}
-
-	// クエリ結果格納用のバッファを作成
-	D3D12_RESOURCE_DESC bufferDesc = {};
-	bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	bufferDesc.Width = sizeof(UINT64) * queryCount_; // クエリ数に応じたサイズ
-	bufferDesc.Height = 1;
-	bufferDesc.DepthOrArraySize = 1;
-	bufferDesc.MipLevels = 1;
-	bufferDesc.Format = DXGI_FORMAT_UNKNOWN;
-	bufferDesc.SampleDesc.Count = 1;
-	bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	bufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-	D3D12_HEAP_PROPERTIES heapProps = { D3D12_HEAP_TYPE_READBACK };
-
-	hr = device->CreateCommittedResource(
-		&heapProps, D3D12_HEAP_FLAG_NONE, &bufferDesc,
-		D3D12_RESOURCE_STATE_COPY_DEST, nullptr,
-		IID_PPV_ARGS(&queryResultBuffer_)
-	);
-
-	if (FAILED(hr)) {
-		throw std::runtime_error("Failed to create Query Result Buffer.");
-	}
-}
-
-void GameScene::BeginOcclusionQuery(UINT queryIndex)
-{
-	commandList_->BeginQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
-}
-
-void GameScene::EndOcclusionQuery(UINT queryIndex)
-{
-	commandList_->EndQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
-}
-
-void GameScene::ResolvedOcclusionQuery()
-{
-	// クエリ結果をリソースにコピー
-	commandList_->ResolveQueryData
-	(
-		queryHeap_.Get(),
-		D3D12_QUERY_TYPE_OCCLUSION,
-		0,
-		queryCount_,
-		queryResultBuffer_.Get(),
-		0
-	);
-
-	// 結果をマッピング
-	void* mappedData = nullptr;
-	D3D12_RANGE readRange = { 0, sizeof(UINT64) * queryCount_ };
-	if (SUCCEEDED(queryResultBuffer_->Map(0, &readRange, &mappedData)))
-	{
-		UINT64* queryData = static_cast<UINT64*>(mappedData);
-		for (uint32_t i = 0; i < queryCount_; i++) {
-			occlusionResults_[i] = queryData[i]; // 結果を保存
-		}
-		queryResultBuffer_->Unmap(0, nullptr);
-	}
 }

@@ -177,11 +177,14 @@ void GameScreen::Update()
 			//grass_[1]->SetScale(baseSize);
 		}
 
+#ifdef _DEBUG
+
+
 
 		ImGui::Begin("Grass");
 		ImGui::DragFloat3("offsetGrass_", &offsetGrass_.x, 0.1f);
 		ImGui::End();
-
+#endif // _DEBUG
 		grass_[i]->Update();
 
 	}
