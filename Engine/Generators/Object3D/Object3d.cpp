@@ -43,37 +43,39 @@ void Object3d::UpdateAnimation()
 /// </summary>
 void Object3d::Draw(Camera* camera, WorldTransform& worldTransform)
 {
-	// クエリ開始（常に行う）
+
+
+	// クエリは毎回実行する
 	OcclusionCullingManager::GetInstance()->BeginOcclusionQuery(queryIndex_);
 
-	// 数フレーム前のクエリ結果を参照して描画判定
-	const int kLatency = 1;
-	bool shouldDraw = true;
-
-	if (OcclusionCullingManager::GetInstance()->IsQueryResultAvailable(queryIndex_, kLatency)) {
-		shouldDraw = OcclusionCullingManager::GetInstance()->ShouldDrawWithLatency(queryIndex_, kLatency,0);
+	// 数フレーム連続で見えてなかったら描画しない
+	bool shouldDraw = OcclusionCullingManager::GetInstance()->ShouldDraw(queryIndex_, 10);
+	static uint32_t globalFrameCounter = 0;
+	globalFrameCounter++;
+	if (!shouldDraw && globalFrameCounter % 1 == 0) {
+		shouldDraw = true;
 	}
+
 
 	if (shouldDraw) {
 		Matrix4x4 worldViewProjectionMatrix;
 		Matrix4x4 worldMatrix;
-
 		if (model_) {
 			if (camera) {
 				const Matrix4x4& viewProjectionMatrix = camera->GetViewProjectionMatrix();
 
+				// 
 				if (!model_->GetModelData().hasBones) {
 					worldViewProjectionMatrix = worldTransform.GetMatWorld() * model_->GetModelData().rootNode.localMatrix * viewProjectionMatrix;
 					worldMatrix = worldTransform.GetMatWorld() * model_->GetModelData().rootNode.localMatrix;
-				}
-				else {
+				} else {
 					worldViewProjectionMatrix = worldTransform.GetMatWorld() * viewProjectionMatrix;
 					worldMatrix = worldTransform.GetMatWorld();
 				}
-			}
-			else {
+			} else {
+
 				worldViewProjectionMatrix = worldTransform.GetMatWorld();
-				worldMatrix = worldTransform.GetMatWorld();
+				worldMatrix = worldTransform.GetMatWorld(); // 初期化が必要
 			}
 		}
 
@@ -82,17 +84,16 @@ void Object3d::Draw(Camera* camera, WorldTransform& worldTransform)
 
 		// マテリアル
 		object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-		// TransformationMatrixCB
+		// TransformatonMatrixCB
 		object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, worldTransform.GetConstBuffer()->GetGPUVirtualAddress());
 		// カメラ
 		object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
+
 
 		if (model_) {
 			model_->Draw();
 		}
 	}
-
-	// クエリ終了
 	OcclusionCullingManager::GetInstance()->EndOcclusionQuery(queryIndex_);
 }
 
