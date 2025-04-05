@@ -61,6 +61,9 @@ void Player::InitCollision()
 void Player::InitJson()
 {
 	jsonManager_ = std::make_unique<JsonManager>("playerObj", "Resources/JSON/");
+	jsonManager_->SetCategory("Objects");
+	jsonManager_->Register("草の取得数",&grassGauge_);
+	jsonManager_->Register("草の最大数", &MaxGrass_);
 
 	jsonCollider_ = std::make_unique<JsonManager>("playerCollider", "Resources/JSON/");
 	aabbCollider_->InitJson(jsonCollider_.get());
@@ -147,7 +150,7 @@ void Player::MapChipOnCollision(const CollisionInfo& info)
 
 void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
-	if (behavior_ != BehaviorPlayer::Return)
+	if (behavior_ != BehaviorPlayer::Return && self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
 	{
 		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrass)) // 草を食べたら
 		{
@@ -196,7 +199,7 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrowthArea)) // 草の成長エリア
 			{
 				canSpitting_ = true;
-				if (input_->TriggerKey(DIK_Q))
+				if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
 				{
 					// 唾を吐く
 				}
@@ -212,6 +215,41 @@ void Player::OnExitCollision(BaseCollider* self, BaseCollider* other)
 		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrowthArea)) // 草の成長エリア
 		{
 			canSpitting_ = false;
+		}
+	}
+}
+
+
+
+////////////////////////////////////////////////////////////
+//
+//
+// 				こんな感じに使うよっていう例置いとく
+//
+// 
+///////////////////////////////////////////////////////////
+void Player::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
+{
+	if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
+	{
+		switch (dir)
+		{
+		case HitDirection::None:
+			break;
+		case HitDirection::Top:
+			break;
+		case HitDirection::Bottom:
+			break;
+		case HitDirection::Left:
+			break;
+		case HitDirection::Right:
+			break;
+		case HitDirection::Front:
+			break;
+		case HitDirection::Back:
+			break;
+		default:
+			break;
 		}
 	}
 }
@@ -302,7 +340,10 @@ void Player::Move()
 		moveDirection_ = TransformNormal(moveDirection_, MakeRotateMatrixY(worldTransform_.rotation_.y));
 	}
 
-	velocity_ += moveDirection_ * speed_;
+	if(beforeDirection_ == moveDirection_)
+	{
+		velocity_ += moveDirection_ * speed_;
+	}
 
 
 	Vector3 newPos = worldTransform_.translation_;
@@ -602,6 +643,7 @@ void Player::BehaviorUpdate()
 void Player::BehaviorRootInit()
 {
 	speed_ = 0;
+	grassGauge_ = 0;
 	playerBodys_.clear();
 	isCollisionBody = false;
 	HP_ = kMaxHP_;

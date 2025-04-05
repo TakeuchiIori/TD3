@@ -41,6 +41,7 @@ public:
 	void OnEnterCollision(BaseCollider* self, BaseCollider* other) override;
 	void OnCollision(BaseCollider* self, BaseCollider* other) override;
 	void OnExitCollision(BaseCollider* self, BaseCollider* other) override;
+	void OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir) override;
 	void MapChipOnCollision(const CollisionInfo& info) override;
 
 	/// <summary>

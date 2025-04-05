@@ -127,7 +127,7 @@ void Grass::OnCollision(BaseCollider* self, BaseCollider* other)
 				{
 					if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
 					{
-						if (input_->TriggerKey(DIK_Q))
+						if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
 						{
 							behaviortRquest_ = BehaviorGrass::Growth;
 						}
@@ -139,6 +139,10 @@ void Grass::OnCollision(BaseCollider* self, BaseCollider* other)
 }
 
 void Grass::OnExitCollision(BaseCollider* self, BaseCollider* other)
+{
+}
+
+void Grass::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
 {
 }
 

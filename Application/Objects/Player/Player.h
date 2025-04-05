@@ -13,7 +13,7 @@
 #include "Collision/OBB/OBBCollider.h"
 #include "Collision/AABB/AABBCollider.h"
 #include "Collision/Core/ColliderFactory.h"
-
+#include "Collision/Core/CollisionDirection.h"
 
 // Application
 #include "BaseObject/BaseObject.h"
@@ -78,7 +78,7 @@ public:
 	void OnEnterCollision(BaseCollider* self, BaseCollider* other);
 	void OnCollision(BaseCollider* self, BaseCollider* other);
 	void OnExitCollision(BaseCollider* self, BaseCollider* other);
-
+	void OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir);
 
 
 
@@ -241,7 +241,7 @@ private:
 
 
 	// ゲージ
-	int32_t MaxGrass_ = 4;				// 暫定対応
+	int32_t MaxGrass_ = 2;				// 暫定対応
 	int32_t grassGauge_ = 0;
 
 	// 時間制限 : 単位(sec)
