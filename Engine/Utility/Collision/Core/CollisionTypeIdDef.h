@@ -11,6 +11,7 @@ enum class CollisionTypeIdDef : uint32_t
 	kStuckGrass,	// 草が詰まった場所
 	kGrass,			// 草
 	kGrowthArea,	// 草の成長範囲
+	kBranch,		// 枝
 	kEnemy,			// 敵
 	kNone			// 当たり判定なし
 };

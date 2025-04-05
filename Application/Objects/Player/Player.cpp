@@ -577,6 +577,7 @@ void Player::DebugPlayer()
 	ImGui::Text("BoostCT    : %.2f", boostCoolTimer_);
 	ImGui::Text("HistorySize: %d", a);
 	ImGui::Text("createGrassTimer_: %.2f", createGrassTimer_);
+	ImGui::DragFloat3("Transration", &worldTransform_.translation_.x);
 	int b = grassGauge_;
 	ImGui::Text("grassGauge_: %d", b);
 	ImGui::Text("isCollisionBody: %d", isCollisionBody);

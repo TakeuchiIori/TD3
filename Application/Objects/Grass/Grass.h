@@ -13,7 +13,11 @@
 #include "Collision/AABB/AABBCollider.h"
 #include "Collision/Core/ColliderFactory.h"
 #include "Collision/Core/CollisionDirection.h"
+
+
+// Application
 #include "Player/Player.h"
+#include "Branch.h"
 
 enum class BehaviorGrass
 {
@@ -147,7 +151,7 @@ private: // ふるまい
 	
 
 public: // getter & setter
-	void SetPos(Vector3 pos) { worldTransform_.translation_ = pos; }
+	void SetPos(Vector3 pos);
 
 	Vector3 GetPos() { return worldTransform_.translation_; }
 
@@ -175,6 +179,9 @@ private:
 	std::unique_ptr<JsonManager> jsonManager_;
 	std::unique_ptr<JsonManager> jsonCollider_;
 
+	// 枝
+	std::unique_ptr<Branch> branch_;
+
 	const float deltaTime_ = 1.0f / 60.0f; // 仮対応
 
 	Vector3 defaultScale_ = { 1.0f,1.0f,1.0f };
@@ -189,6 +196,8 @@ private:
 	bool isMadeByPlayer_ = false;
 
 	int enter = 0;
+
+	float  centerX_ = 15.0f;
 
 
 	// 振る舞い

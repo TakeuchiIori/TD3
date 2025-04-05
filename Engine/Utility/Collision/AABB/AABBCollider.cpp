@@ -45,7 +45,7 @@ void AABBCollider::Initialize()
 
 void AABBCollider::Update()
 {
-	Vector3 scale = GetWorldTransform().scale_;;
+	Vector3 scale = GetWorldTransform().scale_;
 	Vector3 center = GetCenterPosition();
 
 	Vector3 size = {

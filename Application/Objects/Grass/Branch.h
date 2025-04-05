@@ -39,7 +39,7 @@ public:
 public:
 	Vector3 GetCenterPosition() const
 	{
-		return Vector3
+		return 
 		{
 			worldTransform_.matWorld_.m[3][0],
 			worldTransform_.matWorld_.m[3][1],
@@ -54,10 +54,17 @@ public:
 	void OnEnterCollision(BaseCollider* self, BaseCollider* other);
 	void OnCollision(BaseCollider* self, BaseCollider* other);
 	void OnExitCollision(BaseCollider* self, BaseCollider* other);
+	void OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir);
 
 private:
 	WorldTransform* grassWorldTransform_ = nullptr;
 
 	std::shared_ptr<AABBCollider> aabbCollider_;
+
+	std::unique_ptr<JsonManager> jsonManager_;
+	std::unique_ptr<JsonManager> jsonCollider_;
+
+	float rightLimit_ = 30.0f;
+	float leftLimit_ = 0.0f;
 };
 
