@@ -83,7 +83,7 @@ private:
 #endif // _DEBUG
 
 
-private: // プレイヤーのふるまい
+private: // ふるまい
 
 	/// <summary>
 	/// ふるまい全体の初期化

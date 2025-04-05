@@ -102,6 +102,7 @@
     <ClCompile Include="Application\Objects\EnemyManager\EnemyManager.cpp" />
     <ClCompile Include="Application\SpriteApp\ScreenApp\GameScreen.cpp" />
     <ClCompile Include="Application\Objects\Player\StuckGrass.cpp" />
+    <ClCompile Include="Application\Objects\Grass\Branch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -204,6 +205,7 @@
     <ClInclude Include="Application\Objects\EnemyManager\EnemyManager.h" />
     <ClInclude Include="Application\SpriteApp\ScreenApp\GameScreen.h" />
     <ClInclude Include="Application\Objects\Player\StuckGrass.h" />
+    <ClInclude Include="Application\Objects\Grass\Branch.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />
