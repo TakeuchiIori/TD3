@@ -12,6 +12,7 @@ void OcclusionCullingManager::Initialize()
 
 	// クエリの数をオブジェクト数に合わせる
 	occlusionResults_.resize(queryCount, 0);
+	wasVisibleLastFrame_.resize(queryCount, true);
 
 	D3D12_QUERY_HEAP_DESC queryHeapDesc = {};
 	queryHeapDesc.Count = queryCount_;
@@ -51,7 +52,7 @@ void OcclusionCullingManager::Initialize()
 
 void OcclusionCullingManager::BeginOcclusionQuery(UINT queryIndex)
 {
-	 assert(queryIndex < queryCount_ && "BeginQuery: queryIndex out of range!");
+	assert(queryIndex < queryCount_ && "BeginQuery: queryIndex out of range!");
 	commandList_->BeginQuery(queryHeap_.Get(), D3D12_QUERY_TYPE_OCCLUSION, queryIndex);
 	queriedFlags_[queryIndex] = true;
 }
@@ -81,23 +82,17 @@ void OcclusionCullingManager::ResolvedOcclusionQuery()
 	{
 		UINT64* queryData = static_cast<UINT64*>(mappedData);
 		for (uint32_t i = 0; i < queryCount_; i++) {
+			bool wasVisible = (queryData[i] > 0);
 			occlusionResults_[i] = queryData[i];
 
-			// 過去データ保存
-			if (i >= pastOcclusionResults_.size()) {
-				pastOcclusionResults_.resize(queryCount_);
-			}
-			if (pastOcclusionResults_[i].size() < kLatencyFrames) {
-				pastOcclusionResults_[i].resize(kLatencyFrames, 1); // 初期化
-			}
-			pastOcclusionResults_[i][currentFrameIndex_] = queryData[i];
-
+			// ★連続不可視の更新
 			if (queriedFlags_[i]) {
-				if (queryData[i] > 0) {
+				if (wasVisible) {
 					invisibleCounts_[i] = 0;
 				} else {
 					invisibleCounts_[i]++;
 				}
+				wasVisibleLastFrame_[i] = wasVisible;
 			}
 		}
 		queryResultBuffer_->Unmap(0, nullptr);
@@ -108,9 +103,9 @@ void OcclusionCullingManager::RebuildResources(UINT newCount)
 {
 	queryCount_ = newCount;
 
-	
+
 	ID3D12Device* device = DirectXCommon::GetInstance()->GetDevice().Get();
-	
+
 	occlusionResults_.resize(queryCount_);
 	queriedFlags_.resize(queryCount_, false);
 	invisibleCounts_.resize(queryCount_, 0);
@@ -151,23 +146,4 @@ void OcclusionCullingManager::RebuildResources(UINT newCount)
 	}
 
 	occlusionResults_.resize(queryCount_, 0);
-}
-
-bool OcclusionCullingManager::IsQueryResultAvailable(uint32_t index, int latencyFrames) const {
-	if (index >= pastOcclusionResults_.size()) return false;
-
-	uint32_t targetFrame = (currentFrameIndex_ + kLatencyFrames - latencyFrames) % kLatencyFrames;
-	return pastOcclusionResults_[index][targetFrame] != UINT64_MAX;
-}
-
-bool OcclusionCullingManager::ShouldDrawWithLatency(uint32_t index, int latencyFrames, uint64_t threshold) const {
-	if (index >= pastOcclusionResults_.size()) return true;
-
-	uint32_t targetFrame = (currentFrameIndex_ + kLatencyFrames - latencyFrames) % kLatencyFrames;
-	return pastOcclusionResults_[index][targetFrame] > threshold;
-}
-
-
-void OcclusionCullingManager::SetFrameIndex(uint32_t frameIndex) {
-	currentFrameIndex_ = frameIndex % kLatencyFrames;
 }

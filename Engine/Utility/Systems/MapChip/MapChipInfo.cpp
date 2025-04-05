@@ -87,6 +87,7 @@ void MapChipInfo::GenerateBlocks()
 				Object3d* obj = new Object3d();
 				obj->Initialize();
 				obj->SetModel("cube.obj");
+				//obj->SetMaterialColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 				objects_[i][j] = obj;
 			}
 		}

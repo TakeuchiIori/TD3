@@ -23,6 +23,7 @@ public:
             RebuildResources(newIndex + 1); // ⬅ 必ず対応
         }
         // フラグやバッファの安全拡張
+        wasVisibleLastFrame_.resize(queryCount_, true);
         queriedFlags_.resize(queryCount_, false);
         invisibleCounts_.resize(queryCount_, 0);
         occlusionResults_.resize(queryCount_, 0);
@@ -31,7 +32,7 @@ public:
 
 
     void Initialize();
-    
+
     void BeginOcclusionQuery(UINT queryIndex);
 
     void EndOcclusionQuery(UINT queryIndex);
@@ -40,14 +41,6 @@ public:
 
     void RebuildResources(UINT newCount);
 
-    static const int kLatencyFrames = 3; // 遅延フレーム数
-
-    bool IsQueryResultAvailable(uint32_t index, int latencyFrames = kLatencyFrames) const;
-
-    bool ShouldDrawWithLatency(uint32_t index, int latencyFrames = kLatencyFrames, uint64_t threshold = 1) const;
-
-    void SetFrameIndex(uint32_t frameIndex); // 呼び出し側でフレーム番号を設定
-
     UINT64 GetQueryResult(uint32_t index) const {
         if (index < occlusionResults_.size() && queriedFlags_[index]) {
             return occlusionResults_[index];
@@ -55,11 +48,12 @@ public:
         return 1; // デフォルト：表示されてる扱い
     }
 
-    bool ShouldDraw(uint32_t index, uint32_t maxSkipFrames = 1) const {
+    bool ShouldDraw(uint32_t index, uint32_t maxSkipFrames = 2) const {
         if (index >= invisibleCounts_.size()) return true;
-
         // 一度もクエリが実行されてない → 表示する（初期フレーム想定）
         if (!queriedFlags_[index]) return true;
+
+        if (wasVisibleLastFrame_[index]) return true;
 
         // クエリされた上で、連続不可視フレームが閾値以内なら表示
         return invisibleCounts_[index] <= maxSkipFrames;
@@ -82,8 +76,6 @@ private:
     UINT queryCount_ = 0;                                           // オクルージョンクエリの数
     UINT currentIndex_ = 0;
     ID3D12GraphicsCommandList* commandList_;
-
-    std::vector<std::vector<UINT64>> pastOcclusionResults_;
-    uint32_t currentFrameIndex_ = 0;
+    std::vector<bool> wasVisibleLastFrame_;
 
 };
