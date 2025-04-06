@@ -32,6 +32,8 @@ class Player
 	: public BaseObject
 {
 public:
+	~Player() override;
+
 	Player(MapChipField* mapChipField)
 		: velocity_(0, 0, 0),
 		mpCollision_(mapChipField) {

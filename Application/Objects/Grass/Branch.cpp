@@ -6,11 +6,16 @@
 #include "imgui.h"
 #endif // _DEBUG
 
+Branch::~Branch()
+{
+	aabbCollider_->~AABBCollider();
+}
+
 void Branch::Initialize(Camera* camera)
 {
 	camera_ = camera;
 	worldTransform_.Initialize();
-	worldTransform_.parent_ = grassWorldTransform_;
+	worldTransform_.translation_ = grassWorldTransform_->translation_;
 	worldTransform_.useAnchorPoint_ = true;
 	
 
@@ -30,7 +35,7 @@ void Branch::InitCollision()
 		this,
 		&worldTransform_,
 		camera_,
-		static_cast<uint32_t>(CollisionTypeIdDef::kGrass)
+		static_cast<uint32_t>(CollisionTypeIdDef::kBranch)
 	);
 }
 
@@ -60,7 +65,7 @@ void Branch::DrawCollision()
 
 void Branch::SetRight()
 {
-	worldTransform_.translation_.x = 2.0f;
+	worldTransform_.translation_.x += 2.0f;
 	worldTransform_.anchorPoint_ = { -1.0f,0.0f,0.0f };
 	float scaleX = rightLimit_ - grassWorldTransform_->translation_.x;
 	worldTransform_.scale_ = { scaleX * 0.5f,0.5f,0.5f };
@@ -68,7 +73,7 @@ void Branch::SetRight()
 
 void Branch::SetLeft()
 {
-	worldTransform_.translation_.x = -2.0f;
+	worldTransform_.translation_.x += -2.0f;
 	worldTransform_.anchorPoint_ = { 1.0f,0.0f,0.0f };
 	float scaleX = grassWorldTransform_->translation_.x - leftLimit_;
 	worldTransform_.scale_ = { scaleX * 0.5f,0.5f,0.5f };
@@ -76,6 +81,14 @@ void Branch::SetLeft()
 
 void Branch::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
+	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+	{
+		if (isPlayerBoost_)
+		{
+			isDelete_ = true;
+			aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
+		}
+	}
 }
 
 void Branch::OnCollision(BaseCollider* self, BaseCollider* other)

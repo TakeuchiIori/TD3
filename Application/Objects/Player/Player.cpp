@@ -7,6 +7,12 @@
 #include "string"
 #endif // _DEBUG
 
+Player::~Player()
+{
+	aabbCollider_->~AABBCollider();
+	nextAabbCollider_->~AABBCollider();
+}
+
 void Player::Initialize(Camera* camera)
 {
 	input_ = Input::GetInstance();
@@ -179,6 +185,14 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 			TakeDamage();
 		}
 
+
+		if (behavior_ != BehaviorPlayer::Boost)
+		{
+			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kBranch))
+			{
+				TakeDamage();
+			}
+		}
 	}
 }
 

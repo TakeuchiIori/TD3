@@ -14,6 +14,7 @@ Grass::~Grass()
 {
 	--count_;
 	aabbCollider_->~AABBCollider();
+	aabbGrowthCollider_->~AABBCollider();
 }
 
 void Grass::Initialize(Camera* camera)
@@ -77,6 +78,11 @@ void Grass::InitJson()
 
 void Grass::Update()
 {
+	branch_->SetPlayerBoost(player_->IsBoost());
+	if (branch_->IsDelete())
+	{
+		behaviortRquest_ = BehaviorGrass::Delete;
+	}
 	BehaviorInitialize();
 	BehaviorUpdate();
 	worldTransform_.UpdateMatrix();
@@ -275,6 +281,7 @@ void Grass::BehaviorRepopUpdate()
 
 void Grass::BehaviorDeleteInit()
 {
+	aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
 }
 
 void Grass::BehaviorDeleteUpdate()
@@ -284,6 +291,7 @@ void Grass::BehaviorDeleteUpdate()
 void Grass::SetPos(Vector3 pos)
 {
 	worldTransform_.translation_ = pos;
+	branch_->SetPos(pos);
 	if (worldTransform_.translation_.x <= centerX_)
 	{
 		// 左にはやす

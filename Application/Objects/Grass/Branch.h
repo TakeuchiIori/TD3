@@ -12,6 +12,7 @@ class Branch :
     public BaseObject
 {
 public:
+	~Branch();
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -31,11 +32,17 @@ public:
 
 	void DrawCollision();
 
+public:
+	void SetPlayerBoost(bool boost) { isPlayerBoost_ = boost; }
+
+	bool IsDelete() { return isDelete_; }
+
 	void SetRight();
 	void SetLeft();
 
 	void SetGrassWorldTransform(WorldTransform* grassWorldTransform) { grassWorldTransform_ = grassWorldTransform; }
 
+	void SetPos(Vector3 pos) { worldTransform_.translation_ = pos; }
 public:
 	Vector3 GetCenterPosition() const
 	{
@@ -66,5 +73,9 @@ private:
 
 	float rightLimit_ = 30.0f;
 	float leftLimit_ = 0.0f;
+
+	bool isDelete_ = false;
+
+	bool isPlayerBoost_ = false;
 };
 
