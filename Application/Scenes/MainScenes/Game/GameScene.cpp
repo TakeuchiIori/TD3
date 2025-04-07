@@ -214,7 +214,7 @@ void GameScene::Draw()
 	DrawAnimation();
 	DrawLine();
 
-	OcclusionCullingManager::GetInstance()->ResolvedOcclusionQuery();
+	//OcclusionCullingManager::GetInstance()->ResolvedOcclusionQuery();
 }
 
 void GameScene::DrawOffScreen()

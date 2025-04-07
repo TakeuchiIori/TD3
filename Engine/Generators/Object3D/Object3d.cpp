@@ -45,19 +45,19 @@ void Object3d::Draw(Camera* camera, WorldTransform& worldTransform)
 {
 
 
-	// クエリは毎回実行する
-	OcclusionCullingManager::GetInstance()->BeginOcclusionQuery(queryIndex_);
+	//// クエリは毎回実行する
+	//OcclusionCullingManager::GetInstance()->BeginOcclusionQuery(queryIndex_);
 
-	// 数フレーム連続で見えてなかったら描画しない
-	bool shouldDraw = OcclusionCullingManager::GetInstance()->ShouldDraw(queryIndex_, 10);
-	static uint32_t globalFrameCounter = 0;
-	globalFrameCounter++;
-	if (!shouldDraw && globalFrameCounter % 1 == 0) {
-		shouldDraw = true;
-	}
+	//// 数フレーム連続で見えてなかったら描画しない
+	//bool shouldDraw = OcclusionCullingManager::GetInstance()->ShouldDraw(queryIndex_, 10);
+	//static uint32_t globalFrameCounter = 0;
+	//globalFrameCounter++;
+	//if (!shouldDraw && globalFrameCounter % 1 == 0) {
+	//	shouldDraw = true;
+	//}
 
 
-	if (shouldDraw) {
+	//if (shouldDraw) {
 		Matrix4x4 worldViewProjectionMatrix;
 		Matrix4x4 worldMatrix;
 		if (model_) {
@@ -93,8 +93,8 @@ void Object3d::Draw(Camera* camera, WorldTransform& worldTransform)
 		if (model_) {
 			model_->Draw();
 		}
-	}
-	OcclusionCullingManager::GetInstance()->EndOcclusionQuery(queryIndex_);
+	/*}
+	OcclusionCullingManager::GetInstance()->EndOcclusionQuery(queryIndex_);*/
 }
 
 
