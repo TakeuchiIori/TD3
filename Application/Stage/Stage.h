@@ -45,12 +45,18 @@ public:
 
 
 private:
-	std::unique_ptr<CheckPoint> checkPoint_;	// チェックポイントクラス
+	std::string stageName_;
+
+	std::vector<std::unique_ptr<CheckPoint>> checkPoint_;	// チェックポイントクラス
+
+	std::unique_ptr<JsonManager> jsonManager_;
 
 	Player* player_ = nullptr;
 	EnemyManager* enemyManager_ = nullptr;
 	GrassManager* grassManager_ = nullptr;
 
-	int checkPointNum_ = 0;						// チェックポイント番号
+	int checkPointElements_ = 0;
+
+	int currentCheckPoint_ = 0;						// チェックポイント番号
 };
 
