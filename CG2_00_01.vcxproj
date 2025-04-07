@@ -66,7 +66,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)Application\Objects;$(ProjectDir)Application\Scenes;$(ProjectDir)Application\SystemApp;$(ProjectDir)Application\CheckPoint;$(ProjectDir)Engine\Core;$(ProjectDir)Engine\Generators;$(ProjectDir)Engine\Graphics;$(ProjectDir)Engine\Systems;$(ProjectDir)Engine\Utility;$(ProjectDir)Math</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Application\Objects;$(ProjectDir)Application\Scenes;$(ProjectDir)Application\SystemApp;$(ProjectDir)Application\Stage;$(ProjectDir)Application\CheckPoint;$(ProjectDir)Engine\Core;$(ProjectDir)Engine\Generators;$(ProjectDir)Engine\Graphics;$(ProjectDir)Engine\Systems;$(ProjectDir)Engine\Utility;$(ProjectDir)Math</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -93,7 +93,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>false</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir)Application\Objects;$(ProjectDir)Application\Scenes;$(ProjectDir)Application\SystemApp;$(ProjectDir)Application\CheckPoint;$(ProjectDir)Engine\Core;$(ProjectDir)Engine\Generators;$(ProjectDir)Engine\Graphics;$(ProjectDir)Engine\Systems;$(ProjectDir)Engine\Utility;$(ProjectDir)Math</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Application\Objects;$(ProjectDir)Application\Scenes;$(ProjectDir)Application\SystemApp;$(ProjectDir)Application\Stage;$(ProjectDir)Application\CheckPoint;$(ProjectDir)Engine\Core;$(ProjectDir)Engine\Generators;$(ProjectDir)Engine\Graphics;$(ProjectDir)Engine\Systems;$(ProjectDir)Engine\Utility;$(ProjectDir)Math</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -203,6 +203,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\SystemsApp\Picture\Picture.cpp" />
     <ClCompile Include="Application\Objects\Player\StuckGrass.cpp" />
     <ClCompile Include="Application\Stage\Stage.cpp" />
+    <ClCompile Include="Application\Stage\StageManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -307,6 +308,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\SystemsApp\Picture\Picture.h" />
     <ClInclude Include="Application\Objects\Player\StuckGrass.h" />
     <ClInclude Include="Application\Stage\Stage.h" />
+    <ClInclude Include="Application\Stage\StageManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
