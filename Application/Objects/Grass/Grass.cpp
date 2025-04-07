@@ -14,6 +14,7 @@ Grass::~Grass()
 {
 	--count_;
 	aabbCollider_->~AABBCollider();
+	aabbGrowthCollider_->~AABBCollider();
 }
 
 void Grass::Initialize(Camera* camera)
@@ -41,6 +42,11 @@ void Grass::Initialize(Camera* camera)
 	obj_->Initialize();
 	obj_->SetModel("unitCube.obj");
 	obj_->SetMaterialColor({ 0.3f,1.0f,0.3f,1.0f });
+
+	// 枝の初期化
+	branch_ = std::make_unique<Branch>();
+	branch_->SetGrassWorldTransform(&worldTransform_);
+	branch_->Initialize(camera_);
 
 	InitCollision();
 	InitJson();
@@ -72,10 +78,15 @@ void Grass::InitJson()
 
 void Grass::Update()
 {
+	branch_->SetPlayerBoost(player_->IsBoost());
+	if (branch_->IsDelete())
+	{
+		behaviortRquest_ = BehaviorGrass::Delete;
+	}
 	BehaviorInitialize();
 	BehaviorUpdate();
-
 	worldTransform_.UpdateMatrix();
+	branch_->Update();
 	growthAreaWT_.translation_ = worldTransform_.translation_;
 	growthAreaWT_.UpdateMatrix();
 	aabbCollider_->Update();
@@ -90,12 +101,14 @@ void Grass::Update()
 void Grass::Draw()
 {
 	obj_->Draw(BaseObject::camera_, worldTransform_);
+	branch_->Draw();
 }
 
 void Grass::DrawCollision()
 {
 	aabbCollider_->Draw();
 	aabbGrowthCollider_->Draw();
+	branch_->DrawCollision();
 }
 
 void Grass::OnEnterCollision(BaseCollider* self, BaseCollider* other)
@@ -268,8 +281,25 @@ void Grass::BehaviorRepopUpdate()
 
 void Grass::BehaviorDeleteInit()
 {
+	aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
 }
 
 void Grass::BehaviorDeleteUpdate()
 {
+}
+
+void Grass::SetPos(Vector3 pos)
+{
+	worldTransform_.translation_ = pos;
+	branch_->SetPos(pos);
+	if (worldTransform_.translation_.x <= centerX_)
+	{
+		// 左にはやす
+		branch_->SetLeft();
+	}
+	else
+	{
+		// 右にはやす
+		branch_->SetRight();
+	}
 }

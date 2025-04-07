@@ -102,6 +102,7 @@
     <ClCompile Include="Application\CheckPoint\CheckPoint.cpp" />
     <ClCompile Include="Application\Stage\Stage.cpp" />
     <ClCompile Include="Engine\Graphics\Culling\OcclusionCullingManager.cpp" />
+    <ClCompile Include="Application\Objects\Grass\Branch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -205,6 +206,7 @@
     <ClInclude Include="Application\Stage\Stage.h" />
     <ClInclude Include="Engine\Utility\Collision\Core\CollisionDirection.h" />
     <ClInclude Include="Engine\Graphics\Culling\OcclusionCullingManager.h" />
+    <ClInclude Include="Application\Objects\Grass\Branch.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />

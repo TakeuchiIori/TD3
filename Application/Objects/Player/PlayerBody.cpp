@@ -30,6 +30,7 @@ void PlayerBody::Initialize(Camera* camera)
 
 	InitCollision();
 	InitJson();
+	aabbCollider_->checkOutsideCamera = false;
 }
 
 void PlayerBody::InitCollision()
@@ -85,7 +86,6 @@ void PlayerBody::UpExtend()
 {
 	worldTransform_.anchorPoint_ = { 0.0f,-1.0f,0.0f };
 	worldTransform_.scale_ = verticalGrowthScale_;
-	//worldTransform_.translation_.y -= 1.0f;
 	extendDirection_ = ExtendDirection::Up;
 }
 
@@ -93,7 +93,6 @@ void PlayerBody::LeftExtend()
 {
 	worldTransform_.anchorPoint_ = { 1.0f,0.0f,0.0f };
 	worldTransform_.scale_ = horizontalGrowthScale_;
-	//worldTransform_.translation_.x += 1.0f;
 	extendDirection_ = ExtendDirection::Left;
 }
 
@@ -101,7 +100,6 @@ void PlayerBody::RightExtend()
 {
 	worldTransform_.anchorPoint_ = { -1.0f,0.0f,0.0f };
 	worldTransform_.scale_ = horizontalGrowthScale_;
-	//worldTransform_.translation_.x -= 1.0f;
 	extendDirection_ = ExtendDirection::Right;
 }
 
@@ -109,7 +107,6 @@ void PlayerBody::DownExtend()
 {
 	worldTransform_.anchorPoint_ = { 0.0f,1.0f,0.0f };
 	worldTransform_.scale_ = verticalGrowthScale_;
-	//worldTransform_.translation_.y += 1.0f;
 	extendDirection_ = ExtendDirection::Down;
 }
 
