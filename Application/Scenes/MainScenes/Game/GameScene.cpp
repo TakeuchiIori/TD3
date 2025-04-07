@@ -112,7 +112,7 @@ void GameScene::Initialize()
 	//=====================================================//
 	/*                  これより下は触るな危険　　　　　　　   　*/
 	//=====================================================//
-	OcclusionCullingManager::GetInstance()->Initialize();
+	//OcclusionCullingManager::GetInstance()->Initialize();
 }
 
 /// <summary>

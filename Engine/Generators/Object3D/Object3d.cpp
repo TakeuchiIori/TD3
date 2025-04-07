@@ -19,7 +19,7 @@
 
 Object3d::Object3d()
 {
-	queryIndex_ = OcclusionCullingManager::GetInstance()->AddOcclusionQuery();
+	//queryIndex_ = OcclusionCullingManager::GetInstance()->AddOcclusionQuery();
 }
 
 void Object3d::Initialize()
