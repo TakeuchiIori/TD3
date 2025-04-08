@@ -45,6 +45,17 @@ public:
 
 	bool IsDead() const { return !isAlive_; }
 
+	virtual Vector3 GetTranslate() const = 0;
+	virtual void SetTranslate(const Vector3& pos) = 0;
+
+	virtual float GetMoveSpeed() const = 0;
+	virtual void SetMoveSpeed(float speed) = 0;
+
+	virtual float GetFallSpeed() const { return 0.0f; }
+	virtual void SetFallSpeed(float /*speed*/) {}
+
+	virtual const char* GetTypeName() const = 0;
+
 public:
 
 	/// <summary>

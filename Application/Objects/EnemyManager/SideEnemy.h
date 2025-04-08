@@ -44,6 +44,7 @@ public:
 	void OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir) override;
 	void MapChipOnCollision(const CollisionInfo& info) override;
 
+
 	/// <summary>
 	/// 状態リセット
 	/// </summary>
@@ -57,13 +58,21 @@ public:
 	/// <summary>
 	/// 位置設定
 	/// </summary>
-	void SetTranslate(Vector3 pos);
+	void SetTranslate(const Vector3& pos) override;
+	Vector3 GetTranslate() const override { return worldTransform_.translation_; }
 
 	/// <summary>
 	/// プレイヤーのセット
 	/// </summary>
 	/// <param name="player"></param>
 	void SetPlayer(Player* player) { player_ = player; }
+
+	void SetMoveSpeed(float speed) { speed_ = speed; }
+	float GetMoveSpeed() const override { return speed_; }
+	const char* GetTypeName() const override{
+		return "Side";
+	}
+
 
 private:
 
