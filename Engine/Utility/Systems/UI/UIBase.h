@@ -55,6 +55,8 @@ public:
     /// </summary>
     void ImGUi();
 
+    bool isDrawImGui_ = true;
+
 private:
 
     /// <summary>
@@ -224,6 +226,9 @@ protected:
 
     bool showFileBrowser = false;                        // ImGuiファイルブラウザ表示フラグ
     std::string currentDir;                              // ファイルブラウザの現在のディレクトリ
+
+
+
 
     /// <summary>
     ///  現在の状態をJSON形式で作成

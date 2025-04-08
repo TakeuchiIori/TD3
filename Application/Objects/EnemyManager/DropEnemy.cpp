@@ -154,7 +154,7 @@ Vector3 DropEnemy::GetCenterPosition() const
 	};
 }
 
-void DropEnemy::SetTranslate(Vector3 pos)
+void DropEnemy::SetTranslate(const Vector3& pos)
 {
 	worldTransform_.translation_ = pos;
 }

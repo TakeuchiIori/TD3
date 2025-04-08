@@ -63,7 +63,9 @@ void UIBase::Update() {
     }
 
 #ifdef _DEBUG
-    ImGUi();
+    if (!isDrawImGui_) {
+        ImGUi();
+    }
 #endif // _DEBUG
 
 }
