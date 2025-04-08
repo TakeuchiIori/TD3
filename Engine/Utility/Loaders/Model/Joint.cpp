@@ -1,5 +1,6 @@
 #include "Joint.h"
 #include "MathFunc.h"
+#include <unordered_set>
 
 void Joint::Update(std::vector<Joint>& joints)
 {
@@ -13,8 +14,18 @@ void Joint::Update(std::vector<Joint>& joints)
 	}
 }
 
+// イラン奴は除く
+static bool IsIgnoredNode(const std::string& name) {
+	static const std::unordered_set<std::string> ignored = {
+		"Armature", "Retopology_hp_Plane.002"
+	};
+	return ignored.count(name) > 0;
+}
+
+
 int32_t Joint::CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints)
 {
+
 	Joint joint;
 	joint.name_ = node.name_;
 	joint.localMatrix_= node.GetLocalMatrix();

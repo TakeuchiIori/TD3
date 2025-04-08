@@ -12,7 +12,7 @@ void Ground::Initialize(Camera* camera)
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
 	obj_->SetModel("unitFloor.obj");
-	obj_->SetMaterialUVTransform(Multiply(MakeScaleMatrix({ 50,50,0 }), MakeTranslateMatrix({ 0.5f,0.5f,0.0f })));
+	//obj_->SetMaterialUVTransform(Multiply(MakeScaleMatrix({ 50,50,0 }), MakeTranslateMatrix({ 0.5f,0.5f,0.0f })));
 
 	worldTransform_.Initialize();
 	worldTransform_.translation_.y = -1.0f;

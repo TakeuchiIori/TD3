@@ -1,6 +1,8 @@
 #include "SkinCluster.h"
 #include "../Core/DX/DirectXCommon.h"
 #include "../Graphics/SrvManager/SrvManager.h"
+#include "ModelUtils.h"
+
 void SkinCluster::Update(std::vector<Joint> joints_)
 {
 	for (size_t jointIndex = 0; jointIndex < joints_.size(); ++jointIndex) {
@@ -66,3 +68,38 @@ void SkinCluster::CreateResource(size_t jointsSize, size_t verticesSize, std::ma
 
 	}
 }
+
+void SkinCluster::LoadFromScene(const aiScene* scene) {
+	std::map<std::string, JointWeightData> data;
+
+	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
+		aiMesh* mesh = scene->mMeshes[meshIndex];
+		for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
+			aiBone* bone = mesh->mBones[boneIndex];
+			std::string jointName = bone->mName.C_Str();
+			JointWeightData& jointWeightData = data[jointName];
+
+			aiMatrix4x4 bindPoseMatrixAssimp = bone->mOffsetMatrix.Inverse();
+			aiVector3D scale, translate;
+			aiQuaternion rotate;
+			bindPoseMatrixAssimp.Decompose(scale, rotate, translate);
+
+			Matrix4x4 bindposeMatrix = MakeAffineMatrix(
+				{ scale.x, scale.y, scale.z },
+				{ rotate.x, -rotate.y, -rotate.z, rotate.w },
+				{ -translate.x, translate.y, translate.z });
+
+			jointWeightData.inverseBindPoseMatrix = Inverse(bindposeMatrix);
+
+			for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
+				jointWeightData.vertexWeights.push_back({
+					bone->mWeights[weightIndex].mWeight,
+					bone->mWeights[weightIndex].mVertexId
+					});
+			}
+		}
+	}
+
+	SetSkinClusterData(data);
+}
+

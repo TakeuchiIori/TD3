@@ -1,7 +1,7 @@
 #include "Skeleton.h"
 #include "Drawer/LineManager/Line.h"
 
-void Skeleton::CreateSkeleton(const Node& rootNode)
+void Skeleton::Create(const Node& rootNode)
 {
 	root_ = Joint::CreateJoint(rootNode, {}, joints_);
 
@@ -16,7 +16,7 @@ void Skeleton::CreateSkeleton(const Node& rootNode)
 
 }
 
-void Skeleton::UpdateSkeleton()
+void Skeleton::Update()
 {
 	// すべてのJointを更新。親が若いので通常ループで処理が可能になっている
 	for (Joint& joint : joints_) {
@@ -25,7 +25,7 @@ void Skeleton::UpdateSkeleton()
 	}
 }
 
-void Skeleton::DrawSkeleton(Line& line)
+void Skeleton::Draw(Line& line)
 {
 	if (joints_.empty()) {
 		return;
@@ -41,4 +41,5 @@ void Skeleton::DrawSkeleton(Line& line)
 		const Vector3& childPosition = Joint::ExtractJointPosition(joints_[childIndex]);
 		line.RegisterLine(parentPosition, childPosition);
 	}
+	line.DrawLine();
 }

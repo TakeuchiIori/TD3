@@ -21,8 +21,9 @@ public:
 	std::string name_;
 	std::vector<Node> children_;
 	QuaternionTransform transform_;
-private:
 	Matrix4x4 localMatrix_;
+private:
+	
 
 };
 
