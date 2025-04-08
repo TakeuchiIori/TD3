@@ -34,12 +34,6 @@ public:
 	/// </summary>
 	void DrawCollisions();
 
-	/// <summary>
-	/// マップチップで敵を生成
-	/// </summary>
-	/// <param name="field"></param>
-	void SpawnFromMapChip(MapChipField* field);
-
 private:
 
 	/// <summary>

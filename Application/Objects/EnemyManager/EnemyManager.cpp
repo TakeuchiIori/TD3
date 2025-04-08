@@ -9,7 +9,6 @@ void EnemyManager::Initialize(Camera* camera, MapChipField* mapChipField)
 
 	InitJson();
 
-	SpawnFromMapChip(mapChipField);
 }
 
 void EnemyManager::Update()
@@ -21,9 +20,7 @@ void EnemyManager::Update()
 
 	RemoveDeadEnemies();
 	
-
 	CheckSpawnDropEnemy();
-
 
 }
 
@@ -89,36 +86,6 @@ void EnemyManager::AddSideEnemy(const Vector3& pos)
 	enemies_.emplace_back(std::move(enemy));
 }
 
-void EnemyManager::SpawnFromMapChip(MapChipField* field)
-{
-	int mapWidth = field->GetNumBlockHorizontal();
-	int mapHeight = field->GetNumBlockVertical();
-
-	for (int y = 0; y < mapHeight; ++y) {
-		for (int x = 0; x < mapWidth; ++x) {
-
-			MapChipType type = field->GetMapChipTypeByIndex(x, y);
-			Vector3 pos = field->GetMapChipPositionByIndex(x, y);
-
-			switch (type) {
-			case MapChipType::kDropEnemy:
-				pos.y += 2.0f;
-				dropSpawnPoints_.push_back({ pos, false }); // ← ここで予約
-				field->SetMapChipTypeByIndex(x, y, MapChipType::kBlank); // チップ消す
-				break;
-
-			case MapChipType::kSideEnemy:
-				pos.y += 1.0f;
-				AddSideEnemy(pos); // 横敵は即出現
-				field->SetMapChipTypeByIndex(x, y, MapChipType::kBlank); // チップ消す
-				break;
-
-			default:
-				break;
-			}
-		}
-	}
-}
 
 void EnemyManager::CheckSpawnDropEnemy()
 {
