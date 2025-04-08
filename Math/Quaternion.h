@@ -143,8 +143,12 @@ float Dot(const Quaternion& q0, const Quaternion& q1);
 
 Quaternion Lerp(const Quaternion& q1, const Quaternion& q2, float t);
 
+//Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t);
+
 // 2つのクォータニオン間で球面線形補間（Slerp）を行う関数
-Quaternion Slerp(Quaternion q0, Quaternion q1, float t);
+Quaternion Slerp(Quaternion q1, Quaternion q2, float t);
+
+//Quaternion Slerps(const Quaternion& q0In, const Quaternion& q1In, float t);
 
 // 4つのクォータニオン間で球面線形補間（Slerp）を行う関数
 Quaternion CubicSplineInterpolate(const Quaternion& q0, const Quaternion& t0, const Quaternion& q1, const Quaternion& t1, float t);
