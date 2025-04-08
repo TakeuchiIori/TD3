@@ -27,19 +27,19 @@ public:
 	/// スケルトン作成
 	/// </summary>
 	/// <param name="rootNode"></param>
-	void CreateSkeleton(const Node& rootNode);
+	void Create(const Node& rootNode);
 
 	/// <summary>
 	/// スケルトンの更新
 	/// </summary>
-	void UpdateSkeleton();
+	void Update();
 
 
 	/// <summary>
 	///  スケルトンの描画　
 	/// </summary>
 	/// <param name="skeleton"></param>
-	void DrawSkeleton(Line& line);
+	void Draw(Line& line);
 
 public:
 

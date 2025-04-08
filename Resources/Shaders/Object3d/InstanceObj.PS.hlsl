@@ -1,6 +1,7 @@
 #include "Object3d.hlsli"
 struct Material
 {
+    float4 color : SV_TARGET0;
     int enableLighting;
     float4x4 uvTransform;
     float shininess;
@@ -8,10 +9,16 @@ struct Material
     int isHalfVector;
 };
 
-struct MaterialColor
+struct MaterialInstances
 {
     float4 color : SV_TARGET0;
+    int enableLighting;
+    float4x4 uvTransform;
+    float shininess;
+    int enableSpecular;
+    int isHalfVector;
 };
+
 
 struct DirectionalLight
 {
@@ -51,28 +58,29 @@ struct PixelShaderOutput
    
 };
 
-ConstantBuffer<Material> gMaterial : register(b0);
+//ConstantBuffer<Material> gMaterialInstances[instanceID] : register(b0);
+StructuredBuffer <MaterialInstances> gMaterialInstances : register(t2);
+
 ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
 ConstantBuffer<Camera> gCamera : register(b2);
 ConstantBuffer<PointLight> gPointLight : register(b3);
 ConstantBuffer<SpotLight> gSpotLight : register(b4);
-ConstantBuffer<MaterialColor> gMaterialColor : register(b5);
 
 Texture2D<float4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
-PixelShaderOutput main(VertexShaderOutput input)
+PixelShaderOutput main(VertexShaderOutput input,uint instanceID : SV_InstanceID)
 {
     PixelShaderOutput output;
 
     // UV座標変換とテクスチャサンプリング
-    float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
+    float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterialInstances[instanceID].uvTransform);
     float4 textureColor = gTexture.Sample(gSampler, transformedUV.xy);
 
     // 初期化
     float3 finalDiffuse = float3(0.0f, 0.0f, 0.0f);
     float3 finalSpecular = float3(0.0f, 0.0f, 0.0f);
 
-    if (gMaterial.enableLighting)
+    if (gMaterialInstances[instanceID].enableLighting)
     {
         // カメラ視線ベクトル
         float3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
@@ -86,14 +94,14 @@ PixelShaderOutput main(VertexShaderOutput input)
             // 拡散反射
             float NdotL = max(dot(normalize(input.normal), -gDirectionalLight.direction), 0.0f);
             float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-            float3 diffuseDirectional = gMaterialColor.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
+            float3 diffuseDirectional = gMaterialInstances[instanceID].color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
             // 鏡面反射 (Blinn-Phong)
             float3 halfVector = normalize(-gDirectionalLight.direction + toEye);
             float NdotH = max(dot(normalize(input.normal), halfVector), 0.0f);
-            float3 specularDirectional = gDirectionalLight.color.rgb * gDirectionalLight.intensity * pow(saturate(NdotH), gMaterial.shininess);
+            float3 specularDirectional = gDirectionalLight.color.rgb * gDirectionalLight.intensity * pow(saturate(NdotH), gMaterialInstances[instanceID].shininess);
 
             // フラグで有効化
-            if (gMaterial.enableSpecular != 0)
+            if (gMaterialInstances[instanceID].enableSpecular != 0)
             {
                 finalSpecular += specularDirectional;
             }
@@ -114,14 +122,14 @@ PixelShaderOutput main(VertexShaderOutput input)
             
             // 拡散反射
             float NdotLPoint = max(dot(normalize(input.normal), pointLightDirection), 0.0f);
-            float3 diffusePoint = gMaterialColor.color.rgb * textureColor.rgb * gPointLight.color.rgb * NdotLPoint * gPointLight.intensity * factor;
+            float3 diffusePoint = gMaterialInstances[instanceID].color.rgb * textureColor.rgb * gPointLight.color.rgb * NdotLPoint * gPointLight.intensity * factor;
             // 鏡面反射 (Blinn-Phong)
             float3 halfVectorPoint = normalize(pointLightDirection + toEye);
             float NdotHPoint = max(dot(normalize(input.normal), halfVectorPoint), 0.0f);
-            float3 specularPoint = gPointLight.color.rgb * gPointLight.intensity * pow(saturate(NdotHPoint), gMaterial.shininess) * factor;
+            float3 specularPoint = gPointLight.color.rgb * gPointLight.intensity * pow(saturate(NdotHPoint), gMaterialInstances[instanceID].shininess) * factor;
         
             // フラグで有効化
-            if (gMaterial.enableSpecular != 0)
+            if (gMaterialInstances[instanceID].enableSpecular != 0)
             {
                 finalSpecular += specularPoint;
             }
@@ -152,15 +160,15 @@ PixelShaderOutput main(VertexShaderOutput input)
 
             // 拡散反射 (NdotL)
             float NdotLPoint = max(dot(normalize(input.normal), -spotLightDirectionOnSurface), 0.0f);
-            float3 diffusePoint = gMaterialColor.color.rgb * textureColor.rgb * gSpotLight.color.rgb * NdotLPoint * gSpotLight.intensity * falloffFactor;
+            float3 diffusePoint = gMaterialInstances[instanceID].color.rgb * textureColor.rgb * gSpotLight.color.rgb * NdotLPoint * gSpotLight.intensity * falloffFactor;
 
             // 鏡面反射 (Blinn-Phong)
             float3 halfVectorPoint = normalize(-spotLightDirectionOnSurface + toEye);
             float NdotHPoint = max(dot(normalize(input.normal), halfVectorPoint), 0.0f);
-            float3 specularPoint = gSpotLight.color.rgb * gSpotLight.intensity * pow(saturate(NdotHPoint), gMaterial.shininess) * falloffFactor;
+            float3 specularPoint = gSpotLight.color.rgb * gSpotLight.intensity * pow(saturate(NdotHPoint), gMaterialInstances[instanceID].shininess) * falloffFactor;
 
             // スペキュラー反射の有効化
-            if (gMaterial.enableSpecular != 0)
+            if (gMaterialInstances[instanceID].enableSpecular != 0)
             {
                 finalSpecular += specularPoint;
             }
@@ -173,11 +181,11 @@ PixelShaderOutput main(VertexShaderOutput input)
     else
     {
         // ライティングなしの場合
-        output.color.rgb = gMaterialColor.color.rgb * textureColor.rgb;
+        output.color.rgb = gMaterialInstances[instanceID].color.rgb * textureColor.rgb;
     }
 
     // アルファ値の設定
-    output.color.a = gMaterialColor.color.a * textureColor.a;
+    output.color.a = gMaterialInstances[instanceID].color.a * textureColor.a;
 
     return output;
 }

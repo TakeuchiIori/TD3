@@ -104,6 +104,12 @@
     <ClCompile Include="Engine\Graphics\Culling\OcclusionCullingManager.cpp" />
     <ClCompile Include="Application\Objects\Grass\Branch.cpp" />
     <ClCompile Include="Application\Stage\StageManager.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Model\Animation\Animation.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Model\Animation\AnimationSystem.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Model\Material\Material.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Model\Material\MaterialColor.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Model\Material\MaterialManager.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Model\Mesh\Mesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -209,6 +215,14 @@
     <ClInclude Include="Engine\Graphics\Culling\OcclusionCullingManager.h" />
     <ClInclude Include="Application\Objects\Grass\Branch.h" />
     <ClInclude Include="Application\Stage\StageManager.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\ModelUtils.h" />
+    <ClInclude Include="Engine\Utility\Debugger\Logger.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\Animation\Animation.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\Animation\AnimationSystem.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\Material\Material.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\Material\MaterialColor.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\Material\MaterialManager.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\Mesh\Mesh.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />
