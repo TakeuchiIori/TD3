@@ -181,9 +181,9 @@ void GameScreen::Update()
 
 
 
-		ImGui::Begin("Grass");
-		ImGui::DragFloat3("offsetGrass_", &offsetGrass_.x, 0.1f);
-		ImGui::End();
+		//ImGui::Begin("Grass");
+		//ImGui::DragFloat3("offsetGrass_", &offsetGrass_.x, 0.1f);
+		//ImGui::End();
 #endif // _DEBUG
 		grass_[i]->Update();
 

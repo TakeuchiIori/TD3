@@ -178,25 +178,28 @@ void EnemyManager::SaveEnemyDataToJson(const std::string& path)
 
 void EnemyManager::ImGui()
 {
-	if (ImGui::Begin("Enemy Manager")) {
-		if (ImGui::Button("Add DropEnemy")) {
+	if (ImGui::Begin("エネミー管理")) {
+		if (ImGui::Button("上から敵を追加")) {
 			spawnDataList_.push_back({ EnemyType::Drop, {0,0,0}, 1.0f, 2.0f });
 		}
-		if (ImGui::Button("Add SideEnemy")) {
+		if (ImGui::Button("横から敵を追加")) {
 			spawnDataList_.push_back({ EnemyType::Side, {0,0,0}, 1.0f, 0.0f });
 		}
+
+		ImGui::Separator();
+		ImGui::Text("出現予定のエネミー一覧");
 
 		for (size_t i = 0; i < spawnDataList_.size(); ++i) {
 			ImGui::PushID(static_cast<int>(i));
 			auto& data = spawnDataList_[i];
 
-			ImGui::Text("Enemy %zu", i);
-			ImGui::InputFloat3("Position", &data.position.x);
-			ImGui::InputFloat("MoveSpeed", &data.moveSpeed);
+			ImGui::Text("エネミー %zu", i);
+			ImGui::InputFloat3("位置", &data.position.x);
+			ImGui::InputFloat("移動速度", &data.moveSpeed);
 			if (data.type == EnemyType::Drop) {
-				ImGui::InputFloat("FallSpeed", &data.fallSpeed);
+				ImGui::InputFloat("落下速度", &data.fallSpeed);
 			}
-			if (ImGui::Button("Remove")) {
+			if (ImGui::Button("この敵を削除")) {
 				spawnDataList_.erase(spawnDataList_.begin() + i);
 				ImGui::PopID();
 				break;
@@ -205,52 +208,50 @@ void EnemyManager::ImGui()
 			ImGui::PopID();
 		}
 
-		if (ImGui::Button("Save to JSON")) {
+		if (ImGui::Button("JSONに保存（出現前）")) {
 			SaveEnemyDataToJson("Resources/JSON/EnemyData/EnemyData.json");
 		}
-		if (ImGui::Button("Load from JSON")) {
+		if (ImGui::Button("JSONから読み込み")) {
 			LoadEnemyDataFromJson("Resources/JSON/EnemyData/EnemyData.json");
 		}
 	}
 	ImGui::End();
 
-	if (ImGui::Begin("Spawned Enemies")) {
+	if (ImGui::Begin("出現済みエネミー編集")) {
 		for (size_t i = 0; i < enemies_.size(); ++i) {
 			ImGui::PushID(static_cast<int>(i));
 			BaseEnemy* enemy = enemies_[i].get();
 
-			ImGui::Text("Enemy %zu", i);
-			ImGui::Text("Type: %s", enemy->GetTypeName());
+			ImGui::Text("エネミー %zu", i);
+			ImGui::Text("種類: %s", enemy->GetTypeName());
 
 			Vector3 pos = enemy->GetTranslate();
-			if (ImGui::InputFloat3("Position", &pos.x)) {
+			if (ImGui::InputFloat3("位置", &pos.x)) {
 				enemy->SetTranslate(pos);
 			}
 
 			float speed = enemy->GetMoveSpeed();
-			if (ImGui::InputFloat("MoveSpeed", &speed)) {
+			if (ImGui::InputFloat("移動速度", &speed)) {
 				enemy->SetMoveSpeed(speed);
 			}
 
-			if (auto drop = dynamic_cast<DropEnemy*>(enemy)) {
-				float fallSpeed = drop->GetFallSpeed();
-				if (ImGui::InputFloat("FallSpeed", &fallSpeed)) {
-					drop->SetFallSpeed(fallSpeed);
-				}
+			float fallSpeed = enemy->GetFallSpeed();
+			if (ImGui::InputFloat("落下速度", &fallSpeed)) {
+				enemy->SetFallSpeed(fallSpeed);
 			}
 
 			ImGui::Separator();
 			ImGui::PopID();
 		}
-	}
-	if (ImGui::Button("Save Current Enemies to JSON")) {
-		UpdateSpawnDataFromEnemies();
-		SaveEnemyDataToJson("Resources/JSON/EnemyData/EnemyData.json");
-	}
 
+		if (ImGui::Button("現在のエネミーをJSONに保存")) {
+			UpdateSpawnDataFromEnemies();
+			SaveEnemyDataToJson("Resources/JSON/EnemyData/EnemyData.json");
+		}
+	}
 	ImGui::End();
-
 }
+
 
 
 void EnemyManager::CheckSpawnEnemies()
