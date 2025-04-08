@@ -8,5 +8,15 @@
             "z": 0.0
         },
         "type": "Side"
+    },
+    {
+        "fallSpeed": 2.0,
+        "moveSpeed": 1.0,
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "type": "Drop"
     }
 ]

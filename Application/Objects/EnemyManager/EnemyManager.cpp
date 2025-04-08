@@ -179,10 +179,10 @@ void EnemyManager::SaveEnemyDataToJson(const std::string& path)
 void EnemyManager::ImGui()
 {
 	if (ImGui::Begin("エネミー管理")) {
-		if (ImGui::Button("上から敵を追加")) {
+		if (ImGui::Button("上からの敵を追加")) {
 			spawnDataList_.push_back({ EnemyType::Drop, {0,0,0}, 1.0f, 2.0f });
 		}
-		if (ImGui::Button("横から敵を追加")) {
+		if (ImGui::Button("横からの敵を追加")) {
 			spawnDataList_.push_back({ EnemyType::Side, {0,0,0}, 1.0f, 0.0f });
 		}
 
@@ -194,11 +194,11 @@ void EnemyManager::ImGui()
 			auto& data = spawnDataList_[i];
 
 			ImGui::Text("エネミー %zu", i);
-			ImGui::InputFloat3("位置", &data.position.x);
-			ImGui::InputFloat("移動速度", &data.moveSpeed);
-			if (data.type == EnemyType::Drop) {
-				ImGui::InputFloat("落下速度", &data.fallSpeed);
-			}
+			//ImGui::InputFloat3("位置", &data.position.x);
+			//ImGui::InputFloat("移動速度", &data.moveSpeed);
+			//if (data.type == EnemyType::Drop) {
+			//	ImGui::InputFloat("落下速度", &data.fallSpeed);
+			//}
 			if (ImGui::Button("この敵を削除")) {
 				spawnDataList_.erase(spawnDataList_.begin() + i);
 				ImGui::PopID();
@@ -208,7 +208,7 @@ void EnemyManager::ImGui()
 			ImGui::PopID();
 		}
 
-		if (ImGui::Button("JSONに保存（出現前）")) {
+		if (ImGui::Button("JSONに保存")) {
 			SaveEnemyDataToJson("Resources/JSON/EnemyData/EnemyData.json");
 		}
 		if (ImGui::Button("JSONから読み込み")) {
