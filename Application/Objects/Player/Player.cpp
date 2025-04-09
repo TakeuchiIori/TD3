@@ -246,26 +246,30 @@ void Player::OnExitCollision(BaseCollider* self, BaseCollider* other)
 ///////////////////////////////////////////////////////////
 void Player::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
 {
-	if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
+	if (behavior_ == BehaviorPlayer::Moving || behavior_ == BehaviorPlayer::Boost)
 	{
-		switch (dir)
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
 		{
-		case HitDirection::None:
-			break;
-		case HitDirection::Top:
-			break;
-		case HitDirection::Bottom:
-			break;
-		case HitDirection::Left:
-			break;
-		case HitDirection::Right:
-			break;
-		case HitDirection::Front:
-			break;
-		case HitDirection::Back:
-			break;
-		default:
-			break;
+			switch (dir)
+			{
+			case HitDirection::None:
+				break;
+			case HitDirection::Top: // くちばし想定
+				TakeDamage();
+				break;
+			case HitDirection::Bottom:
+				break;
+			case HitDirection::Left:
+				break;
+			case HitDirection::Right:
+				break;
+			case HitDirection::Front:
+				break;
+			case HitDirection::Back:
+				break;
+			default:
+				break;
+			}
 		}
 	}
 }

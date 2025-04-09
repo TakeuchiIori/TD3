@@ -201,9 +201,24 @@ public: // getter&setter
 	int32_t GetMaxGrassGauge() { return MaxGrass_; }
 
 	float GetMaxGrassTime() { return kCreateGrassTime_; }
-	float GetGrassTimer() { return createGrassTimer_; }
 
-	float GetTimeLimit() { return extendTimer_; }
+	float GetGrassTimer() 
+	{
+		if (createGrassTimer_ < 0)
+		{
+			createGrassTimer_ = 0;
+		}
+		return createGrassTimer_;
+	}
+
+	float GetTimeLimit() 
+	{ 
+		if (extendTimer_ < 0) 
+		{
+			extendTimer_ = 0;
+		}
+		return extendTimer_;
+	}
 
 	int32_t GetMaxHP() { return kMaxHP_; }	// 最大HPの取得
 	int32_t GetHP() { return HP_; }			// 現在のHPの取得

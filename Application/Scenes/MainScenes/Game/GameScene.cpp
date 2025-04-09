@@ -112,7 +112,7 @@ void GameScene::Initialize()
 	//=====================================================//
 	/*                  これより下は触るな危険　　　　　　　   　*/
 	//=====================================================//
-	OcclusionCullingManager::GetInstance()->Initialize();
+	//OcclusionCullingManager::GetInstance()->Initialize();
 }
 
 /// <summary>
@@ -214,7 +214,7 @@ void GameScene::Draw()
 	DrawAnimation();
 	DrawLine();
 
-	OcclusionCullingManager::GetInstance()->ResolvedOcclusionQuery();
+	//OcclusionCullingManager::GetInstance()->ResolvedOcclusionQuery();
 }
 
 void GameScene::DrawOffScreen()
