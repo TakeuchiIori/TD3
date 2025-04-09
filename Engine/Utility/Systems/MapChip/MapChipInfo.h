@@ -68,6 +68,7 @@ private:
 	MapChipField* mpField_ = nullptr;
 	std::vector<std::vector<Object3d*>> objects_;
 	std::unique_ptr<JsonManager> jsonManager_;
-	Vector3 color_;
+	Vector3 color_{};
+	float alpha_ = 1.0f;
 };
 

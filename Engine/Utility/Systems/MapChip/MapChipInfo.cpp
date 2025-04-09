@@ -33,6 +33,7 @@ void MapChipInfo::InitJson()
 	jsonManager_ = std::make_unique<JsonManager>("MapChipInfo", "Resources/JSON/MapChip/Info");
 	jsonManager_->SetCategory("MapChip");
 	jsonManager_->Register("Color", &color_);
+	jsonManager_->Register("Alpha", &alpha_);
 }
 
 void MapChipInfo::Update()
@@ -57,6 +58,7 @@ void MapChipInfo::Update()
 		for (auto& obj2 : obj) {
 			if (obj2) {
 				obj2->SetMaterialColor(color_);
+				obj2->SetAlpha(alpha_);
 			}
 		}
 	}
