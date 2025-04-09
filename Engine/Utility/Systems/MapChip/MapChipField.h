@@ -109,7 +109,7 @@ private:
 
     // ブロックの個数
     static inline const uint32_t kNumBlockVertical = 62;      // 縦
-    static inline const uint32_t kNumBlockHorizontal = 16;   // 横  
+    static inline const uint32_t kNumBlockHorizontal = 18;   // 横  
 
 public:
 
