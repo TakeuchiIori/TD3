@@ -197,7 +197,7 @@ private:
 
 	int enter = 0;
 
-	float  centerX_ = 15.0f;
+	float  centerX_ = 17.0f;
 
 
 	// 振る舞い

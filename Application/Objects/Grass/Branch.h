@@ -71,7 +71,7 @@ private:
 	//std::unique_ptr<JsonManager> jsonManager_;
 	//std::unique_ptr<JsonManager> jsonCollider_;
 
-	float rightLimit_ = 30.0f;
+	float rightLimit_ = 34.0f;
 	float leftLimit_ = 0.0f;
 
 	bool isDelete_ = false;
