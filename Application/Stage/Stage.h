@@ -45,6 +45,7 @@ public:
 
 
 private:
+	Camera* camera_ = nullptr;
 	std::unique_ptr<CheckPoint> checkPoint_;	// チェックポイントクラス
 
 	Player* player_ = nullptr;

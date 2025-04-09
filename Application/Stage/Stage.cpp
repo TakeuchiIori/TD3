@@ -2,7 +2,7 @@
 
 void Stage::Initialize(Camera* camera)
 {
-	(void)camera;
+	camera_ = camera;
 	// TODO: それぞれのステージごとの初期化を呼び出す
 	checkPoint_;
 	player_;

@@ -89,6 +89,8 @@ void Player::Update()
 
 	IsPopGrass();
 
+	DamageProcessBodys();
+
 	TimerManager();
 
 	UpdateMatrices();
@@ -392,6 +394,7 @@ void Player::Move()
 
 }
 
+#pragma region // 体が伸びる向き決定
 void Player::UpBody()
 {
 	moveDirection_ = { 0,1,0 };
@@ -456,6 +459,7 @@ void Player::RightBody()
 	body->RightExtend();
 	playerBodys_.push_back(std::move(body));
 }
+#pragma endregion
 
 void Player::EntryMove()
 {
@@ -500,6 +504,10 @@ void Player::TimerManager()
 	{
 		boostCoolTimer_ -= deltaTime_;
 	}
+	if (0 < boostTimer_)
+	{
+		boostTimer_ -= deltaTime_;
+	}
 	if (0 < createGrassTimer_)
 	{
 		createGrassTimer_ -= deltaTime_;
@@ -539,12 +547,6 @@ void Player::ExtendBody()
 
 
 
-
-
-
-
-
-
 	if (playerBodys_.size() > 0)
 	{
 		playerBodys_.back()->SetEndPos(GetCenterPosition());
@@ -566,7 +568,7 @@ void Player::ShrinkBody()
 
 void Player::TakeDamage()
 {
-	if (HP_ > 0 && invincibleTimer_ <= 0 && behavior_ != BehaviorPlayer::Boost)
+	if (HP_ > 0 && invincibleTimer_ <= 0)
 	{
 		HP_--;
 		if (HP_ <= 0)
@@ -578,6 +580,27 @@ void Player::TakeDamage()
 			invincibleTimer_ = kInvincibleTime_;
 		}
 	}
+}
+
+void Player::DamageProcessBodys()
+{
+	for (auto&& body : playerBodys_)
+	{
+		if (0 < boostTimer_)
+		{
+			body->SetIsInvincible(true);
+		}
+		else
+		{
+			body->SetIsInvincible(false);
+		}
+
+		if (body->IsTakeDamage())
+		{
+			TakeDamage();
+		}
+	}
+
 }
 
 #ifdef _DEBUG
@@ -597,6 +620,7 @@ void Player::DebugPlayer()
 	ImGui::Text("isCollisionBody: %d", isCollisionBody);
 	int c = HP_;
 	ImGui::Text("HP : %d", c);
+	ImGui::Text("Inv : %.2f", invincibleTimer_);
 	ImGui::End();
 
 	if (input_->TriggerKey(DIK_N))
@@ -690,17 +714,14 @@ void Player::BehaviorBoostInit()
 {
 	speed_ = defaultSpeed_ + boostSpeed_;
 	boostTimer_ = kBoostTime_;
+	invincibleTimer_ = kBoostTime_; // ブースト中無敵に
 }
 
 void Player::BehaviorBoostUpdate()
 {
 	Move();
 
-	if (0 < boostTimer_)
-	{
-		boostTimer_ -= deltaTime_;
-	}
-	else
+	if (0 >= boostTimer_)
 	{
 		behaviortRquest_ = BehaviorPlayer::Moving;
 		boostCoolTimer_ = kBoostCT_;

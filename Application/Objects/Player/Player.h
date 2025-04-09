@@ -115,6 +115,8 @@ private:
 
 	void TakeDamage();
 
+	void DamageProcessBodys();
+
 
 #ifdef _DEBUG
 	// デバッグ用 (ImGuiとか)
@@ -282,7 +284,7 @@ private:
 
 	//MapChipCollision::CollisionFlag collisionFlag_ = MapChipCollision::CollisionFlag::None;
 
-	std::list <std::unique_ptr<PlayerBody>> playerBodys_;
+	std::list<std::unique_ptr<PlayerBody>> playerBodys_;
 
 	std::list<std::unique_ptr<StuckGrass>> stuckGrassList_;
 
