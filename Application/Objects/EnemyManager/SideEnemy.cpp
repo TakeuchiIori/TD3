@@ -1,6 +1,9 @@
 #include "SideEnemy.h"
 #include "../Player/Player.h"
 
+// DX
+#include <DirectXMath.h>
+
 SideEnemy::~SideEnemy()
 {
 	aabbCollider_->~AABBCollider();
@@ -12,7 +15,7 @@ void SideEnemy::Initialize(Camera* camera)
 
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("cube.obj");
+	obj_->SetModel("needle_Body.obj");
 	obj_->SetMaterialColor({ 1.0f,1.0f,1.0f,1.0f });
 
 	worldTransform_.Initialize();
@@ -131,8 +134,10 @@ void SideEnemy::Move()
 	// 左右移動
 	if (moveRight_) {
 		velocity_.x = speed_;
+		worldTransform_.rotation_.y = 0.0f; // 右向き
 	} else {
 		velocity_.x = -speed_;
+		worldTransform_.rotation_.y = DirectX::XMConvertToRadians(180.0f); // 左向き（180度回転）
 	}
 
 	// 現在のワールド座標を使って、前方のマップを調べる
