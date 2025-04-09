@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Stage.h"
+#include "Systems/MapChip/MapChipInfo.h"
 
 class StageManager
 {
@@ -16,6 +17,8 @@ public:
 	/// </summary>
 	void Update();
 
+	void NotDebugCameraUpdate();
+
 	/// <summary>
 	/// 描画
 	/// </summary>
@@ -23,13 +26,27 @@ public:
 
 	void DrawCollision();
 
+private:
+	void ReloadObject();
 
+public:
+	Player* GetPlayer() { return player_.get(); }
 
-
+	void SetMapChipInfo(MapChipInfo* mapChipInfo) { mpInfo_ = mapChipInfo; }
 
 private:
+	Input* input_ = nullptr;
+
 	Camera* camera_ = nullptr;
 
-	std::list<Stage> stageList_;
+	std::vector<std::unique_ptr<Stage>> stageList_;
+	MapChipInfo* mpInfo_ = nullptr;
+
+	int currentStageNum_ = 0;
+
+
+	std::unique_ptr<Player> player_;
+	//std::unique_ptr<EnemyManager> enemyManager_;
+	std::unique_ptr<GrassManager> grassManager_;
 };
 

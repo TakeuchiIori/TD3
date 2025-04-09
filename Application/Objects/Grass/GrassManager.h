@@ -44,6 +44,13 @@ public:
 
 	void SetPlayer(Player* player) { player_ = player; }
 
+	void ClearGrass()
+	{
+		grassList_.remove_if([](const std::unique_ptr<Grass>& g) {
+			return true;
+			});
+	}
+
 private:
 	Player* player_ = nullptr;
 	std::list<std::unique_ptr<Grass>> grassList_;

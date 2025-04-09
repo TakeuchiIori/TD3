@@ -41,10 +41,10 @@ void Branch::InitCollision()
 
 void Branch::InitJson()
 {
-	jsonManager_ = std::make_unique<JsonManager>("branchObj", "Resources/JSON/");
+	/*jsonManager_ = std::make_unique<JsonManager>("branchObj", "Resources/JSON/");
 
 	jsonCollider_ = std::make_unique<JsonManager>("branchCollider", "Resources/JSON/");
-	aabbCollider_->InitJson(jsonCollider_.get());
+	aabbCollider_->InitJson(jsonCollider_.get());*/
 }
 
 void Branch::Update()

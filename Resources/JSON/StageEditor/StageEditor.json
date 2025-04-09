@@ -1,0 +1,53 @@
+{
+    "stages": [
+        {
+            "checkPoints": [
+                {
+                    "checkPointNumber": 0,
+                    "height": 74.9000015258789,
+                    "objects": [
+                        {
+                            "id": 0,
+                            "position": {
+                                "x": 5.0,
+                                "y": 12.0,
+                                "z": 0.0
+                            }
+                        },
+                        {
+                            "id": 0,
+                            "position": {
+                                "x": 28.0,
+                                "y": 16.0,
+                                "z": 0.0
+                            }
+                        },
+                        {
+                            "id": 0,
+                            "position": {
+                                "x": 25.0,
+                                "y": 19.0,
+                                "z": 0.0
+                            }
+                        },
+                        {
+                            "id": 0,
+                            "position": {
+                                "x": 24.0,
+                                "y": 8.0,
+                                "z": 0.0
+                            }
+                        }
+                    ]
+                }
+            ],
+            "objectDefinitions": [
+                {
+                    "id": 0,
+                    "name": "NewObject"
+                }
+            ],
+            "stageNumber": 0
+        }
+    ]
+}

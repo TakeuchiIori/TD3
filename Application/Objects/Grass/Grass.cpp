@@ -70,10 +70,10 @@ void Grass::InitCollision()
 
 void Grass::InitJson()
 {
-	jsonManager_ = std::make_unique<JsonManager>("grassObj", "Resources/JSON/");
+	/*jsonManager_ = std::make_unique<JsonManager>("grassObj", "Resources/JSON/");
 
 	jsonCollider_ = std::make_unique<JsonManager>("grassCollider", "Resources/JSON/");
-	aabbCollider_->InitJson(jsonCollider_.get());
+	aabbCollider_->InitJson(jsonCollider_.get());*/
 }
 
 void Grass::Update()

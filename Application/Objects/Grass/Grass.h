@@ -176,8 +176,8 @@ private:
 
 	WorldTransform growthAreaWT_;
 
-	std::unique_ptr<JsonManager> jsonManager_;
-	std::unique_ptr<JsonManager> jsonCollider_;
+	//std::unique_ptr<JsonManager> jsonManager_;
+	//std::unique_ptr<JsonManager> jsonCollider_;
 
 	// 枝
 	std::unique_ptr<Branch> branch_;

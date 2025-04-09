@@ -205,6 +205,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Objects\Player\StuckGrass.cpp" />
     <ClCompile Include="Application\Stage\Stage.cpp" />
     <ClCompile Include="Application\Stage\StageManager.cpp" />
+    <ClCompile Include="Application\Stage\StageEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -316,6 +317,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Objects\Player\StuckGrass.h" />
     <ClInclude Include="Application\Stage\Stage.h" />
     <ClInclude Include="Application\Stage\StageManager.h" />
+    <ClInclude Include="Application\Stage\StageEditor.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">

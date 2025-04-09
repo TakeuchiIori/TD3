@@ -105,6 +105,7 @@
     <ClCompile Include="Engine\Utility\Loaders\Model\Material\MaterialManager.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Model\Mesh\Mesh.cpp" />
     <ClCompile Include="Application\Objects\EnemyManager\EnemyEditor.cpp" />
+    <ClCompile Include="Application\Stage\StageEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -216,6 +217,7 @@
     <ClInclude Include="Engine\Utility\Loaders\Model\Material\MaterialManager.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\Mesh\Mesh.h" />
     <ClInclude Include="Application\Objects\EnemyManager\EnemyEditor.h" />
+    <ClInclude Include="Application\Stage\StageEditor.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />

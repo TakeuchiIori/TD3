@@ -55,22 +55,22 @@ void GameScene::Initialize()
 	mpInfo_->Initialize();
 	mpInfo_->SetCamera(sceneCamera_.get());
 
-	player_ = std::make_unique<Player>(mpInfo_->GetMapChipField());
-	player_->Initialize(sceneCamera_.get());
-	followCamera_.SetTarget(player_->GetWorldTransform());
+	stageEditor_ = StageEditor::Instance();
+	stageEditor_->Load("Resources/JSON/StageEditor/StageEditor.json");
+
+	stageManager_ = std::make_unique<StageManager>();
+	stageManager_->SetMapChipInfo(mpInfo_.get());
+	stageManager_->Initialize(sceneCamera_.get());
 
 
-    player_->SetMapInfo(mpInfo_->GetMapChipField());
+	followCamera_.SetTarget(stageManager_->GetPlayer()->GetWorldTransform());
+
 
 	// 敵
 	enemyManager_ = std::make_unique<EnemyManager>();
-	enemyManager_->SetPlayer(player_.get());
+	enemyManager_->SetPlayer(stageManager_->GetPlayer());
 	enemyManager_->Initialize(sceneCamera_.get(), mpInfo_->GetMapChipField());
 
-	// 草
-	grassManager_ = std::make_unique<GrassManager>();
-	grassManager_->SetPlayer(player_.get());
-	grassManager_->Initialize(sceneCamera_.get());
 
     
     // 地面
@@ -106,7 +106,7 @@ void GameScene::Initialize()
 
 	gameScreen_ = std::make_unique<GameScreen>();
 	gameScreen_->SetCamera(sceneCamera_.get());
-	gameScreen_->SetPlayer(player_.get());
+	gameScreen_->SetPlayer(stageManager_->GetPlayer());
 	gameScreen_->Initialize();
 	
 	//=====================================================//
@@ -124,6 +124,7 @@ void GameScene::Update()
 	if ((Input::GetInstance()->TriggerKey(DIK_LCONTROL)) || Input::GetInstance()->IsPadTriggered(0, GamePadButton::RT)) {
 		isDebugCamera_ = !isDebugCamera_;
 	}
+	stageEditor_->DrawEditorUI();
 #endif // _DEBUG
 
 
@@ -139,27 +140,14 @@ void GameScene::Update()
 	testWorldTransform_.UpdateMatrix();
 
 	if (!isDebugCamera_) {
-		player_->Update();
-		grassManager_->hakuGrass(player_->IsPopGrass(), player_->GetCenterPosition());
+		stageManager_->NotDebugCameraUpdate();
 	}
-	player_->SetFPSMode(cameraMode_ == CameraMode::FPS);
+	stageManager_->Update();
 
-	if (player_->EndReturn())
-	{
-		grassManager_->Repop();
-	}
-
-	if (Input::GetInstance()->PushKey(DIK_UP)) {
-		sceneCamera_->SetFovY(sceneCamera_->GetFovY() - 0.001f);
-	}
-	if (Input::GetInstance()->PushKey(DIK_DOWN)) {
-		sceneCamera_->SetFovY(sceneCamera_->GetFovY() + 0.001f);
-	}
 
 	enemyManager_->Update();
 
 	ground_->Update();
-	grassManager_->Update();
 
 	particleEmitter_[0]->Emit();
 
@@ -237,9 +225,8 @@ void GameScene::DrawObject()
 {
 	mpInfo_->Draw();
 	ground_->Draw();
-	player_->Draw();
 	enemyManager_->Draw();
-	grassManager_->Draw();
+	stageManager_->Draw();
 }
 
 void GameScene::DrawSprite()
@@ -254,8 +241,7 @@ void GameScene::DrawAnimation()
 
 void GameScene::DrawLine()
 {
-	player_->DrawCollision();
-	grassManager_->DrawCollision();
+	stageManager_->DrawCollision();
 	enemyManager_->DrawCollisions();
 }
 

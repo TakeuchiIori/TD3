@@ -33,6 +33,8 @@
 #include "Player/Player.h"
 #include "Grass/GrassManager.h"
 #include "../SpriteApp/ScreenApp/GameScreen.h"
+#include "StageManager.h"
+#include "StageEditor.h"
 
 enum class CameraMode
 {
@@ -167,9 +169,9 @@ private:
     std::unique_ptr<Ground> ground_;
 
     // 3Dモデル
-    std::unique_ptr<Player> player_;
+    //std::unique_ptr<Player> player_;
     std::unique_ptr<EnemyManager> enemyManager_;
-    std::unique_ptr<GrassManager> grassManager_;
+    //std::unique_ptr<GrassManager> grassManager_;
 
     /*=================================================================
 
@@ -188,4 +190,7 @@ private:
     =================================================================*/
     std::unique_ptr<MapChipInfo> mpInfo_;
     bool isClear_ = false;
+
+    StageEditor* stageEditor_ = nullptr;
+    std::unique_ptr<StageManager> stageManager_;
 };

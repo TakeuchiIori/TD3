@@ -17,11 +17,16 @@
 class Stage
 {
 public:
+	// デフォルトコンストラクタ
+	Stage() = default;
+	~Stage() = default;
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
 	void Initialize(Camera* camera);
 	void InitJson();
+	void InitCheckPoint();
 
 	/// <summary>
 	/// 更新
@@ -38,19 +43,23 @@ public:
 	// チェックポイントにたどり着いたときの処理
 	void ReachCheckPoint();
 
+
+public:
+	void ReloadObject();
+
 public:
 	void SetPlayer(Player* player) { player_ = player; }
 	void SetEnemyManager(EnemyManager* enemyManager) { enemyManager_ = enemyManager; }
-	void SetEnemyManager(GrassManager* grassManager) { grassManager_ = grassManager; }
+	void SetGrassManager(GrassManager* grassManager) { grassManager_ = grassManager; }
 
 
 private:
-	std::string stageName_;
+	int currentStageNum_ = 0;
 
-	std::vector<std::unique_ptr<CheckPoint>> checkPoint_;	// チェックポイントクラス
+	CheckPoint checkPoint_;	// チェックポイントクラス
 
 	std::unique_ptr<JsonManager> jsonManager_;
-
+	
 	Camera* camera_ = nullptr;
 
 	Player* player_ = nullptr;
