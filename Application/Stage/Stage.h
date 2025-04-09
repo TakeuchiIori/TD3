@@ -51,6 +51,8 @@ private:
 
 	std::unique_ptr<JsonManager> jsonManager_;
 
+	Camera* camera_ = nullptr;
+
 	Player* player_ = nullptr;
 	EnemyManager* enemyManager_ = nullptr;
 	GrassManager* grassManager_ = nullptr;
