@@ -1,0 +1,22 @@
+[
+    {
+        "fallSpeed": 0.0,
+        "moveSpeed": 0.20000000298023224,
+        "position": {
+            "x": 21.60000991821289,
+            "y": 4.0,
+            "z": 0.0
+        },
+        "type": "Side"
+    },
+    {
+        "fallSpeed": 2.0,
+        "moveSpeed": 1.0,
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "type": "Drop"
+    }
+]

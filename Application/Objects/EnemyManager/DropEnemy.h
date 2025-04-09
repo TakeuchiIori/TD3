@@ -57,7 +57,8 @@ public:
 	/// <summary>
 	/// 位置設定
 	/// </summary>
-	void SetTranslate(Vector3 pos);
+	void SetTranslate(const Vector3& pos) override;
+	Vector3 GetTranslate() const override { return worldTransform_.translation_; }
 
 	/// <summary>
 	/// プレイヤーのセット
@@ -65,6 +66,19 @@ public:
 	/// <param name="player"></param>
 	void SetPlayer(Player* player) { player_ = player; }
 
+	void SetMoveSpeed(float speed) { defaultSpeed_ = speed; }
+	float GetMoveSpeed() const override { return defaultSpeed_; }
+	
+
+	
+
+	float GetFallSpeed() const override { return velocity_.y; }
+	void SetFallSpeed(float speed) override { velocity_.y = speed; }
+
+
+	const char* GetTypeName() const override {
+		return "Drop";
+	}
 
 private:
 

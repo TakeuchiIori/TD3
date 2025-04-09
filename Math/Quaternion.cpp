@@ -233,30 +233,138 @@ Quaternion Lerp(const Quaternion& q1, const Quaternion& q2, float t)
     return result;
 }
 
-Quaternion Slerp(Quaternion q0, Quaternion q1, float t) {
-    float dot = Dot(q0, q1);
+Quaternion Slerp(Quaternion q1, Quaternion q2, float t)
+{
+    // クォータニオンの内積を計算
+    float dot = q1.x * q2.x + q1.y * q2.y + q1.z * q2.z + q1.w * q2.w;
+
+    // ドット積が負の場合、逆の方向に補間するために q2 を反転
     if (dot < 0.0f) {
-        q0 = { -q0.x, -q0.y, -q0.z, -q0.w }; // 反対方向に補間
+        q2.x = -q2.x;
+        q2.y = -q2.y;
+        q2.z = -q2.z;
+        q2.w = -q2.w;
         dot = -dot;
     }
 
-    // なす角を求める
-    float theta = std::acos(dot);
-    float sinTheta = std::sin(theta);
-
-    // 補間係数を求める
-    if (sinTheta > 0.001f) { // 数値安定性のための閾値
-        float scale0 = std::sin((1 - t) * theta) / sinTheta;
-        float scale1 = std::sin(t * theta) / sinTheta;
-
-        // 補間後のQuaternionを計算
-        return q0 * scale0 + q1 * scale1;
+    // 補間係数を使った係数の計算
+    const float threshold = 0.9995f;
+    if (dot > threshold) {
+        // ドット積が閾値を超えた場合、線形補間を実行（角度が小さいため）
+        Quaternion result = {
+            q1.x + t * (q2.x - q1.x),
+            q1.y + t * (q2.y - q1.y),
+            q1.z + t * (q2.z - q1.z),
+            q1.w + t * (q2.w - q1.w)
+        };
+        return Normalize(result); // 結果を正規化
     }
-    else {
-        // ほぼ同じ方向の場合、線形補間
-        return q0 * (1 - t) + q1 * t;
-    }
+
+    // 角度の計算
+    float theta_0 = std::acos(dot);        // θ0 = q1 と q2 間の角度
+    float theta = theta_0 * t;             // θ = t に対応する角度
+
+    // 係数の計算
+    float sin_theta = std::sin(theta);
+    float sin_theta_0 = std::sin(theta_0);
+
+    float s1 = std::cos(theta) - dot * sin_theta / sin_theta_0;
+    float s2 = sin_theta / sin_theta_0;
+
+    // 補間結果の計算
+    Quaternion result = {
+        s1 * q1.x + s2 * q2.x,
+        s1 * q1.y + s2 * q2.y,
+        s1 * q1.z + s2 * q2.z,
+        s1 * q1.w + s2 * q2.w
+    };
+    return result;
 }
+
+
+
+//Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t) {
+//    // クォータニオンの内積を計算
+//    float dot = Dot(q0, q1);
+//
+//    // クォータニオンが反対向きの場合、内積が負になるので符号を反転
+//    const float THRESHOLD = 0.9995f;
+//    if (dot < 0.0f) {
+//        dot = -dot;
+//        Quaternion negQ1 = { -q1.x, -q1.y, -q1.z, -q1.w };
+//        return Slerp(q0, negQ1, t);
+//    }
+//
+//    // 内積が閾値以上の場合、線形補間を使用
+//    if (dot > THRESHOLD) {
+//        Quaternion result = {
+//            q0.x + t * (q1.x - q0.x),
+//            q0.y + t * (q1.y - q0.y),
+//            q0.z + t * (q1.z - q0.z),
+//            q0.w + t * (q1.w - q0.w)
+//        };
+//        // 正規化
+//        float norm = std::sqrt(result.x * result.x + result.y * result.y + result.z * result.z + result.w * result.w);
+//        return { result.x / norm, result.y / norm, result.z / norm, result.w / norm };
+//    }
+//
+//    if (dot >= 1.0f - THRESHOLD) {
+//        Quaternion result = (1.0f - t) * q0 + t * q1;
+//
+//        // 正規化
+//        float norm = std::sqrt(result.x * result.x + result.y * result.y + result.z * result.z + result.w * result.w);
+//        return { result.x / norm, result.y / norm, result.z / norm, result.w / norm };
+//    }
+//
+//
+//    // 角度を計算
+//    float theta_0 = std::acos(dot);
+//    float theta = theta_0 * t;
+//    float sin_theta = std::sin(theta);
+//    float sin_theta_0 = std::sin(theta_0);
+//
+//    float s0 = std::cos(theta) - dot * sin_theta / sin_theta_0;
+//    float s1 = sin_theta / sin_theta_0;
+//
+//    return {
+//        s0 * q0.x + s1 * q1.x,
+//        s0 * q0.y + s1 * q1.y,
+//        s0 * q0.z + s1 * q1.z,
+//        s0 * q0.w + s1 * q1.w
+//    };
+//}
+
+
+//Quaternion Slerps(const Quaternion& q0In, const Quaternion& q1In, float t)
+//{
+//    // 入力を正規化（念のため）
+//    Quaternion q0 = Normalize(q0In);
+//    Quaternion q1 = Normalize(q1In);
+//
+//    // 最短経路を取るために dot が負なら q1 を反転
+//    float dot = Dot(q0, q1);
+//    if (dot < 0.0f) {
+//        q1 = { -q1.x, -q1.y, -q1.z, -q1.w };
+//        dot = -dot;
+//    }
+//
+//    // ほぼ同一方向なら NLerp で十分
+//    const float kThreshold = 0.9995f;
+//    if (dot > kThreshold) {
+//        Quaternion result = q0 * (1.0f - t) + q1 * t;
+//        return Normalize(result);
+//    }
+//
+//    // 通常の Slerp
+//    float theta = std::acos(dot);
+//    float sinTheta = std::sin(theta);
+//    float scale0 = std::sin((1.0f - t) * theta) / sinTheta;
+//    float scale1 = std::sin(t * theta) / sinTheta;
+//
+//    Quaternion result = q0 * scale0 + q1 * scale1;
+//    return Normalize(result);   // ★ 出力も正規化
+//}
+
 
 Quaternion CubicSplineInterpolate(const Quaternion& q0, const Quaternion& t0, const Quaternion& q1, const Quaternion& t1, float t) {
     // t の 2乗と 3乗を計算

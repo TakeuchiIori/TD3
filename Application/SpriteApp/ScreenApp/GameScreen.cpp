@@ -42,6 +42,12 @@ void GameScreen::Initialize()
 	option_[5] = std::make_unique<UIBase>("Controller_5");
 	option_[5]->Initialize("Resources/JSON/UI/Controller_5.json");
 
+	// ImGuiの描画やめる
+	for (uint32_t i = 0; i < numOptions_; i++)
+	{
+		option_[i]->isDrawImGui_ = false;
+	}
+
 	///////////////////////////////////////////////////////////////////////////
 	// 
 	// 草の初期化
@@ -51,6 +57,11 @@ void GameScreen::Initialize()
 	grass_[0]->Initialize("Resources/JSON/UI/Grass_0.json");
 	grass_[1] = std::make_unique<UIBase>("Grass_1");
 	grass_[1]->Initialize("Resources/JSON/UI/Grass_1.json");
+
+	// ImGuiの描画やめる
+	for (uint32_t i = 0; i < 2; i++) {
+		grass_[i]->isDrawImGui_ = false;
+	}
 	
 	///////////////////////////////////////////////////////////////////////////
 	// 
@@ -181,9 +192,9 @@ void GameScreen::Update()
 
 
 
-		ImGui::Begin("Grass");
-		ImGui::DragFloat3("offsetGrass_", &offsetGrass_.x, 0.1f);
-		ImGui::End();
+		//ImGui::Begin("Grass");
+		//ImGui::DragFloat3("offsetGrass_", &offsetGrass_.x, 0.1f);
+		//ImGui::End();
 #endif // _DEBUG
 		grass_[i]->Update();
 

@@ -159,8 +159,9 @@ Vector3 SideEnemy::GetCenterPosition() const
 	};
 }
 
-void SideEnemy::SetTranslate(Vector3 pos)
+void SideEnemy::SetTranslate(const Vector3& pos)
 {
 	worldTransform_.translation_ = pos;
 	startPos_ = pos;
 }
+

@@ -8,6 +8,29 @@ class EnemyManager
 {
 public:
 
+	enum class EnemyType {
+		Drop,
+		Side
+	};
+
+	struct EnemySpawnData {
+		EnemyType type;
+		Vector3 position;
+		float moveSpeed = 1.0f;
+		float fallSpeed = 0.0f; // DropEnemy 専用
+		bool triggered = false; //
+
+		// JSON用の型変換（文字列との変換）
+		static std::string ToString(EnemyType type) {
+			return type == EnemyType::Drop ? "Drop" : "Side";
+		}
+
+		static EnemyType FromString(const std::string& str) {
+			return (str == "Drop") ? EnemyType::Drop : EnemyType::Side;
+		}
+	};
+
+
 	struct EnemySpawnPoint {
 		Vector3 position;
 		bool triggered = false;
@@ -34,18 +57,15 @@ public:
 	/// </summary>
 	void DrawCollisions();
 
-	/// <summary>
-	/// マップチップで敵を生成
-	/// </summary>
-	/// <param name="field"></param>
-	void SpawnFromMapChip(MapChipField* field);
-
 private:
 
 	/// <summary>
 	/// json
 	/// </summary>
 	void InitJson();
+
+
+	void SpawnAllEnemies();
 
 	/// <summary>
 	/// 死亡フラグのたった敵の削除
@@ -66,7 +86,16 @@ private:
 	/// <summary>
 	/// 出現チェック
 	/// </summary>
-	void CheckSpawnDropEnemy();
+	//void CheckSpawnDropEnemy();
+
+	void LoadEnemyDataFromJson(const std::string& path);
+	void SaveEnemyDataToJson(const std::string& path);
+	void ImGui();
+
+	void CheckSpawnEnemies();
+
+	void UpdateSpawnDataFromEnemies();
+
 
 public:
 
@@ -87,5 +116,7 @@ private:
 	float triggerDistance_ = 20.0f;
 	std::vector<EnemySpawnPoint> dropSpawnPoints_;
 	std::unique_ptr< JsonManager> jsonManager_;
+
+	std::vector<EnemySpawnData> spawnDataList_;
 
 };

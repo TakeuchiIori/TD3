@@ -84,6 +84,10 @@ public:
 	void SetCategory(const std::string& category) { category_ = category; }
 	const std::string& GetCategory() const { return category_; }
 
+	void SetSubCategory(const std::string& subCategory) { subCategory_ = subCategory; }
+	const std::string& GetSubCategory() const { return subCategory_; }
+
+
 private:
 	/// <summary>
 	///  フォルダパスとファイル名からフルパス文字列を組み立てる
@@ -104,6 +108,7 @@ private:
 	static inline std::unordered_map<std::string, JsonManager*> instances;
 	static inline std::string selectedClass;
 	std::string category_;
+	std::string subCategory_;
 };
 template<typename T>
 inline void JsonManager::ChildRegister(std::string parentFileName, std::string childName, const std::string& name, T* ptr)
