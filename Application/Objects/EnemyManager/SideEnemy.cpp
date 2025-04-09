@@ -1,5 +1,7 @@
 #include "SideEnemy.h"
 #include "../Player/Player.h"
+#include "Easing.h"
+
 
 // DX
 #include <DirectXMath.h>
@@ -128,23 +130,26 @@ void SideEnemy::MapChipOnCollision(const CollisionInfo& info) {
 }
 
 
-void SideEnemy::Move()
-{
+/// <summary>
+///  移動処理（回転補間による滑らかな方向転換）
+/// </summary>
+void SideEnemy::Move() {
+	// ターゲット回転角度（Y軸）
+	float targetRotationY = moveRight_
+		? DirectX::XMConvertToRadians(270.0f)
+		: DirectX::XMConvertToRadians(90.0f);
 
-	// 左右移動
-	if (moveRight_) {
-		velocity_.x = speed_;
-		worldTransform_.rotation_.y = 0.0f; // 右向き
-	} else {
-		velocity_.x = -speed_;
-		worldTransform_.rotation_.y = DirectX::XMConvertToRadians(180.0f); // 左向き（180度回転）
-	}
+	float t = 0.7f;
+	t = Easing::easeInExpo(t);
+	worldTransform_.rotation_.y = Lerp(worldTransform_.rotation_.y, targetRotationY, t);
+	// 移動速度の設定（方向に応じて）
+	velocity_.x = moveRight_ ? speed_ : -speed_;
 
-	// 現在のワールド座標を使って、前方のマップを調べる
+	// 進行方向を使って前方チェック座標を計算
 	Vector3 checkPos = worldTransform_.translation_;
-	checkPos.x += (moveRight_ ? 1.0f : -1.0f); // 進行方向に1.0fずらす
-
+	checkPos.x += (moveRight_ ? 1.0f : -1.0f);
 }
+
 
 void SideEnemy::Reset(Vector3& pos)
 {
