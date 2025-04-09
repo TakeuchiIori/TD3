@@ -24,6 +24,15 @@ void MapChipInfo::Initialize()
 	mpField_->LoadMapChipCsv("Resources/images/MapChip.csv");
 
 	GenerateBlocks();
+
+	InitJson();
+}
+
+void MapChipInfo::InitJson()
+{
+	jsonManager_ = std::make_unique<JsonManager>("MapChipInfo", "Resources/JSON/MapChip/Info");
+	jsonManager_->SetCategory("MapChip");
+	jsonManager_->Register("Color", &color_);
 }
 
 void MapChipInfo::Update()
@@ -44,7 +53,13 @@ void MapChipInfo::Update()
 			}
 		}
 	}
-
+	for (auto& obj : objects_) {
+		for (auto& obj2 : obj) {
+			if (obj2) {
+				obj2->SetMaterialColor(color_);
+			}
+		}
+	}
 
 }
 

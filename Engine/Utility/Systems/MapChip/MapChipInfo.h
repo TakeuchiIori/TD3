@@ -6,6 +6,7 @@
 #include "Systems/Camera/Camera.h"
 #include "Object3D/Object3d.h"
 #include "WorldTransform/WorldTransform.h"
+#include "Loaders/Json/JsonManager.h"
 
 // C++ 
 #include <vector>
@@ -22,6 +23,8 @@ public:
 	/// 初期化
 	/// </summary>
 	void Initialize();
+	
+	void InitJson();
 
 	/// <summary>
 	/// 更新
@@ -64,5 +67,7 @@ private:
 	std::vector<std::vector<WorldTransform*>> wt_;
 	MapChipField* mpField_ = nullptr;
 	std::vector<std::vector<Object3d*>> objects_;
+	std::unique_ptr<JsonManager> jsonManager_;
+	Vector3 color_;
 };
 
