@@ -32,8 +32,11 @@ void MapChipInfo::InitJson()
 {
 	jsonManager_ = std::make_unique<JsonManager>("MapChipInfo", "Resources/JSON/MapChip/Info");
 	jsonManager_->SetCategory("MapChip");
-	jsonManager_->Register("Color", &color_);
-	jsonManager_->Register("Alpha", &alpha_);
+	jsonManager_->Register("1:Color", &color_[0]);
+	jsonManager_->Register("1:Alpha", &alpha_[0]);
+
+	jsonManager_->Register("4:Color", &color_[1]);
+	jsonManager_->Register("4:Alpha", &alpha_[1]);
 }
 
 void MapChipInfo::Update()
@@ -57,12 +60,20 @@ void MapChipInfo::Update()
 	for (auto& obj : objects_) {
 		for (auto& obj2 : obj) {
 			if (obj2) {
-				obj2->SetMaterialColor(color_);
-				obj2->SetAlpha(alpha_);
+				obj2->SetMaterialColor(color_[0]);
+				obj2->SetAlpha(alpha_[0]);
 			}
 		}
 	}
 
+	for (auto& obj : floors_) {
+		for (auto& obj2 : obj) {
+			if (obj2) {
+				obj2->SetMaterialColor(color_[1]);
+				obj2->SetAlpha(alpha_[1]);
+			}
+		}
+	}
 }
 
 void MapChipInfo::Draw() {
@@ -70,6 +81,14 @@ void MapChipInfo::Draw() {
 		for (uint32_t j = 0; j < wt_[i].size(); ++j) {
 			if (wt_[i][j] && objects_[i][j]) {
 				objects_[i][j]->Draw(camera_, *wt_[i][j]);
+			}
+		}
+	}
+
+	for (uint32_t i = 0; i < wt_.size(); ++i) {
+		for (uint32_t j = 0; j < wt_[i].size(); ++j) {
+			if (floors_[i][j]) {
+				floors_[i][j]->Draw(camera_, *wt_[i][j]);
 			}
 		}
 	}
@@ -84,11 +103,13 @@ void MapChipInfo::GenerateBlocks()
 	// 列数を設定 (縦方向のブロック数)
 	wt_.resize(numBlockVirtical);
 	objects_.resize(numBlockVirtical);
+	floors_.resize(numBlockVirtical);
 	// キューブの生成
 	for (uint32_t i = 0; i < numBlockVirtical; ++i) {
 		// 1列の要素数を設定 (横方向のブロック数)
 		wt_[i].resize(numBlockHorizotal);
 		objects_[i].resize(numBlockHorizotal);
+		floors_[i].resize(numBlockHorizotal);
 	}
 	// ブロックの生成
 	for (uint32_t i = 0; i < numBlockVirtical; ++i) {
@@ -101,11 +122,20 @@ void MapChipInfo::GenerateBlocks()
 				wt_[i][j] = worldTransform;
 				wt_[i][j]->translation_ = mpField_->GetMapChipPositionByIndex(j, i);
 
-				Object3d* obj = new Object3d();
+				auto obj = std::make_unique<Object3d>();
 				obj->Initialize();
 				obj->SetModel("cube.obj");
-				//obj->SetMaterialColor({ 0.0f, 0.0f, 0.0f, 1.0f });
-				objects_[i][j] = obj;
+				objects_[i][j] = std::move(obj);
+
+			} else if (mpField_->GetMapChipTypeByIndex(j, i) == MapChipType::kFloor) {
+				WorldTransform* worldTransform = new WorldTransform();
+				worldTransform->Initialize();
+				wt_[i][j] = worldTransform;
+				wt_[i][j]->translation_ = mpField_->GetMapChipPositionByIndex(j, i);
+				auto obj = std::make_unique<Object3d>();
+				obj->Initialize();
+				obj->SetModel("cube.obj");
+				floors_[i][j] = std::move(obj);
 			}
 		}
 	}

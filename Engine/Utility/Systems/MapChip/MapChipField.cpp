@@ -8,6 +8,8 @@ MapChipField::MapChipField() {
     RegisterMapChipType("2", MapChipType::kDropEnemy);
     RegisterMapChipType("3", MapChipType::kSideEnemy);
 
+    RegisterMapChipType("5", MapChipType::kFloor);
+
     // マップチップデータの初期化
     ResetMapChipData();
 }
