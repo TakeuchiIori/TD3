@@ -72,7 +72,8 @@ private:
 public: // アクセッサ
 	Model* GetModel() { return model_; }
 	void SetMaterialColor(const Vector4& color) { materialColor_->SetColor(color); }
-
+	void SetMaterialColor(const Vector3& color) { materialColor_->SetColor(color); }
+	void SetAlpha(float alpha) { materialColor_->SetAlpha(alpha); }
 
 private:
 

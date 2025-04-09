@@ -252,6 +252,34 @@ void JsonManager::ImGuiManager()
 	ImGui::EndChild();
 
 	// （以下、選択クラスの表示などはそのまま）
+	if (!selectedClass.empty()) {
+		auto it = instances.find(selectedClass);
+		if (it != instances.end()) {
+			JsonManager* instance = it->second;
+
+			ImGui::TextColored(ImVec4(1.0f, 0.6f, 0.2f, 1.0f), "[ %s ]", selectedClass.c_str());
+			//ImGui::Separator();
+
+			ImGui::PushID(selectedClass.c_str());
+
+			// 変数表示もスクロールできるように
+			ImGui::BeginChild("VariableList", ImVec2(0, 200), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+
+			for (auto& pair : instance->variables_) {
+				pair.second->ShowImGui(pair.first, selectedClass);
+			}
+
+			ImGui::EndChild();
+
+			if (ImGui::Button(("Save " + selectedClass).c_str())) {
+				std::string message = format("{}.json Saved!!.", selectedClass);
+				MessageBoxA(nullptr, message.c_str(), "JsonManager", 0);
+				instance->Save();
+			}
+
+			ImGui::PopID();
+		}
+	}
 
 	ImGui::End();
 #endif

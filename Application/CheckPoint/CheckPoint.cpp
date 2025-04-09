@@ -24,7 +24,7 @@ void CheckPoint::DebugInitialize(Camera* camera)
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
 	obj_->SetModel("unitCube.obj");
-	obj_->SetMaterialColor({ 1,1,1 });
+	obj_->SetMaterialColor(Vector3{ 1,1,1 });
 }
 
 void CheckPoint::DebugUpdate()
