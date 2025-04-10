@@ -64,11 +64,15 @@ private:
 
 	========================================================================*/
 	Camera* camera_ = nullptr;
-	std::vector<std::vector<WorldTransform*>> wt_;
 	MapChipField* mpField_ = nullptr;
-	std::vector<std::vector<Object3d*>> objects_;
+	std::vector<std::vector<WorldTransform*>> wt_;
+	std::vector<std::vector<std::unique_ptr<Object3d>>> objects_;
 	std::unique_ptr<JsonManager> jsonManager_;
-	Vector3 color_{};
-	float alpha_ = 1.0f;
+	std::vector<std::vector<std::unique_ptr<Object3d>>> floors_;
+
+
+
+	Vector3 color_[2]{};
+	float alpha_[2];
 };
 

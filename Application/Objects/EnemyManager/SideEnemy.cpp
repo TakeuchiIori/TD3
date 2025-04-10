@@ -1,5 +1,10 @@
 #include "SideEnemy.h"
 #include "../Player/Player.h"
+#include "Easing.h"
+
+
+// DX
+#include <DirectXMath.h>
 
 SideEnemy::~SideEnemy()
 {
@@ -12,7 +17,7 @@ void SideEnemy::Initialize(Camera* camera)
 
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("cube.obj");
+	obj_->SetModel("bard.obj");
 	obj_->SetMaterialColor({ 1.0f,1.0f,1.0f,1.0f });
 
 	worldTransform_.Initialize();
@@ -125,21 +130,26 @@ void SideEnemy::MapChipOnCollision(const CollisionInfo& info) {
 }
 
 
-void SideEnemy::Move()
-{
+/// <summary>
+///  移動処理（回転補間による滑らかな方向転換）
+/// </summary>
+void SideEnemy::Move() {
+	// ターゲット回転角度（Y軸）
+	float targetRotationY = moveRight_
+		? DirectX::XMConvertToRadians(270.0f)
+		: DirectX::XMConvertToRadians(90.0f);
 
-	// 左右移動
-	if (moveRight_) {
-		velocity_.x = speed_;
-	} else {
-		velocity_.x = -speed_;
-	}
+	float t = 0.7f;
+	t = Easing::easeInExpo(t);
+	worldTransform_.rotation_.y = Lerp(worldTransform_.rotation_.y, targetRotationY, t);
+	// 移動速度の設定（方向に応じて）
+	velocity_.x = moveRight_ ? speed_ : -speed_;
 
-	// 現在のワールド座標を使って、前方のマップを調べる
+	// 進行方向を使って前方チェック座標を計算
 	Vector3 checkPos = worldTransform_.translation_;
-	checkPos.x += (moveRight_ ? 1.0f : -1.0f); // 進行方向に1.0fずらす
-
+	checkPos.x += (moveRight_ ? 1.0f : -1.0f);
 }
+
 
 void SideEnemy::Reset(Vector3& pos)
 {
