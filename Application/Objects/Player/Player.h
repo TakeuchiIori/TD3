@@ -190,8 +190,11 @@ public: // getter&setter
 
 	bool EndReturn()
 	{
-		return beforebehavior_ == BehaviorPlayer::Return &&
-			behavior_ == BehaviorPlayer::Root;
+		if (behaviortRquest_ == BehaviorPlayer::Root)
+		{
+			return true;
+		}
+		return false;
 	}
 
 	bool IsPopGrass();

@@ -37,8 +37,11 @@ void StageManager::Update()
 	}
 	stageList_[currentStageNum_]->Update();
 
+	grassManager_->Update();
+
 	if (player_->EndReturn())
 	{
+
 		grassManager_->Repop();
 	}
 }

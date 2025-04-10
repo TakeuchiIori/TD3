@@ -77,7 +77,6 @@ void Player::InitJson()
 
 void Player::Update()
 {
-	beforebehavior_ = behavior_;
 
 	// 各行動の初期化
 	BehaviorInitialize();
@@ -102,6 +101,7 @@ void Player::Update()
 	DebugPlayer();
 #endif // _DEBUG
 
+	beforebehavior_ = behavior_;
 }
 
 void Player::Draw()
@@ -563,10 +563,10 @@ void Player::ShrinkBody()
 	if (playerBodys_.size() > 0)
 	{
 		playerBodys_.back()->SetEndPos(GetCenterPosition());
-	}
-	if (playerBodys_.back()->GetLength() <= 0)
-	{
-		playerBodys_.pop_back();
+		if (playerBodys_.back()->GetLength() <= 0)
+		{
+			playerBodys_.pop_back();
+		}
 	}
 }
 
@@ -742,6 +742,7 @@ void Player::BehaviorReturnInit()
 	speed_ = defaultSpeed_ + boostSpeed_;
 	moveDirection_ = { 0,0,0 };
 	isCollisionBody = false;
+	extendTimer_ = 0;
 }
 
 void Player::BehaviorReturnUpdate()
