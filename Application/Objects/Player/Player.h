@@ -64,6 +64,8 @@ public:
 	void MapChipOnCollision(const CollisionInfo& info);
 
 
+	void Reset();
+
 public:
 	Vector3 GetCenterPosition() const { 
 		return
@@ -75,6 +77,8 @@ public:
 	}
 	//virtual Vector3 GetEulerRotation() override { return{}; }
 	const WorldTransform& GetWorldTransform() { return worldTransform_; }
+
+	void SetPos(Vector3 pos) { worldTransform_.translation_ = pos; }
 
 	// 衝突イベント（共通で受け取る）
 	void OnEnterCollision(BaseCollider* self, BaseCollider* other);

@@ -23,6 +23,7 @@ void StageManager::Initialize(Camera* camera)
 	stageList_[0]->SetPlayer(player_.get());
 	stageList_[0]->SetGrassManager(grassManager_.get());
 
+	ReloadObject();
 }
 
 void StageManager::InitJson()

@@ -152,6 +152,17 @@ void Player::MapChipOnCollision(const CollisionInfo& info)
 	}
 }
 
+void Player::Reset()
+{
+	extendTimer_ = 0;
+	boostCoolTimer_ = 0;
+	boostTimer_ = 0;
+	createGrassTimer_ = 0;
+	invincibleTimer_ = 0;
+	playerBodys_.clear();
+	behaviortRquest_ = BehaviorPlayer::Root;
+}
+
 
 
 

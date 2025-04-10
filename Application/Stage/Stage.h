@@ -58,7 +58,7 @@ private:
 
 	CheckPoint checkPoint_;	// チェックポイントクラス
 
-	std::unique_ptr<JsonManager> jsonManager_;
+	//std::unique_ptr<JsonManager> jsonManager_;
 	
 	Camera* camera_ = nullptr;
 

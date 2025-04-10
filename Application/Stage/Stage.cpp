@@ -27,7 +27,12 @@ void Stage::Update()
 	player_->Update();
 	//enemyManager_->Update();
 	grassManager_->Update();
-	//ReachCheckPoint();
+	ReachCheckPoint();
+
+#ifdef _DEBUG
+	checkPoint_.DebugUpdate();
+#endif // _DEBUG
+
 }
 
 void Stage::Draw()
@@ -35,6 +40,10 @@ void Stage::Draw()
 	player_->Draw();
 	//enemyManager_->Draw();
 	grassManager_->Draw();
+
+#ifdef _DEBUG
+	checkPoint_.DebugDraw();
+#endif // _DEBUG
 }
 
 void Stage::DrawCollision()
@@ -45,12 +54,22 @@ void Stage::DrawCollision()
 
 void Stage::ReachCheckPoint()
 {
-	/*if (player_->GetCenterPosition().y >= *checkPoint_.GetCheckPointHight())
+	if (player_->GetCenterPosition().y >= *checkPoint_.GetCheckPointHight())
 	{
-		currentCheckPoint_++;
+		if (currentStageNum_ < StageEditor::Instance()->GetMaxCheckPointNumber(currentStageNum_))
+		{
+			currentCheckPoint_++;
+		}
+		else if (currentStageNum_ < StageEditor::Instance()->GetMaxStageNumber())
+		{
+			currentStageNum_++;
+		}
+		//currentCheckPoint_++;
 		Vector3 pos = player_->GetCenterPosition();
+		player_->Reset();
 		player_->SetPos({ pos.x, 2.0f, pos.z });
-	}*/
+		ReloadObject();
+	}
 }
 
 void Stage::ReloadObject()

@@ -45,11 +45,11 @@ void PlayerBody::InitCollision()
 
 void PlayerBody::InitJson()
 {
-	jsonManager_ = std::make_unique<JsonManager>("playerBodyObj", "Resources/JSON/");
+	//jsonManager_ = std::make_unique<JsonManager>("playerBodyObj", "Resources/JSON/");
 
-	jsonCollider_ = std::make_unique<JsonManager>("playerBodyCollider", "Resources/JSON/");
-	//SphereCollider::InitJson(jsonCollider_.get());
-	aabbCollider_->InitJson(jsonCollider_.get());
+	//jsonCollider_ = std::make_unique<JsonManager>("playerBodyCollider", "Resources/JSON/");
+	////SphereCollider::InitJson(jsonCollider_.get());
+	//aabbCollider_->InitJson(jsonCollider_.get());
 }
 
 void PlayerBody::Update()

@@ -42,6 +42,8 @@ public:
 
     void DrawEditorUI();
 
+
+public: // getter setter
     const std::vector<ObjectDefinition>* GetObjectDefinitions(int stageNum) const {
         for (const auto& s : stages_) if (s.stageNumber == stageNum) return &s.objectDefinitions;
         return nullptr;
@@ -67,6 +69,31 @@ public:
             }
         }
         return nullptr;
+    }
+
+    int GetMaxStageNumber() const {
+        int maxNum = -1;
+        for (const auto& stage : stages_) {
+            if (stage.stageNumber > maxNum) {
+                maxNum = stage.stageNumber;
+            }
+        }
+        return maxNum;
+    }
+
+    int GetMaxCheckPointNumber(int stageNum) const {
+        for (const auto& stage : stages_) {
+            if (stage.stageNumber == stageNum) {
+                int maxNum = -1;
+                for (const auto& cp : stage.checkPoints) {
+                    if (cp.checkPointNumber > maxNum) {
+                        maxNum = cp.checkPointNumber;
+                    }
+                }
+                return maxNum;
+            }
+        }
+        return -1;
     }
 
 private:

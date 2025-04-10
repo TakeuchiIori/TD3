@@ -118,8 +118,8 @@ private:
 
 	std::shared_ptr<AABBCollider> aabbCollider_;
 
-	std::unique_ptr<JsonManager> jsonManager_;
-	std::unique_ptr<JsonManager> jsonCollider_;
+	//std::unique_ptr<JsonManager> jsonManager_;
+	//std::unique_ptr<JsonManager> jsonCollider_;
 
 	bool isPlayerInvincible_ = false;
 
