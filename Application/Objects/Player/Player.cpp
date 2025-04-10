@@ -77,7 +77,6 @@ void Player::InitJson()
 
 void Player::Update()
 {
-	beforebehavior_ = behavior_;
 
 	// 各行動の初期化
 	BehaviorInitialize();
@@ -88,6 +87,8 @@ void Player::Update()
 	ExtendBody();
 
 	IsPopGrass();
+
+	DamageProcessBodys();
 
 	TimerManager();
 
@@ -100,6 +101,7 @@ void Player::Update()
 	DebugPlayer();
 #endif // _DEBUG
 
+	beforebehavior_ = behavior_;
 }
 
 void Player::Draw()
@@ -148,6 +150,17 @@ void Player::MapChipOnCollision(const CollisionInfo& info)
 	if (info.direction == 4) {  // 下方向の衝突 = 着地
 		//isGrounded_ = true;
 	}
+}
+
+void Player::Reset()
+{
+	extendTimer_ = 0;
+	boostCoolTimer_ = 0;
+	boostTimer_ = 0;
+	createGrassTimer_ = 0;
+	invincibleTimer_ = 0;
+	playerBodys_.clear();
+	behaviortRquest_ = BehaviorPlayer::Root;
 }
 
 
@@ -244,26 +257,30 @@ void Player::OnExitCollision(BaseCollider* self, BaseCollider* other)
 ///////////////////////////////////////////////////////////
 void Player::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
 {
-	if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
+	if (behavior_ == BehaviorPlayer::Moving || behavior_ == BehaviorPlayer::Boost)
 	{
-		switch (dir)
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
 		{
-		case HitDirection::None:
-			break;
-		case HitDirection::Top:
-			break;
-		case HitDirection::Bottom:
-			break;
-		case HitDirection::Left:
-			break;
-		case HitDirection::Right:
-			break;
-		case HitDirection::Front:
-			break;
-		case HitDirection::Back:
-			break;
-		default:
-			break;
+			switch (dir)
+			{
+			case HitDirection::None:
+				break;
+			case HitDirection::Top: // くちばし想定
+				TakeDamage();
+				break;
+			case HitDirection::Bottom:
+				break;
+			case HitDirection::Left:
+				break;
+			case HitDirection::Right:
+				break;
+			case HitDirection::Front:
+				break;
+			case HitDirection::Back:
+				break;
+			default:
+				break;
+			}
 		}
 	}
 }
@@ -392,6 +409,7 @@ void Player::Move()
 
 }
 
+#pragma region // 体が伸びる向き決定
 void Player::UpBody()
 {
 	moveDirection_ = { 0,1,0 };
@@ -456,6 +474,7 @@ void Player::RightBody()
 	body->RightExtend();
 	playerBodys_.push_back(std::move(body));
 }
+#pragma endregion
 
 void Player::EntryMove()
 {
@@ -500,6 +519,10 @@ void Player::TimerManager()
 	{
 		boostCoolTimer_ -= deltaTime_;
 	}
+	if (0 < boostTimer_)
+	{
+		boostTimer_ -= deltaTime_;
+	}
 	if (0 < createGrassTimer_)
 	{
 		createGrassTimer_ -= deltaTime_;
@@ -539,12 +562,6 @@ void Player::ExtendBody()
 
 
 
-
-
-
-
-
-
 	if (playerBodys_.size() > 0)
 	{
 		playerBodys_.back()->SetEndPos(GetCenterPosition());
@@ -557,16 +574,16 @@ void Player::ShrinkBody()
 	if (playerBodys_.size() > 0)
 	{
 		playerBodys_.back()->SetEndPos(GetCenterPosition());
-	}
-	if (playerBodys_.back()->GetLength() <= 0)
-	{
-		playerBodys_.pop_back();
+		if (playerBodys_.back()->GetLength() <= 0)
+		{
+			playerBodys_.pop_back();
+		}
 	}
 }
 
 void Player::TakeDamage()
 {
-	if (HP_ > 0 && invincibleTimer_ <= 0 && behavior_ != BehaviorPlayer::Boost)
+	if (HP_ > 0 && invincibleTimer_ <= 0)
 	{
 		HP_--;
 		if (HP_ <= 0)
@@ -578,6 +595,27 @@ void Player::TakeDamage()
 			invincibleTimer_ = kInvincibleTime_;
 		}
 	}
+}
+
+void Player::DamageProcessBodys()
+{
+	for (auto&& body : playerBodys_)
+	{
+		if (0 < boostTimer_)
+		{
+			body->SetIsInvincible(true);
+		}
+		else
+		{
+			body->SetIsInvincible(false);
+		}
+
+		if (body->IsTakeDamage())
+		{
+			TakeDamage();
+		}
+	}
+
 }
 
 #ifdef _DEBUG
@@ -597,6 +635,7 @@ void Player::DebugPlayer()
 	ImGui::Text("isCollisionBody: %d", isCollisionBody);
 	int c = HP_;
 	ImGui::Text("HP : %d", c);
+	ImGui::Text("Inv : %.2f", invincibleTimer_);
 	ImGui::End();
 
 	if (input_->TriggerKey(DIK_N))
@@ -690,17 +729,14 @@ void Player::BehaviorBoostInit()
 {
 	speed_ = defaultSpeed_ + boostSpeed_;
 	boostTimer_ = kBoostTime_;
+	invincibleTimer_ = kBoostTime_; // ブースト中無敵に
 }
 
 void Player::BehaviorBoostUpdate()
 {
 	Move();
 
-	if (0 < boostTimer_)
-	{
-		boostTimer_ -= deltaTime_;
-	}
-	else
+	if (0 >= boostTimer_)
 	{
 		behaviortRquest_ = BehaviorPlayer::Moving;
 		boostCoolTimer_ = kBoostCT_;
@@ -717,6 +753,7 @@ void Player::BehaviorReturnInit()
 	speed_ = defaultSpeed_ + boostSpeed_;
 	moveDirection_ = { 0,0,0 };
 	isCollisionBody = false;
+	extendTimer_ = 0;
 }
 
 void Player::BehaviorReturnUpdate()

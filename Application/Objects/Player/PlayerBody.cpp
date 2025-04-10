@@ -45,11 +45,11 @@ void PlayerBody::InitCollision()
 
 void PlayerBody::InitJson()
 {
-	jsonManager_ = std::make_unique<JsonManager>("playerBodyObj", "Resources/JSON/");
+	//jsonManager_ = std::make_unique<JsonManager>("playerBodyObj", "Resources/JSON/");
 
-	jsonCollider_ = std::make_unique<JsonManager>("playerBodyCollider", "Resources/JSON/");
-	//SphereCollider::InitJson(jsonCollider_.get());
-	aabbCollider_->InitJson(jsonCollider_.get());
+	//jsonCollider_ = std::make_unique<JsonManager>("playerBodyCollider", "Resources/JSON/");
+	////SphereCollider::InitJson(jsonCollider_.get());
+	//aabbCollider_->InitJson(jsonCollider_.get());
 }
 
 void PlayerBody::Update()
@@ -112,6 +112,13 @@ void PlayerBody::DownExtend()
 
 void PlayerBody::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
+	if (!isPlayerInvincible_)
+	{
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy)) // 敵なら
+		{
+			isTakeDamage_ = true;
+		}
+	}
 }
 
 void PlayerBody::OnCollision(BaseCollider* self, BaseCollider* other)

@@ -176,8 +176,8 @@ private:
 
 	WorldTransform growthAreaWT_;
 
-	std::unique_ptr<JsonManager> jsonManager_;
-	std::unique_ptr<JsonManager> jsonCollider_;
+	//std::unique_ptr<JsonManager> jsonManager_;
+	//std::unique_ptr<JsonManager> jsonCollider_;
 
 	// 枝
 	std::unique_ptr<Branch> branch_;
@@ -197,7 +197,7 @@ private:
 
 	int enter = 0;
 
-	float  centerX_ = 15.0f;
+	float  centerX_ = 17.0f;
 
 
 	// 振る舞い

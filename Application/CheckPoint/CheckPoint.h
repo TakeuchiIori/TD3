@@ -17,8 +17,8 @@ public: // メンバ関数
 
 	void InitJson();
 
-private: // getter & setter
-	float GetCheckPointHight() { return checkPointHight_; }
+public: // getter & setter
+	float* GetCheckPointHight() { return &checkPointHight_; }
 	void SetCheckPointHight(float checkPointHight) { checkPointHight_ = checkPointHight; }
 
 
