@@ -1,6 +1,7 @@
 #include "Player.h"
 
 #include <cmath>
+#include <algorithm>
 
 #ifdef _DEBUG
 #include "imgui.h"
@@ -69,7 +70,7 @@ void Player::InitJson()
 	jsonManager_ = std::make_unique<JsonManager>("playerObj", "Resources/JSON/");
 	jsonManager_->SetCategory("Objects");
 	jsonManager_->Register("草の取得数",&grassGauge_);
-	jsonManager_->Register("草の最大数", &MaxGrass_);
+	jsonManager_->Register("草の最大数", &kMaxGrassGauge_);
 
 	jsonCollider_ = std::make_unique<JsonManager>("playerCollider", "Resources/JSON/");
 	aabbCollider_->InitJson(jsonCollider_.get());
@@ -83,6 +84,9 @@ void Player::Update()
 
 	// 各行動の更新
 	BehaviorUpdate();
+
+	// 草ゲージの更新
+	GrassGaugeUpdate();
 
 	ExtendBody();
 
@@ -174,7 +178,7 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 	{
 		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrass)) // 草を食べたら
 		{
-			if (MaxGrass_ > grassGauge_ && createGrassTimer_ <= 0)
+			if (kMaxGrassGauge_ > grassGauge_ && createGrassTimer_ <= 0)
 			{
 				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.3f)
 				{
@@ -184,7 +188,7 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + largeGrassTime_);
 				}
 				grassGauge_++;
-				if (MaxGrass_ <= grassGauge_)
+				if (kMaxGrassGauge_ <= grassGauge_)
 				{
 					createGrassTimer_ = kCreateGrassTime_;
 					isCreateGrass_ = true;
@@ -617,6 +621,18 @@ void Player::DamageProcessBodys()
 		}
 	}
 
+}
+
+void Player::GrassGaugeUpdate()
+{
+	if (grassGauge_ < kMaxGrassGauge_)
+	{
+		UIGauge_ = std::clamp(static_cast<float>(grassGauge_) / static_cast<float>(kMaxGrassGauge_), 0.0f, 1.0f);
+	}
+	else
+	{
+		UIGauge_ = std::clamp(1.0f * (createGrassTimer_ / kCreateGrassTime_), 0.0f, 1.0f);
+	}
 }
 
 #ifdef _DEBUG
