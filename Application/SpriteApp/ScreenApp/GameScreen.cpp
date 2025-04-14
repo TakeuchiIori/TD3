@@ -132,9 +132,28 @@ void GameScreen::Update()
 		//grass_[1]->SetPosition(playerPos + offsetGrass_);
 
 		if (i == 1) {
+			static bool isMaxGauge = false;
+
 			float gauge = static_cast<float>(player_->GetGrassGauge());
 			float maxGauge = static_cast<float>(player_->GetMaxGrassGauge());
-			float ratio = std::clamp(gauge / maxGauge, 0.0f, 100.0f);  // 0.0〜1.0
+			float ratio = 0.0f;
+			if(!isMaxGauge)
+			{
+				ratio = std::clamp(gauge / maxGauge, 0.0f, 100.0f);  // 0.0〜1.0
+			}
+			else
+			{
+				ratio = 1.0f * (player_->GetGrassTimer() / player_->GetMaxGrassTime());
+			}
+
+			if (gauge >= maxGauge)
+			{
+				isMaxGauge = true;
+			}
+			else
+			{
+				isMaxGauge = false;
+			}
 
 			Vector4 bottomColor{};
 			Vector4 topColor{};
