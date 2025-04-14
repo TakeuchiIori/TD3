@@ -1,6 +1,10 @@
 #include "EnemyManager.h"
 #include "./Player/Player.h"
 
+const std::string EnemyManager::directryPath_ = "Resources/JSON/EnemyData/";
+
+const std::string EnemyManager::json_ = "EnemyData.json";
+
 void EnemyManager::Initialize(Camera* camera, MapChipField* mapChipField)
 {
 	camera_ = camera;
@@ -9,7 +13,8 @@ void EnemyManager::Initialize(Camera* camera, MapChipField* mapChipField)
 
 	//InitJson();
 
-	LoadEnemyDataFromJson("Resources/JSON/EnemyData/EnemyData.json");
+	fullPath_ = directryPath_ + checkPointPath_ + json_;
+	LoadEnemyDataFromJson(fullPath_);
 
 }
 
@@ -45,6 +50,12 @@ void EnemyManager::DrawCollisions()
 	for (auto& enemy : enemies_) {
 		enemy->DrawCollision();
 	}
+}
+
+void EnemyManager::ClearAll()
+{
+	spawnDataList_.clear();
+	enemies_.clear();
 }
 
 void EnemyManager::InitJson()
@@ -209,10 +220,10 @@ void EnemyManager::ImGui()
 		}
 
 		if (ImGui::Button("JSONに保存")) {
-			SaveEnemyDataToJson("Resources/JSON/EnemyData/EnemyData.json");
+			SaveEnemyDataToJson(fullPath_);
 		}
 		if (ImGui::Button("JSONから読み込み")) {
-			LoadEnemyDataFromJson("Resources/JSON/EnemyData/EnemyData.json");
+			LoadEnemyDataFromJson(fullPath_);
 		}
 	}
 	ImGui::End();
@@ -246,7 +257,7 @@ void EnemyManager::ImGui()
 
 		if (ImGui::Button("現在のエネミーをJSONに保存")) {
 			UpdateSpawnDataFromEnemies();
-			SaveEnemyDataToJson("Resources/JSON/EnemyData/EnemyData.json");
+			SaveEnemyDataToJson(fullPath_);
 		}
 	}
 	ImGui::End();

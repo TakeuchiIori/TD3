@@ -78,6 +78,7 @@ void StageEditor::DrawEditorUI()
     static int selectedCheckPointIndex = -1;
 
     if (ImGui::Begin("Stage Editor")) {
+        ImGui::Text("Vで配置をリロード"); // 処理はStageManager::Update()に
         if (ImGui::CollapsingHeader("ステージ一覧", ImGuiTreeNodeFlags_DefaultOpen)) {
             for (int i = 0; i < stages_.size(); ++i) {
                 std::string label = "ステージ : " + std::to_string(stages_[i].stageNumber);
@@ -126,7 +127,6 @@ void StageEditor::DrawEditorUI()
             }
 
             if (ImGui::CollapsingHeader("チェックポイント一覧", ImGuiTreeNodeFlags_DefaultOpen)) {
-                ImGui::Text("Vで配置をリロード");
                 for (int i = 0; i < stage.checkPoints.size(); ++i) {
                     std::string label = "チェックポイント : " + std::to_string(stage.checkPoints[i].checkPointNumber);
                     if (ImGui::Selectable(label.c_str(), selectedCheckPointIndex == i)) {
