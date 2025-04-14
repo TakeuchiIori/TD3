@@ -10,18 +10,23 @@ void StageManager::Initialize(Camera* camera)
 
 	player_ = std::make_unique<Player>(mpInfo_->GetMapChipField());
 	player_->Initialize(camera_);
-	//s->SetPlayer(player_.get());
 
 	// 草
 	grassManager_ = std::make_unique<GrassManager>();
 	grassManager_->SetPlayer(player_.get());
 	grassManager_->Initialize(camera_);
-	//s->SetGrassManager(grassManager_.get());
+
+	// 敵
+	enemyManager_ = std::make_unique<EnemyManager>();
+	enemyManager_->SetPlayer(player_.get());
+	enemyManager_->Initialize(camera_, mpInfo_->GetMapChipField());
 
 	stageList_.push_back(std::make_unique<Stage>());
-	stageList_[0]->Initialize(camera_);
 	stageList_[0]->SetPlayer(player_.get());
 	stageList_[0]->SetGrassManager(grassManager_.get());
+	stageList_[0]->SetEnemyManager(enemyManager_.get());
+	stageList_[0]->Initialize(camera_);
+
 
 	ReloadObject();
 }
@@ -32,13 +37,15 @@ void StageManager::InitJson()
 
 void StageManager::Update()
 {
+#ifdef _DEBUG
 	if (input_->TriggerKey(DIK_V))
 	{
 		ReloadObject();
 	}
-	stageList_[currentStageNum_]->Update();
+#endif // _DEBUG
 
-	grassManager_->Update();
+	
+	stageList_[currentStageNum_]->Update();
 
 	if (player_->EndReturn())
 	{
@@ -49,8 +56,7 @@ void StageManager::Update()
 
 void StageManager::NotDebugCameraUpdate()
 {
-	player_->Update();
-	grassManager_->hakuGrass(player_->IsPopGrass(), player_->GetCenterPosition());
+	stageList_[currentStageNum_]->NotDebugCameraUpdate();
 }
 
 void StageManager::Draw()

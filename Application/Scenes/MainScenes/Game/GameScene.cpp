@@ -67,9 +67,9 @@ void GameScene::Initialize()
 
 
 	// 敵
-	enemyManager_ = std::make_unique<EnemyManager>();
+	/*enemyManager_ = std::make_unique<EnemyManager>();
 	enemyManager_->SetPlayer(stageManager_->GetPlayer());
-	enemyManager_->Initialize(sceneCamera_.get(), mpInfo_->GetMapChipField());
+	enemyManager_->Initialize(sceneCamera_.get(), mpInfo_->GetMapChipField());*/
 
 
     
@@ -134,7 +134,7 @@ void GameScene::Update()
 	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
 		picture_->Update();
     }
-    //stageManager_.Update();
+    
 
 	test_->UpdateAnimation();
 	testWorldTransform_.UpdateMatrix();
@@ -145,7 +145,7 @@ void GameScene::Update()
 	stageManager_->Update();
 
 
-	enemyManager_->Update();
+	//enemyManager_->Update();
 
 	ground_->Update();
 
@@ -225,7 +225,7 @@ void GameScene::DrawObject()
 {
 	mpInfo_->Draw();
 	ground_->Draw();
-	enemyManager_->Draw();
+	//enemyManager_->Draw();
 	stageManager_->Draw();
 }
 
@@ -242,7 +242,7 @@ void GameScene::DrawAnimation()
 void GameScene::DrawLine()
 {
 	stageManager_->DrawCollision();
-	enemyManager_->DrawCollisions();
+	//enemyManager_->DrawCollisions();
 }
 
 

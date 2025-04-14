@@ -57,6 +57,8 @@ public:
 	/// </summary>
 	void DrawCollisions();
 
+	void ClearAll();
+
 private:
 
 	/// <summary>
@@ -107,6 +109,17 @@ public:
 	void SetPlayer(Player* player) { player_ = player; }
 	//Player* GetPlayer() { return player_; }
 
+
+	/// <summary>
+	/// 現在のステージ + チェックポイント
+	/// </summary>
+	void SetCurrentCheckPoint(std::string checkPoint) 
+	{ 
+		checkPointPath_ = checkPoint;
+		fullPath_ = directryPath_ + checkPointPath_ + json_;
+		LoadEnemyDataFromJson(fullPath_);
+	}
+
 private:
 	Camera* camera_ = nullptr;
 	Player* player_ = nullptr;
@@ -119,4 +132,9 @@ private:
 
 	std::vector<EnemySpawnData> spawnDataList_;
 
+	static const std::string directryPath_;
+	static const std::string json_;
+	std::string checkPointPath_ = "";
+
+	std::string fullPath_;
 };

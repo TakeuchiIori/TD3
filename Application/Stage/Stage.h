@@ -33,6 +33,8 @@ public:
 	/// </summary>
 	void Update();
 
+	void NotDebugCameraUpdate();
+
 	/// <summary>
 	/// 描画
 	/// </summary>
@@ -42,6 +44,9 @@ public:
 
 	// チェックポイントにたどり着いたときの処理
 	void ReachCheckPoint();
+
+private:
+	bool StageSelector(const char* label = "StageSelector");
 
 
 public:
