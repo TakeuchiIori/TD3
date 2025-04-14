@@ -183,11 +183,11 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + largeGrassTime_);
 				}
 				grassGauge_++;
-			}
-			if (MaxGrass_ <= grassGauge_)
-			{
-				createGrassTimer_ = kCreateGrassTime_;
-				isCreateGrass_ = true;
+				if (MaxGrass_ <= grassGauge_)
+				{
+					createGrassTimer_ = kCreateGrassTime_;
+					isCreateGrass_ = true;
+				}
 			}
 		}
 
