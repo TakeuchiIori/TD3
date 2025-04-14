@@ -121,6 +121,8 @@ private:
 
 	void DamageProcessBodys();
 
+	void GrassGaugeUpdate();
+
 
 #ifdef _DEBUG
 	// デバッグ用 (ImGuiとか)
@@ -205,7 +207,7 @@ public: // getter&setter
 
 	int32_t GetGrassGauge() { return grassGauge_; }
 
-	int32_t GetMaxGrassGauge() { return MaxGrass_; }
+	int32_t GetMaxGrassGauge() { return kMaxGrassGauge_; }
 
 	float GetMaxGrassTime() { return kCreateGrassTime_; }
 
@@ -231,6 +233,8 @@ public: // getter&setter
 	int32_t GetHP() { return HP_; }			// 現在のHPの取得
 
 	bool CanSpitting() { return canSpitting_; }// 唾を吐けるか
+
+	float GetUIGrassGauge() { return UIGauge_; }
 
 private:
 	Input* input_ = nullptr;
@@ -267,8 +271,10 @@ private:
 
 
 	// ゲージ
-	int32_t MaxGrass_ = 2;				// 暫定対応
+	int32_t kMaxGrassGauge_ = 2;		// 暫定対応
 	int32_t grassGauge_ = 0;
+
+	float UIGauge_ = 0.0f;				// 草ゲージのUIに渡すための値
 
 	// 時間制限 : 単位(sec)
 	float kTimeLimit_ = 10.0f;			// タイマーの限界値
