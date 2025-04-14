@@ -169,15 +169,16 @@ void GameScreen::Update()
 			//grass_[1]->SetUVScale({ 1.0f, ratio });
 			//grass_[1]->SetUVTranslate({ 0.0f,1.0f - ratio });
 
-			Vector2 baseSize = { 51.5f, 50.0f }; // 草画像の本来のサイズ
+			Vector2 baseSize = { 55.0f, 55.0f }; // 草画像の本来のサイズ
 
 			// 補正用オフセット計算（比率1.0なら0、0.5なら半分ズレる）
 			float yOffset = baseSize.y * (1.0f - ratio);
 			Vector3 position = playerPos + offsetGrass_;
-			position.y += yOffset;
+			//position.y += yOffset;
 
 			grass_[1]->SetPosition(position);
 			// UV設定（比率に応じて縦方向に縮小 & 下から満ちる）
+			grass_[1]->SetScale({ baseSize.x, baseSize.y * ratio });
 			grass_[1]->SetUVScale({ 1.0f, ratio });
 			grass_[1]->SetUVTranslate({ 0.0f, 1.0f - ratio });
 
@@ -185,7 +186,7 @@ void GameScreen::Update()
 			//grass_[1]->SetAnchorPoint({ 0.5f, 1.0f });
 
 
-			//grass_[1]->SetScale(baseSize);
+			//grass_[1]->SetScale({ baseSize.x, baseSize.y * ratio });
 		}
 
 #ifdef _DEBUG
