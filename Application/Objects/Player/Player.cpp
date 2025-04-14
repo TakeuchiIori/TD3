@@ -160,6 +160,7 @@ void Player::Reset()
 	createGrassTimer_ = 0;
 	invincibleTimer_ = 0;
 	playerBodys_.clear();
+	moveHistory_.clear();
 	behaviortRquest_ = BehaviorPlayer::Root;
 }
 
