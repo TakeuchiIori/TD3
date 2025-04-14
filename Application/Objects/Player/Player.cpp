@@ -186,7 +186,6 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 			}
 			if (MaxGrass_ <= grassGauge_)
 			{
-				grassGauge_ = 0;
 				createGrassTimer_ = kCreateGrassTime_;
 				isCreateGrass_ = true;
 			}
@@ -537,6 +536,7 @@ bool Player::IsPopGrass()
 {
 	if (0 >= createGrassTimer_ && isCreateGrass_)
 	{
+		grassGauge_ = 0;
 		std::unique_ptr<StuckGrass> stuck = std::make_unique<StuckGrass>();
 		stuck->Initialize(camera_);
 		stuck->SetPlayer(this);

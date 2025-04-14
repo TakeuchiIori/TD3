@@ -206,18 +206,18 @@ public:
     void SetUVRectRatio(const Vector2& leftTopRatio, const Vector2& sizeRatio);
 
 
-    /// <summary>
-    /// 上下の頂点カラーを設定（グラデーション）
-    /// </summary>
-        void SetGradientColor(const Vector4& bottom, const Vector4& top) {
-			sprite_->SetGradientColor(bottom, top);
-        }
-        void SetGradientFillRatio(float ratio) {
-			sprite_->SetGradientFillRatio(ratio);
-        }
+	/// <summary>
+	/// 上下の頂点カラーを設定（グラデーション）
+	/// </summary>
+	void SetGradientColor(const Vector4& bottom, const Vector4& top) {
+		sprite_->SetGradientColor(bottom, top);
+	}
+	void SetGradientFillRatio(float ratio) {
+		sprite_->SetGradientFillRatio(ratio);
+	}
 
 protected:
-    std::unique_ptr<Sprite> sprite_;                     // スプライト本体
+	std::unique_ptr<Sprite> sprite_;                     // スプライト本体
     std::string configPath_;                             // JSON設定ファイルパス
     std::filesystem::file_time_type lastModTime_;        // 最終更新時刻（ホットリロード用）
     std::string name_;                                   // UI名
