@@ -84,15 +84,6 @@ void GameScene::Initialize()
 	testWorldTransform_.Initialize();
 
 
-
-	// パーティクル
-	emitterPosition_ = Vector3{ 0.0f, 0.0f, 0.0f }; // エミッタの初期位置
-	particleCount_ = 1;
-	particleEmitter_[0] = std::make_unique<ParticleEmitter>("Circle", emitterPosition_, particleCount_);
-	particleEmitter_[0]->Initialize();
-
-
-
 	//// オーディオファイルのロード（例: MP3）
 	//soundData = Audio::GetInstance()->LoadAudio(L"Resources./images./harpohikunezumi.mp3");
 	//// オーディオの再生
@@ -149,7 +140,6 @@ void GameScene::Update()
 
 	ground_->Update();
 
-	particleEmitter_[0]->Emit();
 
 	ParticleManager::GetInstance()->Update();
 	// カメラ更新
@@ -339,21 +329,6 @@ void GameScene::ShowImGui()
 #ifdef _DEBUG
 	ImGui::Begin("FPS");
 	ImGui::Text("FPS:%.1f", ImGui::GetIO().Framerate);
-	ImGui::End();
-	ImGui::Begin("Emitter");
-	ImGui::DragFloat3("Emitter Position", &emitterPosition_.x, 0.1f);
-	// particleEmitter_[0]->SetPosition(emitterPosition_);
-
-	 // パーティクル数の表示と調整
-	ImGui::Text("Particle Count: %.0d", particleCount_); // 現在のパーティクル数を表示
-	if (ImGui::Button("Increase Count")) {
-		particleCount_ += 1; // パーティクル数を増加
-	}
-	if (ImGui::Button("Decrease Count")) {
-		if (particleCount_ > 1) { // パーティクル数が1未満にならないように制限
-			particleCount_ -= 1;
-		}
-	}
 	ImGui::End();
 #endif // _DEBUG
 }

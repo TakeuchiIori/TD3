@@ -3,14 +3,27 @@
 #include "imgui.h"
 #endif
 ParticleEmitter::ParticleEmitter(const std::string& name, const Vector3& transform, uint32_t count)
-    : emitter_{name, Vector3{transform,}, count, 0.0025f, 0.0f} {}
-
-void ParticleEmitter::Initialize() {
-
-	InitJson();
+	: emitter_{ name, Vector3{transform,}, count, 0.0025f, 0.0f } {
 }
 
-void ParticleEmitter::Update()
+void ParticleEmitter::Initialize(const std::string& jsonPath) {
+
+	InitJson(jsonPath);
+}
+
+void ParticleEmitter::InitJson(const std::string& jsonPath)
+{
+	jsonManager_ = std::make_unique<JsonManager>(jsonPath, "Resources/Json/Emitters/");
+	jsonManager_->SetCategory("Emitter");
+	jsonManager_->SetSubCategory(jsonPath + "Emitter");
+	jsonManager_->Register("Name", &emitter_.name);
+	jsonManager_->Register("Transform", &emitter_.transform);
+	jsonManager_->Register("Count", &emitter_.count);
+	jsonManager_->Register("Frequency", &emitter_.frequency);
+	jsonManager_->Register("FrequencyTime", &emitter_.frequencyTime);
+}
+
+void ParticleEmitter::UpdateTime()
 {
 	emitter_.frequencyTime += deltaTime_;
 	if (emitter_.frequency <= emitter_.frequencyTime) {
@@ -21,9 +34,9 @@ void ParticleEmitter::Update()
 
 }
 
-void ParticleEmitter::UpdateEmit(const std::string& name, const Vector3& transform, uint32_t count)
+void ParticleEmitter::FollowEmit(const std::string& name, const Vector3& transform)
 {
-	ParticleManager::GetInstance()->Emit(name,transform,count);
+	ParticleManager::GetInstance()->Emit(name, transform, emitter_.count);
 }
 
 void ParticleEmitter::Emit()
@@ -36,7 +49,7 @@ void ParticleEmitter::ShowImGui()
 #ifdef _DEBUG
 	ImGui::Begin("Particle");
 
-	if(ImGui::Button("Add Particle")) {
+	if (ImGui::Button("Add Particle")) {
 		Emit();
 	}
 	ImGui::End();
@@ -79,7 +92,7 @@ void ParticleEmitter::ShowImGui()
 
 }
 
-void ParticleEmitter::InitJson() { 
+void ParticleEmitter::InitJson() {
 	//jsonManager_ = new JsonManager("パーティクル : " + emitter_.name, "Resources/JSON");
 	//jsonManager_->Register("Frequency", &emitter_.frequency);
  //   jsonManager_->Register("FrequencyTime", &emitter_.frequencyTime);

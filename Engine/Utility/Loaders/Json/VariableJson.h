@@ -76,7 +76,7 @@ public:
         else if constexpr (std::is_same_v<T, std::string>)
         {
             char buffer[256];
-            strncpy(buffer, ptr_->c_str(), sizeof(buffer));
+            strncpy_s(buffer, ptr_->c_str(), sizeof(buffer));
             buffer[sizeof(buffer) - 1] = '\0';
             if (ImGui::InputText(label.c_str(), buffer, sizeof(buffer)))
             {

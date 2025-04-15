@@ -144,9 +144,8 @@ private:
                               パーティクル関連
 
     =================================================================*/
-    std::unique_ptr<ParticleEmitter> particleEmitter_[2];
-    Vector3 emitterPosition_;
-    uint32_t particleCount_;
+
+
 
     /*=================================================================
 

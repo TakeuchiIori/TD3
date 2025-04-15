@@ -46,7 +46,7 @@ public:
 		kCount0fBlendMode,
 	};
 
-	
+
 	struct VertexData {
 		Vector4 position;
 		Vector2 texcoord;
@@ -91,14 +91,6 @@ public:
 		float currentTime;
 	};
 
-	//enum class ParticleUpdateMode {
-	//	kNormal,    // 通常の動き
-	//	kThunder,   // 雷
-	//	kFire,      // 炎
-	//	kSpiral,    // 螺旋
-	//	// 他のモードも追加可能
-	//};
-
 	struct ParticleGroup {
 		MaterialData materialData;										// マテリアルデータ
 		std::list<Particle> particles;									// パーティクルリスト
@@ -110,21 +102,17 @@ public:
 
 
 	struct ParticleTransformSettings {
-		Vector2 scaleX;        // Scale X Min : Max
-		Vector2 scaleY;        // Scale Y Min : Max
-		Vector2 scaleZ;        // Scale Z Min : Max
-		Vector2 translateX;    // Position X Min : Max
-		Vector2 translateY;    // Position Y Min : Max
-		Vector2 translateZ;    // Position Z Min : Max
-		Vector2 rotateX;       // Rotation X Min : Max
-		Vector2 rotateY;       // Rotation Y Min : Max
-		Vector2 rotateZ;       // Rotation Z Min : Max
+		Vector3 scaleMin;
+		Vector3 scaleMax;
+		Vector3 translateMin;
+		Vector3 translateMax;
+		Vector3 rotateMin;
+		Vector3 rotateMax;
 	};
 
 	struct ParticleVelocitySettings {
-		Vector2 velocityX;     // Velocity X Min : Max
-		Vector2 velocityY;     // Velocity Y Min : Max
-		Vector2 velocityZ;     // Velocity Z Min : Max
+		Vector3 velocityMin;
+		Vector3 velocityMax;
 	};
 
 	struct ParticleColorSettings {
@@ -140,11 +128,19 @@ public:
 
 
 	// 全体のパーティクル構造体の設定
-	struct ParticleParameters{
+	struct ParticleParameters {
 		ParticleTransformSettings baseTransform;
 		ParticleVelocitySettings baseVelocity;
 		ParticleColorSettings baseColor;
 		ParticleLifeSettings baseLife;
+
+
+		bool useBillboard = true;
+		bool isRandom = true;
+		bool randomFromCenter = false;
+		Vector3 randomDirectionMin = { -1.0f, -1.0f, -1.0f };
+		Vector3 randomDirectionMax = { 1.0f, 1.0f, 1.0f };
+		float randomForce = 0.02f;
 	};
 
 
@@ -182,12 +178,6 @@ public: // メンバ関数
 	/// <param name="blendMode"></param>
 	void SetBlendMode(D3D12_BLEND_DESC& blendDesc, BlendMode blendMode);
 
-	/// <summary>
-	/// ImGuiでブレンドモード変更
-	/// </summary>
-	/// <param name="currentBlendMode"></param>
-	void ShowBlendModeDropdown(BlendMode& currentBlendMode);
-
 
 	void Render(D3D12_BLEND_DESC& blendDesc, BlendMode& currentBlendMode);
 
@@ -213,28 +203,8 @@ private:
 
 
 	void InitJson(const std::string& name);
-
-	/// <summary>
-	/// 横に移動
-	/// </summary>
-	void UpdateParticleMove();
-
-
-	/// <summary>
-	/// 
-	/// </summary>
 	void UpdateParticles();
 
-	/// <summary>
-	/// 
-	/// </summary>
-	void UpdateParticlesFor();
-
-
-	/// <summary>
-	/// 行列の更新
-	/// </summary>
-	void UpadateMatrix();
 
 	/// <summary>
 	///  ルートシグネチャ生成
@@ -323,7 +293,7 @@ private: // メンバ変数
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
 	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob_;
 	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob_;
-	
+
 
 	D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU;
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU;
@@ -340,7 +310,7 @@ private: // メンバ変数
 	ModelData modelData_;
 	// 乱数生成器
 	std::random_device seedGenerator_;
-
+	std::mt19937 randomEngine_ = std::mt19937(seedGenerator_());
 	// 最初のブレンドモード
 	BlendMode currentBlendMode_;
 	// パーティクルグループコンテナ
@@ -356,15 +326,5 @@ private: // メンバ変数
 	Matrix4x4 scaleMatrix;
 	Matrix4x4 translateMatrix;
 
-	// パーティクル更新モード
-	enum ParticleUpdateMode {
-		kUpdateModeMove,
-		kUpdateModeRadial,
-		kUpdateModeSpiral,
-	};
 
-	// パーティクル更新モードの選択
-	ParticleUpdateMode currentUpdateMode_ = kUpdateModeRadial;
-
-	
 };
