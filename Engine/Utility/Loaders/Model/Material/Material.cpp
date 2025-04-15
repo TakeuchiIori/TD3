@@ -8,10 +8,10 @@ void Material::Initialize(std::string& textureFilePath)
 
 	materialResource_ = dxCommon_->CreateBufferResource(sizeof(Material));
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+	//TransferData();
 
 	SetTextureFilePath(textureFilePath_);
 
-	TransferData();
 
 	LoadTexture();
 }
@@ -19,7 +19,7 @@ void Material::Initialize(std::string& textureFilePath)
 void Material::RecordDrawCommands(ID3D12GraphicsCommandList* command, UINT rootParameterIndexCBV, UINT rootParameterIndexSRV)
 {
 	// 元々は0番
-	command->SetGraphicsRootConstantBufferView(rootParameterIndexCBV, materialResource_->GetGPUVirtualAddress());
+	//command->SetGraphicsRootConstantBufferView(rootParameterIndexCBV, materialResource_->GetGPUVirtualAddress());
 	// 元々は2番
 	command->SetGraphicsRootDescriptorTable(rootParameterIndexSRV, TextureManager::GetInstance()->GetsrvHandleGPU(mtlData_.textureFilePath));
 }
@@ -45,7 +45,7 @@ std::shared_ptr<Material> Material::CreateFromAiMaterial(aiMaterial* src, const 
 
 	float shininess = 0.0f;
 	if (src->Get(AI_MATKEY_SHININESS, shininess) == AI_SUCCESS) {
-		mat->SetMaterialShininess(shininess);
+		//mat->SetMaterialShininess(shininess);
 		mat->SetNs(shininess);
 	}
 
@@ -63,12 +63,12 @@ std::shared_ptr<Material> Material::CreateFromAiMaterial(aiMaterial* src, const 
 
 void Material::TransferData()
 {
-	materialData_->enableLighting = true;
-	materialData_->shininess = 30.0f;
+	//materialData_->enableLighting = true;
+	//materialData_->shininess = 30.0f;
 	materialData_->uvTransform = MakeIdentity4x4();
 }
 
 void Material::LoadTexture()
 {
-	TextureManager::GetInstance()->LoadTexture(mtlData_.textureFilePath);
+	TextureManager::GetInstance()->LoadTexture(textureFilePath_);
 }

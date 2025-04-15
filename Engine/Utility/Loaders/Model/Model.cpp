@@ -76,7 +76,7 @@ void Model::Draw()
 			mesh->RecordDrawCommands(commandList);
 		}
 
-		materials_[mesh->GetMaterialIndex()]->TransferData();
+		//materials_[mesh->GetMaterialIndex()]->TransferData();
 		materials_[mesh->GetMaterialIndex()]->RecordDrawCommands(commandList, 0, 2);
 		commandList->DrawIndexedInstanced(mesh->GetIndexCount(), 1, 0, 0, 0);
 	}
@@ -95,7 +95,7 @@ void Model::Draw(Vector4 color)
 			mesh->RecordDrawCommands(commandList);
 		}
 
-		materials_[mesh->GetMaterialIndex()]->TransferData();
+		//materials_[mesh->GetMaterialIndex()]->TransferData();
 		materials_[mesh->GetMaterialIndex()]->RecordDrawCommands(commandList, 0, 2);
 		commandList->DrawIndexedInstanced(mesh->GetIndexCount(), 1, 0, 0, 0);
 	}
@@ -310,7 +310,7 @@ void Model::LoadMaterial(const aiScene* scene, std::string directoryPath)
 		float shininess = 0.0f;
 		if (materialSrc->Get(AI_MATKEY_SHININESS, shininess) == AI_SUCCESS) {
 			material.SetNs(shininess);
-			material.SetMaterialShininess(shininess);
+			//material.SetMaterialShininess(shininess);
 		}
 
 		float refractionIndex = 1.0f;
@@ -324,7 +324,7 @@ void Model::LoadMaterial(const aiScene* scene, std::string directoryPath)
 		}
 
 		if (materialSrc->Get(AI_MATKEY_SHININESS_STRENGTH, shininess) == AI_SUCCESS && shininess > 0.0f) {
-			material.SetMaterialSpecularEnabled(true);
+			//material.SetMaterialSpecularEnabled(true);
 		}
 	}
 }

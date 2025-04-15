@@ -1,13 +1,16 @@
 #include "Skinning.hlsli"
 struct Material
 {
-	int enableLighting;
 	float4x4 uvTransform;
-	float shininess;
+};
+
+struct MaterialLight
+{
+    int enableLighting;
+    float shininess;
     int enableSpecular;
     int isHalfVector;
 };
-
 struct MaterialColor
 {
     float4 color : SV_TARGET0;
@@ -56,7 +59,9 @@ ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
 ConstantBuffer<Camera> gCamera : register(b2);
 ConstantBuffer<PointLight> gPointLight : register(b3);
 ConstantBuffer<SpotLight> gSpotLight : register(b4);
+
 ConstantBuffer<MaterialColor> gMaterialColor : register(b5);
+ConstantBuffer<MaterialLight> gMaterialLight : register(b6);
 
 Texture2D<float4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
@@ -72,7 +77,7 @@ PixelShaderOutput main(VertexShaderOutput input)
 	float3 finalDiffuse = float3(0.0f, 0.0f, 0.0f);
 	float3 finalSpecular = float3(0.0f, 0.0f, 0.0f);
 
-	if (gMaterial.enableLighting)
+    if (gMaterialLight.enableLighting)
 	{
         // カメラ視線ベクトル
 		float3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
@@ -90,10 +95,10 @@ PixelShaderOutput main(VertexShaderOutput input)
             // 鏡面反射 (Blinn-Phong)
 			float3 halfVector = normalize(-gDirectionalLight.direction + toEye);
 			float NdotH = max(dot(normalize(input.normal), halfVector), 0.0f);
-			float3 specularDirectional = gDirectionalLight.color.rgb * gDirectionalLight.intensity * pow(saturate(NdotH), gMaterial.shininess);
+            float3 specularDirectional = gDirectionalLight.color.rgb * gDirectionalLight.intensity * pow(saturate(NdotH), gMaterialLight.shininess);
 
             // フラグで有効化
-			if (gMaterial.enableSpecular != 0)
+            if (gMaterialLight.enableSpecular != 0)
 			{
 				finalSpecular += specularDirectional;
 			}
@@ -118,10 +123,10 @@ PixelShaderOutput main(VertexShaderOutput input)
             // 鏡面反射 (Blinn-Phong)
 			float3 halfVectorPoint = normalize(pointLightDirection + toEye);
 			float NdotHPoint = max(dot(normalize(input.normal), halfVectorPoint), 0.0f);
-			float3 specularPoint = gPointLight.color.rgb * gPointLight.intensity * pow(saturate(NdotHPoint), gMaterial.shininess) * factor;
+            float3 specularPoint = gPointLight.color.rgb * gPointLight.intensity * pow(saturate(NdotHPoint), gMaterialLight.shininess) * factor;
         
             // フラグで有効化
-            if (gMaterial.enableSpecular != 0)
+            if (gMaterialLight.enableSpecular != 0)
 			{
 				finalSpecular += specularPoint;
 			}
@@ -157,10 +162,10 @@ PixelShaderOutput main(VertexShaderOutput input)
             // 鏡面反射 (Blinn-Phong)
 			float3 halfVectorPoint = normalize(-spotLightDirectionOnSurface + toEye);
 			float NdotHPoint = max(dot(normalize(input.normal), halfVectorPoint), 0.0f);
-			float3 specularPoint = gSpotLight.color.rgb * gSpotLight.intensity * pow(saturate(NdotHPoint), gMaterial.shininess) * falloffFactor;
+            float3 specularPoint = gSpotLight.color.rgb * gSpotLight.intensity * pow(saturate(NdotHPoint), gMaterialLight.shininess) * falloffFactor;
 
             // スペキュラー反射の有効化
-            if (gMaterial.enableSpecular != 0)
+            if (gMaterialLight.enableSpecular != 0)
 			{
 				finalSpecular += specularPoint;
 			}

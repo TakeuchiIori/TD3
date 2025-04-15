@@ -11,7 +11,8 @@
 #include "Loaders/Model/Model.h"
 #include "../Graphics/Culling/OcclusionCullingManager.h"
 #include "Loaders/Model/Material/MaterialColor.h"
-
+#include "Loaders/Model/Material/MaterialLighting.h"
+#include "Loaders/Model/Material/MaterialUV.h"
 
 // Math
 #include "Vector4.h"
@@ -44,7 +45,7 @@ public: // メンバ関数
 	/// <summary>
 	/// 描画
 	/// </summary>
-	void Draw(Camera* camera, WorldTransform& worldTransform);
+	void Draw(Camera* camera,WorldTransform& worldTransform);
 
 	/// <summary>
 	/// スケルトン描画
@@ -62,6 +63,16 @@ public: // メンバ関数
 	void SetChangeAnimation(const std::string& filePath);
 
 
+
+	Vector2 uvScale = { 1.0f,1.0f };
+	Vector2 uvTranslate = { 0.0f,0.0f };
+	float uvRotate = 0.0f;
+
+public:
+
+	static Object3d* Create(const std::string& fileName, bool isAnimation = false);
+	static Object3d* Create(Model* model);
+
 private:
 
 	/// <summary>
@@ -69,11 +80,16 @@ private:
 	/// </summary>
 	void CreateCameraResource();
 
+	/// <summary>
+	/// UVの更新
+	/// </summary>
+	void UpdateUV();
 public: // アクセッサ
 	Model* GetModel() { return model_; }
 	void SetMaterialColor(const Vector4& color) { materialColor_->SetColor(color); }
 	void SetMaterialColor(const Vector3& color) { materialColor_->SetColor(color); }
 	void SetAlpha(float alpha) { materialColor_->SetAlpha(alpha); }
+	void SetUvTransform(const Matrix4x4& uvTransform) { materialUV_->SetUVTransform(uvTransform); }
 
 private:
 
@@ -92,9 +108,11 @@ private:
 	uint32_t queryIndex_ = 0;
 
 	std::unique_ptr<MaterialColor> materialColor_;
+	std::unique_ptr<MaterialLighting> materialLighting_;
+	std::unique_ptr<MaterialUV> materialUV_;
 
 	// デフォルトのモデルパス
-	static const std::string defaultModelPath_;
+	static const std::string defaultModelPath_; 
 
 };
 

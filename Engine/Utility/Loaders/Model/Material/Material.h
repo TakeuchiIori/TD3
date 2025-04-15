@@ -92,41 +92,41 @@ public:
 
 	=================================================================*/
 
-	///
-	/// Lighting
-	/// 
-	bool IsLightingEnabled() const { return materialData_->enableLighting != 0; }
-	void SetLightingEnabled(bool enabled) { materialData_->enableLighting = enabled ? 1 : 0; }
+	/////
+	///// Lighting
+	///// 
+	//bool IsLightingEnabled() const { return materialData_->enableLighting != 0; }
+	//void SetLightingEnabled(bool enabled) { materialData_->enableLighting = enabled ? 1 : 0; }
 
-	///
-	/// Specular
-	/// 
-	bool IsSpecularEnabled() const { return materialData_->enableSpecular; }
-	void SetMaterialSpecularEnabled(bool enable) { materialData_->enableSpecular = enable; }
+	/////
+	///// Specular
+	///// 
+	//bool IsSpecularEnabled() const { return materialData_->enableSpecular; }
+	//void SetMaterialSpecularEnabled(bool enable) { materialData_->enableSpecular = enable; }
 
-	///
-	/// HalfVector
-	/// 
-	bool IsHalfVectorEnabled() const { return materialData_->isHalfVector; }
-	void SetMaterialHalfVectorEnabled(bool enable) { materialData_->isHalfVector = enable; }
+	/////
+	///// HalfVector
+	///// 
+	//bool IsHalfVectorEnabled() const { return materialData_->isHalfVector; }
+	//void SetMaterialHalfVectorEnabled(bool enable) { materialData_->isHalfVector = enable; }
 
-	///
-	/// Shininess
-	///
-	float GetMaterialShininess() const { return materialData_->shininess; }
-	void SetMaterialShininess(float shininess) { materialData_->shininess = shininess; }
+	/////
+	///// Shininess
+	/////
+	//float GetMaterialShininess() const { return materialData_->shininess; }
+	//void SetMaterialShininess(float shininess) { materialData_->shininess = shininess; }
 
-	///
-	/// UV Transform
-	/// 
-	const Matrix4x4& GetMaterialUVTransform() const { return materialData_->uvTransform; }
-	void SetMaterialUVTransform(const Matrix4x4& uvTransform) { materialData_->uvTransform = uvTransform; }
+	/////
+	///// UV Transform
+	///// 
+	//const Matrix4x4& GetMaterialUVTransform() const { return materialData_->uvTransform; }
+	//void SetMaterialUVTransform(const Matrix4x4& uvTransform) { materialData_->uvTransform = uvTransform; }
 
-	///
-	/// Material Enable
-	/// 
-	bool IsMaterialEnabled() const { return materialData_->enableLighting != 0; }
-	void SetMaterialEnabled(bool enable) { materialData_->enableLighting = enable; }
+	/////
+	///// Material Enable
+	///// 
+	//bool IsMaterialEnabled() const { return materialData_->enableLighting != 0; }
+	//void SetMaterialEnabled(bool enable) { materialData_->enableLighting = enable; }
 
 	///
 	/// Resource

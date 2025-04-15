@@ -37,7 +37,7 @@ void Mesh::RecordDrawCommands(ID3D12GraphicsCommandList* command, D3D12_VERTEX_B
 
 void Mesh::RecordDrawCommands(ID3D12GraphicsCommandList* command, SkinCluster& skinCluster)
 {
-	command->SetGraphicsRootDescriptorTable(8, skinCluster.GetPaletteSrvHandle().second);
+	command->SetGraphicsRootDescriptorTable(9, skinCluster.GetPaletteSrvHandle().second);
 }
 
 void Mesh::InitResources() {

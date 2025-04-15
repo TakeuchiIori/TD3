@@ -8,10 +8,10 @@
 
 // Engine
 #include "Loaders./Texture./TextureManager.h"
-#include "Loaders./Model/ModelManager.h"
-#include "Loaders./Model/Model.h"
-#include "WorldTransform./WorldTransform.h"
+#include "Loaders/Model/ModelManager.h"
 
+#include "WorldTransform./WorldTransform.h"
+#include "Debugger/Logger.h"
 
 #ifdef _DEBUG
 #include "imgui.h"
@@ -35,6 +35,12 @@ void Object3d::Initialize()
 	materialColor_ = std::make_unique<MaterialColor>();
 	materialColor_->Initialize();
 
+	materialLighting_ = std::make_unique<MaterialLighting>();
+	materialLighting_->Initialize();
+
+	materialUV_ = std::make_unique<MaterialUV>();
+	materialUV_->Initialize();
+
 }
 void Object3d::UpdateAnimation()
 {
@@ -46,7 +52,6 @@ void Object3d::UpdateAnimation()
 void Object3d::Draw(Camera* camera, WorldTransform& worldTransform)
 {
 
-
 	//// クエリは毎回実行する
 	//OcclusionCullingManager::GetInstance()->BeginOcclusionQuery(queryIndex_);
 
@@ -57,8 +62,7 @@ void Object3d::Draw(Camera* camera, WorldTransform& worldTransform)
 	//if (!shouldDraw && globalFrameCounter % 1 == 0) {
 	//	shouldDraw = true;
 	//}
-
-
+		UpdateUV();
 	//if (shouldDraw) {
 		Matrix4x4 worldViewProjectionMatrix;
 		Matrix4x4 worldMatrix;
@@ -87,7 +91,11 @@ void Object3d::Draw(Camera* camera, WorldTransform& worldTransform)
 		object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, worldTransform.GetConstBuffer()->GetGPUVirtualAddress());
 		// カメラ
 		object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
+		
+		// マテリアル関連
+		materialUV_->RecordDrawCommands(object3dCommon_->GetDxCommon()->GetCommandList().Get(), 0);
 		materialColor_->RecordDrawCommands(object3dCommon_->GetDxCommon()->GetCommandList().Get(), 7);
+		materialLighting_->RecordDrawCommands(object3dCommon_->GetDxCommon()->GetCommandList().Get(), 8);
 
 		if (model_) {
 			model_->Draw();
@@ -109,6 +117,18 @@ void Object3d::CreateCameraResource()
 	cameraResource_ = object3dCommon_->GetDxCommon()->CreateBufferResource(sizeof(CameraForGPU));
 	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
 	cameraData_->worldPosition = { 0.0f, 0.0f, 0.0f };
+}
+
+void Object3d::UpdateUV()
+{
+	Vector3 s = { uvScale.x, uvScale.y, 1.0f};
+	Vector3 r = { 0.0f, 0.0f, uvRotate};
+	Vector3 t = { uvTranslate.x, uvTranslate.y, 0.0f };
+
+	Matrix4x4 affine = MakeAffineMatrix(s, r, t);
+
+	// マテリアルのUV変換行列をセット
+	SetUvTransform(affine);
 }
 
 
@@ -151,4 +171,42 @@ void Object3d::SetChangeAnimation(const std::string& filePath)
 	if (model_) {
 		model_->SetChangeAnimation(defaultModelPath_ + basePath, fileName);
 	}
+}
+
+Object3d* Object3d::Create(const std::string& fileName, bool isAnimation)
+{
+	// ファイル名に応じてモデル読み込み
+	std::string basePath = fileName;
+	std::string trueFileName;
+
+	if (basePath.size() > 4 && basePath.substr(basePath.size() - 4) == ".obj") {
+		basePath = basePath.substr(0, basePath.size() - 4);
+		trueFileName = basePath + ".obj";
+	} else if (basePath.size() > 5 && basePath.substr(basePath.size() - 5) == ".gltf") {
+		basePath = basePath.substr(0, basePath.size() - 5);
+		trueFileName = basePath + ".gltf";
+	}
+
+	// 読み込み（重複チェックあり）
+	ModelManager::GetInstance()->LoadModel(defaultModelPath_ + basePath, trueFileName, isAnimation);
+
+	// モデル取得
+	Model* model = ModelManager::GetInstance()->FindModel(trueFileName);
+	if (!model) {
+		return nullptr;
+	}
+
+	// Object3d生成
+	Object3d* newObj = new Object3d();
+	newObj->Initialize();
+	newObj->model_ = model;
+	return newObj;
+}
+
+Object3d* Object3d::Create(Model* model)
+{
+	Object3d* newObj = new Object3d();
+	newObj->Initialize();
+	newObj->model_ = model;
+	return newObj;
 }
