@@ -166,10 +166,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Utility\Loaders\Model\Joint.cpp" />
     <ClCompile Include="Application\Objects\Ground\Ground.cpp" />
     <ClCompile Include="Application\Scenes\MainScenes\Transitions\Fade\Fade.cpp" />
-    <ClCompile Include="Engine\Utility\Systems\GameTime\HitStop.cpp" />
     <ClCompile Include="Application\SystemsApp\Cameras\FollowCamera\FollowCamera.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Json\JsonManager.cpp" />
-    <ClCompile Include="Engine\Utility\Systems\GameTime\GameTIme.cpp" />
+    <ClCompile Include="Engine\Utility\Systems\GameTime\GameTime.cpp" />
     <ClCompile Include="Application\Scenes\MainScenes\Transitions\Base\ISceneTransition.cpp" />
     <ClCompile Include="Application\Scenes\MainScenes\Transitions\Fade\FadeTransition.cpp" />
     <ClCompile Include="main.cpp" />
@@ -197,7 +196,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Utility\Loaders\Model\Node.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Model\SkinCluster.cpp" />
     <ClCompile Include="Application\SystemsApp\Cameras\TopDownCamera\TopDownCamera.cpp" />
-    <ClCompile Include="Engine\Utility\Systems\GameTime\ObjectTime.cpp" />
     <ClCompile Include="Application\Scenes\MainScenes\Transitions\Base\TransitionFactory.cpp" />
     <ClCompile Include="Application\Objects\Player\Player.cpp" />
     <ClCompile Include="Application\Objects\Player\PlayerMapCollision.cpp" />
@@ -268,10 +266,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Utility\Loaders\Model\Joint.h" />
     <ClInclude Include="Application\Objects\Ground\Ground.h" />
     <ClInclude Include="Application\Scenes\MainScenes\Transitions\Fade\Fade.h" />
-    <ClInclude Include="Engine\Utility\Systems\GameTime\HitStop.h" />
     <ClInclude Include="Application\SystemsApp\Cameras\FollowCamera\FollowCamera.h" />
     <ClInclude Include="Engine\Utility\Loaders\Json\JsonManager.h" />
-    <ClInclude Include="Engine\Utility\Systems\GameTime\GameTIme.h" />
+    <ClInclude Include="Engine\Utility\Systems\GameTime\GameTime.h" />
     <ClInclude Include="Application\Scenes\MainScenes\Transitions\Base\ISceneTransition.h" />
     <ClInclude Include="Application\Scenes\MainScenes\Transitions\Fade\FadeTransition.h" />
     <ClInclude Include="Math\MathFunc.h" />
@@ -307,7 +304,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Utility\Loaders\Model\Node.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\SkinCluster.h" />
     <ClInclude Include="Application\SystemsApp\Cameras\TopDownCamera\TopDownCamera.h" />
-    <ClInclude Include="Engine\Utility\Systems\GameTime\ObjectTime.h" />
     <ClInclude Include="Application\Scenes\MainScenes\Transitions\Base\TransitionFactory.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\Mesh.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\ModelTest.h" />

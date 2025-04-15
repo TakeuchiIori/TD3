@@ -9,7 +9,6 @@
 #include "PipelineManager/SkinningManager.h"
 #include "Loaders/Model/Model.h"
 #include "Collision/Core/CollisionManager.h"
-#include <Systems/GameTime/HitStop.h>
 #include "../Graphics/Culling/OcclusionCullingManager.h"
 
 // C++
@@ -32,6 +31,7 @@ void GameScene::Initialize()
 	// カメラの生成
 	sceneCamera_ = cameraManager_.AddCamera();
 	//playerCamera_ = cameraManager_.AddCamera();
+	GameTime::Initailzie();
 
     // 初期カメラモード設定
     cameraMode_ = CameraMode::FOLLOW;
@@ -44,7 +44,6 @@ void GameScene::Initialize()
 	picture_->Initialize();
 	picture_->SetCamera(sceneCamera_.get());
 
-	GameTime::GetInstance()->Initialize();
 
 	followCamera_.Initialize();
 	debugCamera_.Initialize();
@@ -111,6 +110,9 @@ void GameScene::Initialize()
 /// </summary>
 void GameScene::Update()
 {
+	GameTime::Update();
+	GameTime::ImGui();
+
 #ifdef _DEBUG
 	if ((Input::GetInstance()->TriggerKey(DIK_LCONTROL)) || Input::GetInstance()->IsPadTriggered(0, GamePadButton::RT)) {
 		isDebugCamera_ = !isDebugCamera_;
