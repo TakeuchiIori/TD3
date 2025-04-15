@@ -69,8 +69,9 @@ void Player::InitJson()
 {
 	jsonManager_ = std::make_unique<JsonManager>("playerObj", "Resources/JSON/");
 	jsonManager_->SetCategory("Objects");
-	jsonManager_->Register("草の取得数",&grassGauge_);
-	jsonManager_->Register("草の最大数", &kMaxGrassGauge_);
+	jsonManager_->Register("通常時の移動速度",&defaultSpeed_);
+	jsonManager_->Register("ブースト時の速度", &boostSpeed_);
+	jsonManager_->Register("帰還時の速度", &returnSpeed_);
 
 	jsonCollider_ = std::make_unique<JsonManager>("playerCollider", "Resources/JSON/");
 	aabbCollider_->InitJson(jsonCollider_.get());
@@ -369,11 +370,6 @@ void Player::Move()
 	}
 
 	moveDirection_ = Normalize(moveDirection_);
-
-	if (isFPSMode_) // カメラをプレイヤー視点にしたとき
-	{
-		moveDirection_ = TransformNormal(moveDirection_, MakeRotateMatrixY(worldTransform_.rotation_.y));
-	}
 
 	if(beforeDirection_ == moveDirection_)
 	{
@@ -744,7 +740,7 @@ void Player::BehaviorMovingUpdate()
 
 void Player::BehaviorBoostInit()
 {
-	speed_ = defaultSpeed_ + boostSpeed_;
+	speed_ = boostSpeed_;
 	boostTimer_ = kBoostTime_;
 	invincibleTimer_ = kBoostTime_; // ブースト中無敵に
 }
@@ -767,7 +763,7 @@ void Player::BehaviorBoostUpdate()
 
 void Player::BehaviorReturnInit()
 {
-	speed_ = defaultSpeed_ + boostSpeed_;
+	speed_ = returnSpeed_;
 	moveDirection_ = { 0,0,0 };
 	isCollisionBody = false;
 	extendTimer_ = 0;
