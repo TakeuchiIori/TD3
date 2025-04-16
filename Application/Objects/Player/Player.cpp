@@ -289,63 +289,23 @@ void Player::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDi
 		{
 			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
 			{
-				HitDirection hitDir = Collision::InverseHitDirection(dir);
+				HitDirection hitDir = Collision::GetSelfLocalHitDirection(self, other);
+				HitDirection otherDir = Collision::GetSelfLocalHitDirection(other, self);
 #ifdef _DEBUG
 				int a = static_cast<int>(dir);
-				int b = static_cast<int>(hitDir);
+				int b = static_cast<int>(otherDir);
 				ImGui::Begin("DebugPlayer");
 				ImGui::Text("dir : %d", a);
-				ImGui::Text("hitDir : %d", b);
+				//ImGui::Text("hitDir : %d", b);
 				ImGui::Text("isHit : %d", isHit);
 				ImGui::End();
 #endif // _DEBUG
-				//if (hitDir != HitDirection::None && !isHit)
-				//{
-				//	isHit = true;
-				//	switch (hitDir)
-				//	{
-				//	case HitDirection::None:
-				//		break;
-				//	case HitDirection::Top:
-				//		break;
-				//	case HitDirection::Bottom:
-				//		break;
-				//	case HitDirection::Left:
-				//		break;
-				//	case HitDirection::Right: // くちばし想定
-				//		TakeDamage();
-				//		break;
-				//	case HitDirection::Front:
-				//		break;
-				//	case HitDirection::Back:
-				//		break;
-				//	default:
-				//		break;
-				//	}
-				//}
-				// おそらく相手がどっちから当たってきたか？
-				if (dir != HitDirection::None && !isHit)
+				if (otherDir != HitDirection::None && !isHit)
 				{
 					isHit = true;
-					switch (dir)
+					if (otherDir == HitDirection::Back)
 					{
-					case HitDirection::None:
-						break;
-					case HitDirection::Top:
-						break;
-					case HitDirection::Bottom:
-						break;
-					case HitDirection::Left: // くちばし想定
 						TakeDamage();
-						break;
-					case HitDirection::Right:
-						break;
-					case HitDirection::Front:
-						break;
-					case HitDirection::Back:
-						break;
-					default:
-						break;
 					}
 				}
 			}
