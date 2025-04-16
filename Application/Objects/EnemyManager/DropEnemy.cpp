@@ -12,7 +12,7 @@ void DropEnemy::Initialize(Camera* camera)
 
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("cube.obj");
+	obj_->SetModel("bard.obj");
 	obj_->SetMaterialColor({ 1.0f,1.0f,1.0f,1.0f });
 
 	worldTransform_.Initialize();
@@ -47,7 +47,10 @@ void DropEnemy::Update()
 		return;
 	}
 
-	Move();
+	if (!IsStop()) // 攻撃を食らったら次まで気絶
+	{
+		Move();
+	}
 
 
 	Vector3 newPos = worldTransform_.translation_ + velocity_;

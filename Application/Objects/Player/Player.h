@@ -123,6 +123,8 @@ private:
 
 	void GrassGaugeUpdate();
 
+	void Eliminate(); // 敵を倒した時
+
 
 #ifdef _DEBUG
 	// デバッグ用 (ImGuiとか)
@@ -224,8 +226,8 @@ private:
 	std::unique_ptr<JsonManager> jsonManager_;
 	std::unique_ptr<JsonManager> jsonCollider_;
 
-	//std::shared_ptr<OBBCollider> obbCollider_;
-	std::shared_ptr<AABBCollider> aabbCollider_;
+	std::shared_ptr<OBBCollider> obbCollider_;
+	//std::shared_ptr<AABBCollider> aabbCollider_;
 	std::shared_ptr<AABBCollider> nextAabbCollider_;
 	WorldTransform nextWorldTransform_;
 	//std::shared_ptr<SphereCollider> sphereCollider_;
@@ -234,6 +236,11 @@ private:
 	MapChipCollision::ColliderRect colliderRect_;
 
 	bool isCollisionBody = false;
+
+
+	const Vector4 defaultColorV4_ = { 0.90625f,0.87109f,0.125f,1.0f };
+	const Vector3 defaultColorV3_ = { 0.90625f,0.87109f,0.125f };
+	Vector3 changeColor_ = {};
 
 
 	// 移動
@@ -247,6 +254,7 @@ private:
 
 	bool isMove_ = false;
 
+	static bool isHit;
 
 	// 移動履歴
 	std::list<Vector3> moveHistory_;
