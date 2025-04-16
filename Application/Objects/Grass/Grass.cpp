@@ -33,7 +33,7 @@ void Grass::Initialize(Camera* camera)
 	worldTransform_.UpdateMatrix();
 
 	growthAreaWT_.Initialize();
-	growthAreaWT_.scale_ = { 2.0f,2.0f,2.0f };
+	growthAreaWT_.scale_ = { 2.5f,2.5f,2.5f };
 	growthAreaWT_.translation_ = worldTransform_.translation_;
 	growthAreaWT_.UpdateMatrix();
 

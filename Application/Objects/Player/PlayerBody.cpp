@@ -57,6 +57,7 @@ void PlayerBody::Update()
 	worldTransform_.UpdateMatrix();
 	ExtendUpdate();
 	obj_->uvScale = { worldTransform_.scale_.x, worldTransform_.scale_.y };
+	// ↓上左ok
 	//obj_->uvTranslate = { -(worldTransform_.scale_.x - 1.0f), -(worldTransform_.scale_.y - 1.0f) };
 
 	aabbCollider_->Update();

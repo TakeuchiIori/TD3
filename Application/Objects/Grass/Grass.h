@@ -185,7 +185,7 @@ private:
 	const float deltaTime_ = 1.0f / 60.0f; // 仮対応
 
 	Vector3 defaultScale_ = { 1.0f,1.0f,1.0f };
-	Vector3 growthScale_ = { 1.4f,1.4f,1.4f };
+	Vector3 growthScale_ = { 1.8f,1.8f,1.8f };
 
 	float kGrowthTime_ = 0.5f;
 	float growthTimer_ = 0.0f;
