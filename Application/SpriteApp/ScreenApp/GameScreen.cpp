@@ -89,6 +89,27 @@ void GameScreen::Initialize()
 	}
 
 
+	///////////////////////////////////////////////////////////////////////////
+	// 
+	// 進んだ距離のスプライト初期化
+	// 
+	///////////////////////////////////////////////////////////////////////////
+
+	for (int i = 0; i < 10; ++i) {
+		disPaths_[i] = "Resources/Textures/Each_Number/distance_" + std::to_string(i) + ".png";
+	}
+	mSprite_ = std::make_unique<Sprite>();
+	mSprite_->Initialize("Resources/Textures/Each_Number/m.png");
+	mSprite_->SetAnchorPoint({ 0.0f, 0.0f });
+
+	// 表示用スプライト5個分を生成（00:00）
+	for (int i = 0; i < 3; ++i) {
+		ditSprites_[i] = std::make_unique<Sprite>();
+		ditSprites_[i]->Initialize("Resources/Textures/Each_Number/distance_0.png");
+		ditSprites_[i]->SetAnchorPoint({ 0.5f, 0.5f });
+		ditSprites_[i]->SetSize({ 30.0f, 40.0f });
+		ditSprites_[i]->SetColor({ 0.0f, 0.0f, 0.0f, 1.0f });
+	}
 
 
 }
@@ -182,7 +203,7 @@ void GameScreen::Update()
 	baseLimit_->Update();
 	UpdateLimit();
 
-
+	Updatedistance();
 }
 
 void GameScreen::Draw()
@@ -220,7 +241,9 @@ void GameScreen::Draw()
 		sprite->Draw();
 	}
 
-
+	for (const auto& sprite : ditSprites_) {
+		sprite->Draw();
+	}
 
 }
 
@@ -252,6 +275,40 @@ void GameScreen::UpdateLimit()
 	for (int i = 0; i < 5; ++i) {
 		timeSprites_[i]->SetPosition({ basePos.x + spacing * i, basePos.y, 0.0f });
 		timeSprites_[i]->Update();
+	}
+
+}
+
+void GameScreen::Updatedistance()
+{
+
+	Vector3 playerPos = player_->GetWorldTransform().translation_;
+	Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
+	Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
+	playerPos = Transform(playerPos, matViewProjectionViewport);
+
+	// 時間をfloatで取得（例：9.83）
+	float dit = player_->GetCenterPosition().y - 2.0f;
+	//if (dit > 10.0f) dit = 10.0f;  // 最大10秒
+
+	int seconds = static_cast<int>(dit);          // 整数部（9）
+	int fraction = static_cast<int>(dit * 100) % 100; // 小数部2桁（83）
+
+	// 桁ごとに数字を分解
+	int secTens = seconds / 10;
+	int secOnes = seconds % 10;
+	int fracTens = fraction / 10;
+	int fracOnes = fraction % 10;
+
+	// テクスチャを変更
+	ditSprites_[0]->ChangeTexture(disPaths_[secTens]);
+	ditSprites_[1]->ChangeTexture(disPaths_[secOnes]);
+	ditSprites_[2]->ChangeTexture(mTexturePath_);
+	// 配置と更新
+	float spacing = 20.0f;
+	for (int i = 0; i < 3; ++i) {
+		ditSprites_[i]->SetPosition({ playerPos.x - 10 + spacing * i, playerPos.y - 50, 0.0f });
+		ditSprites_[i]->Update();
 	}
 
 }

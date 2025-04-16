@@ -30,6 +30,11 @@ public:
 	/// </summary>
 	void UpdateLimit();
 
+	/// <summary>
+	/// 進んだ距離の更新
+	/// </summary>
+	void Updatedistance();
+
 public:
 
 	void SetPlayer(Player* player) { player_ = player; }
@@ -60,6 +65,12 @@ private:
 	std::array<std::unique_ptr<Sprite>, 5> timeSprites_;
 	std::array<std::string, 10> digitTexturePaths_;
 	std::string colonTexturePath_ = "Resources/Textures/Each_Number/a.png";
+
+	// 進んだ距離
+	std::unique_ptr<Sprite> mSprite_;
+	std::array<std::unique_ptr<Sprite>, 3> ditSprites_;
+	std::array<std::string, 10> disPaths_;
+	std::string mTexturePath_ = "Resources/Textures/Each_Number/m.png";
 
 };
 
