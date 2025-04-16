@@ -189,6 +189,11 @@ private:
 	Vector3 defaultScale_ = { 1.0f,1.0f,1.0f };
 	Vector3 growthScale_ = { 1.8f,1.8f,1.8f };
 
+	// 食べる処理
+	float eatenTimer_ = 0.0f;
+	const float kEatenTime_ = 0.2f;
+	Vector3 eatenStartScale_{};
+
 	float kGrowthTime_ = 0.5f;
 	float growthTimer_ = 0.0f;
 	bool growthWait_ = false;

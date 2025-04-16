@@ -51,7 +51,7 @@ void Grass::Initialize(Camera* camera)
 	InitCollision();
 	InitJson();
 
-	particleEmitter_ = std::make_unique<ParticleEmitter>("GrowthParticle", worldTransform_.translation_, 5);
+	particleEmitter_ = std::make_unique<ParticleEmitter>("GrowthParticle", worldTransform_.translation_, 20);
 }
 
 void Grass::InitCollision()
@@ -121,7 +121,7 @@ void Grass::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 		{
 			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
 			{
-				worldTransform_.scale_ = { 0.0f,0.0f,0.0f };
+				//worldTransform_.scale_ = { 0.0f,0.0f,0.0f };
 				aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
 				enter++;
 				behaviortRquest_ = BehaviorGrass::Eaten;
@@ -241,10 +241,23 @@ void Grass::BehaviorRootUpdate()
 
 void Grass::BehaviorEatenInit()
 {
+	eatenTimer_ = kEatenTime_;
+	eatenStartScale_ = worldTransform_.scale_;
 }
 
 void Grass::BehaviorEatenUpdate()
 {
+	if (0 < eatenTimer_) {
+		eatenTimer_ -= deltaTime_;
+		float t = 1.0f - eatenTimer_ / kEatenTime_;
+
+		// スケールを0に向かって補間
+		worldTransform_.scale_ = Lerp(eatenStartScale_, { 0.0f, 0.0f, 0.0f }, t);
+	} else {
+		// 補間完了後はRootに戻す（またはそのまま消えるならDeleteでもOK）
+		worldTransform_.scale_ = { 0.0f, 0.0f, 0.0f };
+		//behaviortRquest_ = BehaviorGrass::Root;
+	}
 }
 
 void Grass::BehaviorGrowthInit()
