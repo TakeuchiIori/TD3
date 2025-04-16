@@ -1,5 +1,10 @@
 #include "DropEnemy.h"
 #include "../Player/Player.h"
+#include "Easing.h"
+
+#include "Collision/Core/CollisionManager.h"
+
+bool::DropEnemy::isHit = false;
 
 DropEnemy::~DropEnemy()
 {
@@ -105,6 +110,26 @@ void DropEnemy::OnExitCollision(BaseCollider* self, BaseCollider* other) {
 }
 void DropEnemy::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
 {
+	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+	{
+		if (player_->behavior_ == BehaviorPlayer::Boost)
+		{
+			isHit = true;
+			TakeAttack();
+		}
+		HitDirection selfDir = Collision::GetSelfLocalHitDirection(self, other);
+		HitDirection otherDir = Collision::GetSelfLocalHitDirection(other, self);
+
+		if (selfDir != HitDirection::None && !isHit)
+		{
+			isHit = true;
+			if (selfDir != HitDirection::Back)
+			{
+				isTakeAttack_ = true;
+				TakeAttack();
+			}
+		}
+	}
 }
 
 void DropEnemy::MapChipOnCollision(const CollisionInfo& info) {
@@ -128,12 +153,25 @@ void DropEnemy::MapChipOnCollision(const CollisionInfo& info) {
 
 void DropEnemy::Move()
 {
+	// ターゲット回転角度（X軸を使って上下向きに傾ける）
+	float targetRotationX = isInversion_
+		? DirectX::XMConvertToRadians(90.0f)  // 上に向かうとき
+		: DirectX::XMConvertToRadians(-90.0f);  // 下に向かうとき
+
+	// 補間して自然な回転にする
+	float t = 0.7f;
+	t = Easing::easeInExpo(t);
+	worldTransform_.rotation_.x = Lerp(worldTransform_.rotation_.x, targetRotationX, t);
+
+	// 落下処理
 	constexpr float gravity = -0.16f;
 	constexpr float terminalVelocity = -0.05f;
 
 	velocity_.y += gravity;
+
+	// 上下の向きに応じて速度制限
 	if (velocity_.y < terminalVelocity) {
-		velocity_.y = (isInversion_ ? -terminalVelocity : terminalVelocity);
+		velocity_.y = isInversion_ ? -terminalVelocity : terminalVelocity;
 	}
 }
 

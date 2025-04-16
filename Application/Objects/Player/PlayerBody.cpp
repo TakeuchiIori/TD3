@@ -25,7 +25,7 @@ void PlayerBody::Initialize(Camera* camera)
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("cube.obj");
+	obj_->SetModel("unitCube.obj");
 	obj_->SetMaterialColor({ 0.90625f,0.87109f,0.125f,1.0f });
 
 	InitCollision();
