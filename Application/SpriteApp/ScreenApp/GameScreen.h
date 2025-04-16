@@ -3,6 +3,7 @@
 
 class Player;
 class Camera;
+class CheckPoint;
 class GameScreen
 {
 public:
@@ -39,11 +40,16 @@ public:
 
 	void SetPlayer(Player* player) { player_ = player; }
 	void SetCamera(Camera* camera) { camera_ = camera; }
+	void SetCheckPoint(float checkPoint) { checkPointPos_ = checkPoint; }
+	void SetCheckPointPos(Vector3 checkPointv) { checkPointPosv_ = checkPointv; }
 
 private:
 
 	Player* player_ = nullptr;
 	Camera* camera_ = nullptr;
+	float checkPointPos_ = 0.0f;
+	Vector3 checkPointPosv_{};
+
 	std::unique_ptr<UIBase> background_[2];
 	uint32_t numBGs_ = 2;
 
@@ -68,7 +74,7 @@ private:
 
 	// 進んだ距離
 	std::unique_ptr<Sprite> mSprite_;
-	std::array<std::unique_ptr<Sprite>, 3> ditSprites_;
+	std::array<std::unique_ptr<Sprite>, 4> ditSprites_;
 	std::array<std::string, 10> disPaths_;
 	std::string mTexturePath_ = "Resources/Textures/Each_Number/m.png";
 

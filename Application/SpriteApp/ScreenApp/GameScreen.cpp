@@ -103,7 +103,7 @@ void GameScreen::Initialize()
 	mSprite_->SetAnchorPoint({ 0.0f, 0.0f });
 
 	// 表示用スプライト5個分を生成（00:00）
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 4; ++i) {
 		ditSprites_[i] = std::make_unique<Sprite>();
 		ditSprites_[i]->Initialize("Resources/Textures/Each_Number/distance_0.png");
 		ditSprites_[i]->SetAnchorPoint({ 0.5f, 0.5f });
@@ -288,25 +288,26 @@ void GameScreen::Updatedistance()
 	playerPos = Transform(playerPos, matViewProjectionViewport);
 
 	// 時間をfloatで取得（例：9.83）
-	float dit = player_->GetCenterPosition().y - 2.0f;
+	float dit = checkPointPos_ - (player_->GetCenterPosition().y );
 	//if (dit > 10.0f) dit = 10.0f;  // 最大10秒
 
-	int seconds = static_cast<int>(dit);          // 整数部（9）
-	int fraction = static_cast<int>(dit * 100) % 100; // 小数部2桁（83）
+// 整数部と小数部に分ける
+	int seconds = static_cast<int>(dit);                  // 整数部（例：123）
+	int fraction = static_cast<int>(dit * 100) % 100;     // 小数部2桁（例：45）
 
-	// 桁ごとに数字を分解
-	int secTens = seconds / 10;
-	int secOnes = seconds % 10;
-	int fracTens = fraction / 10;
-	int fracOnes = fraction % 10;
+	// 100の位まで分解（最大999まで想定）
+	int secHundreds = seconds / 100;                      // 百の位
+	int secTens = (seconds / 10) % 10;                    // 十の位
+	int secOnes = seconds % 10;                           // 一の位
 
 	// テクスチャを変更
-	ditSprites_[0]->ChangeTexture(disPaths_[secTens]);
-	ditSprites_[1]->ChangeTexture(disPaths_[secOnes]);
-	ditSprites_[2]->ChangeTexture(mTexturePath_);
+	ditSprites_[0]->ChangeTexture(disPaths_[secHundreds]);
+	ditSprites_[1]->ChangeTexture(disPaths_[secTens]);
+	ditSprites_[2]->ChangeTexture(disPaths_[secOnes]);
+	ditSprites_[3]->ChangeTexture(mTexturePath_);
 	// 配置と更新
 	float spacing = 20.0f;
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 4; ++i) {
 		ditSprites_[i]->SetPosition({ playerPos.x - 10 + spacing * i, playerPos.y - 50, 0.0f });
 		ditSprites_[i]->Update();
 	}

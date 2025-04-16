@@ -157,3 +157,13 @@ void Stage::ReloadObject()
 		checkPoint_.SetCheckPointHight(*hight);
 	}
 }
+
+float Stage::GetCheckPoint()
+{
+	return *checkPoint_.GetCheckPointHight();
+}
+
+Vector3 Stage::GetCheckPointPos()
+{
+	return checkPoint_.GetCheckPointPos();
+}
