@@ -62,12 +62,6 @@ void UIBase::Update() {
         sprite_->Update();
     }
 
-#ifdef _DEBUG
-    if (!isDrawImGui_) {
-        ImGUi();
-    }
-#endif // _DEBUG
-
 }
 
 void UIBase::Draw() {
