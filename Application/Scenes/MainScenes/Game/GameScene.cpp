@@ -77,9 +77,9 @@ void GameScene::Initialize()
     ground_ = std::make_unique<Ground>();
     ground_->Initialize(sceneCamera_.get());
 
-	test_ = std::make_unique<Object3d>();
-	test_->Initialize();
-	test_->SetModel("walk.gltf", true);
+	//test_ = std::make_unique<Object3d>();
+	//test_->Initialize();
+	//test_->SetModel("walk.gltf", true);
 	//test->SetModel("sneakWalk.gltf", true);
 	testWorldTransform_.Initialize();
 
@@ -130,7 +130,7 @@ void GameScene::Update()
     }
     
 
-	test_->UpdateAnimation();
+	//test_->UpdateAnimation();
 	testWorldTransform_.UpdateMatrix();
 
 	if (!isDebugCamera_) {
@@ -229,7 +229,7 @@ void GameScene::DrawSprite()
 
 void GameScene::DrawAnimation()
 {
-	test_->Draw(sceneCamera_.get(), testWorldTransform_);
+	//test_->Draw(sceneCamera_.get(), testWorldTransform_);
 }
 
 void GameScene::DrawLine()
