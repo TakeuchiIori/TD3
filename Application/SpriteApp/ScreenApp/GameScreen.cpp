@@ -157,16 +157,6 @@ void GameScreen::Update()
 				}; // 黄→赤
 			}
 
-			// スプライトに色設定
-		//	grass_[1]->SetGradientColor(bottomColor, topColor);
-		//	grass_[1]->SetGradientFillRatio(ratio); // ← 追加！
-
-			
-			//grass_[1]->SetScale({ 1.0f, ratio });
-			// UVスケールとUVトランスレートを設定
-			//grass_[1]->SetUVScale({ 1.0f, ratio });
-			//grass_[1]->SetUVTranslate({ 0.0f,1.0f - ratio });
-
 			Vector2 baseSize = { 55.0f, 55.0f }; // 草画像の本来のサイズ
 
 			// 補正用オフセット計算（比率1.0なら0、0.5なら半分ズレる）
@@ -179,22 +169,7 @@ void GameScreen::Update()
 			grass_[1]->SetScale({ baseSize.x, baseSize.y * ratio });
 			grass_[1]->SetUVScale({ 1.0f, ratio });
 			grass_[1]->SetUVTranslate({ 0.0f, 1.0f - ratio });
-
-			// アンカーを下に固定（下から伸びてくるイメージ）
-			//grass_[1]->SetAnchorPoint({ 0.5f, 1.0f });
-
-
-			//grass_[1]->SetScale({ baseSize.x, baseSize.y * ratio });
 		}
-
-#ifdef _DEBUG
-
-
-
-		//ImGui::Begin("Grass");
-		//ImGui::DragFloat3("offsetGrass_", &offsetGrass_.x, 0.1f);
-		//ImGui::End();
-#endif // _DEBUG
 		grass_[i]->Update();
 
 	}

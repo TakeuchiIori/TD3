@@ -208,7 +208,7 @@ void JsonManager::ImGuiManager()
 	ImGui::Text("Select Category:");
 
 	// カテゴリ > （サブカテゴリ or 直クラス）
-	std::unordered_map<std::string, std::unordered_map<std::string, std::vector<std::string>>> treeMap;
+	std::map<std::string, std::map<std::string, std::vector<std::string>>> treeMap;
 
 	for (const auto& [name, manager] : instances) {
 		std::string cat = manager->GetCategory().empty() ? "Uncategorized" : manager->GetCategory();
@@ -226,8 +226,10 @@ void JsonManager::ImGuiManager()
 
 	for (const auto& [cat, subMap] : treeMap) {
 		if (ImGui::TreeNode(cat.c_str())) {
-			for (const auto& [subCat, classList] : subMap) {
+			for (const auto& [subCat, rawclassList] : subMap) {
 				// __NoSubCategory__ ならそのままボタンだけ表示
+				std::vector<std::string> classList = rawclassList; // コピーしてソート用に
+				std::sort(classList.begin(), classList.end());
 				if (subCat == "__NoSubCategory__") {
 					for (const auto& className : classList) {
 						if (ImGui::Button(className.c_str(), ImVec2(250, 30))) {
@@ -263,10 +265,36 @@ void JsonManager::ImGuiManager()
 			ImGui::PushID(selectedClass.c_str());
 
 			// 変数表示もスクロールできるように
-			ImGui::BeginChild("VariableList", ImVec2(0, 200), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+			ImGui::BeginChild("VariableList", ImVec2(0, 300), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+			// ▼ グループ化：ピリオドで分割してツリー構造に分類
+			std::map<std::string, std::vector<std::pair<std::string, IVariableJson*>>> groupedVars;
+			std::vector<std::pair<std::string, IVariableJson*>> flatVars;
 
-			for (auto& pair : instance->variables_) {
-				pair.second->ShowImGui(pair.first, selectedClass);
+			for (auto& [key, var] : instance->variables_) {
+				if (instance->treeKeys_.contains(key)) {
+					size_t dotPos = key.find('.');
+					std::string group = key.substr(0, dotPos);
+					std::string subKey = key.substr(dotPos + 1);
+					groupedVars[group].emplace_back(subKey, var.get());
+				} else {
+					flatVars.emplace_back(key, var.get());
+				}
+			}
+
+
+			// ▼ ツリー表示
+			for (auto& [group, vars] : groupedVars) {
+				if (ImGui::TreeNode(group.c_str())) {
+					for (auto& [name, var] : vars) {
+						var->ShowImGui(name, selectedClass);
+					}
+					ImGui::TreePop();
+				}
+			}
+
+			// ▼ 通常の変数（ピリオドなし）
+			for (auto& [key, var] : flatVars) {
+				var->ShowImGui(key, selectedClass);
 			}
 
 			ImGui::EndChild();

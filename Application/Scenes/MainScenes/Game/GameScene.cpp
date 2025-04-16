@@ -48,6 +48,7 @@ void GameScene::Initialize()
 	followCamera_.Initialize();
 	debugCamera_.Initialize();
 
+	ParticleManager::GetInstance()->SetCamera(sceneCamera_.get());
 
 	// 各オブジェクトの初期化
 	mpInfo_ = std::make_unique<MapChipInfo>();
@@ -91,7 +92,7 @@ void GameScene::Initialize()
 	//Audio::GetInstance()->SetVolume(sourceVoice, 0.8f); // 80%の音量に設定
 
 
-	ParticleManager::GetInstance()->SetCamera(sceneCamera_.get());
+	
 
 
 	gameScreen_ = std::make_unique<GameScreen>();
@@ -313,7 +314,7 @@ void GameScene::UpdateCamera()
 	{
 		if (isDebugCamera_) {
 			debugCamera_.Update();
-			sceneCamera_->SetFovY(debugCamera_.GetFov());
+			//sceneCamera_->SetFovY(debugCamera_.GetFov());
 			sceneCamera_->viewMatrix_ = debugCamera_.matView_;
 			sceneCamera_->transform_.translate = debugCamera_.translate_;
 			sceneCamera_->transform_.rotate = debugCamera_.rotate_;
