@@ -314,7 +314,7 @@ void GameScene::UpdateCamera()
 	{
 		if (isDebugCamera_) {
 			debugCamera_.Update();
-			//sceneCamera_->SetFovY(debugCamera_.GetFov());
+			sceneCamera_->SetFovY(debugCamera_.GetFov());
 			sceneCamera_->viewMatrix_ = debugCamera_.matView_;
 			sceneCamera_->transform_.translate = debugCamera_.translate_;
 			sceneCamera_->transform_.rotate = debugCamera_.rotate_;

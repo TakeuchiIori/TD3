@@ -4,7 +4,6 @@
 #include <iostream>
 
 // Engine
-#include "ModelManager.h"
 #include "CollisionTypeIdDef.h"
 
 // C++
