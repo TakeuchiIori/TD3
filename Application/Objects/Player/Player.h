@@ -28,6 +28,11 @@ enum class BehaviorPlayer
 	Return,
 };
 
+struct PointWithDirection {
+	Vector3 position;
+	float radian; // XY平面での向き（進行方向ベクトルの角度）
+};
+
 class Player 
 	: public BaseObject
 {
@@ -128,13 +133,13 @@ private:
 	void HeartPos() {
 		if(HP_ > 0)
 		{
-			std::vector<Vector3> result;
-			const float length = 5.0f; // 欲しい間隔
+			std::vector<PointWithDirection> result;
+			const float length = 1.0f;
 			float targetDistance = length;
 			float accumulated = 0.0f;
 
 			auto it = moveHistory_.rbegin();
-			if (it == moveHistory_.rend()) return; // 空チェック
+			if (it == moveHistory_.rend()) return;
 
 			Vector3 prev = *it;
 			++it;
@@ -146,10 +151,16 @@ private:
 				if (accumulated + segLen >= targetDistance) {
 					float remain = targetDistance - accumulated;
 					float t = remain / segLen;
-					Vector3 point = prev + (curr - prev) * t;
-					result.push_back(point);
 
-					// 次のターゲットへ（リセットせず累積のまま）
+					// 補間して位置を算出
+					Vector3 position = prev + (curr - prev) * t;
+
+					// 進行方向（XY平面）からラジアン角を計算
+					Vector3 dir = Normalize(curr - prev); // 方向ベクトル（単位ベクトル）
+					float angle = std::atan2(dir.y, dir.x);  // XY平面での角度
+
+					result.push_back({ position, angle });
+
 					targetDistance += length;
 				}
 				else {
