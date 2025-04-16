@@ -8,7 +8,7 @@
 
 SideEnemy::~SideEnemy()
 {
-	aabbCollider_->~AABBCollider();
+	obbCollider_->~OBBCollider();
 }
 
 void SideEnemy::Initialize(Camera* camera)
@@ -29,7 +29,7 @@ void SideEnemy::Initialize(Camera* camera)
 
 void SideEnemy::InitCollision()
 {
-	aabbCollider_ = ColliderFactory::Create<AABBCollider>(
+	obbCollider_ = ColliderFactory::Create<OBBCollider>(
 		this,
 		&worldTransform_,
 		camera_,
@@ -49,12 +49,15 @@ void SideEnemy::InitJson()
 void SideEnemy::Update()
 {
 	if (!isAlive_) {
-		aabbCollider_->~AABBCollider();
+		//aabbCollider_->~AABBCollider();
+		obbCollider_->~OBBCollider();
 		return;
 	}
 
-
-	Move();
+	if(!IsStop()) // 攻撃を食らったら次まで気絶
+	{
+		Move();
+	}
 
 	Vector3 newPos = worldTransform_.translation_ + velocity_;
 	mpCollision_.DetectAndResolveCollision(
@@ -69,7 +72,8 @@ void SideEnemy::Update()
 	);
 	worldTransform_.translation_ = newPos;
 	worldTransform_.UpdateMatrix();
-	aabbCollider_->Update();
+	//aabbCollider_->Update();
+	obbCollider_->Update();
 }
 
 void SideEnemy::Draw()
@@ -79,7 +83,8 @@ void SideEnemy::Draw()
 
 void SideEnemy::DrawCollision()
 {
-	aabbCollider_->Draw();
+	//aabbCollider_->Draw();
+	obbCollider_->Draw();
 }
 
 void SideEnemy::OnEnterCollision(BaseCollider* self, BaseCollider* other) {

@@ -3,9 +3,9 @@
 
 void CheckPoint::Initialize(Camera* camera)
 {
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	DebugInitialize(camera);
-#endif // _DEBUG
+//#endif // _DEBUG
 
 }
 
@@ -14,11 +14,11 @@ void CheckPoint::InitJson()
 }
 
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 void CheckPoint::DebugInitialize(Camera* camera)
 {
 	worldTransform_.Initialize();
-	worldTransform_.translation_ = { 17.0f, checkPointHight_, 0.0f };
+	worldTransform_.translation_ = { 0.0f, checkPointHight_, 0.0f };
 	worldTransform_.scale_ = { 20,1,1 };
 	//worldTransform_.UpdateMatrix();
 
@@ -40,5 +40,5 @@ void CheckPoint::DebugDraw()
 {
 	obj_->Draw(camera_, worldTransform_);
 }
-#endif // _DEBUG
+//#endif // _DEBUG
 

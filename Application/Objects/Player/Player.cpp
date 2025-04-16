@@ -3,14 +3,19 @@
 #include <cmath>
 #include <algorithm>
 
+#include "Collision/Core/CollisionManager.h"
+
 #ifdef _DEBUG
 #include "imgui.h"
 #include "string"
 #endif // _DEBUG
 
+bool::Player::isHit = false;
+
 Player::~Player()
 {
-	aabbCollider_->~AABBCollider();
+	//aabbCollider_->~AABBCollider();
+	obbCollider_->~OBBCollider();
 	nextAabbCollider_->~AABBCollider();
 }
 
@@ -36,7 +41,7 @@ void Player::Initialize(Camera* camera)
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
 	obj_->SetModel("unitCube.obj");
-	obj_->SetMaterialColor({ 0.90625f,0.87109f,0.125f,1.0f });
+	obj_->SetMaterialColor(defaultColorV4_);
 	
 
 	/*SphereCollider::SetCamera(BaseObject::camera_);
@@ -50,7 +55,14 @@ void Player::Initialize(Camera* camera)
 
 void Player::InitCollision()
 {
-	aabbCollider_ = ColliderFactory::Create<AABBCollider>(
+	/*aabbCollider_ = ColliderFactory::Create<AABBCollider>(
+		this,
+		&worldTransform_,
+		camera_,
+		static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)
+	);*/
+
+	obbCollider_ = ColliderFactory::Create<OBBCollider>(
 		this,
 		&worldTransform_,
 		camera_,
@@ -69,11 +81,13 @@ void Player::InitJson()
 {
 	jsonManager_ = std::make_unique<JsonManager>("playerObj", "Resources/JSON/");
 	jsonManager_->SetCategory("Objects");
-	jsonManager_->Register("草の取得数",&grassGauge_);
-	jsonManager_->Register("草の最大数", &kMaxGrassGauge_);
+	jsonManager_->Register("通常時の移動速度",&defaultSpeed_);
+	jsonManager_->Register("ブースト時の速度", &boostSpeed_);
+	jsonManager_->Register("帰還時の速度", &returnSpeed_);
+	jsonManager_->Register("タイマーの限界値", &kTimeLimit_);
 
 	jsonCollider_ = std::make_unique<JsonManager>("playerCollider", "Resources/JSON/");
-	aabbCollider_->InitJson(jsonCollider_.get());
+	//aabbCollider_->InitJson(jsonCollider_.get());
 }
 
 void Player::Update()
@@ -98,7 +112,8 @@ void Player::Update()
 
 	UpdateMatrices();
 	
-	aabbCollider_->Update();
+	//aabbCollider_->Update();
+	obbCollider_->Update();
 	nextAabbCollider_->Update();
 	
 #ifdef _DEBUG
@@ -121,7 +136,8 @@ void Player::Draw()
 
 void Player::DrawCollision()
 {
-	aabbCollider_->Draw();
+	//aabbCollider_->Draw();
+	obbCollider_->Draw();
 	nextAabbCollider_->Draw();
 	for (const auto& body : playerBodys_) {
 		body->DrawCollision();
@@ -180,10 +196,11 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 		{
 			if (kMaxGrassGauge_ > grassGauge_ && createGrassTimer_ <= 0)
 			{
-				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.3f)
+				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/2.0f)
 				{
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
-				} else
+				} 
+				else
 				{
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + largeGrassTime_);
 				}
@@ -197,10 +214,10 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 		}
 
 
-		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
+		/*if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
 		{
 			TakeDamage();
-		}
+		}*/
 
 
 		if (behavior_ != BehaviorPlayer::Boost)
@@ -247,6 +264,10 @@ void Player::OnExitCollision(BaseCollider* self, BaseCollider* other)
 		{
 			canSpitting_ = false;
 		}
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
+		{
+			isHit = false;
+		}
 	}
 }
 
@@ -261,29 +282,32 @@ void Player::OnExitCollision(BaseCollider* self, BaseCollider* other)
 ///////////////////////////////////////////////////////////
 void Player::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
 {
-	if (behavior_ == BehaviorPlayer::Moving || behavior_ == BehaviorPlayer::Boost)
+	if(self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
 	{
-		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
+		// 敵からダメージ受ける
+		if (behavior_ == BehaviorPlayer::Moving)
 		{
-			switch (dir)
+			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
 			{
-			case HitDirection::None:
-				break;
-			case HitDirection::Top: // くちばし想定
-				TakeDamage();
-				break;
-			case HitDirection::Bottom:
-				break;
-			case HitDirection::Left:
-				break;
-			case HitDirection::Right:
-				break;
-			case HitDirection::Front:
-				break;
-			case HitDirection::Back:
-				break;
-			default:
-				break;
+				HitDirection hitDir = Collision::GetSelfLocalHitDirection(self, other);
+				HitDirection otherDir = Collision::GetSelfLocalHitDirection(other, self);
+#ifdef _DEBUG
+				int a = static_cast<int>(dir);
+				int b = static_cast<int>(otherDir);
+				ImGui::Begin("DebugPlayer");
+				ImGui::Text("dir : %d", a);
+				//ImGui::Text("hitDir : %d", b);
+				ImGui::Text("isHit : %d", isHit);
+				ImGui::End();
+#endif // _DEBUG
+				if (otherDir != HitDirection::None && !isHit)
+				{
+					isHit = true;
+					if (otherDir == HitDirection::Back)
+					{
+						TakeDamage();
+					}
+				}
 			}
 		}
 	}
@@ -369,11 +393,6 @@ void Player::Move()
 	}
 
 	moveDirection_ = Normalize(moveDirection_);
-
-	if (isFPSMode_) // カメラをプレイヤー視点にしたとき
-	{
-		moveDirection_ = TransformNormal(moveDirection_, MakeRotateMatrixY(worldTransform_.rotation_.y));
-	}
 
 	if(beforeDirection_ == moveDirection_)
 	{
@@ -534,7 +553,20 @@ void Player::TimerManager()
 	if (0 < invincibleTimer_)
 	{
 		invincibleTimer_ -= deltaTime_;
+		if (changeColor_ == defaultColorV3_)
+		{
+			changeColor_ = { 1,1,1 };
+		}
+		else
+		{
+			changeColor_ = defaultColorV3_;
+		}
 	}
+	else
+	{
+		changeColor_ = defaultColorV3_;
+	}
+	obj_->SetMaterialColor(changeColor_);
 }
 
 bool Player::IsPopGrass()
@@ -633,6 +665,11 @@ void Player::GrassGaugeUpdate()
 	{
 		UIGauge_ = std::clamp(1.0f * (createGrassTimer_ / kCreateGrassTime_), 0.0f, 1.0f);
 	}
+}
+
+void Player::Eliminate()
+{
+	extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
 }
 
 #ifdef _DEBUG
@@ -744,7 +781,7 @@ void Player::BehaviorMovingUpdate()
 
 void Player::BehaviorBoostInit()
 {
-	speed_ = defaultSpeed_ + boostSpeed_;
+	speed_ = boostSpeed_;
 	boostTimer_ = kBoostTime_;
 	invincibleTimer_ = kBoostTime_; // ブースト中無敵に
 }
@@ -767,7 +804,7 @@ void Player::BehaviorBoostUpdate()
 
 void Player::BehaviorReturnInit()
 {
-	speed_ = defaultSpeed_ + boostSpeed_;
+	speed_ = returnSpeed_;
 	moveDirection_ = { 0,0,0 };
 	isCollisionBody = false;
 	extendTimer_ = 0;

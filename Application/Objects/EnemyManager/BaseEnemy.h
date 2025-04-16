@@ -11,6 +11,8 @@
 #include "Collision/Core/ColliderFactory.h"
 #include "Collision/Core/CollisionDirection.h"
 
+class Player;
+
 class BaseEnemy : public BaseObject
 {
 public:
@@ -56,6 +58,23 @@ public:
 
 	virtual const char* GetTypeName() const = 0;
 
+	// 攻撃を食らったら次まで気絶
+	bool IsStop() { return (isTakeAttack_ || isFaint_); }
+
+protected:
+	// 攻撃を受けた時
+	void TakeAttack()
+	{ 
+		obj_->SetMaterialColor(Vector3{ 0.5f,0.5f,0.5f });
+		obbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
+		if(!isFaint_)
+		{
+			isTakeAttack_ = true;
+		}
+	}
+
+	void FaintUpdate(Player* player);
+
 public:
 
 	/// <summary>
@@ -72,9 +91,11 @@ public:
 
 
 protected:
+	bool isTakeAttack_ = false;
+	bool isFaint_ = false;
 
 	bool isAlive_ = true;
-	//std::shared_ptr<OBBCollider> obbCollider_;
+	std::shared_ptr<OBBCollider> obbCollider_;
 	std::shared_ptr<AABBCollider> aabbCollider_;
 	//std::shared_ptr<SphereCollider> sphereCollider_;
 

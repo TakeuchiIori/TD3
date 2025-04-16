@@ -123,6 +123,8 @@ private:
 
 	void GrassGaugeUpdate();
 
+	void Eliminate(); // 敵を倒した時
+
 
 #ifdef _DEBUG
 	// デバッグ用 (ImGuiとか)
@@ -184,9 +186,6 @@ private: // プレイヤーのふるまい
 
 public: // getter&setter
 
-	// 一人称視点にした場合横を向いているので操作を切り替えるため
-	void SetFPSMode(bool isFPS) { isFPSMode_ = isFPS; }
-
 	void SetMapInfo(MapChipField* mapChipField) { 
 		//mapCollision_.SetMap(mapChipField);
 		//mapCollision_.Init(colliderRct_, worldTransform_.translation_);
@@ -205,21 +204,6 @@ public: // getter&setter
 
 	bool IsPopGrass();
 
-	int32_t GetGrassGauge() { return grassGauge_; }
-
-	int32_t GetMaxGrassGauge() { return kMaxGrassGauge_; }
-
-	float GetMaxGrassTime() { return kCreateGrassTime_; }
-
-	float GetGrassTimer() 
-	{
-		if (createGrassTimer_ < 0)
-		{
-			createGrassTimer_ = 0;
-		}
-		return createGrassTimer_;
-	}
-
 	float GetTimeLimit() 
 	{ 
 		if (extendTimer_ < 0) 
@@ -229,10 +213,10 @@ public: // getter&setter
 		return extendTimer_;
 	}
 
-	int32_t GetMaxHP() { return kMaxHP_; }	// 最大HPの取得
-	int32_t GetHP() { return HP_; }			// 現在のHPの取得
+	int32_t GetMaxHP() { return kMaxHP_; }		// 最大HPの取得
+	int32_t GetHP() { return HP_; }				// 現在のHPの取得
 
-	bool CanSpitting() { return canSpitting_; }// 唾を吐けるか
+	bool CanSpitting() { return canSpitting_; }	// 唾を吐けるか
 
 	float GetUIGrassGauge() { return UIGauge_; }
 
@@ -242,8 +226,8 @@ private:
 	std::unique_ptr<JsonManager> jsonManager_;
 	std::unique_ptr<JsonManager> jsonCollider_;
 
-	//std::shared_ptr<OBBCollider> obbCollider_;
-	std::shared_ptr<AABBCollider> aabbCollider_;
+	std::shared_ptr<OBBCollider> obbCollider_;
+	//std::shared_ptr<AABBCollider> aabbCollider_;
 	std::shared_ptr<AABBCollider> nextAabbCollider_;
 	WorldTransform nextWorldTransform_;
 	//std::shared_ptr<SphereCollider> sphereCollider_;
@@ -254,67 +238,67 @@ private:
 	bool isCollisionBody = false;
 
 
+	const Vector4 defaultColorV4_ = { 0.90625f,0.87109f,0.125f,1.0f };
+	const Vector3 defaultColorV3_ = { 0.90625f,0.87109f,0.125f };
+	Vector3 changeColor_ = {};
+
+
 	// 移動
 	Vector3 velocity_ = { 0.0f,0.0f,0.0f };			// 加速度
-	Vector3 moveDirection_ = { 0.0f,0.0f,0.0f };	// 動く向き
-	Vector3 beforeDirection_ = { 0.0f,0.0f,0.0f };	// 動く向き
-	float defaultSpeed_ = 0.1f;
-	float speed_ = defaultSpeed_;							// 動く速度
-	bool isFPSMode_ = false;
+	Vector3 moveDirection_ = { 0.0f,0.0f,0.0f };	// 動く向き(nowFrame)
+	Vector3 beforeDirection_ = { 0.0f,0.0f,0.0f };	// 動く向き(beforeFrame)
+	float defaultSpeed_ = 0.1f;						// 通常時の移動速度
+	float boostSpeed_ = 0.2f;						// ブースト時の速度
+	float returnSpeed_ = 1.0f;						// 帰還時の速度
+	float speed_ = defaultSpeed_;					// 動く速度
 
 	bool isMove_ = false;
 
-	float boostSpeed_ = 0.2f;
+	static bool isHit;
 
 	// 移動履歴
 	std::list<Vector3> moveHistory_;
+	std::list<std::unique_ptr<PlayerBody>> playerBodys_;
+	std::list<std::unique_ptr<StuckGrass>> stuckGrassList_;
 
 
-	// ゲージ
-	int32_t kMaxGrassGauge_ = 2;		// 暫定対応
-	int32_t grassGauge_ = 0;
-
-	float UIGauge_ = 0.0f;				// 草ゲージのUIに渡すための値
+	// 草ゲージ
+	int32_t kMaxGrassGauge_ = 2;			// 草ゲージ最大値
+	int32_t grassGauge_ = 0;				// 草ゲージ
+	float UIGauge_ = 0.0f;					// 草ゲージのUIに渡すための値
 
 	// 時間制限 : 単位(sec)
-	float kTimeLimit_ = 10.0f;			// タイマーの限界値
-	float extendTimer_ = 0;				// 伸びられる残り時間
+	float kTimeLimit_ = 10.0f;				// タイマーの限界値
+	float extendTimer_ = 0;					// 伸びられる残り時間
 	float grassTime_ = 3.0f / 2.0f;			// 草を食べて追加される時間
-	float largeGrassTime_ = 6.0f / 2.0f;		// 大きい草
+	float largeGrassTime_ = 6.0f / 2.0f;	// 大きい草
 
-	float kBoostTime_ = 1.5f;			// ブーストの最大効果時間
-	float boostTimer_ = 0;				// 現在のブーストの残り時間
+	float kBoostTime_ = 1.5f;				// ブーストの最大効果時間
+	float boostTimer_ = 0;					// 現在のブーストの残り時間
 
-	float kBoostCT_ = 5.0f;				// ブーストのクールタイム
-	float boostCoolTimer_ = 0;			// 現在のクールタイムトの残り時間
-
-
-	float kCreateGrassTime_ = 3.0f;		// 草が詰まるまでの時間
-	float createGrassTimer_ = 0.0f;
-	bool isCreateGrass_ = false;
-
-	bool canSpitting_ = false;			// 唾を吐けるか
+	float kBoostCT_ = 5.0f;					// ブーストのクールタイム
+	float boostCoolTimer_ = 0;				// 現在のクールタイムトの残り時間
 
 
-	const float deltaTime_ = 1.0f / 60.0f; // 仮対応
+	float kCreateGrassTime_ = 3.0f;			// 草が詰まるまでの時間
+	float createGrassTimer_ = 0.0f;			// 草が詰まるまでのタイマー
+	bool isCreateGrass_ = false;			// 草を吐いたか
+
+	bool canSpitting_ = false;				// 唾を吐けるか
+
+	float kInvincibleTime_ = 2.0f;			// 無敵時間
+	float invincibleTimer_ = 0.0f;			// 無敵タイマー
+
+
+	const float deltaTime_ = 1.0f / 60.0f;	// 仮対応
 
 	// ヒットポイント
 	int32_t kMaxHP_ = 3;
 	int32_t HP_ = kMaxHP_;
 
-	float kInvincibleTime_ = 2.0f;
-	float invincibleTimer_ = 0.0f;
-
-
 	//PlayerMapCollision mapCollision_;
-
 	//MapChipCollision::ColliderRect colliderRct_;
-
 	//MapChipCollision::CollisionFlag collisionFlag_ = MapChipCollision::CollisionFlag::None;
-
-	std::list<std::unique_ptr<PlayerBody>> playerBodys_;
-
-	std::list<std::unique_ptr<StuckGrass>> stuckGrassList_;
 
 	// コントローラー用
 	Vector2 stick = {};

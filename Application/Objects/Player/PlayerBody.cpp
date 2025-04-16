@@ -25,7 +25,7 @@ void PlayerBody::Initialize(Camera* camera)
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("unitCube.obj");
+	obj_->SetModel("cube.obj");
 	obj_->SetMaterialColor({ 0.90625f,0.87109f,0.125f,1.0f });
 
 	InitCollision();
@@ -56,6 +56,9 @@ void PlayerBody::Update()
 {
 	worldTransform_.UpdateMatrix();
 	ExtendUpdate();
+	obj_->uvScale = { worldTransform_.scale_.x, worldTransform_.scale_.y };
+	// ↓上左ok
+	//obj_->uvTranslate = { -(worldTransform_.scale_.x - 1.0f), -(worldTransform_.scale_.y - 1.0f) };
 
 	aabbCollider_->Update();
 
@@ -112,13 +115,13 @@ void PlayerBody::DownExtend()
 
 void PlayerBody::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
-	if (!isPlayerInvincible_)
-	{
-		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy)) // 敵なら
-		{
-			isTakeDamage_ = true;
-		}
-	}
+	//if (!isPlayerInvincible_)
+	//{
+	//	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy)) // 敵なら
+	//	{
+	//		isTakeDamage_ = true;
+	//	}
+	//}
 }
 
 void PlayerBody::OnCollision(BaseCollider* self, BaseCollider* other)

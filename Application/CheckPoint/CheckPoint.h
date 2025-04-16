@@ -23,7 +23,7 @@ public: // getter & setter
 
 
 public: // デバッグ用メンバ関数
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	/// <summary>
 	/// デバッグ時用の初期化
 	/// </summary>
@@ -38,7 +38,7 @@ public: // デバッグ用メンバ関数
 	/// デバッグ時用の描画
 	/// </summary>
 	void DebugDraw();
-#endif // _DEBUG
+//#endif // _DEBUG
 
 
 
@@ -48,13 +48,13 @@ private:
 
 
 	// デバッグ時用
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	// ポインタ
 	std::unique_ptr<Object3d> obj_;
 	Camera* camera_;
 	// ワールドトランスフォーム
 	WorldTransform worldTransform_;
-#endif // _DEBUG
+//#endif // _DEBUG
 
 };
 
