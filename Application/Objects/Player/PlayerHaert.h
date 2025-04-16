@@ -23,6 +23,6 @@ public:
 
 	void SetPos(const Vector3 pos) { worldTransform_.translation_ = pos; }
 
-	void SetRotaY(float y) { worldTransform_.rotation_.y = y; }
+	void SetRotaZ(float z) { worldTransform_.rotation_.z = z; }
 };
 

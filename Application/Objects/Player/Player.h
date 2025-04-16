@@ -136,7 +136,7 @@ private:
 		if(HP_ > 0)
 		{
 			std::vector<PointWithDirection> result;
-			const float length = 1.0f;
+			const float length = 1.2f;
 			float targetDistance = length;
 			float accumulated = 0.0f;
 			std::list<Vector3> v = moveHistory_;
@@ -177,7 +177,7 @@ private:
 			for (size_t i = 0; i < result.size(); ++i)
 			{
 				haerts_[i]->SetPos(result[i].position);
-				haerts_[i]->SetRotaY(result[i].radian);
+				haerts_[i]->SetRotaZ(result[i].radian + (std::numbers::pi_v<float> / 2.0f));
 			}
 		}
 
