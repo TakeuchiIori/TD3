@@ -387,6 +387,37 @@ HitDirection Collision::InverseHitDirection(HitDirection hitdirection)
 	}
 }
 
+HitDirection Collision::GetSelfLocalHitDirection(BaseCollider* self, BaseCollider* other)
+{
+	Vector3 toOther = Normalize(other->GetCenterPosition() - self->GetCenterPosition());
+
+	const Matrix4x4& mat = self->GetWorldTransform().matWorld_;
+	Vector3 up = { mat.m[1][0], mat.m[1][1], mat.m[1][2] };
+	Vector3 right = { mat.m[0][0], mat.m[0][1], mat.m[0][2] };
+	Vector3 forward = { mat.m[2][0], mat.m[2][1], mat.m[2][2] };
+
+	struct DirDot {
+		HitDirection dir;
+		float dot;
+	};
+
+	std::vector<DirDot> dots = {
+		{ HitDirection::Top,    Dot(toOther, up) },
+		{ HitDirection::Bottom, Dot(toOther, up * -1.0f) },
+		{ HitDirection::Right,  Dot(toOther, right) },
+		{ HitDirection::Left,   Dot(toOther, right * -1.0f) },
+		{ HitDirection::Front,  Dot(toOther, forward) },
+		{ HitDirection::Back,   Dot(toOther, forward * -1.0f) },
+	};
+
+	// 最大の内積方向を返す
+	auto maxIt = std::max_element(dots.begin(), dots.end(), [](const DirDot& a, const DirDot& b) {
+		return a.dot < b.dot;
+		});
+
+	return maxIt->dir;
+}
+
 
 
 

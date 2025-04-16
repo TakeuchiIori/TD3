@@ -75,6 +75,8 @@ namespace Collision {
 
 	HitDirection InverseHitDirection(HitDirection hitdirection);
 
+	HitDirection GetSelfLocalHitDirection(BaseCollider* self, BaseCollider* other);
+
 }
 
 
