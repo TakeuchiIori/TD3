@@ -4,7 +4,7 @@
 #include <iostream>
 
 // Engine
-#include "Loaders./Model/ModelManager.h"
+#include "ModelManager.h"
 #include "CollisionTypeIdDef.h"
 
 // C++
@@ -262,8 +262,13 @@ bool Collision::CheckHitDirection(const AABB& aabb, const OBB& obb, HitDirection
 	aabbAcObb.size = (aabb.max - aabb.min) * 0.5f;
 	aabbAcObb.rotation = { 0.0f,0.0f,0.0f }; // AABBは回転しない
 
-	// OBB同士の方向で判定チェック
-	return CheckHitDirection(aabbAcObb, obb, hitDirection);
+	HitDirection dir;
+	bool hit = CheckHitDirection(aabbAcObb, obb, &dir);
+	if (hitDirection) {
+		*hitDirection = dir;
+	}
+
+	return hit;
 }
 
 bool Collision::CheckHitDirection(const OBB& obbA, const OBB& obbB, HitDirection* hitDirection)
@@ -336,16 +341,31 @@ bool Collision::CheckHitDirection(const OBB& obbA, const OBB& obbB, HitDirection
 
 
 	// 両方のOBBの主軸の外積でのテスト
-	if (hitDirection) {
-		Vector3 dir = Normalize(minAxis);
-		if (fabs(dir.x) > fabs(dir.y) && fabs(dir.x) > fabs(dir.z)) {
-			*hitDirection = dir.x > 0 ? HitDirection::Left : HitDirection::Right;
-		} else if (fabs(dir.y) > fabs(dir.z)) {
-			*hitDirection = dir.y > 0 ? HitDirection::Top : HitDirection::Bottom;
-		} else {
-			*hitDirection = dir.z > 0 ? HitDirection::Front : HitDirection::Back;
-		}
-	}
+// 最終的に取得した minAxis をローカル基準で比較して HitDirection を決定
+	Vector3 selfUp = { matA.m[1][0], matA.m[1][1], matA.m[1][2] };
+	Vector3 selfRight = { matA.m[0][0], matA.m[0][1], matA.m[0][2] };
+	Vector3 selfForward = { matA.m[2][0], matA.m[2][1], matA.m[2][2] };
+
+	// ここで、minAxis を「自分の軸基準で比較」
+	float dotUp = Dot(Normalize(minAxis), selfUp);
+	float dotDown = Dot(Normalize(minAxis), selfUp * -1.0f);
+	float dotRight = Dot(Normalize(minAxis), selfRight);
+	float dotLeft = Dot(Normalize(minAxis), selfRight * -1.0f);
+	float dotForward = Dot(Normalize(minAxis), selfForward);
+	float dotBack = Dot(Normalize(minAxis), selfForward * -1.0f);
+
+	// 一番大きい内積の方向が衝突方向
+	float maxDot = dotUp;
+	HitDirection hitDir = HitDirection::Top;
+
+	if (dotDown > maxDot) { maxDot = dotDown; hitDir = HitDirection::Bottom; }
+	if (dotRight > maxDot) { maxDot = dotRight; hitDir = HitDirection::Right; }
+	if (dotLeft > maxDot) { maxDot = dotLeft; hitDir = HitDirection::Left; }
+	if (dotForward > maxDot) { maxDot = dotForward; hitDir = HitDirection::Front; }
+	if (dotBack > maxDot) { maxDot = dotBack; hitDir = HitDirection::Back; }
+
+	*hitDirection = hitDir;
+
 	return true;
 }
 
@@ -410,12 +430,58 @@ HitDirection Collision::GetSelfLocalHitDirection(BaseCollider* self, BaseCollide
 		{ HitDirection::Back,   Dot(toOther, forward * -1.0f) },
 	};
 
-	// 最大の内積方向を返す
-	auto maxIt = std::max_element(dots.begin(), dots.end(), [](const DirDot& a, const DirDot& b) {
-		return a.dot < b.dot;
-		});
+	// 閾値付きで方向分類（優しめ）
+	const float threshold = 0.5f; // ≒60度以内なら許容
 
-	return maxIt->dir;
+	for (const auto& d : dots) {
+		if (d.dot >= threshold) return d.dir;
+	}
+
+	// どれも当てはまらないときは None
+	return HitDirection::None;
+}
+
+HitDirectionBits Collision::GetSelfLocalHitDirectionFlags(BaseCollider* self, BaseCollider* other, float threshold)
+{
+	HitDirectionBits flags = HitDirection_None;
+
+	Vector3 toOther = Normalize(other->GetCenterPosition() - self->GetCenterPosition());
+
+	const Matrix4x4& mat = self->GetWorldTransform().matWorld_;
+	Vector3 up = { mat.m[1][0], mat.m[1][1], mat.m[1][2] };
+	Vector3 right = { mat.m[0][0], mat.m[0][1], mat.m[0][2] };
+	Vector3 forward = { mat.m[2][0], mat.m[2][1], mat.m[2][2] };
+
+	if (Dot(toOther, up) >= threshold)     flags |= HitDirection_Top;
+	if (Dot(toOther, up * -1.0f) >= threshold)    flags |= HitDirection_Bottom;
+	if (Dot(toOther, right) >= threshold)  flags |= HitDirection_Right;
+	if (Dot(toOther, right * -1.0f) >= threshold) flags |= HitDirection_Left;
+	if (Dot(toOther, forward) >= threshold) flags |= HitDirection_Front;
+	if (Dot(toOther, forward * -1.0f) >= threshold) flags |= HitDirection_Back;
+
+	return flags;
+}
+
+HitDirectionBits Collision::GetSelfLocalHitDirectionsSimple(BaseCollider* self, BaseCollider* other)
+{
+	HitDirectionBits flags = HitDirection_None;
+
+	Vector3 toOther = Normalize(other->GetCenterPosition() - self->GetCenterPosition());
+
+	const Matrix4x4& mat = self->GetWorldTransform().matWorld_;
+	Vector3 up = { mat.m[1][0], mat.m[1][1], mat.m[1][2] };
+	Vector3 right = { mat.m[0][0], mat.m[0][1], mat.m[0][2] };
+	Vector3 forward = { mat.m[2][0], mat.m[2][1], mat.m[2][2] };
+
+	// 全方向に対して判定
+	if (Dot(toOther, up) > 0.0f)         flags |= HitDirection_Top;
+	if (Dot(toOther, up * -1.0f) > 0.0f) flags |= HitDirection_Bottom;
+	if (Dot(toOther, right) > 0.0f)      flags |= HitDirection_Right;
+	if (Dot(toOther, right * -1.0f) > 0.0f) flags |= HitDirection_Left;
+	if (Dot(toOther, forward) > 0.0f)    flags |= HitDirection_Front;
+	if (Dot(toOther, forward * -1.0f) > 0.0f) flags |= HitDirection_Back;
+
+	return flags;
 }
 
 
@@ -440,10 +506,7 @@ void CollisionManager::Update()
 		bool isVisible = IsColliderInView(center, cam);
 
 		// ここで無効化するのは当たり判定だけ！
-		// trueなら判定を取る : falseなら取らない
-		if (collider->IsCheckOutsideCamera()) {
-			collider->SetCollisionEnabled(isVisible);
-		}
+		collider->SetCollisionEnabled(isVisible);
 	}
 
 
@@ -460,32 +523,6 @@ void CollisionManager::Reset() {
 	collidingPairs_.clear();
 }
 
-//void CollisionManager::CheckCollisionPair(BaseCollider* a, BaseCollider* b) {
-//	// 順序を統一してペアのキーにする（ポインタの小さい順）
-//	auto key = std::minmax(a, b);
-//	bool isNowColliding = Collision::Check(a, b); // ← BaseCollider* 用のオーバーロードが必要
-//	bool wasColliding = collidingPairs_.contains(key);
-//	HitDirection dirA = HitDirection::None;
-//	HitDirection dirB = HitDirection::None;
-//
-//
-//	if (isNowColliding) {
-//		if (!wasColliding) {
-//			a->CallOnEnterCollision(b);
-//			b->CallOnEnterCollision(a);
-//			collidingPairs_.insert(key);
-//		}
-//		a->CallOnCollision(b);
-//		b->CallOnCollision(a);
-//	} else {
-//		if (wasColliding) {
-//			a->CallOnExitCollision(b);
-//			b->CallOnExitCollision(a);
-//			collidingPairs_.erase(key);
-//		}
-//	}
-//}
-
 void CollisionManager::CheckCollisionPair(BaseCollider* a, BaseCollider* b) {
 	auto key = std::minmax(a, b);
 	bool wasColliding = collidingPairs_.contains(key);
@@ -493,49 +530,40 @@ void CollisionManager::CheckCollisionPair(BaseCollider* a, BaseCollider* b) {
 	HitDirection dirA = HitDirection::None;
 	HitDirection dirB = HitDirection::None;
 
-	// =========================
-	// AABB or OBB with direction
-	// =========================
 	if (auto aa = dynamic_cast<AABBCollider*>(a)) {
 		if (auto ab = dynamic_cast<AABBCollider*>(b)) {
 			isNowColliding = Collision::CheckHitDirection(aa->GetAABB(), ab->GetAABB(), &dirA);
 			dirB = Collision::InverseHitDirection(dirA);
 		} else if (auto ob = dynamic_cast<OBBCollider*>(b)) {
 			isNowColliding = Collision::CheckHitDirection(aa->GetAABB(), ob->GetOBB(), &dirA);
-			dirB = Collision::InverseHitDirection(dirA);
+			dirB = Collision::GetSelfLocalHitDirection(ob, aa); // ★ これに修正！
 		} else {
-			// fallback for other types like Sphere
 			isNowColliding = Collision::Check(a, b);
 		}
 	} else if (auto oa = dynamic_cast<OBBCollider*>(a)) {
 		if (auto ab = dynamic_cast<AABBCollider*>(b)) {
 			isNowColliding = Collision::CheckHitDirection(ab->GetAABB(), oa->GetOBB(), &dirB);
-			dirA = Collision::InverseHitDirection(dirB);
+			dirA = Collision::GetSelfLocalHitDirection(oa, ab); // ★ こっちも逆視点で判定！
 		} else if (auto ob = dynamic_cast<OBBCollider*>(b)) {
 			isNowColliding = Collision::CheckHitDirection(oa->GetOBB(), ob->GetOBB(), &dirA);
-			dirB = Collision::InverseHitDirection(dirA);
+			dirB = Collision::GetSelfLocalHitDirection(ob, oa); // ★ 片方はSAT、もう片方はローカル視点
 		} else {
 			isNowColliding = Collision::Check(a, b);
 		}
 	} else {
-		// Sphere × AABB / OBB / Sphere → 方向なしで通常衝突チェック
 		isNowColliding = Collision::Check(a, b);
 	}
 
-	// =========================
 	// イベント処理
-	// =========================
 	if (isNowColliding) {
 		if (!wasColliding) {
 			a->CallOnEnterCollision(b);
 			b->CallOnEnterCollision(a);
 			collidingPairs_.insert(key);
 		}
-
 		a->CallOnCollision(b);
 		b->CallOnCollision(a);
 
-		// AABB or OBB の場合のみ方向通知
 		if (dirA != HitDirection::None || dirB != HitDirection::None) {
 			a->CallOnDirectionCollision(b, dirA);
 			b->CallOnDirectionCollision(a, dirB);
@@ -548,6 +576,7 @@ void CollisionManager::CheckCollisionPair(BaseCollider* a, BaseCollider* b) {
 		}
 	}
 }
+
 
 void CollisionManager::CheckAllCollisions() {
 
@@ -578,12 +607,14 @@ void CollisionManager::CheckAllCollisions() {
 
 
 bool CollisionManager::IsColliderInView(const Vector3& position, const Camera* camera) {
+
+	// ワールド座標をクリップ空間に変換
 	Vector3 clipPos = Transform(position, camera->GetViewProjectionMatrix());
 
 	// 正規化デバイス座標系（NDC）での可視範囲は -1 ~ +1
 	return (clipPos.x >= -1.0f && clipPos.x <= 1.0f &&
 		clipPos.y >= -1.0f && clipPos.y <= 1.0f &&
-		clipPos.z >= 0.0f && clipPos.z <= 1.0f); // zは0〜1（DirectX系）
+		clipPos.z >= 0.0f && clipPos.z <= 1.0f);
 }
 
 

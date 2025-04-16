@@ -111,16 +111,19 @@ void ParticleManager::Draw()
 void ParticleManager::UpdateParticles()
 {
 	// ───────── カメラ行列計算 ─────────
-	Matrix4x4 camMtx = MakeAffineMatrix(
-		camera_->GetScale(), camera_->GetRotate(), camera_->GetTranslate());
-	Matrix4x4 view = Inverse(camMtx);
-	Matrix4x4 proj = MakePerspectiveFovMatrix(
-		0.45f, WinApp::kClientWidth / WinApp::kClientHeight, 0.1f, 100.0f);
+// ビュー・プロジェクション行列
+	Matrix4x4 view = camera_->viewMatrix_;
+	Matrix4x4 proj = camera_->projectionMatrix_;
 	Matrix4x4 vp = Multiply(view, proj);
 
-	// ビルボード用回転行列（Z+ をカメラ向きに）
-	Matrix4x4 bbBase = Multiply(MakeRotateMatrixY(std::numbers::pi_v<float>), camMtx);
-	bbBase.m[3][0] = bbBase.m[3][1] = bbBase.m[3][2] = 0.0f;
+	// ビルボード行列（カメラの回転のみを逆行列で取り出す）
+	Matrix4x4 billboardMatrix = view;
+	billboardMatrix.m[3][0] = 0.0f;
+	billboardMatrix.m[3][1] = 0.0f;
+	billboardMatrix.m[3][2] = 0.0f;
+	billboardMatrix.m[3][3] = 1.0f;
+
+	Matrix4x4 bbBase = Inverse(billboardMatrix);
 
 	// ───────── 各パーティクルグループ ─────────
 	for (auto& [name, group] : particleGroups_)
@@ -182,20 +185,20 @@ void ParticleManager::UpdateParticles()
 			//}
 
 			// 移動
-			particle.transform.translate += particle.velocity * kDeltaTime;
+			particle.transform.translate += particle.velocity * kDeltaTime ;
 
 			// α フェード
 			float alpha = 1.0f - (particle.currentTime / particle.lifeTime);
 
 			// 行列計算
 			Matrix4x4 S = MakeScaleMatrix(particle.transform.scale);
-			Matrix4x4 T = MakeTranslateMatrix(particle.transform.translate);
+			Matrix4x4 T = MakeTranslateMatrix(particle.transform.translate + prm.offset);
 			Matrix4x4 world = useBB
 				? S * bbBase * T
 				: MakeAffineMatrix(
 					particle.transform.scale,
 					particle.transform.rotate,
-					particle.transform.translate);
+					particle.transform.translate + prm.offset);
 
 			Matrix4x4 wvp = Multiply(world, vp);
 
@@ -516,6 +519,9 @@ Particle ParticleManager::MakeNewParticle(const std::string& name, std::mt19937&
 	particle.lifeTime = getValue(params.baseLife.lifeTime.x, params.baseLife.lifeTime.y, params.isRandom, randomEngine);
 	particle.currentTime = 0.0f;
 
+	// offset
+	
+	
 	return particle;
 }
 
@@ -657,31 +663,51 @@ void ParticleManager::InitJson(const std::string& name)
 	jsonManager_->SetSubCategory(name + "Parameter");
 
 
-	jsonManager_->Register("Scale.Min", &particleParameters_[name].baseTransform.scaleMin);
-	jsonManager_->Register("Scale.Max", &particleParameters_[name].baseTransform.scaleMax);
-	jsonManager_->Register("Translate.Min", &particleParameters_[name].baseTransform.translateMin);
-	jsonManager_->Register("Translate.Max", &particleParameters_[name].baseTransform.translateMax);
-	jsonManager_->Register("Rotate.Min", &particleParameters_[name].baseTransform.rotateMin);
-	jsonManager_->Register("Rotate.Max", &particleParameters_[name].baseTransform.rotateMax);
+	// ---------------------- トランスフォーム系 ----------------------
+	jsonManager_->SetTreePrefix("スケール");
+	jsonManager_->Register("最小", &particleParameters_[name].baseTransform.scaleMin);
+	jsonManager_->Register("最大", &particleParameters_[name].baseTransform.scaleMax);
 
-	jsonManager_->Register("Velocity.Min", &particleParameters_[name].baseVelocity.velocityMin);
-	jsonManager_->Register("Velocity.Max", &particleParameters_[name].baseVelocity.velocityMax);
+	jsonManager_->SetTreePrefix("位置");
+	jsonManager_->Register("最小", &particleParameters_[name].baseTransform.translateMin);
+	jsonManager_->Register("最大", &particleParameters_[name].baseTransform.translateMax);
 
-	// Color設定の登録
-	jsonManager_->Register("Color.Min", &particleParameters_[name].baseColor.minColor);
-	jsonManager_->Register("Color.Max", &particleParameters_[name].baseColor.maxColor);
-	jsonManager_->Register("Color.Alpha", &particleParameters_[name].baseColor.alpha);
+	jsonManager_->SetTreePrefix("回転");
+	jsonManager_->Register("最小", &particleParameters_[name].baseTransform.rotateMin);
+	jsonManager_->Register("最大", &particleParameters_[name].baseTransform.rotateMax);
 
-	// Life設定の登録
-	jsonManager_->Register(base + "Life/Time", &particleParameters_[name].baseLife.lifeTime);
+	// ---------------------- 移動速度系 ----------------------
+	jsonManager_->SetTreePrefix("速度");
+	jsonManager_->Register("最小", &particleParameters_[name].baseVelocity.velocityMin);
+	jsonManager_->Register("最大", &particleParameters_[name].baseVelocity.velocityMax);
 
-	jsonManager_->Register("Billboard", &particleParameters_[name].useBillboard);
-	jsonManager_->Register("Random/Enable", &particleParameters_[name].isRandom);
-	jsonManager_->Register("Random/FromCenter", &particleParameters_[name].randomFromCenter);
-	jsonManager_->Register("Random/DirectionMin", &particleParameters_[name].randomDirectionMin);
-	jsonManager_->Register("Random/DirectionMax", &particleParameters_[name].randomDirectionMax);
-	jsonManager_->Register("Random/Force", &particleParameters_[name].randomForce);
-	jsonManager_->Register("BlendMode", reinterpret_cast<int*>(&currentBlendMode_));
+	// ---------------------- カラー設定 ----------------------
+	jsonManager_->SetTreePrefix("カラー");
+	jsonManager_->Register("最小", &particleParameters_[name].baseColor.minColor);
+	jsonManager_->Register("最大", &particleParameters_[name].baseColor.maxColor);
+	jsonManager_->Register("アルファ", &particleParameters_[name].baseColor.alpha);
+
+	// ---------------------- ライフ設定 ----------------------
+	jsonManager_->SetTreePrefix("寿命");
+	jsonManager_->Register("時間", &particleParameters_[name].baseLife.lifeTime);
+
+	// ---------------------- ランダム設定 ----------------------
+	jsonManager_->SetTreePrefix("ランダム");
+	jsonManager_->Register("有効", &particleParameters_[name].isRandom);
+	jsonManager_->Register("中心から", &particleParameters_[name].randomFromCenter);
+	jsonManager_->Register("方向最小", &particleParameters_[name].randomDirectionMin);
+	jsonManager_->Register("方向最大", &particleParameters_[name].randomDirectionMax);
+	jsonManager_->Register("加速度", &particleParameters_[name].randomForce);
+
+	// ---------------------- その他 ----------------------
+	jsonManager_->SetTreePrefix("その他");
+	jsonManager_->Register("オフセット", &particleParameters_[name].offset);
+	jsonManager_->Register("ブレンドモード", reinterpret_cast<int*>(&currentBlendMode_));
+	jsonManager_->Register("ビルボード", &particleParameters_[name].useBillboard);
+
+	jsonManager_->ClearTreePrefix();
+
+
 }
 
 

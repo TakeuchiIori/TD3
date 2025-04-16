@@ -5,6 +5,7 @@
 #include <iostream>
 #include <format>
 #include <json.hpp>
+#include <unordered_set>
 #include "Windows.h"
 #include "ConversionJson.h"
 #include "VariableJson.h"
@@ -37,7 +38,16 @@ public:
 	template <typename T>
 	void Register(const std::string& name, T* ptr)
 	{
-		variables_[name] = std::make_unique<VariableJson<T>>(ptr);
+		std::string fullKey;
+
+		if (!treePrefix_.empty()) {
+			fullKey = treePrefix_ + "." + name;
+			treeKeys_.insert(fullKey);
+		} else {
+			fullKey = name;
+		}
+
+		variables_[fullKey] = std::make_unique<VariableJson<T>>(ptr);
 		LoadAll();
 	}
 
@@ -87,6 +97,8 @@ public:
 	void SetSubCategory(const std::string& subCategory) { subCategory_ = subCategory; }
 	const std::string& GetSubCategory() const { return subCategory_; }
 
+	void SetTreePrefix(const std::string& prefix) { treePrefix_ = prefix; }
+	void ClearTreePrefix() { treePrefix_.clear(); }
 
 private:
 	/// <summary>
@@ -109,6 +121,9 @@ private:
 	static inline std::string selectedClass;
 	std::string category_;
 	std::string subCategory_;
+	std::string treePrefix_; // ツリー用
+	std::unordered_set<std::string> treeKeys_;
+
 };
 template<typename T>
 inline void JsonManager::ChildRegister(std::string parentFileName, std::string childName, const std::string& name, T* ptr)

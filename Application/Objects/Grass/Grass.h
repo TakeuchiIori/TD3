@@ -19,6 +19,8 @@
 #include "Player/Player.h"
 #include "Branch.h"
 
+#include "Particle/ParticleEmitter.h"
+
 enum class BehaviorGrass
 {
 	Root,
@@ -207,5 +209,9 @@ private:
 
 	static int count_;    // 現在のインスタンス数
 	int id_;              // 各インスタンスのID
+
+
+	// パーティクル
+	std::unique_ptr<ParticleEmitter> particleEmitter_;
 };
 

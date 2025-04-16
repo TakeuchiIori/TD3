@@ -141,6 +141,8 @@ public:
 		Vector3 randomDirectionMin = { -1.0f, -1.0f, -1.0f };
 		Vector3 randomDirectionMax = { 1.0f, 1.0f, 1.0f };
 		float randomForce = 0.02f;
+
+		Vector3 offset = {};
 	};
 
 
