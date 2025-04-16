@@ -1,6 +1,7 @@
 #include "MyGame.h"
 #include "Particle./ParticleManager.h"
 
+const std::string defaultTexturePath = "Resources/Textures/Particle/";
 void MyGame::Initialize()
 {
 	// 基盤の初期化
@@ -21,10 +22,7 @@ void MyGame::Initialize()
 #endif
 	// パーティクルマネージャ生成
 	ParticleManager::GetInstance()->Initialize(srvManager_);
-	ParticleManager::GetInstance()->CreateParticleGroup("Enemy", "Resources/images/circle.png");
-	ParticleManager::GetInstance()->CreateParticleGroup("W", "Resources/images/circle.png");
-	ParticleManager::GetInstance()->CreateParticleGroup("Circle", "Resources/images/circle.png");
-	ParticleManager::GetInstance()->CreateParticleGroup("Player", "Resources/images/circle.png");
+	ParticleManager::GetInstance()->CreateParticleGroup("Growth", defaultTexturePath + "growth.png");
 }
 
 void MyGame::Finalize()
