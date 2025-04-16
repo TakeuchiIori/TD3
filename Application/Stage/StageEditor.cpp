@@ -41,6 +41,56 @@ void StageEditor::Load(const std::string& filename)
     file >> j;
     stages_.clear();
 
+    if (!j.contains("stages")) return;
+
+    for (const auto& stageJson : j["stages"]) {
+        StageStruct stage;
+
+        if (stageJson.contains("stageNumber")) {
+            stage.stageNumber = stageJson["stageNumber"];
+        }
+
+        if (stageJson.contains("objectDefinitions")) {
+            for (const auto& def : stageJson["objectDefinitions"]) {
+                ObjectDefinition d;
+                if (def.contains("id")) d.id = def["id"];
+                if (def.contains("name")) d.name = def["name"];
+                stage.objectDefinitions.push_back(d);
+            }
+        }
+
+        if (stageJson.contains("checkPoints")) {
+            for (const auto& cpJson : stageJson["checkPoints"]) {
+                CheckPointStruct cp;
+                if (cpJson.contains("checkPointNumber")) cp.checkPointNumber = cpJson["checkPointNumber"];
+                if (cpJson.contains("height")) cp.height = cpJson["height"];
+
+                if (cpJson.contains("objects")) {
+                    for (const auto& objJson : cpJson["objects"]) {
+                        PlacedObject obj;
+                        if (objJson.contains("id")) obj.id = objJson["id"];
+                        if (objJson.contains("position")) {
+                            if (objJson["position"].contains("x")) obj.position.x = objJson["position"]["x"];
+                            if (objJson["position"].contains("y")) obj.position.y = objJson["position"]["y"];
+                            if (objJson["position"].contains("z")) obj.position.z = objJson["position"]["z"];
+                        }
+                        cp.objects.push_back(obj);
+                    }
+                }
+
+                stage.checkPoints.push_back(cp);
+            }
+        }
+
+        stages_.push_back(stage);
+    }
+    /*std::ifstream file(filename);
+    if (!file.is_open()) return;
+
+    nlohmann::json j;
+    file >> j;
+    stages_.clear();
+
     for (const auto& stageJson : j["stages"]) {
         StageStruct stage;
         stage.stageNumber = stageJson["stageNumber"];
@@ -69,7 +119,7 @@ void StageEditor::Load(const std::string& filename)
         }
 
         stages_.push_back(stage);
-    }
+    }*/
 }
 
 void StageEditor::DrawEditorUI()
