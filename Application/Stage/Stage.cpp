@@ -40,8 +40,9 @@ void Stage::Update()
 	grassManager_->Update();
 	ReachCheckPoint();
 
-#ifdef _DEBUG
 	checkPoint_.DebugUpdate();
+#ifdef _DEBUG
+	//checkPoint_.DebugUpdate();
 	if (StageSelector())
 	{
 		InitCheckPoint();
@@ -62,8 +63,9 @@ void Stage::Draw()
 	enemyManager_->Draw();
 	grassManager_->Draw();
 
-#ifdef _DEBUG
 	checkPoint_.DebugDraw();
+#ifdef _DEBUG
+	//checkPoint_.DebugDraw();
 #endif // _DEBUG
 }
 
