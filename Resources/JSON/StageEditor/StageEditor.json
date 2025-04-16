@@ -33,7 +33,7 @@
                         {
                             "id": 0,
                             "position": {
-                                "x": 24.0,
+                                "x": 22.600000381469727,
                                 "y": 8.0,
                                 "z": 0.0
                             }
@@ -69,12 +69,6 @@
                             }
                         }
                     ]
-                }
-            ],
-            "objectDefinitions": [
-                {
-                    "id": 0,
-                    "name": "NewObject"
                 }
             ],
             "stageNumber": 0
