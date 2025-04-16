@@ -19,6 +19,7 @@
 #include "BaseObject/BaseObject.h"
 #include "PlayerBody.h"
 #include "StuckGrass.h"
+#include "PlayerHaert.h"
 
 enum class BehaviorPlayer
 {
@@ -131,20 +132,22 @@ private:
 	void Eliminate(); // 敵を倒した時
 
 	void HeartPos() {
+		drawCount_ = 0;
 		if(HP_ > 0)
 		{
 			std::vector<PointWithDirection> result;
 			const float length = 1.0f;
 			float targetDistance = length;
 			float accumulated = 0.0f;
-
-			auto it = moveHistory_.rbegin();
-			if (it == moveHistory_.rend()) return;
+			std::list<Vector3> v = moveHistory_;
+			v.push_back(worldTransform_.translation_);
+			auto it = v.rbegin();
+			if (it == v.rend()) return;
 
 			Vector3 prev = *it;
 			++it;
 
-			while (it != moveHistory_.rend() && result.size() < 3) {
+			while (it != v.rend() && result.size() < HP_) {
 				Vector3 curr = *it;
 				float segLen = Length(prev - curr);
 
@@ -154,6 +157,7 @@ private:
 
 					// 補間して位置を算出
 					Vector3 position = prev + (curr - prev) * t;
+					position.z -= 1.0f;
 
 					// 進行方向（XY平面）からラジアン角を計算
 					Vector3 dir = Normalize(curr - prev); // 方向ベクトル（単位ベクトル）
@@ -168,6 +172,12 @@ private:
 					prev = curr;
 					++it;
 				}
+			}
+			drawCount_ = result.size();
+			for (size_t i = 0; i < result.size(); ++i)
+			{
+				haerts_[i]->SetPos(result[i].position);
+				haerts_[i]->SetRotaY(result[i].radian);
 			}
 		}
 
@@ -315,6 +325,10 @@ private:
 	int32_t kMaxGrassGauge_ = 2;			// 草ゲージ最大値
 	int32_t grassGauge_ = 0;				// 草ゲージ
 	float UIGauge_ = 0.0f;					// 草ゲージのUIに渡すための値
+
+	//Haert
+	std::vector<std::unique_ptr<PlayerHaert>> haerts_;
+	int drawCount_ = 0;
 
 	// 時間制限 : 単位(sec)
 	float kTimeLimit_ = 10.0f;				// タイマーの限界値

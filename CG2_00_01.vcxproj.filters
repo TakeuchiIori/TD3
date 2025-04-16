@@ -106,6 +106,7 @@
     <ClCompile Include="Application\Stage\StageEditor.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Model\Material\MaterialLighting.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Model\Material\MaterialUV.cpp" />
+    <ClCompile Include="Application\Objects\Player\PlayerHaert.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -218,6 +219,7 @@
     <ClInclude Include="Application\Stage\StageEditor.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\Material\MaterialLighting.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\Material\MaterialUV.h" />
+    <ClInclude Include="Application\Objects\Player\PlayerHaert.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />

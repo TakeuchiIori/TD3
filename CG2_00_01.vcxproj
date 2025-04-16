@@ -206,6 +206,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Stage\Stage.cpp" />
     <ClCompile Include="Application\Stage\StageManager.cpp" />
     <ClCompile Include="Application\Stage\StageEditor.cpp" />
+    <ClCompile Include="Application\Objects\Player\PlayerHaert.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -311,6 +312,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Objects\Player\Player.h" />
     <ClInclude Include="Application\Objects\Player\PlayerMapCollision.h" />
     <ClInclude Include="Application\Objects\Player\PlayerBody.h" />
+    <ClInclude Include="Application\Objects\Player\PlayerHaert.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Application\Objects\EnemyManager\SideEnemy.h" />
     <ClInclude Include="Application\SystemsApp\Picture\Picture.h" />
