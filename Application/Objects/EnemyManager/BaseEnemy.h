@@ -59,21 +59,28 @@ public:
 	virtual const char* GetTypeName() const = 0;
 
 	// 攻撃を食らったら次まで気絶
-	bool IsStop() { return (isTakeAttack_ || isFaint_); }
+	bool IsStop() const { 
+		if(isTakeAttack_ || isFaint_)
+		{
+			return true;
+		}
+		return false;
+
+	}
+
+	void FaintUpdate(Player* player);
 
 protected:
 	// 攻撃を受けた時
 	void TakeAttack()
 	{ 
-		obj_->SetMaterialColor(Vector3{ 0.5f,0.5f,0.5f });
+		obj_->SetMaterialColor(Vector3{ 0.3f,0.3f,0.3f });
 		obbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
 		if(!isFaint_)
 		{
 			isTakeAttack_ = true;
 		}
 	}
-
-	void FaintUpdate(Player* player);
 
 public:
 

@@ -125,6 +125,44 @@ private:
 
 	void Eliminate(); // 敵を倒した時
 
+	void HeartPos() {
+		if(HP_ > 0)
+		{
+			std::vector<Vector3> result;
+			const float length = 5.0f; // 欲しい間隔
+			float targetDistance = length;
+			float accumulated = 0.0f;
+
+			auto it = moveHistory_.rbegin();
+			if (it == moveHistory_.rend()) return; // 空チェック
+
+			Vector3 prev = *it;
+			++it;
+
+			while (it != moveHistory_.rend() && result.size() < 3) {
+				Vector3 curr = *it;
+				float segLen = Length(prev - curr);
+
+				if (accumulated + segLen >= targetDistance) {
+					float remain = targetDistance - accumulated;
+					float t = remain / segLen;
+					Vector3 point = prev + (curr - prev) * t;
+					result.push_back(point);
+
+					// 次のターゲットへ（リセットせず累積のまま）
+					targetDistance += length;
+				}
+				else {
+					accumulated += segLen;
+					prev = curr;
+					++it;
+				}
+			}
+		}
+
+		// resultに3つの配置場所が入っている（足りなければ少ない場合もある）
+	}
+
 
 #ifdef _DEBUG
 	// デバッグ用 (ImGuiとか)

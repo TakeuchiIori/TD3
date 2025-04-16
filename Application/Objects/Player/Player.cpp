@@ -92,6 +92,7 @@ void Player::InitJson()
 
 void Player::Update()
 {
+	beforebehavior_ = behavior_;
 
 	// 各行動の初期化
 	BehaviorInitialize();
@@ -119,8 +120,6 @@ void Player::Update()
 #ifdef _DEBUG
 	DebugPlayer();
 #endif // _DEBUG
-
-	beforebehavior_ = behavior_;
 }
 
 void Player::Draw()
@@ -306,6 +305,10 @@ void Player::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDi
 					if (otherDir == HitDirection::Back)
 					{
 						TakeDamage();
+					}
+					else
+					{
+						Eliminate();
 					}
 				}
 			}
