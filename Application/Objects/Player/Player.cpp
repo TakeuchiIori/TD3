@@ -42,6 +42,13 @@ void Player::Initialize(Camera* camera)
 	obj_->Initialize();
 	obj_->SetModel("unitCube.obj");
 	obj_->SetMaterialColor(defaultColorV4_);
+
+	for (size_t i = 0; i < kMaxHP_; ++i)
+	{
+		std::unique_ptr<PlayerHaert> haert = std::make_unique<PlayerHaert>();
+		haert->Initialize(camera_);
+		haerts_.push_back(std::move(haert));
+	}
 	
 
 	/*SphereCollider::SetCamera(BaseObject::camera_);
@@ -111,6 +118,8 @@ void Player::Update()
 
 	TimerManager();
 
+	HeartPos();
+
 	UpdateMatrices();
 	
 	//aabbCollider_->Update();
@@ -130,6 +139,10 @@ void Player::Draw()
 	}
 	for (const auto& body : stuckGrassList_) {
 		body->Draw();
+	}
+	for (size_t i = 0; i < drawCount_; ++i)
+	{
+		haerts_[i]->Draw();
 	}
 }
 
@@ -320,11 +333,17 @@ void Player::UpdateMatrices()
 {
 	worldTransform_.UpdateMatrix();
 	nextWorldTransform_.UpdateMatrix();
-	for (const auto& body : playerBodys_) {
+	for (const auto& body : playerBodys_) 
+	{
 		body->Update();
 	}
-	for (const auto& body : stuckGrassList_) {
+	for (const auto& body : stuckGrassList_) 
+	{
 		body->Update();
+	}
+	for (const auto& haert : haerts_)
+	{
+		haert->Update();
 	}
 }
 
