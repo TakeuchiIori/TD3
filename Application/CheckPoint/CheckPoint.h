@@ -20,7 +20,7 @@ public: // メンバ関数
 public: // getter & setter
 	float* GetCheckPointHight() { return &checkPointHight_; }
 	void SetCheckPointHight(float checkPointHight) { checkPointHight_ = checkPointHight; }
-
+	Vector3 GetCheckPointPos() { return worldTransform_.translation_; }
 
 public: // デバッグ用メンバ関数
 //#ifdef _DEBUG

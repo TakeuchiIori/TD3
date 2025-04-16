@@ -98,6 +98,7 @@ void GameScene::Initialize()
 	gameScreen_ = std::make_unique<GameScreen>();
 	gameScreen_->SetCamera(sceneCamera_.get());
 	gameScreen_->SetPlayer(stageManager_->GetPlayer());
+	gameScreen_->SetCheckPointPos(stageManager_->GetCheckPointPos());
 	gameScreen_->Initialize();
 	
 	//=====================================================//
@@ -113,7 +114,7 @@ void GameScene::Update()
 {
 	GameTime::Update();
 	GameTime::ImGui();
-
+	gameScreen_->SetCheckPoint(stageManager_->GetCheckPoint());
 #ifdef _DEBUG
 	if ((Input::GetInstance()->TriggerKey(DIK_LCONTROL)) || Input::GetInstance()->IsPadTriggered(0, GamePadButton::RT)) {
 		isDebugCamera_ = !isDebugCamera_;

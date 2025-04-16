@@ -57,6 +57,11 @@ public:
 	void SetEnemyManager(EnemyManager* enemyManager) { enemyManager_ = enemyManager; }
 	void SetGrassManager(GrassManager* grassManager) { grassManager_ = grassManager; }
 
+	/// <summary>
+	/// チェックポイントの座標を取得
+	/// </summary>
+	float GetCheckPoint();
+	Vector3 GetCheckPointPos();
 
 private:
 	int currentStageNum_ = 0;

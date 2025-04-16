@@ -34,6 +34,17 @@ public:
 
 	void SetMapChipInfo(MapChipInfo* mapChipInfo) { mpInfo_ = mapChipInfo; }
 
+	/// <summary>
+	/// 現在のチェックポイントの座標を取得 Vector3
+	/// </summary>
+	Vector3 GetCheckPointPos() const { return stageList_[currentStageNum_]->GetCheckPointPos(); }
+
+	/// <summary>
+	/// 現在のチェックポイントの座標を取得 float
+	/// </summary>
+	float GetCheckPoint() const { return stageList_[currentStageNum_]->GetCheckPoint(); }
+
+
 private:
 	Input* input_ = nullptr;
 

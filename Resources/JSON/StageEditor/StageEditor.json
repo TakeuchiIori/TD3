@@ -4,7 +4,7 @@
             "checkPoints": [
                 {
                     "checkPointNumber": 0,
-                    "height": 74.9000015258789,
+                    "height": 102.0,
                     "objects": [
                         {
                             "id": 0,
@@ -42,7 +42,7 @@
                 },
                 {
                     "checkPointNumber": 1,
-                    "height": 75.0,
+                    "height": 102.0,
                     "objects": [
                         {
                             "id": 0,
