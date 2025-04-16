@@ -6,6 +6,10 @@
 // DX
 #include <DirectXMath.h>
 
+#include "Collision/Core/CollisionManager.h"
+
+bool::SideEnemy::isHit = false;
+
 SideEnemy::~SideEnemy()
 {
 	obbCollider_->~OBBCollider();
@@ -48,29 +52,29 @@ void SideEnemy::InitJson()
 
 void SideEnemy::Update()
 {
-	if (!isAlive_) {
-		//aabbCollider_->~AABBCollider();
-		obbCollider_->~OBBCollider();
-		return;
-	}
-
-	if(!IsStop()) // 攻撃を食らったら次まで気絶
+	FaintUpdate(player_);
+	if (!IsStop()) // 攻撃を食らったら次まで気絶
 	{
-		Move();
-	}
-
-	Vector3 newPos = worldTransform_.translation_ + velocity_;
-	mpCollision_.DetectAndResolveCollision(
-		colliderRect_,  // 衝突判定用矩形
-		newPos,    // 更新される位置（衝突解決後）
-		velocity_,      // 更新される速度
-		MapChipCollision::CollisionFlag::All,  // すべての方向をチェック
-		[this](const CollisionInfo& info) {
-			// 衝突時の処理（例：特殊ブロック対応）
-			MapChipOnCollision(info);
+		if (!isAlive_) {
+			//aabbCollider_->~AABBCollider();
+			obbCollider_->~OBBCollider();
+			return;
 		}
-	);
-	worldTransform_.translation_ = newPos;
+		Move();
+
+		Vector3 newPos = worldTransform_.translation_ + velocity_;
+		mpCollision_.DetectAndResolveCollision(
+			colliderRect_,  // 衝突判定用矩形
+			newPos,    // 更新される位置（衝突解決後）
+			velocity_,      // 更新される速度
+			MapChipCollision::CollisionFlag::All,  // すべての方向をチェック
+			[this](const CollisionInfo& info) {
+				// 衝突時の処理（例：特殊ブロック対応）
+				MapChipOnCollision(info);
+			}
+		);
+		worldTransform_.translation_ = newPos;
+	}
 	worldTransform_.UpdateMatrix();
 	//aabbCollider_->Update();
 	obbCollider_->Update();
@@ -107,12 +111,37 @@ void SideEnemy::OnCollision(BaseCollider* self, BaseCollider* other) {
 	}
 }
 
-void SideEnemy::OnExitCollision(BaseCollider* self, BaseCollider* other) {
+void SideEnemy::OnExitCollision(BaseCollider* self, BaseCollider* other) 
+{
 
+	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+	{
+		isHit = false;
+	}
 }
 
 void SideEnemy::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
 {
+	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+	{
+		if (player_->behavior_ == BehaviorPlayer::Boost)
+		{
+			isHit = true;
+			TakeAttack();
+		}
+		HitDirection selfDir = Collision::GetSelfLocalHitDirection(self, other);
+		HitDirection otherDir = Collision::GetSelfLocalHitDirection(other, self);
+
+		if (selfDir != HitDirection::None && !isHit)
+		{
+			isHit = true;
+			if (selfDir != HitDirection::Back)
+			{
+				isTakeAttack_ = true;
+				TakeAttack();
+			}
+		}
+	}
 }
 
 void SideEnemy::MapChipOnCollision(const CollisionInfo& info) {

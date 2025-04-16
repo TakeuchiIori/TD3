@@ -101,4 +101,9 @@ private:
 	MapChipCollision mpCollision_;
 	MapChipCollision::ColliderRect colliderRect_;
 	Vector3 startPos_;
+
+
+
+
+	static bool isHit;
 };

@@ -120,4 +120,9 @@ private:
 	// マップチップとの当たり判定
 	MapChipCollision mpCollision_;
 	MapChipCollision::ColliderRect colliderRect_;
+
+
+
+
+	static bool isHit;
 };
