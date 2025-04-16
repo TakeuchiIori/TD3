@@ -50,6 +50,8 @@ void Grass::Initialize(Camera* camera)
 
 	InitCollision();
 	InitJson();
+
+	particleEmitter_ = std::make_unique<ParticleEmitter>("GrowthParticle", worldTransform_.translation_, 5);
 }
 
 void Grass::InitCollision()
@@ -143,6 +145,7 @@ void Grass::OnCollision(BaseCollider* self, BaseCollider* other)
 						if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
 						{
 							behaviortRquest_ = BehaviorGrass::Growth;
+							particleEmitter_->FollowEmit("GrowthParticle", worldTransform_.translation_);
 						}
 					}
 				}
