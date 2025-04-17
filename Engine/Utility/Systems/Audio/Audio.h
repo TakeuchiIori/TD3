@@ -57,7 +57,7 @@ public:
 	void SoundUnload(SoundData* soundData);
 
 	IXAudio2SourceVoice* SoundPlayWave(const SoundData& soundData);
-	IXAudio2SourceVoice* SoundPlayAudio(const SoundData& soundData); // .mp3, .mp4 用
+	IXAudio2SourceVoice* SoundPlayAudio(const SoundData& soundData,bool isLoop = false); // .mp3, .mp4 用
 
 	// 音量設定
 	void SetVolume(IXAudio2SourceVoice* pSourceVoice, float volume);
