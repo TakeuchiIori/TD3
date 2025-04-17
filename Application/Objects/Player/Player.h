@@ -306,7 +306,7 @@ private:
 	Vector3 velocity_ = { 0.0f,0.0f,0.0f };			// 加速度
 	Vector3 moveDirection_ = { 0.0f,0.0f,0.0f };	// 動く向き(nowFrame)
 	Vector3 beforeDirection_ = { 0.0f,0.0f,0.0f };	// 動く向き(beforeFrame)
-	float defaultSpeed_ = 0.1f;						// 通常時の移動速度
+	float defaultSpeed_ = 0.05f;					// 通常時の移動速度
 	float boostSpeed_ = 0.2f;						// ブースト時の速度
 	float returnSpeed_ = 1.0f;						// 帰還時の速度
 	float speed_ = defaultSpeed_;					// 動く速度
@@ -333,17 +333,17 @@ private:
 	// 時間制限 : 単位(sec)
 	float kTimeLimit_ = 10.0f;				// タイマーの限界値
 	float extendTimer_ = 0;					// 伸びられる残り時間
-	float grassTime_ = 3.0f / 2.0f;			// 草を食べて追加される時間
-	float largeGrassTime_ = 6.0f / 2.0f;	// 大きい草
+	float grassTime_ = 1.0f;				// 草を食べて追加される時間
+	float largeGrassTime_ = 3.0f;			// 大きい草
 
-	float kBoostTime_ = 1.5f;				// ブーストの最大効果時間
+	float kBoostTime_ = 1.0f;				// ブーストの最大効果時間
 	float boostTimer_ = 0;					// 現在のブーストの残り時間
 
 	float kBoostCT_ = 5.0f;					// ブーストのクールタイム
 	float boostCoolTimer_ = 0;				// 現在のクールタイムトの残り時間
 
 
-	float kCreateGrassTime_ = 3.0f;			// 草が詰まるまでの時間
+	float kCreateGrassTime_ = 2.5f;			// 草が詰まるまでの時間
 	float createGrassTimer_ = 0.0f;			// 草が詰まるまでのタイマー
 	bool isCreateGrass_ = false;			// 草を吐いたか
 
