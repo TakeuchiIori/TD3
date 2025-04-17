@@ -303,15 +303,6 @@ void Player::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDi
 			{
 				HitDirection hitDir = Collision::GetSelfLocalHitDirection(self, other);
 				HitDirection otherDir = Collision::GetSelfLocalHitDirection(other, self);
-#ifdef _DEBUG
-				int a = static_cast<int>(dir);
-				int b = static_cast<int>(otherDir);
-				ImGui::Begin("DebugPlayer");
-				ImGui::Text("dir : %d", a);
-				//ImGui::Text("hitDir : %d", b);
-				ImGui::Text("isHit : %d", isHit);
-				ImGui::End();
-#endif // _DEBUG
 				if (otherDir != HitDirection::None && !isHit)
 				{
 					isHit = true;
@@ -574,21 +565,48 @@ void Player::TimerManager()
 	}
 	if (0 < invincibleTimer_)
 	{
-		invincibleTimer_ -= deltaTime_;
-		if (changeColor_ == defaultColorV3_)
+		static int time = 0;
+		if (time > 3)
 		{
-			changeColor_ = { 1,1,1 };
+			isRed_ = false;
+			time = 0;
+		}
+
+		if (isRed_)
+		{
+			changeColor_ = { 1,0,0 };
 		}
 		else
 		{
+			if (time == 0)
+			{
+				if(changeColor_ == defaultColorV3_)
+				{
+					changeColor_ = { 1,1,1 };
+				}
+				else
+				{
+					changeColor_ = defaultColorV3_;
+				}
+			}
+		}
+
+		time++;
+		invincibleTimer_ -= deltaTime_;
+
+		if (0 >= invincibleTimer_)
+		{
+			time = 0;
 			changeColor_ = defaultColorV3_;
 		}
+
+		obj_->SetMaterialColor(changeColor_);
+
+		for (const auto& body : playerBodys_) 
+		{
+			body->SetColor(changeColor_);
+		}
 	}
-	else
-	{
-		changeColor_ = defaultColorV3_;
-	}
-	obj_->SetMaterialColor(changeColor_);
 }
 
 bool Player::IsPopGrass()
@@ -642,16 +660,20 @@ void Player::ShrinkBody()
 
 void Player::TakeDamage()
 {
-	if (HP_ > 0 && invincibleTimer_ <= 0)
+	if(behavior_ != BehaviorPlayer::Return)
 	{
-		HP_--;
-		if (HP_ <= 0)
+		if (HP_ > 0 && invincibleTimer_ <= 0)
 		{
-			extendTimer_ = 0;
-		}
-		else
-		{
-			invincibleTimer_ = kInvincibleTime_;
+			HP_--;
+			isRed_ = true;
+			if (HP_ <= 0)
+			{
+				extendTimer_ = 0;
+			}
+			else
+			{
+				invincibleTimer_ = kInvincibleTime_;
+			}
 		}
 	}
 }

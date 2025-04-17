@@ -106,6 +106,8 @@ public:
 		return false;
 	}
 
+	void SetColor(Vector3 color){ obj_->SetMaterialColor(color); }
+
 private:
 	Vector3 verticalGrowthScale_ = { 1.0f,0.0f,1.0f };
 	Vector3 horizontalGrowthScale_ = { 0.0f,1.0f,1.0f };
