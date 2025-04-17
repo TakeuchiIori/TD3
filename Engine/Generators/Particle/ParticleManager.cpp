@@ -172,6 +172,8 @@ void ParticleManager::UpdateParticles()
 			}
 
 
+
+
 			// 位置揺らぎ（Enable）
 			if (prm.isRandom) {
 				particle.transform.translate.x += rx(randomEngine_) * kDeltaTime;
@@ -189,6 +191,17 @@ void ParticleManager::UpdateParticles()
 
 			// α フェード
 			float alpha = 1.0f - (particle.currentTime / particle.lifeTime);
+
+			// スケール縮小処理
+			if (prm.enableScale) {
+				float scaleRate = alpha;  // 残り寿命に比例してスケーリング
+				particle.transform.scale = {
+					particle.transform.scale.x * scaleRate,
+					particle.transform.scale.y * scaleRate,
+					particle.transform.scale.z * scaleRate
+				};
+			}
+
 
 			// 行列計算
 			Matrix4x4 S = MakeScaleMatrix(particle.transform.scale);
@@ -668,6 +681,7 @@ void ParticleManager::InitJson(const std::string& name)
 	jsonManager_->Register("最小", &particleParameters_[name].baseTransform.scaleMin);
 	jsonManager_->Register("最大", &particleParameters_[name].baseTransform.scaleMax);
 
+
 	jsonManager_->SetTreePrefix("位置");
 	jsonManager_->Register("最小", &particleParameters_[name].baseTransform.translateMin);
 	jsonManager_->Register("最大", &particleParameters_[name].baseTransform.translateMax);
@@ -675,6 +689,8 @@ void ParticleManager::InitJson(const std::string& name)
 	jsonManager_->SetTreePrefix("回転");
 	jsonManager_->Register("最小", &particleParameters_[name].baseTransform.rotateMin);
 	jsonManager_->Register("最大", &particleParameters_[name].baseTransform.rotateMax);
+
+	jsonManager_->Register("スケール縮小", &particleParameters_[name].enableScale);
 
 	// ---------------------- 移動速度系 ----------------------
 	jsonManager_->SetTreePrefix("速度");
