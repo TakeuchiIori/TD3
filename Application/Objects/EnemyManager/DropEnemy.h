@@ -110,7 +110,7 @@ private:
 	float speed_ = defaultSpeed_;
 	bool isMove_ = false;
 	bool isInversion_ = false;
-
+	float fallSpeed_;
 	/*=======================================================
 
 							プレイヤー
