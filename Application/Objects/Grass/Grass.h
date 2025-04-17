@@ -58,7 +58,8 @@ public:
 	void DrawCollision();
 
 	void Repop() 
-	{ 
+	{
+		obj_->SetMaterialColor(defaultColor_);
 		if(behavior_ != BehaviorGrass::Growth)
 		{
 			behaviortRquest_ = BehaviorGrass::Repop;
@@ -183,6 +184,9 @@ private:
 
 	// 枝
 	std::unique_ptr<Branch> branch_;
+
+	Vector3 defaultColor_ = { 0.3f,1.0f,0.3f };
+	Vector3 growthColor_ = { 0.3f,0.3f,1.0f };
 
 	const float deltaTime_ = 1.0f / 60.0f; // 仮対応
 
