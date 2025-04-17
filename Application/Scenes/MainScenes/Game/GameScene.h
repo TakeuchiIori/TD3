@@ -35,6 +35,7 @@
 #include "../SpriteApp/ScreenApp/GameScreen.h"
 #include "StageManager.h"
 #include "StageEditor.h"
+#include "Giraffe/Giraffe.h"
 
 enum class CameraMode
 {
@@ -166,6 +167,7 @@ private:
     std::unique_ptr<Picture> picture_;
     WorldTransform testWorldTransform_;
     std::unique_ptr<Ground> ground_;
+    std::unique_ptr<Giraffe> giraffe_;
 
     // 3Dモデル
     //std::unique_ptr<Player> player_;

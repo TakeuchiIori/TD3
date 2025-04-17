@@ -71,7 +71,9 @@ void GameScene::Initialize()
 	enemyManager_->SetPlayer(stageManager_->GetPlayer());
 	enemyManager_->Initialize(sceneCamera_.get(), mpInfo_->GetMapChipField());*/
 
-
+	giraffe_ = std::make_unique<Giraffe>();
+	giraffe_->Initialize();
+	giraffe_->SetCamera(sceneCamera_.get());
     
     // 地面
     ground_ = std::make_unique<Ground>();
@@ -141,6 +143,7 @@ void GameScene::Update()
 
 	//enemyManager_->Update();
 
+	giraffe_->Update();
 	ground_->Update();
 
 
@@ -216,6 +219,7 @@ void GameScene::DrawOffScreen()
 
 void GameScene::DrawObject()
 {
+	giraffe_->Draw();
 	mpInfo_->Draw();
 	ground_->Draw();
 	//enemyManager_->Draw();
