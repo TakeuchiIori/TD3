@@ -136,7 +136,7 @@ private:
 		if(HP_ > 0)
 		{
 			std::vector<PointWithDirection> result;
-			const float length = 1.2f;
+			const float length = 1.4f;
 			float targetDistance = length;
 			float accumulated = 0.0f;
 			std::list<Vector3> v = moveHistory_;
