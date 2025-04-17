@@ -8,7 +8,7 @@ bool::DropEnemy::isHit = false;
 
 DropEnemy::~DropEnemy()
 {
-	aabbCollider_->~AABBCollider();
+	obbCollider_->~OBBCollider();
 }
 
 void DropEnemy::Initialize(Camera* camera)
@@ -28,7 +28,7 @@ void DropEnemy::Initialize(Camera* camera)
 
 void DropEnemy::InitCollision()
 {
-	aabbCollider_ = ColliderFactory::Create<AABBCollider>(
+	obbCollider_ = ColliderFactory::Create<OBBCollider>(
 		this,
 		&worldTransform_,
 		camera_,
@@ -48,7 +48,7 @@ void DropEnemy::InitJson()
 void DropEnemy::Update()
 {
 	if (!isAlive_) {
-		aabbCollider_->~AABBCollider();
+		obbCollider_->~OBBCollider();
 		return;
 	}
 
@@ -71,7 +71,7 @@ void DropEnemy::Update()
 	);
 	worldTransform_.translation_ = newPos;
 	worldTransform_.UpdateMatrix();
-	aabbCollider_->Update();
+	obbCollider_->Update();
 }
 
 void DropEnemy::Draw()
@@ -81,7 +81,7 @@ void DropEnemy::Draw()
 
 void DropEnemy::DrawCollision()
 {
-	aabbCollider_->Draw();
+	obbCollider_->Draw();
 }
 
 void DropEnemy::OnEnterCollision(BaseCollider* self, BaseCollider* other) {

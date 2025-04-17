@@ -191,7 +191,7 @@ void EnemyManager::ImGui()
 {
 	if (ImGui::Begin("エネミー管理")) {
 		if (ImGui::Button("上からの敵を追加")) {
-			spawnDataList_.push_back({ EnemyType::Drop, {0,0,0}, 1.0f, 2.0f });
+			spawnDataList_.push_back({ EnemyType::Drop, {10,10,0}, 1.0f, 2.0f });
 		}
 		if (ImGui::Button("横からの敵を追加")) {
 			spawnDataList_.push_back({ EnemyType::Side, {0,0,0}, 1.0f, 0.0f });
@@ -268,27 +268,34 @@ void EnemyManager::ImGui()
 void EnemyManager::CheckSpawnEnemies()
 {
 	for (auto& data : spawnDataList_) {
-		if (data.triggered) continue;
-
-		if (data.type == EnemyType::Drop && !data.triggered) {
-			float dx = data.position.x - player_->GetWorldTransform().translation_.x;
-			float dy = data.position.y - player_->GetWorldTransform().translation_.y;
-			float distSq = dx * dx + dy * dy;
-
-			if (distSq <= triggerDistance_ * triggerDistance_) {
-				auto enemy = std::make_unique<DropEnemy>(mapChipField_);
-				enemy->Initialize(camera_);
-				enemy->SetPlayer(player_);
-				enemy->SetTranslate(data.position);
-				enemy->SetMoveSpeed(data.moveSpeed);
-				enemy->SetFallSpeed(data.fallSpeed);
-				enemies_.emplace_back(std::move(enemy));
-
-				data.triggered = true;
-			}
+		if (data.triggered || data.type != EnemyType::Drop) {
+			continue;
 		}
+
+		//Vector2 playerPos = {
+		//	player_->GetWorldTransform().translation_.x,
+		//	player_->GetWorldTransform().translation_.y
+		//};
+		float dx = data.position.x - player_->GetCenterPosition().x;
+		float dy = data.position.y - player_->GetCenterPosition().y;
+		float distSq = dx * dx + dy * dy;
+
+		if (distSq <= triggerDistance_ * triggerDistance_) {
+			continue;
+		}
+
+		auto enemy = std::make_unique<DropEnemy>(mapChipField_);
+		enemy->Initialize(camera_);
+		enemy->SetPlayer(player_);
+		enemy->SetTranslate(data.position);
+		enemy->SetMoveSpeed(data.moveSpeed);
+		enemy->SetFallSpeed(data.fallSpeed);
+		enemies_.emplace_back(std::move(enemy));
+
+		data.triggered = true;
 	}
 }
+
 
 void EnemyManager::UpdateSpawnDataFromEnemies()
 {

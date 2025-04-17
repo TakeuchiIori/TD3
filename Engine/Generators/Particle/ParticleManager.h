@@ -143,6 +143,9 @@ public:
 		float randomForce = 0.02f;
 
 		Vector3 offset = {};
+
+
+		bool enableScale = false;
 	};
 
 

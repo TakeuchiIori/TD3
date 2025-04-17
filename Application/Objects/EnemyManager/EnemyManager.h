@@ -126,7 +126,7 @@ private:
 	MapChipField* mapChipField_ = nullptr;
 	std::vector<std::unique_ptr<BaseEnemy>> enemies_;
 
-	float triggerDistance_ = 5.0f;
+	float triggerDistance_ = 10.0f;
 	std::vector<EnemySpawnPoint> dropSpawnPoints_;
 	std::unique_ptr< JsonManager> jsonManager_;
 
