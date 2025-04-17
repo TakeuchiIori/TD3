@@ -1,5 +1,9 @@
 #include "GameTime.h"
+#ifdef _DEBUG
+
 #include "imgui.h"
+
+#endif // _DEBUG
 
 /*------------------------------------------------------------------
 
@@ -68,6 +72,9 @@ void GameTime::Update()
 
 void GameTime::ImGui()
 {
+#ifdef _DEBUG
+
+
 	ImGui::Begin("ゲーム時間");
 
 	ImGui::Text("FPS : %.2f", GameTime::GetAverageFPS());
@@ -81,6 +88,7 @@ void GameTime::ImGui()
 	ImGui::DragFloat("タイムスケール", &timeScale_, 0.5f, 0.0f, 2.0f);
 
 	ImGui::End();
+#endif // _DEBUG
 
 }
 

@@ -95,6 +95,7 @@ void Stage::ReachCheckPoint()
 
 bool Stage::StageSelector(const char* label)
 {
+#ifdef _DEBUG
 	bool changed = false;
 
 	ImGui::Begin(label);
@@ -135,6 +136,8 @@ bool Stage::StageSelector(const char* label)
 	ImGui::End();
 
 	return changed;
+#endif // _DEBUG
+
 }
 
 void Stage::ReloadObject()

@@ -126,6 +126,7 @@ void StageEditor::DrawEditorUI()
 {
     static int selectedStageIndex = -1;
     static int selectedCheckPointIndex = -1;
+#ifdef _DEBUG
 
     if (ImGui::Begin("Stage Editor")) {
         ImGui::Text("Vで配置をリロード"); // 処理はStageManager::Update()に
@@ -217,4 +218,6 @@ void StageEditor::DrawEditorUI()
         }
     }
     ImGui::End();
+#endif // _DEBUG
+
 }
