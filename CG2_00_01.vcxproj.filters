@@ -107,6 +107,7 @@
     <ClCompile Include="Engine\Utility\Loaders\Model\Material\MaterialLighting.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Model\Material\MaterialUV.cpp" />
     <ClCompile Include="Application\Objects\Player\PlayerHaert.cpp" />
+    <ClCompile Include="Application\Objects\Giraffe\Giraffe.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -220,6 +221,7 @@
     <ClInclude Include="Engine\Utility\Loaders\Model\Material\MaterialLighting.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\Material\MaterialUV.h" />
     <ClInclude Include="Application\Objects\Player\PlayerHaert.h" />
+    <ClInclude Include="Application\Objects\Giraffe\Giraffe.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />
