@@ -62,6 +62,7 @@ public:
 		obj_->SetMaterialColor(defaultColor_);
 		if(behavior_ != BehaviorGrass::Growth)
 		{
+			isLarge_ = false;
 			behaviortRquest_ = BehaviorGrass::Repop;
 		}
 		else
