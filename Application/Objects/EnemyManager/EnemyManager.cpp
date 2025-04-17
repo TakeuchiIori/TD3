@@ -189,6 +189,8 @@ void EnemyManager::SaveEnemyDataToJson(const std::string& path)
 
 void EnemyManager::ImGui()
 {
+#ifdef _DEBUG
+
 	if (ImGui::Begin("エネミー管理")) {
 		if (ImGui::Button("上からの敵を追加")) {
 			spawnDataList_.push_back({ EnemyType::Drop, {10,10,0}, 1.0f, 2.0f });
@@ -261,6 +263,9 @@ void EnemyManager::ImGui()
 		}
 	}
 	ImGui::End();
+
+#endif // _DEBUG
+
 }
 
 
