@@ -21,6 +21,8 @@
 #include "StuckGrass.h"
 #include "PlayerHaert.h"
 
+#include "Systems/Audio/Audio.h"
+
 enum class BehaviorPlayer
 {
 	Root,
@@ -370,6 +372,9 @@ private:
 	// コントローラー用
 	Vector2 stick = {};
 	float threshold = 0.5f;
+
+	Audio::SoundData soundData;
+	IXAudio2SourceVoice* sourceVoice;
 
 public:
 	// 振る舞い

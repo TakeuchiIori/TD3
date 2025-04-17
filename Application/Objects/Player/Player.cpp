@@ -58,6 +58,11 @@ void Player::Initialize(Camera* camera)
 	InitJson();
 	//colliderRct_.height = 2.0f;
 	//colliderRct_.width = 2.0f;
+
+	soundData = Audio::GetInstance()->LoadAudio(L"Resources/Audio/Grow.mp3");
+	// 音量の設定（0.0f ～ 1.0f）
+	//Audio::GetInstance()->SetVolume(sourceVoice, 0.5f);
+
 }
 
 void Player::InitCollision()
@@ -206,6 +211,7 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 	{
 		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrass)) // 草を食べたら
 		{
+
 			if (kMaxGrassGauge_ > grassGauge_ && createGrassTimer_ <= 0)
 			{
 				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.1f)
@@ -262,6 +268,11 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 				if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
 				{
 					// 唾を吐く
+					 
+					
+					// オーディオの再生
+					sourceVoice = Audio::GetInstance()->SoundPlayAudio(soundData, false);
+					
 				}
 			}
 		}
