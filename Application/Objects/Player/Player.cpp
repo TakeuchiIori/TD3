@@ -60,6 +60,7 @@ void Player::Initialize(Camera* camera)
 	//colliderRct_.width = 2.0f;
 
 	soundData = Audio::GetInstance()->LoadAudio(L"Resources/Audio/Grow.mp3");
+	soundDataBoost = Audio::GetInstance()->LoadAudio(L"Resources/Audio/Boost.mp3");
 	// 音量の設定（0.0f ～ 1.0f）
 	//Audio::GetInstance()->SetVolume(sourceVoice, 0.5f);
 
@@ -839,11 +840,14 @@ void Player::BehaviorBoostInit()
 	speed_ = boostSpeed_;
 	boostTimer_ = kBoostTime_;
 	invincibleTimer_ = kBoostTime_; // ブースト中無敵に
+	sourceVoiceBoost = Audio::GetInstance()->SoundPlayAudio(soundDataBoost, false);
 }
 
 void Player::BehaviorBoostUpdate()
 {
 	Move();
+
+	
 
 	if (0 >= boostTimer_)
 	{

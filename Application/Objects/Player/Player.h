@@ -376,6 +376,9 @@ private:
 	Audio::SoundData soundData;
 	IXAudio2SourceVoice* sourceVoice;
 
+	Audio::SoundData soundDataBoost;
+	IXAudio2SourceVoice* sourceVoiceBoost;
+
 public:
 	// 振る舞い
 	BehaviorPlayer behavior_ = BehaviorPlayer::Root;
