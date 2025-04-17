@@ -37,6 +37,8 @@
 #include "StageEditor.h"
 #include "Giraffe/Giraffe.h"
 
+#include "Particle/ParticleEmitter.h"
+
 enum class CameraMode
 {
     DEFAULT,
@@ -146,7 +148,7 @@ private:
 
     =================================================================*/
 
-
+	std::unique_ptr<ParticleEmitter> particleEmitter_;
 
     /*=================================================================
 

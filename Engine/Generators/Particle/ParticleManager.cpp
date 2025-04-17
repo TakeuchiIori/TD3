@@ -551,8 +551,6 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 	particleGroups_[name] = ParticleGroup();
 	ParticleGroup& particleGroup = particleGroups_[name];
 
-	//InitJson(name);
-
 	// マテリアルデータにテクスチャファイルパスを設定
 	particleGroup.materialData.textureFilePath = textureFilePath;
 	// テクスチャ読み込み
@@ -670,58 +668,58 @@ void ParticleManager::SetBlendMode(D3D12_BLEND_DESC& blendDesc, BlendMode blendM
 
 void ParticleManager::InitJson(const std::string& name)
 {
-	const std::string base = name + " : "; // 名前空間を分けるためのプレフィックス
-	jsonManager_ = std::make_unique<JsonManager>(name, "Resources/Json/Particles");
-	jsonManager_->SetCategory("ParticleParameter");
-	jsonManager_->SetSubCategory(name + "Parameter");
+	const std::string base = name + " : p"; // 名前空間を分けるためのプレフィックス
+	jsonManagers_[name] = std::make_unique<JsonManager>(name, "Resources/Json/Particles");
+	jsonManagers_[name]->SetCategory("ParticleParameter");
+	jsonManagers_[name]->SetSubCategory(name + "Prm");
 
 
 	// ---------------------- トランスフォーム系 ----------------------
-	jsonManager_->SetTreePrefix("スケール");
-	jsonManager_->Register("最小", &particleParameters_[name].baseTransform.scaleMin);
-	jsonManager_->Register("最大", &particleParameters_[name].baseTransform.scaleMax);
+	jsonManagers_[name]->SetTreePrefix("スケール");
+	jsonManagers_[name]->Register("最小", &particleParameters_[name].baseTransform.scaleMin);
+	jsonManagers_[name]->Register("最大", &particleParameters_[name].baseTransform.scaleMax);
 
 
-	jsonManager_->SetTreePrefix("位置");
-	jsonManager_->Register("最小", &particleParameters_[name].baseTransform.translateMin);
-	jsonManager_->Register("最大", &particleParameters_[name].baseTransform.translateMax);
+	jsonManagers_[name]->SetTreePrefix("位置");
+	jsonManagers_[name]->Register("最小", &particleParameters_[name].baseTransform.translateMin);
+	jsonManagers_[name]->Register("最大", &particleParameters_[name].baseTransform.translateMax);
 
-	jsonManager_->SetTreePrefix("回転");
-	jsonManager_->Register("最小", &particleParameters_[name].baseTransform.rotateMin);
-	jsonManager_->Register("最大", &particleParameters_[name].baseTransform.rotateMax);
+	jsonManagers_[name]->SetTreePrefix("回転");
+	jsonManagers_[name]->Register("最小", &particleParameters_[name].baseTransform.rotateMin);
+	jsonManagers_[name]->Register("最大", &particleParameters_[name].baseTransform.rotateMax);
 
-	jsonManager_->Register("スケール縮小", &particleParameters_[name].enableScale);
+	jsonManagers_[name]->Register("スケール縮小", &particleParameters_[name].enableScale);
 
 	// ---------------------- 移動速度系 ----------------------
-	jsonManager_->SetTreePrefix("速度");
-	jsonManager_->Register("最小", &particleParameters_[name].baseVelocity.velocityMin);
-	jsonManager_->Register("最大", &particleParameters_[name].baseVelocity.velocityMax);
+	jsonManagers_[name]->SetTreePrefix("速度");
+	jsonManagers_[name]->Register("最小", &particleParameters_[name].baseVelocity.velocityMin);
+	jsonManagers_[name]->Register("最大", &particleParameters_[name].baseVelocity.velocityMax);
 
 	// ---------------------- カラー設定 ----------------------
-	jsonManager_->SetTreePrefix("カラー");
-	jsonManager_->Register("最小", &particleParameters_[name].baseColor.minColor);
-	jsonManager_->Register("最大", &particleParameters_[name].baseColor.maxColor);
-	jsonManager_->Register("アルファ", &particleParameters_[name].baseColor.alpha);
+	jsonManagers_[name]->SetTreePrefix("カラー");
+	jsonManagers_[name]->Register("最小", &particleParameters_[name].baseColor.minColor);
+	jsonManagers_[name]->Register("最大", &particleParameters_[name].baseColor.maxColor);
+	jsonManagers_[name]->Register("アルファ", &particleParameters_[name].baseColor.alpha);
 
 	// ---------------------- ライフ設定 ----------------------
-	jsonManager_->SetTreePrefix("寿命");
-	jsonManager_->Register("時間", &particleParameters_[name].baseLife.lifeTime);
+	jsonManagers_[name]->SetTreePrefix("寿命");
+	jsonManagers_[name]->Register("時間", &particleParameters_[name].baseLife.lifeTime);
 
 	// ---------------------- ランダム設定 ----------------------
-	jsonManager_->SetTreePrefix("ランダム");
-	jsonManager_->Register("有効", &particleParameters_[name].isRandom);
-	jsonManager_->Register("中心から", &particleParameters_[name].randomFromCenter);
-	jsonManager_->Register("方向最小", &particleParameters_[name].randomDirectionMin);
-	jsonManager_->Register("方向最大", &particleParameters_[name].randomDirectionMax);
-	jsonManager_->Register("加速度", &particleParameters_[name].randomForce);
+	jsonManagers_[name]->SetTreePrefix("ランダム");
+	jsonManagers_[name]->Register("有効", &particleParameters_[name].isRandom);
+	jsonManagers_[name]->Register("中心から", &particleParameters_[name].randomFromCenter);
+	jsonManagers_[name]->Register("方向最小", &particleParameters_[name].randomDirectionMin);
+	jsonManagers_[name]->Register("方向最大", &particleParameters_[name].randomDirectionMax);
+	jsonManagers_[name]->Register("加速度", &particleParameters_[name].randomForce);
 
 	// ---------------------- その他 ----------------------
-	jsonManager_->SetTreePrefix("その他");
-	jsonManager_->Register("オフセット", &particleParameters_[name].offset);
-	jsonManager_->Register("ブレンドモード", reinterpret_cast<int*>(&currentBlendMode_));
-	jsonManager_->Register("ビルボード", &particleParameters_[name].useBillboard);
+	jsonManagers_[name]->SetTreePrefix("その他");
+	jsonManagers_[name]->Register("オフセット", &particleParameters_[name].offset);
+	jsonManagers_[name]->Register("ブレンドモード", reinterpret_cast<int*>(&currentBlendMode_));
+	jsonManagers_[name]->Register("ビルボード", &particleParameters_[name].useBillboard);
 
-	jsonManager_->ClearTreePrefix();
+	//jsonManagers_[name]->ClearTreePrefix();
 
 
 }

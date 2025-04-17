@@ -48,7 +48,7 @@ public:
 	/// </summary>
 	/// <param name="name"></param>
 	/// <param name="transform"></param>
-	void FollowEmit(const std::string& name, const Vector3& transform);
+	void FollowEmit(const Vector3& transform);
 
 	/// <summary>
 	/// パーティクルを指定した位置で発生

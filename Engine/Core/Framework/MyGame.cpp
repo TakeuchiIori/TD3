@@ -23,7 +23,7 @@ void MyGame::Initialize()
 	// パーティクルマネージャ生成
 	ParticleManager::GetInstance()->Initialize(srvManager_);
 	ParticleManager::GetInstance()->CreateParticleGroup("GrowthParticle", defaultTexturePath + "growth.png");
-	//ParticleManager::GetInstance()->CreateParticleGroup("GameSceneParticle", defaultTexturePath + "growth.png");
+	ParticleManager::GetInstance()->CreateParticleGroup("GameScene", defaultTexturePath + "circle.png");
 }
 
 void MyGame::Finalize()

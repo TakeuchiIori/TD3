@@ -34,9 +34,9 @@ void ParticleEmitter::UpdateTime()
 
 }
 
-void ParticleEmitter::FollowEmit(const std::string& name, const Vector3& transform)
+void ParticleEmitter::FollowEmit(const Vector3& transform)
 {
-	ParticleManager::GetInstance()->Emit(name, transform, emitter_.count);
+	ParticleManager::GetInstance()->Emit(emitter_.name, transform, emitter_.count);
 }
 
 void ParticleEmitter::Emit()
@@ -90,12 +90,4 @@ void ParticleEmitter::ShowImGui()
 	ImGui::End();
 #endif // _DEBUG
 
-}
-
-void ParticleEmitter::InitJson() {
-	//jsonManager_ = new JsonManager("パーティクル : " + emitter_.name, "Resources/JSON");
-	//jsonManager_->Register("Frequency", &emitter_.frequency);
- //   jsonManager_->Register("FrequencyTime", &emitter_.frequencyTime);
- //   jsonManager_->Register("Count", &emitter_.count);
- //   jsonManager_->Register("Position", &emitter_.transform.translate);
 }

@@ -94,7 +94,7 @@ void GameScene::Initialize()
 	Audio::GetInstance()->SetVolume(sourceVoice, 0.1f); // 80%の音量に設定
 
 	
-
+	particleEmitter_ = std::make_unique<ParticleEmitter>("GameScene", Vector3{0,0,0}, 20);
 
 	gameScreen_ = std::make_unique<GameScreen>();
 	gameScreen_->SetCamera(sceneCamera_.get());
@@ -145,7 +145,7 @@ void GameScene::Update()
 
 	giraffe_->Update();
 	ground_->Update();
-
+	particleEmitter_->Emit();
 
 	ParticleManager::GetInstance()->Update();
 	// カメラ更新
