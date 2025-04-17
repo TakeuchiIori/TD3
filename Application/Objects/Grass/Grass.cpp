@@ -125,7 +125,6 @@ void Grass::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 				aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
 				enter++;
 				behaviortRquest_ = BehaviorGrass::Eaten;
-				isLarge_ = false;
 			}
 		}
 	}
