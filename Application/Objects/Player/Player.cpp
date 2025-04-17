@@ -574,8 +574,13 @@ void Player::TimerManager()
 	}
 	if (0 < invincibleTimer_)
 	{
+		static int time = 0;
+		if (time > 4)
+		{
+			time = 0;
+		}
 		invincibleTimer_ -= deltaTime_;
-		if (changeColor_ == defaultColorV3_)
+		if (time == 0)
 		{
 			changeColor_ = { 1,1,1 };
 		}
@@ -583,12 +588,16 @@ void Player::TimerManager()
 		{
 			changeColor_ = defaultColorV3_;
 		}
+		time++;
 	}
 	else
 	{
 		changeColor_ = defaultColorV3_;
 	}
 	obj_->SetMaterialColor(changeColor_);
+	for (const auto& body : playerBodys_) {
+		body->SetColor(changeColor_);
+	}
 }
 
 bool Player::IsPopGrass()

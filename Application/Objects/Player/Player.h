@@ -279,6 +279,8 @@ public: // getter&setter
 
 	float GetUIGrassGauge() { return UIGauge_; }
 
+	Vector3 GetColor() { return changeColor_; }
+
 private:
 	Input* input_ = nullptr;
 
