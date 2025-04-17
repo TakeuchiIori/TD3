@@ -203,17 +203,17 @@ void GameScene::Draw()
 
 void GameScene::DrawOffScreen()
 {
+
+	//----------
+	// Particle
+	//----------
+	ParticleManager::GetInstance()->Draw();
 	//----------
 	// Sprite
 	//----------
 	SpriteCommon::GetInstance()->DrawPreference();
 	DrawSprite();
 
-
-	//----------
-	// Particle
-	//----------
-	ParticleManager::GetInstance()->Draw();
 
 }
 
