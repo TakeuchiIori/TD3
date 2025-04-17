@@ -136,7 +136,7 @@ private:
 		if(HP_ > 0)
 		{
 			std::vector<PointWithDirection> result;
-			const float length = 1.2f;
+			const float length = 1.4f;
 			float targetDistance = length;
 			float accumulated = 0.0f;
 			std::list<Vector3> v = moveHistory_;
@@ -279,6 +279,8 @@ public: // getter&setter
 
 	float GetUIGrassGauge() { return UIGauge_; }
 
+	Vector3 GetColor() { return changeColor_; }
+
 private:
 	Input* input_ = nullptr;
 
@@ -295,6 +297,8 @@ private:
 	MapChipCollision::ColliderRect colliderRect_;
 
 	bool isCollisionBody = false;
+
+	bool isRed_ = false;
 
 
 	const Vector4 defaultColorV4_ = { 0.90625f,0.87109f,0.125f,1.0f };

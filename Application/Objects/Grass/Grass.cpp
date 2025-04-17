@@ -41,7 +41,7 @@ void Grass::Initialize(Camera* camera)
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
 	obj_->SetModel("unitCube.obj");
-	obj_->SetMaterialColor({ 0.3f,1.0f,0.3f,1.0f });
+	obj_->SetMaterialColor(defaultColor_);
 
 	// 枝の初期化
 	branch_ = std::make_unique<Branch>();
@@ -144,6 +144,7 @@ void Grass::OnCollision(BaseCollider* self, BaseCollider* other)
 					{
 						if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
 						{
+							obj_->SetMaterialColor(growthColor_);
 							behaviortRquest_ = BehaviorGrass::Growth;
 							particleEmitter_->FollowEmit("GrowthParticle", worldTransform_.translation_);
 						}
