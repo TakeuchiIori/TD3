@@ -25,8 +25,9 @@ void CheckPoint::DebugInitialize(Camera* camera)
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("unitCube.obj");
+	obj_->SetModel("check.obj");
 	obj_->SetMaterialColor(Vector3{ 1,1,1 });
+	obj_->uvScale.x = worldTransform_.scale_.x;
 	camera_ = camera;
 }
 
