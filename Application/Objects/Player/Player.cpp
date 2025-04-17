@@ -526,14 +526,31 @@ void Player::RightBody()
 
 void Player::EntryMove()
 {
-	if (input_->TriggerKey(DIK_SPACE) || 
-		input_->IsPadTriggered(0, GamePadButton::X) || 
-		input_->IsPadTriggered(0, GamePadButton::Start))
+
+	if (input_->IsControllerConnected())
+	{
+	}
+	stick = input_->GetLeftStickInput(0);
+	if (std::abs(stick.x) < threshold && std::abs(stick.y) < threshold) {
+		stick = {};
+	}
+
+	if ((input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP)))
 	{
 		behaviortRquest_ = BehaviorPlayer::Moving;
 		moveDirection_ = { 0,1,0 };
 		extendTimer_ = kTimeLimit_;
 		moveHistory_.push_back(worldTransform_.translation_);
+	}
+	else if (std::abs(stick.x) < std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
+	{
+		if (stick.y > 0)
+		{
+			behaviortRquest_ = BehaviorPlayer::Moving;
+			moveDirection_ = { 0,1,0 };
+			extendTimer_ = kTimeLimit_;
+			moveHistory_.push_back(worldTransform_.translation_);
+		}
 	}
 #ifdef _DEBUG
 #endif // _DEBUG
