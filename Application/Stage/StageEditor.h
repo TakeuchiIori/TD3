@@ -4,9 +4,12 @@
 #include <memory>
 #include <fstream>
 #include <json.hpp>
-#include "imgui.h"
 #include "Vector3.h"
+#ifdef _DEBUG
 
+#include "imgui.h"
+
+#endif // _DEBUG
 struct ObjectDefinition {
     int id;
     std::string name;
