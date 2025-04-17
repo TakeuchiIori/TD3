@@ -91,24 +91,19 @@ void SideEnemy::DrawCollision()
 	obbCollider_->Draw();
 }
 
-void SideEnemy::OnEnterCollision(BaseCollider* self, BaseCollider* other) {
+void SideEnemy::OnEnterCollision(BaseCollider* self, BaseCollider* other) 
+{
 
-	//if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) ||
-	//	other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody))
-	//{
-	//	isAlive_ = false;
-	//}
-}
-
-void SideEnemy::OnCollision(BaseCollider* self, BaseCollider* other) {
-
-	// プレイヤーの期間中は跳ね返るだけでダメージ無し
-	if ((other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) || 
-		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody)) && 
-		player_->behavior_ == BehaviorPlayer::Return)
+	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) ||
+		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody))
 	{
 		moveRight_ = moveRight_ ? false : true;
 	}
+}
+
+void SideEnemy::OnCollision(BaseCollider* self, BaseCollider* other) 
+{
+
 }
 
 void SideEnemy::OnExitCollision(BaseCollider* self, BaseCollider* other) 
@@ -132,13 +127,16 @@ void SideEnemy::OnDirectionCollision(BaseCollider* self, BaseCollider* other, Hi
 		HitDirection selfDir = Collision::GetSelfLocalHitDirection(self, other);
 		HitDirection otherDir = Collision::GetSelfLocalHitDirection(other, self);
 
-		if (selfDir != HitDirection::None && !isHit)
+		if (player_->behavior_ == BehaviorPlayer::Moving)
 		{
-			isHit = true;
-			if (selfDir != HitDirection::Back)
+			if (selfDir != HitDirection::None && !isHit)
 			{
-				isTakeAttack_ = true;
-				TakeAttack();
+				isHit = true;
+				if (selfDir != HitDirection::Back)
+				{
+					isTakeAttack_ = true;
+					TakeAttack();
+				}
 			}
 		}
 	}
