@@ -203,37 +203,57 @@ void JsonManager::ImGui(const std::string& className)
 void JsonManager::ImGuiManager()
 {
 #ifdef _DEBUG
-	ImGui::Begin("JsonManager"); // 親ウィンドウ
+	ImGui::Begin("JsonManager");
 
 	ImGui::Text("Select Category:");
-	//ImGui::Separator();
 
-	// カテゴリごとのマップを作る
-	std::unordered_map<std::string, std::vector<std::string>> categoryMap;
+	// カテゴリ > （サブカテゴリ or 直クラス）
+	std::map<std::string, std::map<std::string, std::vector<std::string>>> treeMap;
+
 	for (const auto& [name, manager] : instances) {
-		std::string category = manager->GetCategory().empty() ? "Uncategorized" : manager->GetCategory();
-		categoryMap[category].push_back(name);
+		std::string cat = manager->GetCategory().empty() ? "Uncategorized" : manager->GetCategory();
+		std::string subCat = manager->GetSubCategory();
+
+		// サブカテゴリが空なら「__NoSubCategory__」という特殊キーにする
+		if (subCat.empty()) {
+			subCat = "__NoSubCategory__";
+		}
+
+		treeMap[cat][subCat].push_back(name);
 	}
 
-	// クラス選択スクロール部分（固定せず最大限使う）
-	ImGui::BeginChild("ClassList", ImVec2(0, 0), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+	ImGui::BeginChild("ClassTree", ImVec2(0, 0), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
-	for (const auto& [category, classList] : categoryMap) {
-		if (ImGui::TreeNode(category.c_str())) {
-			for (const auto& className : classList) {
-				if (ImGui::Button(className.c_str(), ImVec2(250, 30))) {
-					selectedClass = className;
+	for (const auto& [cat, subMap] : treeMap) {
+		if (ImGui::TreeNode(cat.c_str())) {
+			for (const auto& [subCat, rawclassList] : subMap) {
+				// __NoSubCategory__ ならそのままボタンだけ表示
+				std::vector<std::string> classList = rawclassList; // コピーしてソート用に
+				std::sort(classList.begin(), classList.end());
+				if (subCat == "__NoSubCategory__") {
+					for (const auto& className : classList) {
+						if (ImGui::Button(className.c_str(), ImVec2(250, 30))) {
+							selectedClass = className;
+						}
+					}
+				} else {
+					if (ImGui::TreeNode(subCat.c_str())) {
+						for (const auto& className : classList) {
+							if (ImGui::Button(className.c_str(), ImVec2(250, 30))) {
+								selectedClass = className;
+							}
+						}
+						ImGui::TreePop(); // subCat
+					}
 				}
 			}
-			ImGui::TreePop();
+			ImGui::TreePop(); // cat
 		}
 	}
 
-	ImGui::EndChild(); // クラス一覧パネル終わり
+	ImGui::EndChild();
 
-	//ImGui::Separator();
-
-	// 選択されたクラスを表示
+	// （以下、選択クラスの表示などはそのまま）
 	if (!selectedClass.empty()) {
 		auto it = instances.find(selectedClass);
 		if (it != instances.end()) {
@@ -245,10 +265,36 @@ void JsonManager::ImGuiManager()
 			ImGui::PushID(selectedClass.c_str());
 
 			// 変数表示もスクロールできるように
-			ImGui::BeginChild("VariableList", ImVec2(0, 200), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+			ImGui::BeginChild("VariableList", ImVec2(0, 300), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+			// ▼ グループ化：ピリオドで分割してツリー構造に分類
+			std::map<std::string, std::vector<std::pair<std::string, IVariableJson*>>> groupedVars;
+			std::vector<std::pair<std::string, IVariableJson*>> flatVars;
 
-			for (auto& pair : instance->variables_) {
-				pair.second->ShowImGui(pair.first, selectedClass);
+			for (auto& [key, var] : instance->variables_) {
+				if (instance->treeKeys_.contains(key)) {
+					size_t dotPos = key.find('.');
+					std::string group = key.substr(0, dotPos);
+					std::string subKey = key.substr(dotPos + 1);
+					groupedVars[group].emplace_back(subKey, var.get());
+				} else {
+					flatVars.emplace_back(key, var.get());
+				}
+			}
+
+
+			// ▼ ツリー表示
+			for (auto& [group, vars] : groupedVars) {
+				if (ImGui::TreeNode(group.c_str())) {
+					for (auto& [name, var] : vars) {
+						var->ShowImGui(name, selectedClass);
+					}
+					ImGui::TreePop();
+				}
+			}
+
+			// ▼ 通常の変数（ピリオドなし）
+			for (auto& [key, var] : flatVars) {
+				var->ShowImGui(key, selectedClass);
 			}
 
 			ImGui::EndChild();
@@ -263,9 +309,11 @@ void JsonManager::ImGuiManager()
 		}
 	}
 
-	ImGui::End(); // 親ウィンドウ終わり
+	ImGui::End();
 #endif
 }
+
+
 
 void JsonManager::ChildReset(std::string parentFileName, std::string childName)
 {

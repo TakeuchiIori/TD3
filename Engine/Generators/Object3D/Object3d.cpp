@@ -8,23 +8,39 @@
 
 // Engine
 #include "Loaders./Texture./TextureManager.h"
-#include "Loaders./Model/ModelManager.h"
-#include "Loaders./Model/Model.h"
-#include "WorldTransform./WorldTransform.h"
+#include "Loaders/Model/ModelManager.h"
 
+#include "WorldTransform./WorldTransform.h"
+#include "Debugger/Logger.h"
 
 #ifdef _DEBUG
 #include "imgui.h"
 #endif // _DEBUG
+
+
+const std::string  Object3d::defaultModelPath_ = "Resources./Models./";
+
+Object3d::Object3d()
+{
+	//queryIndex_ = OcclusionCullingManager::GetInstance()->AddOcclusionQuery();
+}
 
 void Object3d::Initialize()
 {
 	// 引数で受け取ってメンバ変数に記録する
 	this->object3dCommon_ = Object3dCommon::GetInstance();
 
-	CreateMaterialResource();
-
 	CreateCameraResource();
+
+	materialColor_ = std::make_unique<MaterialColor>();
+	materialColor_->Initialize();
+
+	materialLighting_ = std::make_unique<MaterialLighting>();
+	materialLighting_->Initialize();
+
+	materialUV_ = std::make_unique<MaterialUV>();
+	materialUV_->Initialize();
+
 }
 void Object3d::UpdateAnimation()
 {
@@ -33,62 +49,68 @@ void Object3d::UpdateAnimation()
 }
 
 
-void Object3d::Draw(Camera* camera,WorldTransform& worldTransform)
+void Object3d::Draw(Camera* camera, WorldTransform& worldTransform)
 {
 
-	Matrix4x4 worldViewProjectionMatrix;
-	Matrix4x4 worldMatrix;
-	if (model_) {
-		if (camera) {
-			const Matrix4x4& viewProjectionMatrix = camera->GetViewProjectionMatrix();
+	//// クエリは毎回実行する
+	//OcclusionCullingManager::GetInstance()->BeginOcclusionQuery(queryIndex_);
 
-			// 
-			if (!model_->GetModelData().hasBones) {
-				worldViewProjectionMatrix = worldTransform.GetMatWorld() * model_->GetModelData().rootNode.localMatrix * viewProjectionMatrix;
-				worldMatrix = worldTransform.GetMatWorld() * model_->GetModelData().rootNode.localMatrix;
-			}
-			else {
-				worldViewProjectionMatrix = worldTransform.GetMatWorld() * viewProjectionMatrix;
-				worldMatrix = worldTransform.GetMatWorld();
+	//// 数フレーム連続で見えてなかったら描画しない
+	//bool shouldDraw = OcclusionCullingManager::GetInstance()->ShouldDraw(queryIndex_, 10);
+	//static uint32_t globalFrameCounter = 0;
+	//globalFrameCounter++;
+	//if (!shouldDraw && globalFrameCounter % 1 == 0) {
+	//	shouldDraw = true;
+	//}
+		UpdateUV();
+	//if (shouldDraw) {
+		Matrix4x4 worldViewProjectionMatrix;
+		Matrix4x4 worldMatrix;
+		if (model_) {
+			if (camera) {
+				const Matrix4x4& viewProjectionMatrix = camera->GetViewProjectionMatrix();
+
+				// 
+				if (!model_->GetHasBones()) {
+					worldViewProjectionMatrix = worldTransform.GetMatWorld() * model_->GetRootNode().GetLocalMatrix() * viewProjectionMatrix;
+					worldMatrix = worldTransform.GetMatWorld() * model_->GetRootNode().GetLocalMatrix();
+				} else {
+					worldViewProjectionMatrix = worldTransform.GetMatWorld() * viewProjectionMatrix;
+					worldMatrix = worldTransform.GetMatWorld();
+				}
+			} else {
+
+				worldViewProjectionMatrix = worldTransform.GetMatWorld();
+				worldMatrix = worldTransform.GetMatWorld(); // 初期化が必要
 			}
 		}
-		else {
 
-			worldViewProjectionMatrix = worldTransform.GetMatWorld();
-			worldMatrix = worldTransform.GetMatWorld(); // 初期化が必要
+		worldTransform.SetMapWVP(worldViewProjectionMatrix);
+		worldTransform.SetMapWorld(worldMatrix);
+
+		object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, worldTransform.GetConstBuffer()->GetGPUVirtualAddress());
+		// カメラ
+		object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
+		
+		// マテリアル関連
+		materialUV_->RecordDrawCommands(object3dCommon_->GetDxCommon()->GetCommandList().Get(), 0);
+		materialColor_->RecordDrawCommands(object3dCommon_->GetDxCommon()->GetCommandList().Get(), 7);
+		materialLighting_->RecordDrawCommands(object3dCommon_->GetDxCommon()->GetCommandList().Get(), 8);
+
+		if (model_) {
+			model_->Draw();
 		}
-	}
+	//}
+	//OcclusionCullingManager::GetInstance()->EndOcclusionQuery(queryIndex_);
+}
 
-	worldTransform.SetMapWVP(worldViewProjectionMatrix);
-	worldTransform.SetMapWorld(worldMatrix);
-
-	// マテリアル
-	object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-	// TransformatonMatrixCB
-	object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, worldTransform.GetConstBuffer()->GetGPUVirtualAddress());
-	// カメラ
-	object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
-
-	// 3Dモデルが割り当てられていれば描画する
+void Object3d::DrawBone(Line& line)
+{
 	if (model_) {
-		model_->Draw();
+		model_->DrawBone(line);
 	}
 }
 
-void Object3d::DrawSkeleton(Line& line)
-{
-	model_->DrawSkeleton(model_->GetSkeleton(),line);
-}
-
-void Object3d::CreateMaterialResource()
-{
-	materialResource_ = object3dCommon_->GetDxCommon()->CreateBufferResource(sizeof(Material));
-	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
-	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	materialData_->enableLighting = true;
-	materialData_->shininess = 30.0f;
-	materialData_->uvTransform = MakeIdentity4x4();
-}
 
 void Object3d::CreateCameraResource()
 {
@@ -96,6 +118,19 @@ void Object3d::CreateCameraResource()
 	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
 	cameraData_->worldPosition = { 0.0f, 0.0f, 0.0f };
 }
+
+void Object3d::UpdateUV()
+{
+	Vector3 s = { uvScale.x, uvScale.y, 1.0f};
+	Vector3 r = { 0.0f, 0.0f, uvRotate};
+	Vector3 t = { uvTranslate.x, uvTranslate.y, 0.0f };
+
+	Matrix4x4 affine = MakeAffineMatrix(s, r, t);
+
+	// マテリアルのUV変換行列をセット
+	SetUvTransform(affine);
+}
+
 
 
 
@@ -110,50 +145,68 @@ void Object3d::SetModel(const std::string& filePath, bool isAnimation)
 		if (basePath.substr(basePath.size() - 4) == ".obj") {
 			basePath = basePath.substr(0, basePath.size() - 4);
 			fileName = basePath + ".obj";
-		}
-		else if (basePath.size() > 5 && basePath.substr(basePath.size() - 5) == ".gltf") {
+		} else if (basePath.size() > 5 && basePath.substr(basePath.size() - 5) == ".gltf") {
 			basePath = basePath.substr(0, basePath.size() - 5);
 			fileName = basePath + ".gltf";
 		}
 	}
 
 	// .obj 読み込み (第一引数には拡張子なしのパス)
-	ModelManager::GetInstance()->LoadModel("Resources./Models./" + basePath, fileName, isAnimation);
+	ModelManager::GetInstance()->LoadModel(defaultModelPath_ + basePath, fileName, isAnimation);
 
 	// モデルを検索してセットする
 	model_ = ModelManager::GetInstance()->FindModel(fileName);
 
 }
 
-void Object3d::MaterialByImGui()
+void Object3d::SetChangeAnimation(const std::string& filePath)
 {
-#ifdef _DEBUG
-	ImGui::Begin("Material");
-	Vector4 materialColor = GetMaterialColor();
-	if (ImGui::ColorEdit4("Material Color", &materialColor.x)) {
-		SetMaterialColor(materialColor);
+	std::string basePath = filePath;
+	std::string fileName;
+	if (basePath.size() > 5 && basePath.substr(basePath.size() - 5) == ".gltf") {
+		basePath = basePath.substr(0, basePath.size() - 5);
+		fileName = basePath + ".gltf";
 	}
 
-	float shininess = GetMaterialShininess();
-	if (ImGui::SliderFloat("Shininess", &shininess, 0.1f, 200.0f, "%.2f")) {
-		SetMaterialShininess(shininess);
+	if (model_) {
+		model_->SetChangeAnimation(defaultModelPath_ + basePath, fileName);
 	}
-
-	Matrix4x4 uvTransform = GetMaterialUVTransform();
-	if (ImGui::InputFloat("UV Scale X", &uvTransform.m[0][0], 0.1f, 1.0f, "%.2f")) {
-		uvTransform.m[0][0] = std::clamp(uvTransform.m[0][0], 0.1f, 10.0f);
-		SetMaterialUVTransform(uvTransform);
-	}
-	if (ImGui::InputFloat("UV Scale Y", &uvTransform.m[1][1], 0.1f, 1.0f, "%.2f")) {
-		uvTransform.m[1][1] = std::clamp(uvTransform.m[1][1], 0.1f, 10.0f);
-		SetMaterialUVTransform(uvTransform);
-	}
-
-	bool isMaterialLight = IsMaterialEnabled();
-	if (ImGui::Checkbox("Use Lighting", &isMaterialLight)) {
-		SetMaterialEnabled(isMaterialLight);
-	}
-	ImGui::End();
-#endif // _DEBUG
 }
 
+Object3d* Object3d::Create(const std::string& fileName, bool isAnimation)
+{
+	// ファイル名に応じてモデル読み込み
+	std::string basePath = fileName;
+	std::string trueFileName;
+
+	if (basePath.size() > 4 && basePath.substr(basePath.size() - 4) == ".obj") {
+		basePath = basePath.substr(0, basePath.size() - 4);
+		trueFileName = basePath + ".obj";
+	} else if (basePath.size() > 5 && basePath.substr(basePath.size() - 5) == ".gltf") {
+		basePath = basePath.substr(0, basePath.size() - 5);
+		trueFileName = basePath + ".gltf";
+	}
+
+	// 読み込み（重複チェックあり）
+	ModelManager::GetInstance()->LoadModel(defaultModelPath_ + basePath, trueFileName, isAnimation);
+
+	// モデル取得
+	Model* model = ModelManager::GetInstance()->FindModel(trueFileName);
+	if (!model) {
+		return nullptr;
+	}
+
+	// Object3d生成
+	Object3d* newObj = new Object3d();
+	newObj->Initialize();
+	newObj->model_ = model;
+	return newObj;
+}
+
+Object3d* Object3d::Create(Model* model)
+{
+	Object3d* newObj = new Object3d();
+	newObj->Initialize();
+	newObj->model_ = model;
+	return newObj;
+}

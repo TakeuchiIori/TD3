@@ -22,6 +22,14 @@ public:
 
 	void DrawCollision();
 
+	void Repop()
+	{
+		for (const auto& g : grassList_)
+		{
+			g->Repop();
+		}
+	}
+
 	void hakuGrass(bool pop, Vector3 pos);
 
 	void PopGrass(Vector3 pos, bool madeByPlayer = false)
@@ -35,6 +43,13 @@ public:
 	}
 
 	void SetPlayer(Player* player) { player_ = player; }
+
+	void ClearGrass()
+	{
+		grassList_.remove_if([](const std::unique_ptr<Grass>& g) {
+			return true;
+			});
+	}
 
 private:
 	Player* player_ = nullptr;

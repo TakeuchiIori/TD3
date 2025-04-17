@@ -1,9 +1,18 @@
 #include "SideEnemy.h"
 #include "../Player/Player.h"
+#include "Easing.h"
+
+
+// DX
+#include <DirectXMath.h>
+
+#include "Collision/Core/CollisionManager.h"
+
+bool::SideEnemy::isHit = false;
 
 SideEnemy::~SideEnemy()
 {
-	aabbCollider_->~AABBCollider();
+	obbCollider_->~OBBCollider();
 }
 
 void SideEnemy::Initialize(Camera* camera)
@@ -12,7 +21,7 @@ void SideEnemy::Initialize(Camera* camera)
 
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("cube.obj");
+	obj_->SetModel("bard.obj");
 	obj_->SetMaterialColor({ 1.0f,1.0f,1.0f,1.0f });
 
 	worldTransform_.Initialize();
@@ -24,7 +33,7 @@ void SideEnemy::Initialize(Camera* camera)
 
 void SideEnemy::InitCollision()
 {
-	aabbCollider_ = ColliderFactory::Create<AABBCollider>(
+	obbCollider_ = ColliderFactory::Create<OBBCollider>(
 		this,
 		&worldTransform_,
 		camera_,
@@ -43,28 +52,32 @@ void SideEnemy::InitJson()
 
 void SideEnemy::Update()
 {
-	if (!isAlive_) {
-		aabbCollider_->~AABBCollider();
-		return;
-	}
-
-
-	Move();
-
-	Vector3 newPos = worldTransform_.translation_ + velocity_;
-	mpCollision_.DetectAndResolveCollision(
-		colliderRect_,  // 衝突判定用矩形
-		newPos,    // 更新される位置（衝突解決後）
-		velocity_,      // 更新される速度
-		MapChipCollision::CollisionFlag::All,  // すべての方向をチェック
-		[this](const CollisionInfo& info) {
-			// 衝突時の処理（例：特殊ブロック対応）
-			MapChipOnCollision(info);
+	FaintUpdate(player_);
+	if (!IsStop()) // 攻撃を食らったら次まで気絶
+	{
+		if (!isAlive_) {
+			//aabbCollider_->~AABBCollider();
+			obbCollider_->~OBBCollider();
+			return;
 		}
-	);
-	worldTransform_.translation_ = newPos;
+		Move();
+
+		Vector3 newPos = worldTransform_.translation_ + velocity_;
+		mpCollision_.DetectAndResolveCollision(
+			colliderRect_,  // 衝突判定用矩形
+			newPos,    // 更新される位置（衝突解決後）
+			velocity_,      // 更新される速度
+			MapChipCollision::CollisionFlag::All,  // すべての方向をチェック
+			[this](const CollisionInfo& info) {
+				// 衝突時の処理（例：特殊ブロック対応）
+				MapChipOnCollision(info);
+			}
+		);
+		worldTransform_.translation_ = newPos;
+	}
 	worldTransform_.UpdateMatrix();
-	aabbCollider_->Update();
+	//aabbCollider_->Update();
+	obbCollider_->Update();
 }
 
 void SideEnemy::Draw()
@@ -74,31 +87,59 @@ void SideEnemy::Draw()
 
 void SideEnemy::DrawCollision()
 {
-	aabbCollider_->Draw();
+	//aabbCollider_->Draw();
+	obbCollider_->Draw();
 }
 
-void SideEnemy::OnEnterCollision(BaseCollider* self, BaseCollider* other) {
+void SideEnemy::OnEnterCollision(BaseCollider* self, BaseCollider* other) 
+{
 
-	//if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) ||
-	//	other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody))
-	//{
-	//	isAlive_ = false;
-	//}
-}
-
-void SideEnemy::OnCollision(BaseCollider* self, BaseCollider* other) {
-
-	// プレイヤーの期間中は跳ね返るだけでダメージ無し
-	if ((other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) || 
-		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody)) && 
-		player_->behavior_ == BehaviorPlayer::Return)
+	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) ||
+		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody))
 	{
 		moveRight_ = moveRight_ ? false : true;
 	}
 }
 
-void SideEnemy::OnExitCollision(BaseCollider* self, BaseCollider* other) {
+void SideEnemy::OnCollision(BaseCollider* self, BaseCollider* other) 
+{
 
+}
+
+void SideEnemy::OnExitCollision(BaseCollider* self, BaseCollider* other) 
+{
+
+	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+	{
+		isHit = false;
+	}
+}
+
+void SideEnemy::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
+{
+	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+	{
+		if (player_->behavior_ == BehaviorPlayer::Boost)
+		{
+			isHit = true;
+			TakeAttack();
+		}
+		HitDirection selfDir = Collision::GetSelfLocalHitDirection(self, other);
+		HitDirection otherDir = Collision::GetSelfLocalHitDirection(other, self);
+
+		if (player_->behavior_ == BehaviorPlayer::Moving)
+		{
+			if (selfDir != HitDirection::None && !isHit)
+			{
+				isHit = true;
+				if (selfDir != HitDirection::Back)
+				{
+					isTakeAttack_ = true;
+					TakeAttack();
+				}
+			}
+		}
+	}
 }
 
 void SideEnemy::MapChipOnCollision(const CollisionInfo& info) {
@@ -121,21 +162,26 @@ void SideEnemy::MapChipOnCollision(const CollisionInfo& info) {
 }
 
 
-void SideEnemy::Move()
-{
+/// <summary>
+///  移動処理（回転補間による滑らかな方向転換）
+/// </summary>
+void SideEnemy::Move() {
+	// ターゲット回転角度（Y軸）
+	float targetRotationY = moveRight_
+		? DirectX::XMConvertToRadians(270.0f)
+		: DirectX::XMConvertToRadians(90.0f);
 
-	// 左右移動
-	if (moveRight_) {
-		velocity_.x = speed_;
-	} else {
-		velocity_.x = -speed_;
-	}
+	float t = 0.7f;
+	t = Easing::easeInExpo(t);
+	worldTransform_.rotation_.y = Lerp(worldTransform_.rotation_.y, targetRotationY, t);
+	// 移動速度の設定（方向に応じて）
+	velocity_.x = moveRight_ ? speed_ : -speed_;
 
-	// 現在のワールド座標を使って、前方のマップを調べる
+	// 進行方向を使って前方チェック座標を計算
 	Vector3 checkPos = worldTransform_.translation_;
-	checkPos.x += (moveRight_ ? 1.0f : -1.0f); // 進行方向に1.0fずらす
-
+	checkPos.x += (moveRight_ ? 1.0f : -1.0f);
 }
+
 
 void SideEnemy::Reset(Vector3& pos)
 {
@@ -155,8 +201,9 @@ Vector3 SideEnemy::GetCenterPosition() const
 	};
 }
 
-void SideEnemy::SetTranslate(Vector3 pos)
+void SideEnemy::SetTranslate(const Vector3& pos)
 {
 	worldTransform_.translation_ = pos;
 	startPos_ = pos;
 }
+

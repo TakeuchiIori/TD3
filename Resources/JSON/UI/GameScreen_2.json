@@ -1,0 +1,38 @@
+{
+    "anchorPoint": {
+        "x": 0.0,
+        "y": 0.0
+    },
+    "color": {
+        "a": 1.0,
+        "b": 1.0,
+        "g": 1.0,
+        "r": 1.0
+    },
+    "flipX": false,
+    "flipY": false,
+    "name": "GameScreen_2",
+    "position": {
+        "x": 967.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "scale": {
+        "x": 314.0,
+        "y": 724.0
+    },
+    "textureLeftTop": {
+        "x": 0.0,
+        "y": 0.0
+    },
+    "texturePath": "./Resources/Textures/BackGround/screen.png",
+    "textureSize": {
+        "x": 16.0,
+        "y": 16.0
+    }
+}

@@ -9,6 +9,10 @@
 // Engine
 #include "Systems/Camera/Camera.h"
 #include "Loaders/Model/Model.h"
+#include "../Graphics/Culling/OcclusionCullingManager.h"
+#include "Loaders/Model/Material/MaterialColor.h"
+#include "Loaders/Model/Material/MaterialLighting.h"
+#include "Loaders/Model/Material/MaterialUV.h"
 
 // Math
 #include "Vector4.h"
@@ -25,6 +29,8 @@ class Model;
 class Object3d
 {
 public: // メンバ関数
+
+	Object3d();
 
 	/// <summary>
 	/// 初期化
@@ -44,7 +50,7 @@ public: // メンバ関数
 	/// <summary>
 	/// スケルトン描画
 	/// </summary>
-	void DrawSkeleton(Line& line);
+	void DrawBone(Line& line);
 
 	/// <summary>
 	/// モデルのセット
@@ -52,83 +58,44 @@ public: // メンバ関数
 	void SetModel(const std::string& filePath, bool isAnimation = false);
 
 	/// <summary>
-	/// ImGui
+	/// アニメーションを切り替える
 	/// </summary>
-	void MaterialByImGui();
+	void SetChangeAnimation(const std::string& filePath);
+
+
+
+	Vector2 uvScale = { 1.0f,1.0f };
+	Vector2 uvTranslate = { 0.0f,0.0f };
+	float uvRotate = 0.0f;
+
+public:
+
+	static Object3d* Create(const std::string& fileName, bool isAnimation = false);
+	static Object3d* Create(Model* model);
 
 private:
-
-	/// <summary>
-	/// マテリアルリソース作成
-	/// </summary>
-	void CreateMaterialResource();
 
 	/// <summary>
 	/// マテリアルリソース作成
 	/// </summary>
 	void CreateCameraResource();
 
+	/// <summary>
+	/// UVの更新
+	/// </summary>
+	void UpdateUV();
 public: // アクセッサ
 	Model* GetModel() { return model_; }
+	void SetMaterialColor(const Vector4& color) { materialColor_->SetColor(color); }
+	void SetMaterialColor(const Vector3& color) { materialColor_->SetColor(color); }
+	void SetAlpha(float alpha) { materialColor_->SetAlpha(alpha); }
+	void SetUvTransform(const Matrix4x4& uvTransform) { materialUV_->SetUVTransform(uvTransform); }
 
-	/*===============================================//
-					　アンカーポイント
-	//===============================================*/
-	const Vector3& GetAnchorPoint()const { return anchorPoint_; }
-	void SetAnchorPoint(const Vector3& anchorPoint) { this->anchorPoint_ = anchorPoint; }
-
-	/*===============================================//
-					　    フリップ
-	//===============================================*/
-	const bool& GetIsFlipX()const { return isFlipX_; }
-	const bool& GetIsFlipY()const { return isFlipY_; }
-	void SetIsFlipX(const bool& isFlipX) { this->isFlipX_ = isFlipX; }
-	void SetIsFlipY(const bool& isFlipY) { this->isFlipY_ = isFlipY; }
-
-	/*===============================================//
-				　   	  カメラ
-	//===============================================*/
-
-	
-	//void SetCamera(Camera* camera) { this->camera_ = camera; }
-	//void SetLine(Line* line) { this->line_ = line; }
-
-	// マテリアル
-	const Vector4& GetMaterialColor() const { return materialData_->color; }
-	void SetMaterialColor(const Vector4& color) { materialData_->color = color; }
-	void SetAlpha(const float& alpha) { materialData_->color.w = alpha; }
-	bool IsLightingEnabled() const { return materialData_->enableLighting != 0; }
-	bool IsSpecularEnabled() const { return materialData_->enableSpecular; }
-	bool IsHalfVectorEnabled() const { return materialData_->isHalfVector; }
-	
-	void SetLightingEnabled(bool enabled) { materialData_->enableLighting = enabled ? 1 : 0; }
-	float GetMaterialShininess() const { return materialData_->shininess; }
-	void SetMaterialShininess(float shininess) { materialData_->shininess = shininess; }
-	const Matrix4x4& GetMaterialUVTransform() const { return materialData_->uvTransform; }
-	void SetMaterialUVTransform(const Matrix4x4& uvTransform) { materialData_->uvTransform = uvTransform; }
-	bool IsMaterialEnabled() const { return materialData_->enableLighting != 0; }
-	void SetMaterialEnabled(bool enable) { materialData_->enableLighting = enable; }
-	void SetMaterialSpecularEnabled(bool enable) { materialData_->enableSpecular = enable; }
-	void SetMaterialHalfVectorEnabled(bool enable) { materialData_->isHalfVector = enable; }
 private:
-	// マテリアルデータ
-	struct Material {
-		Vector4 color;
-		int32_t enableLighting;
-		float padding[3];
-		Matrix4x4 uvTransform;
-		float shininess;
-		bool enableSpecular;
-		bool isHalfVector;
-	};
 
 	struct CameraForGPU {
 		Vector3 worldPosition;
-		//float padding[3];
 	};
-	// マテリアルのリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
-	Material* materialData_ = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
 	CameraForGPU* cameraData_ = nullptr;
@@ -136,18 +103,16 @@ private:
 	// 外部からのポインタ
 	Object3dCommon* object3dCommon_ = nullptr;
 	Model* model_ = nullptr;
-	//Camera* camera_ = nullptr;
 
-	// テクスチャ左上座標
-	Vector2 textureLeftTop_ = { 0.0f,0.0f };
-	// テクスチャ切り出しサイズ
-	Vector2 textureSize_ = { 64.0f,64.0f };
 
-	// アンカーポイント
-	Vector3 anchorPoint_ = { 0.5f,0.5f,0.5f };
-	// 左右フリップ
-	bool isFlipX_ = false;
-	// 上下フリップ
-	bool isFlipY_ = false;
+	uint32_t queryIndex_ = 0;
+
+	std::unique_ptr<MaterialColor> materialColor_;
+	std::unique_ptr<MaterialLighting> materialLighting_;
+	std::unique_ptr<MaterialUV> materialUV_;
+
+	// デフォルトのモデルパス
+	static const std::string defaultModelPath_; 
+
 };
 

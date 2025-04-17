@@ -41,6 +41,7 @@ public:
 	void OnEnterCollision(BaseCollider* self, BaseCollider* other) override;
 	void OnCollision(BaseCollider* self, BaseCollider* other) override;
 	void OnExitCollision(BaseCollider* self, BaseCollider* other) override;
+	void OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir) override;
 	void MapChipOnCollision(const CollisionInfo& info) override;
 
 	/// <summary>
@@ -56,7 +57,8 @@ public:
 	/// <summary>
 	/// 位置設定
 	/// </summary>
-	void SetTranslate(Vector3 pos);
+	void SetTranslate(const Vector3& pos) override;
+	Vector3 GetTranslate() const override { return worldTransform_.translation_; }
 
 	/// <summary>
 	/// プレイヤーのセット
@@ -64,6 +66,19 @@ public:
 	/// <param name="player"></param>
 	void SetPlayer(Player* player) { player_ = player; }
 
+	void SetMoveSpeed(float speed) { defaultSpeed_ = speed; }
+	float GetMoveSpeed() const override { return defaultSpeed_; }
+	
+
+	
+
+	float GetFallSpeed() const override { return velocity_.y; }
+	void SetFallSpeed(float speed) override { velocity_.y = speed; }
+
+
+	const char* GetTypeName() const override {
+		return "Drop";
+	}
 
 private:
 
@@ -95,7 +110,7 @@ private:
 	float speed_ = defaultSpeed_;
 	bool isMove_ = false;
 	bool isInversion_ = false;
-
+	float fallSpeed_;
 	/*=======================================================
 
 							プレイヤー
@@ -105,4 +120,9 @@ private:
 	// マップチップとの当たり判定
 	MapChipCollision mpCollision_;
 	MapChipCollision::ColliderRect colliderRect_;
+
+
+
+
+	static bool isHit;
 };

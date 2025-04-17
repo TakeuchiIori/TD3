@@ -1,0 +1,38 @@
+{
+    "anchorPoint": {
+        "x": 0.0,
+        "y": 0.0
+    },
+    "color": {
+        "a": 1.0,
+        "b": 1.0,
+        "g": 1.0,
+        "r": 1.0
+    },
+    "flipX": false,
+    "flipY": false,
+    "name": "KeyBoard_0",
+    "position": {
+        "x": 1000.0,
+        "y": 445.0,
+        "z": 0.0
+    },
+    "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "scale": {
+        "x": 100.0,
+        "y": 100.0
+    },
+    "textureLeftTop": {
+        "x": 0.0,
+        "y": 0.0
+    },
+    "texturePath": "./Resources/Textures/Option/Qkey.png",
+    "textureSize": {
+        "x": 100.0,
+        "y": 100.0
+    }
+}

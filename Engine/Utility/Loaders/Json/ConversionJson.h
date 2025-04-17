@@ -7,6 +7,7 @@
 #include <string>
 #include "Vector2.h"
 #include "Vector3.h"
+#include "Vector4.h"
 #include "Quaternion.h"
 
 using json = nlohmann::json;
@@ -150,6 +151,21 @@ inline void from_json(const json& j, Vector3& v)
     j.at("y").get_to(v.y);
     j.at("z").get_to(v.z);
 }
+
+
+inline void to_json(json& j, const Vector4& v)
+{
+    j = json{ {"x", v.x}, {"y", v.y}, {"z", v.z},{"w", v.w} };
+}
+
+inline void from_json(const json& j, Vector4& v)
+{
+    j.at("x").get_to(v.x);
+    j.at("y").get_to(v.y);
+    j.at("z").get_to(v.z);
+    j.at("w").get_to(v.w);
+}
+
 
 inline void to_json(json& j, const Quaternion& q)
 {

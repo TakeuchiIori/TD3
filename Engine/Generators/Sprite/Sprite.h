@@ -24,6 +24,7 @@ public: // 構造体
 		Vector4 position;
 		Vector2 texcoord;
 		Vector3 normal;
+		Vector4 color;
 	};
 
 	// マテリアルデータ
@@ -33,6 +34,11 @@ public: // 構造体
 		float padding[3];
 		Matrix4x4 uvTransform;
 	};
+
+	Vector2 uvTranslate_ = { 0.0f,0.0f };
+	Vector2 uvScale_ = { 1.0f,1.0f };
+	float uvRotate_ = 0.0f;
+
 
 	// 座標変換データ
 	struct TransformationMatrix {
@@ -101,94 +107,109 @@ private: // メンバ関数
 	void TransformResource();
 
 
+	void UpdateUVMatrix();
+
+
 
 
 public: // アクセッサ
 
-	/*===============================================//
-						  座標
-	//===============================================*/
 	const Vector3& GetPosition()const { return position_; }
 	void SetPosition(const Vector3& position) { position_ = position; }
 
-	/*===============================================//
-						  回転
-	//===============================================*/
 	Vector3 GetRotation()const { return rotation_; }
 	void SetRotation(Vector3 rotation) { rotation_ = rotation; }
 
-	/*===============================================//
-						  拡縮
-	//===============================================*/
 	const Vector2& GetSize() { return size_; }
 	void SetSize(const Vector2& size) { size_ = size; }
 
-	/*===============================================//
-					　	 色を変更
-	//===============================================*/
 	const Vector4& GetColor()const { return materialData_->color; }
 	void SetColor(const Vector4& color) { materialData_->color = color; }
-
-	/*===============================================//
-				　		アルファ値の変更
-	//===============================================*/
-
 	void SetAlpha(const float& alpha) { materialData_->color.w = alpha; }
 
-	/*===============================================//
-					　アンカーポイント
-	//===============================================*/
-	// getter
+
 	const Vector2& GetAnchorPoint()const { return anchorPoint_; }
-	// setter
 	void SetAnchorPoint(const Vector2& anchorPoint) { this->anchorPoint_ = anchorPoint; }
 
-	/*===============================================//
-					　    フリップ
-	//===============================================*/
-	// getter
+
 	const bool& GetIsFlipX()const { return isFlipX_; }
 	const bool& GetIsFlipY()const { return isFlipY_; }
-	// setter
 	void SetIsFlipX(const bool& isFlipX) { this->isFlipX_ = isFlipX; }
 	void SetIsFlipY(const bool& isFlipY) { this->isFlipY_ = isFlipY; }
 
-	/*===============================================//
-					　テクスチャ範囲指定
-	//===============================================*/
-	// getter
+
 	const Vector2& GetTextureLeftTop() const { return textureLeftTop_; }
 	const Vector2& GetTextureSize() const { return textureSize_; }
-	// setter
 	void SetTextureLeftTop(const Vector2& textureLeftTop) { this->textureLeftTop_ = textureLeftTop; }
 	void SetTextureSize(const Vector2& textureSize) { this->textureSize_ = textureSize; }
-	// SrvManagerのセッター
-	void SetSrvManager(SrvManager* srvManager) { this->srvManagaer_ = srvManager; }
 
+	/// <summary>
+	/// UV矩形を設定（左上 + サイズ）
+	/// </summary>
+	void SetUVRect(const Vector2& leftTop, const Vector2& size) {
+		textureLeftTop_ = leftTop;
+		textureSize_ = size;
+	}
+
+	/// <summary>
+	/// アンカーポイントを変更しつつ、見た目の位置を維持する
+	/// </summary>
+	void SetAnchorPointFixPosition(const Vector2& newAnchor);
+	void SetUVRectRatio(const Vector2& leftTopRatio, const Vector2& sizeRatio);
+
+	/// <summary>
+	/// UV矩形を取得（左上 + サイズ）
+	/// </summary>
+	std::pair<Vector2, Vector2> GetUVRect() const {
+		return { textureLeftTop_, textureSize_ };
+	}
+
+	void SetSrvManager(SrvManager* srvManager) { this->srvManagaer_ = srvManager; }
 	void SetCamera(Camera* camera) { this->camera_ = camera; }
+	void SetTextureFilePath(const std::string& filePath) { this->filePath_ = filePath; }
+	std::string GetTextureFilePath() { return filePath_; }
+
+	/// <summary>
+	/// 上下の頂点カラーを設定（グラデーション）
+	/// </summary>
+	void SetGradientColor(const Vector4& bottom, const Vector4& top) {
+		bottomColor_ = bottom;
+		topColor_ = top;
+	}
+
+	void SetGradientFillRatio(float ratio) {
+		ratio_ = std::clamp(ratio, 0.0f, 1.0f);
+	}
+	
+	// UVオフセット（移動）
+	const Vector2& GetUVTranslate() const { return uvTranslate_; }
+	void SetUVTranslate(const Vector2& uvTranslate) { uvTranslate_ = uvTranslate; }
+
+	// UVスケール（拡大縮小）
+	const Vector2& GetUVScale() const { return uvScale_; }
+	void SetUVScale(const Vector2& uvScale) { uvScale_ = uvScale; }
+
+	// UV回転
+	float GetUVRotate() const { return uvRotate_; }
+	void SetUVRotate(float uvRotate) { uvRotate_ = uvRotate; }
+
+
 
 private: // メンバ変数
 
 	SpriteCommon* spriteCommon_ = nullptr;
 	SrvManager* srvManagaer_;
 	Camera* camera_;
-	/*===============================================//
-						Resouurces
-	//===============================================*/
 
-	// 頂点
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 
-	// インデックス
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
 
-	// マテリアル
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	Material* materialData_ = nullptr;
 
-	// 座標変換
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
 	TransformationMatrix* transformationMatrixData_ = nullptr;
 
@@ -205,7 +226,7 @@ private: // メンバ変数
 
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
-	// テクスチャ番号
+
 	uint32_t textureIndex_ = 0;
 	std::string filePath_;
 
@@ -219,7 +240,6 @@ private: // メンバ変数
 	Vector3 rotation_ = { 0.0f,0.0f,0.0f };
 	Vector2 size_ = { 100.0f,100.0f };
 	const float numVertices_ = 6.0f;
-
 	// アンカーポイント
 	Vector2 anchorPoint_ = { 0.0f,0.0f };
 
@@ -228,6 +248,10 @@ private: // メンバ変数
 	// 上下フリップ
 	bool isFlipY_ = false;
 
+	Vector4 bottomColor_ = { 1.0f, 1.0f, 1.0f, 1.0f };
+	Vector4 topColor_ = { 0.0f, 0.0f, 0.0f, 1.0f };
+public:
 	EulerTransform transform_;
+	float ratio_ = 1.0f; 
 };
 

@@ -6,6 +6,7 @@
 
 // Engine
 #include "Collision/AABB/AABBCollider.h"
+#include "Collision/Core/CollisionDirection.h"
 #include "Loaders/Json/JsonManager.h"
 #include <memory>
 #include <WorldTransform/WorldTransform.h>
@@ -76,7 +77,7 @@ public:
 	void OnEnterCollision(BaseCollider* self, BaseCollider* other);
 	void OnCollision(BaseCollider* self, BaseCollider* other);
 	void OnExitCollision(BaseCollider* self, BaseCollider* other);
-
+	void OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir);
 
 private:
 	void ExtendUpdate();
@@ -93,6 +94,20 @@ public:
 
 	float GetLength() { return Length(endPos_ - startPos_); }
 
+	void SetIsInvincible(bool isInvincible = false) { isPlayerInvincible_ = isInvincible; }
+
+	bool IsTakeDamage() 
+	{
+		if (isTakeDamage_)
+		{
+			isTakeDamage_ = false;
+			return true;
+		}
+		return false;
+	}
+
+	void SetColor(Vector3 color){ obj_->SetMaterialColor(color); }
+
 private:
 	Vector3 verticalGrowthScale_ = { 1.0f,0.0f,1.0f };
 	Vector3 horizontalGrowthScale_ = { 0.0f,1.0f,1.0f };
@@ -105,9 +120,12 @@ private:
 
 	std::shared_ptr<AABBCollider> aabbCollider_;
 
-	std::unique_ptr<JsonManager> jsonManager_;
-	std::unique_ptr<JsonManager> jsonCollider_;
+	//std::unique_ptr<JsonManager> jsonManager_;
+	//std::unique_ptr<JsonManager> jsonCollider_;
 
+	bool isPlayerInvincible_ = false;
+
+	bool isTakeDamage_ = false;
 
 	static int count_;    // 現在のインスタンス数
 	int id_;              // 各インスタンスのID

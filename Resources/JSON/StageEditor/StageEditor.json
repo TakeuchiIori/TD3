@@ -1,0 +1,69 @@
+{
+    "stages": [
+        {
+            "checkPoints": [
+                {
+                    "checkPointNumber": 0,
+                    "height": 102.0,
+                    "objects": [
+                        {
+                            "id": 0,
+                            "position": {
+                                "x": 25.0,
+                                "y": 25.0,
+                                "z": 0.0
+                            }
+                        },
+                        {
+                            "id": 0,
+                            "position": {
+                                "x": 5.0,
+                                "y": 50.0,
+                                "z": 0.0
+                            }
+                        }
+                    ]
+                },
+                {
+                    "checkPointNumber": 1,
+                    "height": 152.0,
+                    "objects": [
+                        {
+                            "id": 0,
+                            "position": {
+                                "x": 7.5,
+                                "y": 8.899999618530273,
+                                "z": 0.0
+                            }
+                        },
+                        {
+                            "id": 0,
+                            "position": {
+                                "x": 20.0,
+                                "y": 35.0,
+                                "z": 0.0
+                            }
+                        },
+                        {
+                            "id": 0,
+                            "position": {
+                                "x": 10.0,
+                                "y": 70.0,
+                                "z": 0.0
+                            }
+                        },
+                        {
+                            "id": 0,
+                            "position": {
+                                "x": 18.0,
+                                "y": 90.0,
+                                "z": 0.0
+                            }
+                        }
+                    ]
+                }
+            ],
+            "stageNumber": 0
+        }
+    ]
+}

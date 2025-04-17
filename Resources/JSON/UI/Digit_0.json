@@ -1,0 +1,48 @@
+{
+    "anchorPoint": {
+        "x": 0.0,
+        "y": 0.0
+    },
+    "color": {
+        "a": 1.0,
+        "b": 1.0,
+        "g": 1.0,
+        "r": 1.0
+    },
+    "flipX": false,
+    "flipY": false,
+    "name": "Digit_0",
+    "position": {
+        "x": 320.0,
+        "y": 591.0,
+        "z": 0.0
+    },
+    "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "scale": {
+        "x": 32.0,
+        "y": 65.0
+    },
+    "textureLeftTop": {
+        "x": 0.0,
+        "y": 0.0
+    },
+    "texturePath": "./Resources/Textures/Number/number.png",
+    "textureSize": {
+        "x": 64.0,
+        "y": 128.0
+    },
+    "uvRect": {
+        "leftTop": {
+            "x": 0.0,
+            "y": 0.0
+        },
+        "size": {
+            "x": 64.0,
+            "y": 128.0
+        }
+    }
+}

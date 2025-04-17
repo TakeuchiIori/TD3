@@ -14,9 +14,33 @@
 #include "../Sphere/SphereCollider.h"
 #include "../AABB/AABBCollider.h"
 #include "../OBB/OBBCollider.h"
+#include "CollisionDirection.h"
 #include <set>
 
+/// <summary>
+/// ヒット方向（ビット列で複数持てるように）
+/// </summary>
+enum HitDirectionFlags {
+	HitDirection_None = 0,
+	HitDirection_Top = 1 << 0,
+	HitDirection_Bottom = 1 << 1,
+	HitDirection_Left = 1 << 2,
+	HitDirection_Right = 1 << 3,
+	HitDirection_Front = 1 << 4,
+	HitDirection_Back = 1 << 5,
+};
+using HitDirectionBits = uint32_t;
+
 namespace Collision {
+
+
+	/////////////////////////////////////////////////////////////////////
+	//
+	// 
+	//							衝突チェック
+	//
+	//
+	/////////////////////////////////////////////////////////////////////
 
 	// Sphere - Sphere
 	bool Check(const SphereCollider* a, const SphereCollider* b);
@@ -42,14 +66,44 @@ namespace Collision {
 	// Base - Base
 	bool Check(BaseCollider* a, BaseCollider* b);
 
+	/////////////////////////////////////////////////////////////////////
+	//
+	// 
+	//						衝突方向のチェック
+	//
+	//
+	/////////////////////////////////////////////////////////////////////
+
+	// AABB - AABB
+	bool CheckHitDirection(const AABB& a, const AABB& b, HitDirection* hitDirection);
+
+	// AABB - OBB
+	bool CheckHitDirection(const AABB& aabb, const OBB& obb, HitDirection* hitDirection);
+
+	// OBB - OBB
+	bool CheckHitDirection(const OBB& obbA, const OBB& obbB, HitDirection* hitDirection);
+
+	HitDirection ConvertVectorToHitDirection(const Vector3& dir);
+
+	HitDirection InverseHitDirection(HitDirection hitdirection);
+
+	HitDirection GetSelfLocalHitDirection(BaseCollider* self, BaseCollider* other);
+
+	HitDirectionBits GetSelfLocalHitDirectionFlags(BaseCollider* self, BaseCollider* other, float threshold);
+
+	HitDirectionBits GetSelfLocalHitDirectionsSimple(BaseCollider* self, BaseCollider* other);
+
 }
+
+
+
 
 class CollisionManager {
 public: // 基本的な関数
 
 	/// <summary>
-    /// シングルトンインスタンスの取得
-    /// </summary>
+	/// シングルトンインスタンスの取得
+	/// </summary>
 	static CollisionManager* GetInstance();
 
 	// コンストラクタ
@@ -57,7 +111,7 @@ public: // 基本的な関数
 	CollisionManager() = default;
 	~CollisionManager();
 
-	
+
 	/// <summary>
 	/// 初期化
 	/// </summary>

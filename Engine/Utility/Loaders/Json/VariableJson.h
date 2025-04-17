@@ -59,7 +59,7 @@ public:
     void ShowImGui(const std::string& name, const std::string& uniqueID) override
     {
 #ifdef _DEBUG
-        std::string label = name + "##" + uniqueID;  // ユニークなIDを付ける
+        std::string label = name + "##" + uniqueID;  // IDを付ける
 
         if constexpr (std::is_same_v<T, int>)
         {
@@ -76,7 +76,7 @@ public:
         else if constexpr (std::is_same_v<T, std::string>)
         {
             char buffer[256];
-            strncpy(buffer, ptr_->c_str(), sizeof(buffer));
+            strncpy_s(buffer, ptr_->c_str(), sizeof(buffer));
             buffer[sizeof(buffer) - 1] = '\0';
             if (ImGui::InputText(label.c_str(), buffer, sizeof(buffer)))
             {
@@ -90,6 +90,9 @@ public:
         else if constexpr (std::is_same_v<T, Vector3>)
         {
             ImGui::DragFloat3(label.c_str(), reinterpret_cast<float*>(ptr_), 0.1f);
+        } else if constexpr (std::is_same_v<T, Vector4>)
+        {
+            ImGui::DragFloat4(label.c_str(), reinterpret_cast<float*>(ptr_), 0.1f);
         }
         else if constexpr (std::is_same_v<T, Quaternion>)
         {

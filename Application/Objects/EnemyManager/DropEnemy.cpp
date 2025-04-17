@@ -1,9 +1,14 @@
 #include "DropEnemy.h"
 #include "../Player/Player.h"
+#include "Easing.h"
+
+#include "Collision/Core/CollisionManager.h"
+
+bool::DropEnemy::isHit = false;
 
 DropEnemy::~DropEnemy()
 {
-	aabbCollider_->~AABBCollider();
+	obbCollider_->~OBBCollider();
 }
 
 void DropEnemy::Initialize(Camera* camera)
@@ -12,7 +17,7 @@ void DropEnemy::Initialize(Camera* camera)
 
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("cube.obj");
+	obj_->SetModel("bard.obj");
 	obj_->SetMaterialColor({ 1.0f,1.0f,1.0f,1.0f });
 
 	worldTransform_.Initialize();
@@ -23,7 +28,7 @@ void DropEnemy::Initialize(Camera* camera)
 
 void DropEnemy::InitCollision()
 {
-	aabbCollider_ = ColliderFactory::Create<AABBCollider>(
+	obbCollider_ = ColliderFactory::Create<OBBCollider>(
 		this,
 		&worldTransform_,
 		camera_,
@@ -43,11 +48,14 @@ void DropEnemy::InitJson()
 void DropEnemy::Update()
 {
 	if (!isAlive_) {
-		aabbCollider_->~AABBCollider();
+		obbCollider_->~OBBCollider();
 		return;
 	}
 
-	Move();
+	if (!IsStop()) // 攻撃を食らったら次まで気絶
+	{
+		Move();
+	}
 
 
 	Vector3 newPos = worldTransform_.translation_ + velocity_;
@@ -63,7 +71,7 @@ void DropEnemy::Update()
 	);
 	worldTransform_.translation_ = newPos;
 	worldTransform_.UpdateMatrix();
-	aabbCollider_->Update();
+	obbCollider_->Update();
 }
 
 void DropEnemy::Draw()
@@ -73,15 +81,14 @@ void DropEnemy::Draw()
 
 void DropEnemy::DrawCollision()
 {
-	aabbCollider_->Draw();
+	obbCollider_->Draw();
 }
 
 void DropEnemy::OnEnterCollision(BaseCollider* self, BaseCollider* other) {
 
 	// プレイヤーの期間中は跳ね返るだけでダメージ無し
 	if ((other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) ||
-		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody)) &&
-		player_->behavior_ == BehaviorPlayer::Return)
+		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody)))
 	{
 		isInversion_ = isInversion_ ? false : true;
 	}
@@ -92,7 +99,6 @@ void DropEnemy::OnCollision(BaseCollider* self, BaseCollider* other) {
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer) ||
 		other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody))
 	{
-		//isAlive_ = false;
 	}
 }
 
@@ -100,6 +106,33 @@ void DropEnemy::OnExitCollision(BaseCollider* self, BaseCollider* other) {
 
 
 }
+void DropEnemy::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
+{
+	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+	{
+		if (player_->behavior_ == BehaviorPlayer::Boost)
+		{
+			isHit = true;
+			TakeAttack();
+		}
+		HitDirection selfDir = Collision::GetSelfLocalHitDirection(self, other);
+		HitDirection otherDir = Collision::GetSelfLocalHitDirection(other, self);
+
+		if (player_->behavior_ == BehaviorPlayer::Moving)
+		{
+			if (selfDir != HitDirection::None && !isHit)
+			{
+				isHit = true;
+				if (selfDir != HitDirection::Back)
+				{
+					isTakeAttack_ = true;
+					TakeAttack();
+				}
+			}
+		}
+	}
+}
+
 void DropEnemy::MapChipOnCollision(const CollisionInfo& info) {
 	switch (info.blockType) {
 	case MapChipType::kBlock:
@@ -121,12 +154,25 @@ void DropEnemy::MapChipOnCollision(const CollisionInfo& info) {
 
 void DropEnemy::Move()
 {
+	// ターゲット回転角度（X軸を使って上下向きに傾ける）
+	float targetRotationX = isInversion_
+		? DirectX::XMConvertToRadians(90.0f)  // 上に向かうとき
+		: DirectX::XMConvertToRadians(-90.0f);  // 下に向かうとき
+
+	// 補間して自然な回転にする
+	float t = 0.7f;
+	t = Easing::easeInExpo(t);
+	worldTransform_.rotation_.x = Lerp(worldTransform_.rotation_.x, targetRotationX, t);
+
+	// 落下処理
 	constexpr float gravity = -0.16f;
 	constexpr float terminalVelocity = -0.05f;
 
 	velocity_.y += gravity;
+
+	// 上下の向きに応じて速度制限
 	if (velocity_.y < terminalVelocity) {
-		velocity_.y = (isInversion_ ? -terminalVelocity : terminalVelocity);
+		velocity_.y = isInversion_ ? -terminalVelocity : terminalVelocity;
 	}
 }
 
@@ -150,7 +196,7 @@ Vector3 DropEnemy::GetCenterPosition() const
 	};
 }
 
-void DropEnemy::SetTranslate(Vector3 pos)
+void DropEnemy::SetTranslate(const Vector3& pos)
 {
 	worldTransform_.translation_ = pos;
 }

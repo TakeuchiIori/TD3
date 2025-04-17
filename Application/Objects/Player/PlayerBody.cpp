@@ -30,6 +30,7 @@ void PlayerBody::Initialize(Camera* camera)
 
 	InitCollision();
 	InitJson();
+	aabbCollider_->checkOutsideCamera = false;
 }
 
 void PlayerBody::InitCollision()
@@ -44,17 +45,20 @@ void PlayerBody::InitCollision()
 
 void PlayerBody::InitJson()
 {
-	jsonManager_ = std::make_unique<JsonManager>("playerBodyObj", "Resources/JSON/");
+	//jsonManager_ = std::make_unique<JsonManager>("playerBodyObj", "Resources/JSON/");
 
-	jsonCollider_ = std::make_unique<JsonManager>("playerBodyCollider", "Resources/JSON/");
-	//SphereCollider::InitJson(jsonCollider_.get());
-	aabbCollider_->InitJson(jsonCollider_.get());
+	//jsonCollider_ = std::make_unique<JsonManager>("playerBodyCollider", "Resources/JSON/");
+	////SphereCollider::InitJson(jsonCollider_.get());
+	//aabbCollider_->InitJson(jsonCollider_.get());
 }
 
 void PlayerBody::Update()
 {
 	worldTransform_.UpdateMatrix();
 	ExtendUpdate();
+	obj_->uvScale = { worldTransform_.scale_.x, worldTransform_.scale_.y };
+	// ↓上左ok
+	//obj_->uvTranslate = { -(worldTransform_.scale_.x - 1.0f), -(worldTransform_.scale_.y - 1.0f) };
 
 	aabbCollider_->Update();
 
@@ -85,7 +89,6 @@ void PlayerBody::UpExtend()
 {
 	worldTransform_.anchorPoint_ = { 0.0f,-1.0f,0.0f };
 	worldTransform_.scale_ = verticalGrowthScale_;
-	//worldTransform_.translation_.y -= 1.0f;
 	extendDirection_ = ExtendDirection::Up;
 }
 
@@ -93,7 +96,6 @@ void PlayerBody::LeftExtend()
 {
 	worldTransform_.anchorPoint_ = { 1.0f,0.0f,0.0f };
 	worldTransform_.scale_ = horizontalGrowthScale_;
-	//worldTransform_.translation_.x += 1.0f;
 	extendDirection_ = ExtendDirection::Left;
 }
 
@@ -101,7 +103,6 @@ void PlayerBody::RightExtend()
 {
 	worldTransform_.anchorPoint_ = { -1.0f,0.0f,0.0f };
 	worldTransform_.scale_ = horizontalGrowthScale_;
-	//worldTransform_.translation_.x -= 1.0f;
 	extendDirection_ = ExtendDirection::Right;
 }
 
@@ -109,12 +110,18 @@ void PlayerBody::DownExtend()
 {
 	worldTransform_.anchorPoint_ = { 0.0f,1.0f,0.0f };
 	worldTransform_.scale_ = verticalGrowthScale_;
-	//worldTransform_.translation_.y += 1.0f;
 	extendDirection_ = ExtendDirection::Down;
 }
 
 void PlayerBody::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
+	if (!isPlayerInvincible_)
+	{
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy)) // 敵なら
+		{
+			isTakeDamage_ = true;
+		}
+	}
 }
 
 void PlayerBody::OnCollision(BaseCollider* self, BaseCollider* other)
@@ -122,6 +129,10 @@ void PlayerBody::OnCollision(BaseCollider* self, BaseCollider* other)
 }
 
 void PlayerBody::OnExitCollision(BaseCollider* self, BaseCollider* other)
+{
+}
+
+void PlayerBody::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
 {
 }
 

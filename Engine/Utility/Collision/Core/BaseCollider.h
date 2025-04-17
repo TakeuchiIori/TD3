@@ -7,7 +7,7 @@
 #include "Systems/Camera/Camera.h"
 #include "../Graphics/Drawer/LineManager/Line.h"
 #include "Loaders/Json/JsonManager.h"
-
+#include "CollisionDirection.h"
 // Math
 #include "Vector3.h"
 #include "Matrix4x4.h"
@@ -26,6 +26,7 @@ protected:
 public:
 
 	using CollisionCallback = std::function<void(BaseCollider* self, BaseCollider* other)>;
+	using DirectionalCollisionCallback = std::function<void(BaseCollider* self, BaseCollider* other, HitDirection dir)>;
 	virtual ~BaseCollider();
 
 	/*=======================================================
@@ -36,6 +37,7 @@ public:
 	void SetOnEnterCollision(CollisionCallback cb) { enterCallback_ = cb; }
 	void SetOnCollision(CollisionCallback cb) { collisionCallback_ = cb; }
 	void SetOnExitCollision(CollisionCallback cb) { exitCallback_ = cb; }
+	void SetOnDirectionCollision(DirectionalCollisionCallback cb) { directionCallback_ = cb; }
 
 	void CallOnEnterCollision(BaseCollider* other) {
 		if (enterCallback_) enterCallback_(this, other);
@@ -46,6 +48,10 @@ public:
 	void CallOnExitCollision(BaseCollider* other) {
 		if (exitCallback_) exitCallback_(this, other);
 	}
+	void CallOnDirectionCollision(BaseCollider* other, HitDirection dir) {
+		if (directionCallback_) directionCallback_(this, other,dir);
+	}
+
 
 	/*=======================================================
 
@@ -111,6 +117,12 @@ public:
 	bool IsCollisionEnabled() const { return isCollisionEnabled_; }
 
 	/// <summary>
+	/// カメラ外の判定
+	/// </summary>
+	/// <returns></returns>
+	bool IsCheckOutsideCamera() const { return checkOutsideCamera; }
+
+	/// <summary>
 	/// 当たり判定そのもの有効フラグ
 	/// </summary>
 	bool GetIsActive() const { return isActive_; }
@@ -133,7 +145,8 @@ protected:
 
 public:
 
-	bool isCollisionEnabled_ = true;		// 当たり判定有効フラグ
+	bool isCollisionEnabled_ = true;		// 当たり判定有効
+	bool checkOutsideCamera = true;			// カメラ外に行ったら判定をしない
 	Camera* camera_ = nullptr;				// カメラ参照（ライン描画用）
 
 private:
@@ -149,4 +162,5 @@ private:
 	CollisionCallback enterCallback_;
 	CollisionCallback collisionCallback_;
 	CollisionCallback exitCallback_;
+	DirectionalCollisionCallback directionCallback_;
 };

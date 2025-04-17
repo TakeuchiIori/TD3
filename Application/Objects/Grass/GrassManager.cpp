@@ -4,7 +4,7 @@ void GrassManager::Initialize(Camera* camera)
 {
 	camera_ = camera;
 
-	PopGrass({ 8.0f,12.0f,0.0f });
+	PopGrass({ 5.f,12.0f,0.0f });
 	PopGrass({ 18.0f,8.0f,0.0f });
 	PopGrass({ 22.0f,16.0f,0.0f });
 	PopGrass({ 19.0f,19.0f,0.0f });
@@ -50,7 +50,7 @@ void GrassManager::hakuGrass(bool pop, Vector3 pos)
 	{
 		for (Vector3 Pos : popPos_) 
 		{
-			PopGrass(Pos, true);
+			PopGrass(Pos);
 		}
 		popPos_.clear();
 		isPop_ = false;

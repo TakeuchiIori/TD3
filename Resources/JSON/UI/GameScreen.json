@@ -24,11 +24,15 @@
     },
     "scale": {
         "x": 352.0,
-        "y": 722.0
+        "y": 721.5
     },
     "textureLeftTop": {
         "x": 0.0,
         "y": 0.0
     },
-    "texturePath": "./Resources/Textures/screen.png"
+    "texturePath": "./Resources/Textures/BackGround/screen.png",
+    "textureSize": {
+        "x": 16.0,
+        "y": 16.0
+    }
 }

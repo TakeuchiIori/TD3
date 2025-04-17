@@ -197,7 +197,7 @@ void Audio::SoundUnload(SoundData* soundData)
     ZeroMemory(&soundData->wfex, sizeof(WAVEFORMATEX));
 }
 
-IXAudio2SourceVoice* Audio::SoundPlayAudio(const SoundData& soundData)
+IXAudio2SourceVoice* Audio::SoundPlayAudio(const SoundData& soundData,bool isLoop)
 {
     HRESULT hr;
 
@@ -211,6 +211,10 @@ IXAudio2SourceVoice* Audio::SoundPlayAudio(const SoundData& soundData)
     buf.pAudioData = soundData.pBuffer;
     buf.AudioBytes = soundData.bufferSize;
     buf.Flags = XAUDIO2_END_OF_STREAM;
+
+    if (isLoop) {
+        buf.LoopCount = XAUDIO2_LOOP_INFINITE;
+    }
 
     // バッファの送信
     hr = pSourceVoice->SubmitSourceBuffer(&buf);

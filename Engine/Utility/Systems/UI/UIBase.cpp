@@ -62,10 +62,6 @@ void UIBase::Update() {
         sprite_->Update();
     }
 
-#ifdef _DEBUG
-    ImGUi();
-#endif // _DEBUG
-
 }
 
 void UIBase::Draw() {
@@ -92,7 +88,7 @@ void UIBase::ImGUi() {
     }
 
     // トランスフォーム設定
-    if (ImGui::CollapsingHeader("変形", ImGuiTreeNodeFlags_DefaultOpen)) {
+    if (ImGui::CollapsingHeader("トランスフォーム", ImGuiTreeNodeFlags_DefaultOpen)) {
 
         // スケール設定
         Vector2 scale = GetScale();
@@ -117,7 +113,7 @@ void UIBase::ImGUi() {
     }
 
     // 外観設定
-    if (ImGui::CollapsingHeader("外観", ImGuiTreeNodeFlags_DefaultOpen)) {
+    if (ImGui::CollapsingHeader("マテリアル", ImGuiTreeNodeFlags_DefaultOpen)) {
         // 色設定（RGBA）
         Vector4 color = GetColor();
         if (ImGui::ColorEdit4("色", &color.x)) {
@@ -301,12 +297,38 @@ void UIBase::ImGUi() {
             modified = true;
         }
 
+        // テクスチャサイズ設定
+        Vector2 textureSize = sprite_->GetTextureSize();
+        if (ImGui::DragFloat2("テクスチャサイズ", &textureSize.x, 1.0f)) {
+            sprite_->SetTextureSize(textureSize);
+            modified = true;
+        }
+
         // アンカーポイント設定（0.0〜1.0の範囲）
         Vector2 anchor = sprite_->GetAnchorPoint();
         if (ImGui::DragFloat2("アンカーポイント", &anchor.x, 0.01f, 0.0f, 1.0f)) {
-            sprite_->SetAnchorPoint(anchor);
+            sprite_->SetAnchorPointFixPosition(anchor); 
             modified = true;
         }
+
+        // UV矩形（左上＋サイズ）
+        if (ImGui::CollapsingHeader("UV矩形", ImGuiTreeNodeFlags_DefaultOpen)) {
+            auto uv = GetUVRect();
+            Vector2 leftTop = uv.first;
+            Vector2 size = uv.second;
+
+            if (ImGui::DragFloat2("UV左上", &leftTop.x, 1.0f)) {
+                SetUVRect(leftTop, size);
+                modified = true;
+            }
+
+            if (ImGui::DragFloat2("UVサイズ", &size.x, 1.0f)) {
+                SetUVRect(leftTop, size);
+                modified = true;
+            }
+        }
+
+
     }
 
     // ホットリロード設定
@@ -554,6 +576,112 @@ bool UIBase::GetFlipY() const {
     return false;
 }
 
+void UIBase::SetTextureLeftTop(const Vector2& leftTop) {
+    if (sprite_) {
+        sprite_->SetTextureLeftTop(leftTop);
+    }
+}
+
+Vector2 UIBase::GetTextureLeftTop() const {
+    if (sprite_) {
+        return sprite_->GetTextureLeftTop();
+    }
+    return { 0.0f, 0.0f };
+}
+
+void UIBase::SetTextureSize(const Vector2& size) {
+    if (sprite_) {
+        sprite_->SetTextureSize(size);
+    }
+}
+
+Vector2 UIBase::GetTextureSize() const {
+    if (sprite_) {
+        return sprite_->GetTextureSize();
+    }
+    return { 1.0f, 1.0f };
+}
+
+void UIBase::SetAnchorPoint(const Vector2& anchor) {
+    if (sprite_) {
+        sprite_->SetAnchorPoint(anchor);
+    }
+}
+
+Vector2 UIBase::GetAnchorPoint() const {
+    if (sprite_) {
+        return sprite_->GetAnchorPoint();
+    }
+    return { 0.0f, 0.0f };
+}
+
+void UIBase::SetUVRect(const Vector2& leftTop, const Vector2& size) {
+    if (sprite_) {
+        sprite_->SetUVRect(leftTop, size);
+    }
+}
+
+std::pair<Vector2, Vector2> UIBase::GetUVRect() const {
+    if (sprite_) {
+        return sprite_->GetUVRect();
+    }
+    return { {0.0f, 0.0f}, {1.0f, 1.0f} };
+}
+
+/// <summary>
+/// 上から下に向かってゲージが減っていくようにUVと描画サイズを調整
+/// </summary>
+void UIBase::SetVerticalGaugeRatio(float ratio) {
+    if (!sprite_) return;
+
+    ratio = std::clamp(ratio / 2, 0.0f, 1.0f);
+
+    // 初期値（必要なら保存しておく）
+    Vector2 baseUV = sprite_->GetTextureLeftTop();
+    Vector2 baseSize = sprite_->GetTextureSize();
+    Vector2 drawSize = sprite_->GetSize();
+    Vector3 position = sprite_->GetPosition();
+
+    // 新しいUVとサイズ
+    Vector2 newSize = { baseSize.x, baseSize.y * ratio };
+    Vector2 newLeftTop = { baseUV.x, baseUV.y + (baseSize.y * (1.0f - ratio)) };
+    sprite_->SetUVRect(newLeftTop, newSize);
+
+    Vector2 newDrawSize = { drawSize.x, drawSize.y * ratio };
+    sprite_->SetSize(newDrawSize);
+
+    // 上詰めのために位置を下げる
+    Vector3 newPos = position;
+    newPos.y += (drawSize.y * (1.0f - ratio)) * 0.5f;
+    sprite_->SetPosition(newPos);
+}
+
+void UIBase::SetAnchorPointFixPosition(const Vector2& newAnchor) {
+    if (!sprite_) return;
+
+    Vector2 oldAnchor = sprite_->GetAnchorPoint();
+    Vector2 size = sprite_->GetSize();
+
+    // アンカー差分によるオフセット
+    Vector2 offset = {
+        (newAnchor.x - oldAnchor.x) * size.x,
+        (newAnchor.y - oldAnchor.y) * size.y
+    };
+
+    Vector3 pos = sprite_->GetPosition();
+    pos.x += offset.x;
+    pos.y += offset.y;
+
+    sprite_->SetAnchorPoint(newAnchor);
+    sprite_->SetPosition(pos);
+}
+
+void UIBase::SetUVRectRatio(const Vector2& leftTopRatio, const Vector2& sizeRatio)
+{
+    if(sprite_)
+		sprite_->SetUVRectRatio(leftTopRatio, sizeRatio);
+}
+
 nlohmann::json UIBase::CreateJSONFromCurrentState() {
     nlohmann::json data;
 
@@ -608,6 +736,24 @@ nlohmann::json UIBase::CreateJSONFromCurrentState() {
             {"y", sprite_->GetAnchorPoint().y}
         };
     }
+
+    // テクスチャサイズ
+    if (sprite_) {
+        data["textureSize"] = {
+            {"x", sprite_->GetTextureSize().x},
+            {"y", sprite_->GetTextureSize().y}
+        };
+    }
+
+    // UV矩形（leftTop + size）
+    if (sprite_) {
+        auto uv = sprite_->GetUVRect();
+        data["uvRect"] = {
+            {"leftTop", { {"x", uv.first.x}, {"y", uv.first.y} }},
+            {"size",    { {"x", uv.second.x}, {"y", uv.second.y} }}
+        };
+    }
+
 
     return data;
 }
@@ -690,19 +836,31 @@ void UIBase::ApplyJSONToState(const nlohmann::json& data) {
             sprite_->SetTextureLeftTop(leftTop);
         }
 
-        //if (data.contains("textureSize")) {
-        //    Vector2 size;
-        //    size.x = data["textureSize"]["x"];
-        //    size.y = data["textureSize"]["y"];
-        //    //sprite_->SetTextureSize(size);
-        //}
-
         if (data.contains("anchorPoint")) {
             Vector2 anchor;
             anchor.x = data["anchorPoint"]["x"];
             anchor.y = data["anchorPoint"]["y"];
-            sprite_->SetAnchorPoint(anchor);
+            SetAnchorPointFixPosition(anchor);  // UIBase経由で補正付き変更
         }
+
+
+        if (data.contains("textureSize")) {
+            Vector2 size;
+            size.x = data["textureSize"]["x"];
+            size.y = data["textureSize"]["y"];
+            sprite_->SetTextureSize(size);
+        }
+
+        // UV矩形
+        if (data.contains("uvRect")) {
+            Vector2 leftTop, size;
+            leftTop.x = data["uvRect"]["leftTop"]["x"];
+            leftTop.y = data["uvRect"]["leftTop"]["y"];
+            size.x = data["uvRect"]["size"]["x"];
+            size.y = data["uvRect"]["size"]["y"];
+            sprite_->SetUVRect(leftTop, size);
+        }
+
     }
 }
 

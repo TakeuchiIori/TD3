@@ -1,11 +1,23 @@
 #include "Player.h"
 
 #include <cmath>
+#include <algorithm>
+
+#include "Collision/Core/CollisionManager.h"
 
 #ifdef _DEBUG
 #include "imgui.h"
 #include "string"
 #endif // _DEBUG
+
+bool::Player::isHit = false;
+
+Player::~Player()
+{
+	//aabbCollider_->~AABBCollider();
+	obbCollider_->~OBBCollider();
+	nextAabbCollider_->~AABBCollider();
+}
 
 void Player::Initialize(Camera* camera)
 {
@@ -29,7 +41,14 @@ void Player::Initialize(Camera* camera)
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
 	obj_->SetModel("unitCube.obj");
-	obj_->SetMaterialColor({ 0.90625f,0.87109f,0.125f,1.0f });
+	obj_->SetMaterialColor(defaultColorV4_);
+
+	for (size_t i = 0; i < kMaxHP_; ++i)
+	{
+		std::unique_ptr<PlayerHaert> haert = std::make_unique<PlayerHaert>();
+		haert->Initialize(camera_);
+		haerts_.push_back(std::move(haert));
+	}
 	
 
 	/*SphereCollider::SetCamera(BaseObject::camera_);
@@ -39,11 +58,24 @@ void Player::Initialize(Camera* camera)
 	InitJson();
 	//colliderRct_.height = 2.0f;
 	//colliderRct_.width = 2.0f;
+
+	soundData = Audio::GetInstance()->LoadAudio(L"Resources/Audio/Grow.mp3");
+	soundDataBoost = Audio::GetInstance()->LoadAudio(L"Resources/Audio/Boost.mp3");
+	// 音量の設定（0.0f ～ 1.0f）
+	//Audio::GetInstance()->SetVolume(sourceVoice, 0.5f);
+
 }
 
 void Player::InitCollision()
 {
-	aabbCollider_ = ColliderFactory::Create<AABBCollider>(
+	/*aabbCollider_ = ColliderFactory::Create<AABBCollider>(
+		this,
+		&worldTransform_,
+		camera_,
+		static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)
+	);*/
+
+	obbCollider_ = ColliderFactory::Create<OBBCollider>(
 		this,
 		&worldTransform_,
 		camera_,
@@ -61,9 +93,14 @@ void Player::InitCollision()
 void Player::InitJson()
 {
 	jsonManager_ = std::make_unique<JsonManager>("playerObj", "Resources/JSON/");
+	jsonManager_->SetCategory("Objects");
+	jsonManager_->Register("通常時の移動速度",&defaultSpeed_);
+	jsonManager_->Register("ブースト時の速度", &boostSpeed_);
+	jsonManager_->Register("帰還時の速度", &returnSpeed_);
+	jsonManager_->Register("タイマーの限界値", &kTimeLimit_);
 
 	jsonCollider_ = std::make_unique<JsonManager>("playerCollider", "Resources/JSON/");
-	aabbCollider_->InitJson(jsonCollider_.get());
+	//aabbCollider_->InitJson(jsonCollider_.get());
 }
 
 void Player::Update()
@@ -76,21 +113,28 @@ void Player::Update()
 	// 各行動の更新
 	BehaviorUpdate();
 
+	// 草ゲージの更新
+	GrassGaugeUpdate();
+
 	ExtendBody();
 
-	PopGrass();
+	IsPopGrass();
+
+	DamageProcessBodys();
 
 	TimerManager();
 
+	HeartPos();
+
 	UpdateMatrices();
 	
-	aabbCollider_->Update();
+	//aabbCollider_->Update();
+	obbCollider_->Update();
 	nextAabbCollider_->Update();
 	
 #ifdef _DEBUG
 	DebugPlayer();
 #endif // _DEBUG
-
 }
 
 void Player::Draw()
@@ -99,13 +143,24 @@ void Player::Draw()
 	for (const auto& body : playerBodys_) {
 		body->Draw();
 	}
+	for (const auto& body : stuckGrassList_) {
+		body->Draw();
+	}
+	for (size_t i = 0; i < drawCount_; ++i)
+	{
+		haerts_[i]->Draw();
+	}
 }
 
 void Player::DrawCollision()
 {
-	aabbCollider_->Draw();
+	//aabbCollider_->Draw();
+	obbCollider_->Draw();
 	nextAabbCollider_->Draw();
 	for (const auto& body : playerBodys_) {
+		body->DrawCollision();
+	}
+	for (const auto& body : stuckGrassList_) {
 		body->DrawCollision();
 	}
 }
@@ -135,41 +190,62 @@ void Player::MapChipOnCollision(const CollisionInfo& info)
 	}
 }
 
+void Player::Reset()
+{
+	extendTimer_ = 0;
+	boostCoolTimer_ = 0;
+	boostTimer_ = 0;
+	createGrassTimer_ = 0;
+	invincibleTimer_ = 0;
+	playerBodys_.clear();
+	moveHistory_.clear();
+	behaviortRquest_ = BehaviorPlayer::Root;
+}
+
 
 
 
 
 void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
-	if (behavior_ != BehaviorPlayer::Return)
+	if (behavior_ != BehaviorPlayer::Return && self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
 	{
 		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrass)) // 草を食べたら
 		{
-			if (MaxGrass_ > grassGauge_ && createGrassTimer_ <= 0)
+
+			if (kMaxGrassGauge_ > grassGauge_ && createGrassTimer_ <= 0)
 			{
-				if (dynamic_cast<SphereCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.3f)
+				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.1f)
 				{
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
-				} else
+				} 
+				else
 				{
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + largeGrassTime_);
 				}
 				grassGauge_++;
-			}
-			if (MaxGrass_ <= grassGauge_)
-			{
-				grassGauge_ = 0;
-				createGrassTimer_ = kCreateGrassTime_;
-				isCreateGrass_ = true;
+				if (kMaxGrassGauge_ <= grassGauge_)
+				{
+					createGrassTimer_ = kCreateGrassTime_;
+					isCreateGrass_ = true;
+				}
 			}
 		}
 
 
-		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
+		/*if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
 		{
 			TakeDamage();
-		}
+		}*/
 
+
+		if (behavior_ != BehaviorPlayer::Boost)
+		{
+			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kBranch))
+			{
+				TakeDamage();
+			}
+		}
 	}
 }
 
@@ -185,19 +261,92 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 				TakeDamage();
 			}
 		}
+		if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+		{
+			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrowthArea)) // 草の成長エリア
+			{
+				canSpitting_ = true;
+				if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
+				{
+					// 唾を吐く
+					 
+					
+					// オーディオの再生
+					sourceVoice = Audio::GetInstance()->SoundPlayAudio(soundData, false);
+					
+				}
+			}
+		}
 	}
 }
 
 void Player::OnExitCollision(BaseCollider* self, BaseCollider* other)
 {
+	if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+	{
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrowthArea)) // 草の成長エリア
+		{
+			canSpitting_ = false;
+		}
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
+		{
+			isHit = false;
+		}
+	}
+}
+
+
+
+////////////////////////////////////////////////////////////
+//
+//
+// 				こんな感じに使うよっていう例置いとく
+//
+// 
+///////////////////////////////////////////////////////////
+void Player::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
+{
+	if(self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+	{
+		// 敵からダメージ受ける
+		if (behavior_ == BehaviorPlayer::Moving)
+		{
+			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
+			{
+				HitDirection hitDir = Collision::GetSelfLocalHitDirection(self, other);
+				HitDirection otherDir = Collision::GetSelfLocalHitDirection(other, self);
+				if (otherDir != HitDirection::None && !isHit)
+				{
+					isHit = true;
+					if (otherDir == HitDirection::Back)
+					{
+						TakeDamage();
+					}
+					else
+					{
+						Eliminate();
+					}
+				}
+			}
+		}
+	}
 }
 
 void Player::UpdateMatrices()
 {
 	worldTransform_.UpdateMatrix();
 	nextWorldTransform_.UpdateMatrix();
-	for (const auto& body : playerBodys_) {
+	for (const auto& body : playerBodys_) 
+	{
 		body->Update();
+	}
+	for (const auto& body : stuckGrassList_) 
+	{
+		body->Update();
+	}
+	for (const auto& haert : haerts_)
+	{
+		haert->Update();
 	}
 }
 
@@ -270,12 +419,10 @@ void Player::Move()
 
 	moveDirection_ = Normalize(moveDirection_);
 
-	if (isFPSMode_) // カメラをプレイヤー視点にしたとき
+	if(beforeDirection_ == moveDirection_)
 	{
-		moveDirection_ = TransformNormal(moveDirection_, MakeRotateMatrixY(worldTransform_.rotation_.y));
+		velocity_ += moveDirection_ * speed_;
 	}
-
-	velocity_ += moveDirection_ * speed_;
 
 
 	Vector3 newPos = worldTransform_.translation_;
@@ -310,6 +457,7 @@ void Player::Move()
 
 }
 
+#pragma region // 体が伸びる向き決定
 void Player::UpBody()
 {
 	moveDirection_ = { 0,1,0 };
@@ -374,17 +522,35 @@ void Player::RightBody()
 	body->RightExtend();
 	playerBodys_.push_back(std::move(body));
 }
+#pragma endregion
 
 void Player::EntryMove()
 {
-	if (input_->TriggerKey(DIK_SPACE) || 
-		input_->IsPadTriggered(0, GamePadButton::X) || 
-		input_->IsPadTriggered(0, GamePadButton::Start))
+
+	if (input_->IsControllerConnected())
+	{
+	}
+	stick = input_->GetLeftStickInput(0);
+	if (std::abs(stick.x) < threshold && std::abs(stick.y) < threshold) {
+		stick = {};
+	}
+
+	if ((input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP)))
 	{
 		behaviortRquest_ = BehaviorPlayer::Moving;
 		moveDirection_ = { 0,1,0 };
 		extendTimer_ = kTimeLimit_;
 		moveHistory_.push_back(worldTransform_.translation_);
+	}
+	else if (std::abs(stick.x) < std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
+	{
+		if (stick.y > 0)
+		{
+			behaviortRquest_ = BehaviorPlayer::Moving;
+			moveDirection_ = { 0,1,0 };
+			extendTimer_ = kTimeLimit_;
+			moveHistory_.push_back(worldTransform_.translation_);
+		}
 	}
 #ifdef _DEBUG
 #endif // _DEBUG
@@ -418,20 +584,70 @@ void Player::TimerManager()
 	{
 		boostCoolTimer_ -= deltaTime_;
 	}
+	if (0 < boostTimer_)
+	{
+		boostTimer_ -= deltaTime_;
+	}
 	if (0 < createGrassTimer_)
 	{
 		createGrassTimer_ -= deltaTime_;
 	}
 	if (0 < invincibleTimer_)
 	{
+		static int time = 0;
+		if (time > 3)
+		{
+			isRed_ = false;
+			time = 0;
+		}
+
+		if (isRed_)
+		{
+			changeColor_ = { 1,0,0 };
+		}
+		else
+		{
+			if (time == 0)
+			{
+				if(changeColor_ == defaultColorV3_)
+				{
+					changeColor_ = { 1,1,1 };
+				}
+				else
+				{
+					changeColor_ = defaultColorV3_;
+				}
+			}
+		}
+
+		time++;
 		invincibleTimer_ -= deltaTime_;
+
+		if (0 >= invincibleTimer_)
+		{
+			time = 0;
+			changeColor_ = defaultColorV3_;
+		}
+
+		obj_->SetMaterialColor(changeColor_);
+
+		for (const auto& body : playerBodys_) 
+		{
+			body->SetColor(changeColor_);
+		}
 	}
 }
 
-bool Player::PopGrass()
+bool Player::IsPopGrass()
 {
 	if (0 >= createGrassTimer_ && isCreateGrass_)
 	{
+		grassGauge_ = 0;
+		std::unique_ptr<StuckGrass> stuck = std::make_unique<StuckGrass>();
+		stuck->Initialize(camera_);
+		stuck->SetPlayer(this);
+		stuck->SetPos(worldTransform_.translation_);
+		stuckGrassList_.push_back(std::move(stuck));
 		isCreateGrass_ = false;
 		return true;
 	}
@@ -452,12 +668,6 @@ void Player::ExtendBody()
 
 
 
-
-
-
-
-
-
 	if (playerBodys_.size() > 0)
 	{
 		playerBodys_.back()->SetEndPos(GetCenterPosition());
@@ -470,27 +680,69 @@ void Player::ShrinkBody()
 	if (playerBodys_.size() > 0)
 	{
 		playerBodys_.back()->SetEndPos(GetCenterPosition());
-	}
-	if (playerBodys_.back()->GetLength() <= 0)
-	{
-		playerBodys_.pop_back();
+		if (playerBodys_.back()->GetLength() <= 0)
+		{
+			playerBodys_.pop_back();
+		}
 	}
 }
 
 void Player::TakeDamage()
 {
-	if (HP_ > 0 && invincibleTimer_ <= 0 && behavior_ != BehaviorPlayer::Boost)
+	if(behavior_ != BehaviorPlayer::Return)
 	{
-		HP_--;
-		if (HP_ <= 0)
+		if (HP_ > 0 && invincibleTimer_ <= 0)
 		{
-			extendTimer_ = 0;
+			HP_--;
+			isRed_ = true;
+			if (HP_ <= 0)
+			{
+				extendTimer_ = 0;
+			}
+			else
+			{
+				invincibleTimer_ = kInvincibleTime_;
+			}
+		}
+	}
+}
+
+void Player::DamageProcessBodys()
+{
+	for (auto&& body : playerBodys_)
+	{
+		if (0 < boostTimer_)
+		{
+			body->SetIsInvincible(true);
 		}
 		else
 		{
-			invincibleTimer_ = kInvincibleTime_;
+			body->SetIsInvincible(false);
+		}
+
+		if (body->IsTakeDamage())
+		{
+			TakeDamage();
 		}
 	}
+
+}
+
+void Player::GrassGaugeUpdate()
+{
+	if (grassGauge_ < kMaxGrassGauge_)
+	{
+		UIGauge_ = std::clamp(static_cast<float>(grassGauge_) / static_cast<float>(kMaxGrassGauge_), 0.0f, 1.0f);
+	}
+	else
+	{
+		UIGauge_ = std::clamp(1.0f * (createGrassTimer_ / kCreateGrassTime_), 0.0f, 1.0f);
+	}
+}
+
+void Player::Eliminate()
+{
+	extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
 }
 
 #ifdef _DEBUG
@@ -504,11 +756,13 @@ void Player::DebugPlayer()
 	ImGui::Text("BoostCT    : %.2f", boostCoolTimer_);
 	ImGui::Text("HistorySize: %d", a);
 	ImGui::Text("createGrassTimer_: %.2f", createGrassTimer_);
+	ImGui::DragFloat3("Transration", &worldTransform_.translation_.x);
 	int b = grassGauge_;
 	ImGui::Text("grassGauge_: %d", b);
 	ImGui::Text("isCollisionBody: %d", isCollisionBody);
 	int c = HP_;
 	ImGui::Text("HP : %d", c);
+	ImGui::Text("Inv : %.2f", invincibleTimer_);
 	ImGui::End();
 
 	if (input_->TriggerKey(DIK_N))
@@ -570,6 +824,7 @@ void Player::BehaviorUpdate()
 void Player::BehaviorRootInit()
 {
 	speed_ = 0;
+	grassGauge_ = 0;
 	playerBodys_.clear();
 	isCollisionBody = false;
 	HP_ = kMaxHP_;
@@ -599,19 +854,19 @@ void Player::BehaviorMovingUpdate()
 
 void Player::BehaviorBoostInit()
 {
-	speed_ = defaultSpeed_ + boostSpeed_;
+	speed_ = boostSpeed_;
 	boostTimer_ = kBoostTime_;
+	invincibleTimer_ = kBoostTime_; // ブースト中無敵に
+	sourceVoiceBoost = Audio::GetInstance()->SoundPlayAudio(soundDataBoost, false);
 }
 
 void Player::BehaviorBoostUpdate()
 {
 	Move();
 
-	if (0 < boostTimer_)
-	{
-		boostTimer_ -= deltaTime_;
-	}
-	else
+	
+
+	if (0 >= boostTimer_)
 	{
 		behaviortRquest_ = BehaviorPlayer::Moving;
 		boostCoolTimer_ = kBoostCT_;
@@ -625,9 +880,10 @@ void Player::BehaviorBoostUpdate()
 
 void Player::BehaviorReturnInit()
 {
-	speed_ = defaultSpeed_ + boostSpeed_;
+	speed_ = returnSpeed_;
 	moveDirection_ = { 0,0,0 };
 	isCollisionBody = false;
+	extendTimer_ = 0;
 }
 
 void Player::BehaviorReturnUpdate()
@@ -644,9 +900,15 @@ void Player::BehaviorReturnUpdate()
 			worldTransform_.translation_ = moveHistory_.back();
 			moveHistory_.pop_back();
 		}
+
+		stuckGrassList_.remove_if([](const std::unique_ptr<StuckGrass>& s)
+			{
+				return s->IsDelete();
+			});
 	}
 	else
 	{
+		stuckGrassList_.clear();
 		behaviortRquest_ = BehaviorPlayer::Root;
 	}
 	nextWorldTransform_.translation_ = worldTransform_.translation_;

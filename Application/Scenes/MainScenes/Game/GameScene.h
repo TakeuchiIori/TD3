@@ -30,11 +30,12 @@
 
 // App
 #include "../SystemsApp/Picture/Picture.h"
-#include "../../../SystemsApp/Cameras/PlayerCamera/PlayerCamera.h"
 #include "Player/Player.h"
 #include "Grass/GrassManager.h"
-#include "../Stages/StageManager/StageManager.h"
 #include "../SpriteApp/ScreenApp/GameScreen.h"
+#include "StageManager.h"
+#include "StageEditor.h"
+#include "Giraffe/Giraffe.h"
 
 enum class CameraMode
 {
@@ -116,30 +117,6 @@ private:
     /// </summary>
     void ShowImGui();
 
-    void CheckAllCollisions();
-
-
-private:
-    /// <summary>
-    /// オクルージョンクエリの初期化
-    /// </summary>
-    void InitializeOcclusionQuery();
-
-    /// <summary>
-    /// 読み取り開始
-    /// </summary>
-    void BeginOcclusionQuery(UINT queryIndex);
-
-    /// <summary>
-    /// 読み取りの終了
-    /// </summary>
-    void EndOcclusionQuery(UINT queryIndex);
-
-    /// <summary>
-    /// オクルージョンクエリの解決
-    /// </summary>
-    void ResolvedOcclusionQuery();
-
 private:
     /*=================================================================
 
@@ -153,7 +130,6 @@ private:
     TopDownCamera topDownCamera_;
     DebugCamera debugCamera_;
     bool isDebugCamera_ = false;
-    std::unique_ptr<PlayerCamera> playerCamera_;
 
 
     /*=================================================================
@@ -169,9 +145,8 @@ private:
                               パーティクル関連
 
     =================================================================*/
-    std::unique_ptr<ParticleEmitter> particleEmitter_[2];
-    Vector3 emitterPosition_;
-    uint32_t particleCount_;
+
+
 
     /*=================================================================
 
@@ -179,8 +154,8 @@ private:
 
     =================================================================*/
     Vector3 weaponPos;
-    std::unique_ptr<Sprite> sprite_;
-    std::vector<std::unique_ptr<Sprite>> sprites;
+    //std::unique_ptr<Sprite> sprite_;
+    //std::vector<std::unique_ptr<Sprite>> sprites;
 	std::unique_ptr<GameScreen> gameScreen_;
 
     /*=================================================================
@@ -192,14 +167,12 @@ private:
     std::unique_ptr<Picture> picture_;
     WorldTransform testWorldTransform_;
     std::unique_ptr<Ground> ground_;
-
-    StageManager stageManager_;
-
+    std::unique_ptr<Giraffe> giraffe_;
 
     // 3Dモデル
-    std::unique_ptr<Player> player_;
-    std::unique_ptr<EnemyManager> enemyManager_;
-    std::unique_ptr<GrassManager> grassManager_;
+    //std::unique_ptr<Player> player_;
+    //std::unique_ptr<EnemyManager> enemyManager_;
+    //std::unique_ptr<GrassManager> grassManager_;
 
     /*=================================================================
 
@@ -219,18 +192,6 @@ private:
     std::unique_ptr<MapChipInfo> mpInfo_;
     bool isClear_ = false;
 
-    std::unique_ptr<UIBase> uiBase_;
-    std::unique_ptr<UIBase> uiSub_;
-
-private:
-    /*=================================================================
-
-                            オクルージョンクエリ
-
-    =================================================================*/
-    Microsoft::WRL::ComPtr<ID3D12QueryHeap> queryHeap_;
-    Microsoft::WRL::ComPtr<ID3D12Resource> queryResultBuffer_;
-    std::vector<UINT64> occlusionResults_;                          // オブジェクトごとに結果を保持
-    uint32_t queryCount_ = 2;                                       // オクルージョンクエリの数
-    ID3D12GraphicsCommandList* commandList_;
+    StageEditor* stageEditor_ = nullptr;
+    std::unique_ptr<StageManager> stageManager_;
 };

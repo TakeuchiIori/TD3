@@ -210,10 +210,16 @@ void DirectXCommon::InitializeRenderTarget()
 	}
 
 	// オフスクリーンリソースの作成
+	//renderTargetClearColor_ = {
+	//	DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
+	//	{ 0.1f, 0.4f, 0.1f, 1.0f }
+	//};
+
 	renderTargetClearColor_ = {
-		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
-		{ 0.1f, 0.4f, 0.1f, 1.0f }
+	DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
+	{ 0.53f, 0.81f, 0.92f, 1.0f } // スカイブルー（Sky Blue）
 	};
+
 
 	offScreenResource_ = CreateRenderTextureResource(
 		WinApp::kClientWidth,

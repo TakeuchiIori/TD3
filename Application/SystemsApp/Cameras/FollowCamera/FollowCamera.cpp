@@ -16,7 +16,7 @@ void FollowCamera::Initialize()
 void FollowCamera::Update()
 {
 
-	UpdateInput();
+	//UpdateInput();
 
 	FollowProsess();
 	

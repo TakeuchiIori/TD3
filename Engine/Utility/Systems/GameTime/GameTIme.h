@@ -1,113 +1,192 @@
 #pragma once
-#include "ObjectTime.h"
-#include "HitStop.h"
-#include <string>
-#include <unordered_map>
-#include <memory>
-#include <map>
 
-class GameTime {
+// Engine
+#include "float.h"
+#include "MathFunc.h"
+
+// C++
+#include <chrono>
+
+class GameTime
+{
 public:
-    static GameTime* GetInstance() {
-        static GameTime instance;
-        return &instance;
-    }
 
-    void Initialize() {
-        globalTime_ = 0.0f;
-        globalTimeScale_ = 1.0f;
-        isPaused_ = false;
-        objectTimes_.clear();
-        hitStop_ = HitStop::GetInstance();
-    }
+	/// <summary>
+	/// 初期化
+	/// </summary>
+	static void Initailzie();
 
-    void RegisterObject(const std::string& id) {
-        objectTimes_[id] = std::make_unique<ObjectTime>();
-        prevTimes_[id] = 0.0f;  // 前回の時間も初期化
-    }
+	/// <summary>
+	/// 更新
+	/// </summary>
+	static void Update();
 
-    void UnregisterObject(const std::string& id) {
-        objectTimes_.erase(id);
-    }
+	/// <summary>
+	/// ImGuiで表示
+	/// </summary>
+	static void ImGui();
 
-    void GameUpdate(float deltaTime) {
-        const float DELTA_SPEED = 1.0f;  // 時間の進行速度（調整可能）
+	/// <summary>
+	/// 一時停止
+	/// </summary>
+	static void Pause();
 
-        // グローバル時間の更新
-        globalTime_ += deltaTime * DELTA_SPEED;
+	/// <summary>
+	/// 一時停止解除
+	/// </summary>
+	static void Resume();
 
-        // 各オブジェクトの時間を更新
-        for (auto& [id, objTime] : objectTimes_) {
-            if (objTime) {
-                // ヒットストップ中かチェック
-                float timeScale = HitStop::GetInstance()->GetTimeScale(id);
-                if (timeScale > 0.001f) {  // ヒットストップ中でなければ
-                    objTime->Update(deltaTime * DELTA_SPEED);  // 時間を更新
-                }
-            }
-        }
-    }
+	/// <summary>
+	/// 固定時間過ぎたらtrue
+	/// </summary>
+	static bool ShouldUpdateOneFrame();
 
-    // オブジェクトの時間取得（存在しない場合は0.0fを返す）
-    float GetObjectTime(const std::string& id) const {
-        auto it = objectTimes_.find(id);
-        if (it != objectTimes_.end() && it->second) {
-            return it->second->GetTime();
-        }
-        return 0.0f;
-    }
+	/// <summary>
+	/// デバッグ用
+	/// </summary>
+	static void StepOneFrame();
 
-    // オブジェクトのデルタタイム取得
-    float GetDeltaTime(const std::string& id) const {
-        const float BASE_DELTA = 1.0f;  // 基準デルタタイム
-        const float SPEED_MULTIPLIER = 1.0f;     // 速度倍率（調整可能）
 
-        auto it = objectTimes_.find(id);
-        if (it != objectTimes_.end() && it->second) {
-            float timeScale = HitStop::GetInstance()->GetTimeScale(id);
-            if (timeScale < 0.001f) {
-                return 0.0f;  // ヒットストップ中
-            }
-            return BASE_DELTA * SPEED_MULTIPLIER;  // 通常時
-        }
-        return BASE_DELTA * SPEED_MULTIPLIER;
-    }
+public:
 
-    // グローバル時間関連
-    float GetGlobalTime() const { return globalTime_; }
-    void SetGlobalTimeScale(float scale) { globalTimeScale_ = scale; }
-    float GetGlobalTimeScale() const { return globalTimeScale_; }
+	/*--------------------------------------------------------------------------
 
-    // 一時停止関連
-    void SetPaused(bool paused) { isPaused_ = paused; }
-    bool IsPaused() const { return isPaused_; }
+									アクセッサ
 
-    // オブジェクト個別の一時停止
-    void SetObjectPaused(const std::string& id, bool paused) {
-        auto it = objectTimes_.find(id);
-        if (it != objectTimes_.end() && it->second) {
-            it->second->SetPaused(paused);
-        }
-    }
+	---------------------------------------------------------------------------*/
 
-    // 指定したオブジェクトの時間をリセット
-    void ResetObjectTime(const std::string& id) {
-        auto it = objectTimes_.find(id);
-        if (it != objectTimes_.end() && it->second) {
-            it->second->Reset();
-        }
-    }
+
+	static float GetDeltaTime()
+	{
+		return deltaTime_;
+	}
+
+	static float GetUnscaledDeltaTime()
+	{
+		return unscaledDeltaTime_;
+	}
+
+	static float GetAccumulatedTime()
+	{
+		return accumulatedTime_;
+	}
+
+	static float GetTotalTime()
+	{
+		return totalTime_;
+	}
+
+	static float GetFixedDeltaTime()
+	{
+		return fixedDeltaTime_;
+	}
+
+	static void SetTimeScale(float timeScale)
+	{
+		timeScale_ = timeScale;
+	}
+
+	static float GetTimeScale()
+	{
+		return timeScale_;
+	}
+
+	static bool IsPause()
+	{
+		return isPause_;
+	}
+
+	static float GetFPS()
+	{
+		return (deltaTime_ > 0.0f) ? 1.0f / deltaTime_ : 0.0f;
+	}
+
+	/// <summary>
+	/// 5秒ごとの平均FPSを取得
+	/// </summary>
+	static float GetAverageFPS();
+
+
+
 
 private:
-    float globalTime_;      // グローバル時間
-    float globalTimeScale_; // グローバル時間スケール
-    bool isPaused_;         // グローバル一時停止フラグ
-    mutable std::unordered_map<std::string, float> prevTimes_;  // mutableを追加
-    HitStop* hitStop_;      // HitStopインスタンス
-    std::unordered_map<std::string, std::unique_ptr<ObjectTime>> objectTimes_; // オブジェクト時間管理
 
-    GameTime() = default;
-    ~GameTime() = default;
-    GameTime(const GameTime&) = delete;
-    GameTime& operator=(const GameTime&) = delete;
+	using Clock = std::chrono::steady_clock;
+
+	/// <summary>
+	/// 前フレームの時刻
+	/// </summary>
+	static Clock::time_point prevTime_;
+
+	/// <summary>
+	/// 経過時間
+	/// </summary>
+	static float deltaTime_;
+
+	/// <summary>
+	/// ポーズ中でも計測する経過時間
+	/// </summary>
+	static float unscaledDeltaTime_;
+
+	/// <summary>
+	/// ゲーム開始からの合計時間
+	/// </summary>
+	static float totalTime_;
+
+	/// <summary>
+	/// 固定時間
+	/// </summary>
+	static float fixedDeltaTime_;
+
+	/// <summary>
+	/// 累積した固定時間
+	/// </summary>
+	static float accumulatedTime_;
+
+	/// <summary>
+	/// 時間のスケール　: 1.0f = 通常, 0.5f = 半分の速さ, 2.0f = 2倍の速さ
+	/// </summary>
+	static float timeScale_;
+
+	/// <summary>
+	/// ポーズ中
+	/// </summary>
+	static bool isPause_;
+
+	/// <summary>
+	/// 1フレームだけ進める
+	/// </summary>
+	static bool stepOneFrame_;
+
 };
+
+
+/*-----------------------------------------------------------------
+
+							FPS関連
+
+-----------------------------------------------------------------*/
+namespace {
+
+
+	/// <summary>
+	/// 平均のFPS
+	/// </summary>
+	float averageFps_ = 0.0f;
+
+	/// <summary>
+	/// FPSを算出
+	/// </summary>
+	float fpsCounter_ = 0.0f;
+
+	/// <summary>
+	/// フレーム数をカウント
+	/// </summary>
+	int frameCount_ = 0;
+
+	/// <summary>
+	/// FPSを計算する間隔（秒）
+	/// </summary>
+	constexpr float fpsInterval_ = 2.0f;
+
+}

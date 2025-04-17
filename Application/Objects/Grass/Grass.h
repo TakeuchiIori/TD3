@@ -12,12 +12,19 @@
 #include "Collision/OBB/OBBCollider.h"
 #include "Collision/AABB/AABBCollider.h"
 #include "Collision/Core/ColliderFactory.h"
+#include "Collision/Core/CollisionDirection.h"
 
+
+// Application
 #include "Player/Player.h"
+#include "Branch.h"
+
+#include "Particle/ParticleEmitter.h"
 
 enum class BehaviorGrass
 {
 	Root,
+	Eaten,
 	Growth,
 	Repop,
 	Delete,
@@ -50,6 +57,20 @@ public:
 
 	void DrawCollision();
 
+	void Repop() 
+	{
+		obj_->SetMaterialColor(defaultColor_);
+		if(behavior_ != BehaviorGrass::Growth)
+		{
+			isLarge_ = false;
+			behaviortRquest_ = BehaviorGrass::Repop;
+		}
+		else
+		{
+			growthWait_ = false;
+		}
+	}
+
 
 public:
 	Vector3 GetCenterPosition() const { return worldTransform_.translation_; }
@@ -60,6 +81,7 @@ public:
 	void OnEnterCollision(BaseCollider* self, BaseCollider* other);
 	void OnCollision(BaseCollider* self, BaseCollider* other);
 	void OnExitCollision(BaseCollider* self, BaseCollider* other);
+	void OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir);
 
 private:
 #ifdef _DEBUG
@@ -70,7 +92,7 @@ private:
 #endif // _DEBUG
 
 
-private: // プレイヤーのふるまい
+private: // ふるまい
 
 	/// <summary>
 	/// ふるまい全体の初期化
@@ -90,6 +112,16 @@ private: // プレイヤーのふるまい
 	/// 通常状態更新
 	/// </summary>
 	void BehaviorRootUpdate();
+
+
+	/// <summary>
+	/// 通常状態初期化
+	/// </summary>
+	void BehaviorEatenInit();
+	/// <summary>
+	/// 通常状態更新
+	/// </summary>
+	void BehaviorEatenUpdate();
 
 
 	/// <summary>
@@ -123,7 +155,7 @@ private: // プレイヤーのふるまい
 	
 
 public: // getter & setter
-	void SetPos(Vector3 pos) { worldTransform_.translation_ = pos; }
+	void SetPos(Vector3 pos);
 
 	Vector3 GetPos() { return worldTransform_.translation_; }
 
@@ -142,23 +174,42 @@ private:
 	Input* input_ = nullptr;
 
 	//std::shared_ptr<OBBCollider> obbCollider_;
-	//std::shared_ptr<AABBCollider> aabbCollider_;
-	std::shared_ptr<SphereCollider> sphereCollider_;
+	std::shared_ptr<AABBCollider> aabbCollider_;
+	std::shared_ptr<AABBCollider> aabbGrowthCollider_;
+	//std::shared_ptr<SphereCollider> sphereCollider_;
 
-	std::unique_ptr<JsonManager> jsonManager_;
-	std::unique_ptr<JsonManager> jsonCollider_;
+	WorldTransform growthAreaWT_;
+
+	//std::unique_ptr<JsonManager> jsonManager_;
+	//std::unique_ptr<JsonManager> jsonCollider_;
+
+	// 枝
+	std::unique_ptr<Branch> branch_;
+
+	Vector3 defaultColor_ = { 0.3f,1.0f,0.3f };
+	Vector3 growthColor_ = { 0.3f,0.3f,1.0f };
 
 	const float deltaTime_ = 1.0f / 60.0f; // 仮対応
 
 	Vector3 defaultScale_ = { 1.0f,1.0f,1.0f };
-	Vector3 growthScale_ = { 1.4f,1.4f,1.4f };
+	Vector3 growthScale_ = { 1.8f,1.8f,1.8f };
 
-	float kGrowthTime_ = 1.0f;
+	// 食べる処理
+	float eatenTimer_ = 0.0f;
+	const float kEatenTime_ = 0.2f;
+	Vector3 eatenStartScale_{};
+
+	float kGrowthTime_ = 0.5f;
 	float growthTimer_ = 0.0f;
+	bool growthWait_ = false;
 
 	bool isLarge_ = false;
 
 	bool isMadeByPlayer_ = false;
+
+	int enter = 0;
+
+	float  centerX_ = 17.0f;
 
 
 	// 振る舞い
@@ -168,5 +219,9 @@ private:
 
 	static int count_;    // 現在のインスタンス数
 	int id_;              // 各インスタンスのID
+
+
+	// パーティクル
+	std::unique_ptr<ParticleEmitter> particleEmitter_;
 };
 

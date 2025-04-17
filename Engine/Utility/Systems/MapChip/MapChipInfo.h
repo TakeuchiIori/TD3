@@ -6,6 +6,7 @@
 #include "Systems/Camera/Camera.h"
 #include "Object3D/Object3d.h"
 #include "WorldTransform/WorldTransform.h"
+#include "Loaders/Json/JsonManager.h"
 
 // C++ 
 #include <vector>
@@ -22,6 +23,8 @@ public:
 	/// 初期化
 	/// </summary>
 	void Initialize();
+	
+	void InitJson();
 
 	/// <summary>
 	/// 更新
@@ -47,33 +50,29 @@ private:
 	/// </summary>
 	void GenerateBlocks();
 
-	/// <summary>
-	/// imgui
-	/// </summary>
-	void ImGui();
 
 public:
 
-	void SetMapChipField(MapChipField* mpField) { mpField_ = std::unique_ptr<MapChipField>(mpField);; }
+	void SetMapChipField(MapChipField* mpField) { mpField_ = mpField; }
 	void SetWorldTransform(std::vector<std::vector<WorldTransform*>> wt) { wt_ = wt; }
-
-	MapChipField* GetMapChipField() { return mpField_.get(); }
+	MapChipField* GetMapChipField() { return mpField_; }
 
 private:
 	/*=======================================================================
-
+	
 								  ポインタなど
 
 	========================================================================*/
 	Camera* camera_ = nullptr;
+	MapChipField* mpField_ = nullptr;
 	std::vector<std::vector<WorldTransform*>> wt_;
-	std::unique_ptr<MapChipField> mpField_ ;
-	//MapChipCollision* mpCollision_ = nullptr;
-	std::unique_ptr<Object3d> obj_;
+	std::vector<std::vector<std::unique_ptr<Object3d>>> objects_;
+	std::unique_ptr<JsonManager> jsonManager_;
+	std::vector<std::vector<std::unique_ptr<Object3d>>> floors_;
 
-	MapChipType selectedType_;
 
-	std::string currentCsvFileName_;
 
+	Vector3 color_[2]{};
+	float alpha_[2];
 };
 
