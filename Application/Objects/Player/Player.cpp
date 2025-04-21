@@ -207,6 +207,7 @@ void Player::Reset()
 	invincibleTimer_ = 0;
 	playerBodys_.clear();
 	moveHistory_.clear();
+	stuckGrassList_.clear();
 	behaviortRquest_ = BehaviorPlayer::Root;
 }
 
