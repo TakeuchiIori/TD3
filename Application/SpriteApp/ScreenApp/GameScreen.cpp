@@ -288,7 +288,7 @@ void GameScreen::Updatedistance()
 	playerPos = Transform(playerPos, matViewProjectionViewport);
 
 	// 時間をfloatで取得（例：9.83）
-	float dit = checkPointPos_ - (player_->GetCenterPosition().y );
+	float dit = std::max<float>(0, checkPointPos_ - (player_->GetCenterPosition().y));
 	//if (dit > 10.0f) dit = 10.0f;  // 最大10秒
 
 // 整数部と小数部に分ける

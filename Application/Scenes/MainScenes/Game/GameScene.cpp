@@ -30,15 +30,12 @@ void GameScene::Initialize()
 	srand(static_cast<unsigned int>(time(nullptr))); // 乱数シード設定
 	// カメラの生成
 	sceneCamera_ = cameraManager_.AddCamera();
-	//playerCamera_ = cameraManager_.AddCamera();
 	GameTime::Initailzie();
 
     // 初期カメラモード設定
     cameraMode_ = CameraMode::FOLLOW;
 
 	CollisionManager::GetInstance()->Initialize();
-
-	//stageManager_.Initialize(sceneCamera_.get());
 
 	picture_ = std::make_unique<Picture>();
 	picture_->Initialize();
@@ -55,9 +52,10 @@ void GameScene::Initialize()
 	mpInfo_->Initialize();
 	mpInfo_->SetCamera(sceneCamera_.get());
 
+	// エディターの初期化
 	stageEditor_ = StageEditor::Instance();
 	stageEditor_->Load("Resources/JSON/StageEditor/StageEditor.json");
-
+	// ステージの初期化
 	stageManager_ = std::make_unique<StageManager>();
 	stageManager_->SetMapChipInfo(mpInfo_.get());
 	stageManager_->Initialize(sceneCamera_.get());
@@ -65,11 +63,6 @@ void GameScene::Initialize()
 
 	followCamera_.SetTarget(stageManager_->GetPlayer()->GetWorldTransform());
 
-
-	// 敵
-	/*enemyManager_ = std::make_unique<EnemyManager>();
-	enemyManager_->SetPlayer(stageManager_->GetPlayer());
-	enemyManager_->Initialize(sceneCamera_.get(), mpInfo_->GetMapChipField());*/
 
 	giraffe_ = std::make_unique<Giraffe>();
 	giraffe_->Initialize();
@@ -123,25 +116,29 @@ void GameScene::Update()
 	stageEditor_->DrawEditorUI();
 #endif // _DEBUG
 
-
-	mpInfo_->Update();
-	
-
-	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
-		picture_->Update();
-    }
-    
-
-	//test_->UpdateAnimation();
-	testWorldTransform_.UpdateMatrix();
-
-	if (!isDebugCamera_) {
-		stageManager_->NotDebugCameraUpdate();
+	// クリアしたとき
+	if (stageManager_->IsClear()) {
+		sceneManager_->ChangeScene("Clear");
 	}
-	stageManager_->Update();
+	// プレイ中
+	else
+	{
+		mpInfo_->Update();
 
 
-	//enemyManager_->Update();
+		if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
+			picture_->Update();
+		}
+
+
+		//test_->UpdateAnimation();
+		testWorldTransform_.UpdateMatrix();
+
+		if (!isDebugCamera_) {
+			stageManager_->NotDebugCameraUpdate();
+		}
+		stageManager_->Update();
+	}
 
 	giraffe_->Update();
 	ground_->Update();
@@ -222,7 +219,6 @@ void GameScene::DrawObject()
 	giraffe_->Draw();
 	mpInfo_->Draw();
 	ground_->Draw();
-	//enemyManager_->Draw();
 	stageManager_->Draw();
 }
 
@@ -239,7 +235,6 @@ void GameScene::DrawAnimation()
 void GameScene::DrawLine()
 {
 	stageManager_->DrawCollision();
-	//enemyManager_->DrawCollisions();
 }
 
 
