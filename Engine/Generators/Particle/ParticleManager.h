@@ -12,8 +12,15 @@
 #include <list>
 #include <unordered_map >
 #include "Loaders/Json/JsonManager.h"
+
+
 // Engine
 #include "Systems./Camera/Camera.h"
+#include "PipelineManager/PipelineManager.h"
+#include "Loaders/Json/EnumUtils.h"
+#include "Loaders/Model/Mesh/Mesh.h"
+#include "Loaders/Model/Mesh/MeshPrimitive.h"
+
 
 // Math
 #include "Vector4.h"
@@ -27,40 +34,8 @@ class SrvManager;
 class ParticleManager {
 
 public:
-	// ブレンドモード構造体
-	enum BlendMode {
-		// ブレンド無し
-		kBlendModeNone,
-		// 通常のブレンド
-		kBlendModeNormal,
-		// 加算
-		kBlendModeAdd,
-		// 減算
-		kBlendModeSubtract,
-		// 乗算
-		kBlendModeMultiply,
-		// スクリーン
-		kBlendModeScreen,
-
-		// 利用してはいけない
-		kCount0fBlendMode,
-	};
 
 
-	struct VertexData {
-		Vector4 position;
-		Vector2 texcoord;
-		Vector3 normal;
-	};
-	struct MaterialData {
-		std::string textureFilePath;
-		uint32_t textureIndexSRV = 0;
-	};
-
-	struct ModelData {
-		std::vector<VertexData> vertices;
-		MaterialData material;
-	};
 
 	struct Material {
 		Vector4 color;
@@ -73,6 +48,16 @@ public:
 		Matrix4x4 WVP;
 		Matrix4x4 World;
 		Vector4 color;
+	};
+
+	struct MaterialData {
+		std::string textureFilePath;
+		uint32_t textureIndexSRV = 0;
+	};
+
+
+	struct ModelData {
+		MaterialData material;
 	};
 
 
@@ -97,7 +82,21 @@ public:
 		uint32_t srvIndex;												// インスタンシングデータ用SRVインデックス
 		Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource;		// インスタンシングリソース
 		UINT instance;													// インスタンス数
-		ParticleForGPU* instancingData;									// インスタンシングデータを書き込むためのポインタ
+		ParticleForGPU* instancingDataForGPU;									// インスタンシングデータを書き込むためのポインタ
+
+		BlendMode blendMode = BlendMode::kBlendModeAdd;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = nullptr;
+
+		std::shared_ptr<Mesh> mesh = nullptr;
+		std::vector<ParticleForGPU> instancingData;
+
+		Vector2 uvScale = { 1.0f, 1.0f };
+		Vector2 uvTranslate = { 0.0f, 0.0f };
+		float uvRotate = 0.0f;
+		bool uvAnimationEnable = false;
+		float uvAnimSpeedX = 1.0f;
+		float uvAnimSpeedY = 0.0f;
+
 	};
 
 
@@ -143,9 +142,13 @@ public:
 		float randomForce = 0.02f;
 
 		Vector3 offset = {};
-
-
 		bool enableScale = false;
+
+		// 生成時にランダムで回転
+		bool isRandomRotate = false;
+		// 生成時にランダムのスケール
+		bool isRandomScale = false;
+		Vector2 minmaxScale = { 0.0f, 1.0f };
 	};
 
 
@@ -177,16 +180,6 @@ public: // メンバ関数
 	void Draw();
 
 	/// <summary>
-	/// ブレンドモードせてい
-	/// </summary>
-	/// <param name="blendDesc"></param>
-	/// <param name="blendMode"></param>
-	void SetBlendMode(D3D12_BLEND_DESC& blendDesc, BlendMode blendMode);
-
-
-	void Render(D3D12_BLEND_DESC& blendDesc, BlendMode& currentBlendMode);
-
-	/// <summary>
 	/// パーティクルグループ生成
 	/// </summary>
 	/// <param name="name"></param>
@@ -200,10 +193,19 @@ public: // メンバ関数
 	/// <param name="name"></param>
 	/// <param name="position"></param>
 	/// <param name="count"></param>
-	/*void Emit(const std::string& name, const Vector3& position, uint32_t count);*/
-
 	std::list<Particle> Emit(const std::string& name, const Vector3& position, uint32_t count);
 
+	/// <summary>
+	///  マネージャ全体のデフォルトメッシュを設定  
+	///  指定しないグループはこれを使う
+	/// </summary>
+	void SetDefaultPrimitiveMesh(const std::shared_ptr<Mesh>& mesh);
+
+	/// <summary>
+	///  指定したパーティクル グループ専用のメッシュを設定
+	/// </summary>
+	void SetPrimitiveMesh(const std::string& groupName,
+		const std::shared_ptr<Mesh>& mesh);
 private:
 
 
@@ -211,20 +213,6 @@ private:
 	void UpdateParticles();
 
 
-	/// <summary>
-	///  ルートシグネチャ生成
-	/// </summary>
-	void CreateRootSignature();
-
-	/// <summary>
-	/// パイプライン生成
-	/// </summary>
-	void CreateGraphicsPipeline();
-
-	/// <summary>
-	/// 頂点リソース
-	/// </summary>
-	void CreateVertexResource();
 
 	/// <summary>
 	/// マテリアルリソース
@@ -232,24 +220,12 @@ private:
 	void CreateMaterialResource();
 
 	/// <summary>
-	/// 頂点バッファビュー
-	/// </summary>
-	void CreateVertexVBV();
-
-	/// <summary>
-	/// パイプラインの設定
-	/// </summary>
-	void SetGraphicsPipeline();
-
-	/// <summary>
 	/// パーティクルの生成
 	/// </summary>
 	Particle MakeNewParticle(const std::string& name, std::mt19937& randomEngine, const Vector3& position);
 
-	/// <summary>
-	/// ImGui
-	/// </summary>
-	void ShowUpdateModeDropdown();
+
+
 
 
 public:
@@ -264,38 +240,26 @@ private: // メンバ変数
 	// ポインタ
 	DirectXCommon* dxCommon_ = nullptr;
 	SrvManager* srvManager_ = nullptr;
-	VertexData* vertexData_ = nullptr;
+	//VertexData* vertexData_ = nullptr;
 	Material* materialData_ = nullptr;
 	Camera* camera_ = nullptr;
-	ParticleForGPU* instancingData_ = nullptr;
-	std::unique_ptr<JsonManager> jsonManager_;
+	std::shared_ptr<Mesh> defaultMesh_ = nullptr;
 
-	// ルートシグネチャ
-	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
-	D3D12_DESCRIPTOR_RANGE descriptorRangeForInstancing_[1] = {};
-	// ルートパラメーター
-	D3D12_ROOT_PARAMETER rootParameters_[4] = {};
-	// サンプラー
-	D3D12_STATIC_SAMPLER_DESC staticSamplers_[1] = {};
-	// インプットレイアウト
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[3] = {};
 
-	// ブレンド
-	BlendMode blendMode_{};
-	D3D12_BLEND_DESC blendDesc_{};
-	D3D12_RASTERIZER_DESC rasterrizerDesc_{};
-	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_{};
-	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc_{};
+	//ParticleForGPU* instancingData_ = nullptr;
+	std::vector<ParticleForGPU> instancingData_;
+	std::unordered_map<std::string, std::unique_ptr<JsonManager>> jsonManagers_;
+
+
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
-
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;
 	// 頂点リソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	// マテリアル
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_ = nullptr;
 	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob_;
 	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob_;
 

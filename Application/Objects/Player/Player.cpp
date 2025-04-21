@@ -97,7 +97,15 @@ void Player::InitJson()
 	jsonManager_->Register("通常時の移動速度",&defaultSpeed_);
 	jsonManager_->Register("ブースト時の速度", &boostSpeed_);
 	jsonManager_->Register("帰還時の速度", &returnSpeed_);
-	jsonManager_->Register("タイマーの限界値", &kTimeLimit_);
+	jsonManager_->Register("伸びられるタイマーの限界値", &kTimeLimit_);
+
+	jsonManager_->Register("ブーストの最大効果時間", &kBoostTime_);
+	jsonManager_->Register("ブーストのクールタイム", &kBoostCT_);
+	jsonManager_->Register("草が詰まるまでの時間", &kCreateGrassTime_);
+	jsonManager_->Register("無敵時間", &kInvincibleTime_);
+
+	/*jsonManager_->Register("伸びられるタイマーの限界値", &kMaxHP_);
+	jsonManager_->Register("伸びられるタイマーの限界値", &kMaxGrassGauge_);*/
 
 	jsonCollider_ = std::make_unique<JsonManager>("playerCollider", "Resources/JSON/");
 	//aabbCollider_->InitJson(jsonCollider_.get());

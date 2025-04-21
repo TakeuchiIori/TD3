@@ -9,6 +9,10 @@
 
 void ClearScene::Initialize()
 {
+    // カメラの生成
+    currentCamera_ = cameraManager_.AddCamera();
+    Object3dCommon::GetInstance()->SetDefaultCamera(currentCamera_.get());
+
     sprite_ = std::make_unique<Sprite>();
     sprite_->Initialize("Resources/Textures/BackGround/KoboClear.png");
     sprite_->SetSize(Vector2{ 1280.0f,720.0f });
@@ -23,8 +27,13 @@ void ClearScene::Finalize()
 
 void ClearScene::Update()
 {
+
+    if (Input::GetInstance()->PushKey(DIK_SPACE) || Input::GetInstance()->IsPadPressed(0, GamePadButton::A)) {
+        sceneManager_->ChangeScene("Title");
+    }
+
     sprite_->Update();
-    fade_->Update();
+    //fade_->Update();
 }
 
 void ClearScene::Draw()

@@ -80,7 +80,7 @@ void Stage::ReachCheckPoint()
 {
 	if (player_->GetCenterPosition().y >= *checkPoint_.GetCheckPointHight())
 	{
-		if (currentStageNum_ < StageEditor::Instance()->GetMaxCheckPointNumber(currentStageNum_))
+		if (currentCheckPoint_ < StageEditor::Instance()->GetMaxCheckPointNumber(currentStageNum_))
 		{
 			currentCheckPoint_++;
 		}
@@ -88,8 +88,14 @@ void Stage::ReachCheckPoint()
 		{
 			currentStageNum_++;
 		}
-
-		InitCheckPoint();
+		else 
+		{
+			isClear_ = true;
+		}
+		if(!isClear_)
+		{
+			InitCheckPoint();
+		}
 	}
 }
 

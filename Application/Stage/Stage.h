@@ -63,6 +63,8 @@ public:
 	float GetCheckPoint();
 	Vector3 GetCheckPointPos();
 
+	bool IsClear() { return isClear_; }
+
 private:
 	int currentStageNum_ = 0;
 
@@ -79,5 +81,7 @@ private:
 	int checkPointElements_ = 0;
 
 	int currentCheckPoint_ = 0;						// チェックポイント番号
+
+	bool isClear_ = false;
 };
 

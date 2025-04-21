@@ -37,6 +37,8 @@
 #include "StageEditor.h"
 #include "Giraffe/Giraffe.h"
 
+#include "Particle/ParticleEmitter.h"
+
 enum class CameraMode
 {
     DEFAULT,
@@ -146,7 +148,7 @@ private:
 
     =================================================================*/
 
-
+	std::unique_ptr<ParticleEmitter> particleEmitter_;
 
     /*=================================================================
 
@@ -170,9 +172,6 @@ private:
     std::unique_ptr<Giraffe> giraffe_;
 
     // 3Dモデル
-    //std::unique_ptr<Player> player_;
-    //std::unique_ptr<EnemyManager> enemyManager_;
-    //std::unique_ptr<GrassManager> grassManager_;
 
     /*=================================================================
 
@@ -192,6 +191,7 @@ private:
     std::unique_ptr<MapChipInfo> mpInfo_;
     bool isClear_ = false;
 
+    // ステージ関連（3Dモデル含む）
     StageEditor* stageEditor_ = nullptr;
     std::unique_ptr<StageManager> stageManager_;
 };
