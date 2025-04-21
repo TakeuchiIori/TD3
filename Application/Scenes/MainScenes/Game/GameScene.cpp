@@ -123,6 +123,9 @@ void GameScene::Update()
 	stageEditor_->DrawEditorUI();
 #endif // _DEBUG
 
+	if (stageManager_->IsClear()) {
+		sceneManager_->ChangeScene("Clear");
+	}
 
 	mpInfo_->Update();
 	

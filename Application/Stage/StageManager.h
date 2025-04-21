@@ -44,6 +44,8 @@ public:
 	/// </summary>
 	float GetCheckPoint() const { return stageList_[currentStageNum_]->GetCheckPoint(); }
 
+	bool IsClear() { return stageList_[currentStageNum_]->IsClear() || input_->TriggerKey(DIK_L); }
+
 
 private:
 	Input* input_ = nullptr;

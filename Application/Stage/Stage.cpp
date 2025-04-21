@@ -88,8 +88,14 @@ void Stage::ReachCheckPoint()
 		{
 			currentStageNum_++;
 		}
-
-		InitCheckPoint();
+		else 
+		{
+			isClear_ = true;
+		}
+		if(!isClear_)
+		{
+			InitCheckPoint();
+		}
 	}
 }
 
