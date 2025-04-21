@@ -753,6 +753,60 @@ void Player::Eliminate()
 	extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
 }
 
+void Player::HeartPos()
+{
+	drawCount_ = 0;
+	if (HP_ > 0)
+	{
+		std::vector<PointWithDirection> result;
+		const float length = 1.4f;
+		float targetDistance = length;
+		float accumulated = 0.0f;
+		std::list<Vector3> v = moveHistory_;
+		v.push_back(worldTransform_.translation_);
+		auto it = v.rbegin();
+		if (it == v.rend()) return;
+
+		Vector3 prev = *it;
+		++it;
+
+		while (it != v.rend() && result.size() < HP_) {
+			Vector3 curr = *it;
+			float segLen = Length(prev - curr);
+
+			if (accumulated + segLen >= targetDistance) {
+				float remain = targetDistance - accumulated;
+				float t = remain / segLen;
+
+				// 補間して位置を算出
+				Vector3 position = prev + (curr - prev) * t;
+				position.z -= 1.0f;
+
+				// 進行方向（XY平面）からラジアン角を計算
+				Vector3 dir = Normalize(curr - prev); // 方向ベクトル（単位ベクトル）
+				float angle = std::atan2(dir.y, dir.x);  // XY平面での角度
+
+				result.push_back({ position, angle });
+
+				targetDistance += length;
+			}
+			else {
+				accumulated += segLen;
+				prev = curr;
+				++it;
+			}
+		}
+		drawCount_ = result.size();
+		for (size_t i = 0; i < result.size(); ++i)
+		{
+			haerts_[i]->SetPos(result[i].position);
+			haerts_[i]->SetRotaZ(result[i].radian + (std::numbers::pi_v<float> / 2.0f));
+		}
+	}
+
+	// resultに3つの配置場所が入っている（足りなければ少ない場合もある）
+}
+
 #ifdef _DEBUG
 void Player::DebugPlayer()
 {
