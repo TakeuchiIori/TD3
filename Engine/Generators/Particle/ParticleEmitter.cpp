@@ -3,8 +3,7 @@
 #include "imgui.h"
 #endif
 ParticleEmitter::ParticleEmitter(const std::string& name, const Vector3& transform, uint32_t count)
-	: emitter_{ name, Vector3{transform,}, count, 0.0025f, 0.0f } {
-}
+    : emitter_{name, Vector3{transform,}, count, 0.0025f, 0.0f} {}
 
 void ParticleEmitter::Initialize(const std::string& jsonPath) {
 
@@ -20,23 +19,26 @@ void ParticleEmitter::InitJson(const std::string& jsonPath)
 	jsonManager_->Register("Transform", &emitter_.transform);
 	jsonManager_->Register("Count", &emitter_.count);
 	jsonManager_->Register("Frequency", &emitter_.frequency);
-	jsonManager_->Register("FrequencyTime", &emitter_.frequencyTime);
+	jsonManager_->Register("IsUpdateTime", &isUpdateTime_);
 }
 
-void ParticleEmitter::UpdateTime()
+void ParticleEmitter::Update()
 {
-	emitter_.frequencyTime += deltaTime_;
-	if (emitter_.frequency <= emitter_.frequencyTime) {
-		// パーティクルを生成してグループに追加
+	if (isUpdateTime_) {
+		emitter_.frequencyTime += deltaTime_;
+		if (emitter_.frequency <= emitter_.frequencyTime) {
+			// パーティクルを生成してグループに追加
+			Emit();
+			emitter_.frequencyTime -= emitter_.frequency;
+		}
+	} else {
 		Emit();
-		emitter_.frequencyTime -= emitter_.frequency;
 	}
-
 }
 
-void ParticleEmitter::FollowEmit(const Vector3& transform)
+void ParticleEmitter::FollowEmit(const std::string& name, const Vector3& transform)
 {
-	ParticleManager::GetInstance()->Emit(emitter_.name, transform, emitter_.count);
+	ParticleManager::GetInstance()->Emit(name, transform,emitter_.count);
 }
 
 void ParticleEmitter::Emit()
@@ -49,7 +51,7 @@ void ParticleEmitter::ShowImGui()
 #ifdef _DEBUG
 	ImGui::Begin("Particle");
 
-	if (ImGui::Button("Add Particle")) {
+	if(ImGui::Button("Add Particle")) {
 		Emit();
 	}
 	ImGui::End();
@@ -90,4 +92,12 @@ void ParticleEmitter::ShowImGui()
 	ImGui::End();
 #endif // _DEBUG
 
+}
+
+void ParticleEmitter::InitJson() { 
+	//jsonManager_ = new JsonManager("パーティクル : " + emitter_.name, "Resources/JSON");
+	//jsonManager_->Register("Frequency", &emitter_.frequency);
+ //   jsonManager_->Register("FrequencyTime", &emitter_.frequencyTime);
+ //   jsonManager_->Register("Count", &emitter_.count);
+ //   jsonManager_->Register("Position", &emitter_.transform.translate);
 }

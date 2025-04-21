@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include "ConversionJson.h"
+#include "EnumUtils.h"
 
 #ifdef _DEBUG
 #include <imgui.h>
@@ -98,6 +99,27 @@ public:
         {
             ImGui::DragFloat4(label.c_str(), reinterpret_cast<float*>(ptr_), 0.1f);
         }
+
+        // Enum の場合
+        else if constexpr (std::is_enum_v<T>) {
+            const auto& names = GetEnumNames<T>();
+            int current = static_cast<int>(*ptr_);
+            std::string label = name + "##" + uniqueID;
+            if (ImGui::BeginCombo(label.c_str(), names[current].c_str())) {
+                for (int i = 0; i < names.size(); ++i) {
+                    bool isSelected = (i == current);
+                    if (ImGui::Selectable(names[i].c_str(), isSelected)) {
+                        current = i;
+                        *ptr_ = static_cast<T>(i);
+                    }
+                    if (isSelected) {
+                        ImGui::SetItemDefaultFocus();
+                    }
+                }
+                ImGui::EndCombo();
+            }
+        }
+
 #endif // _DEBUG
 
     }
