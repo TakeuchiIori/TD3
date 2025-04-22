@@ -21,7 +21,7 @@ void TitlePlayer::Initialize(Camera* camera)
 
 
 	InitJson();
-	
+
 }
 
 void TitlePlayer::InitCollision()
@@ -74,21 +74,19 @@ void TitlePlayer::Reset()
 
 void TitlePlayer::Move()
 {
-	if (input_->PushKey(DIK_UP) || input_->PushKey(DIK_W)){
+	if (input_->PushKey(DIK_UP) || input_->PushKey(DIK_W)) {
 		moveDirection_ = { 0.0f,1.0f,0.0f };
-	}
-	
-	if (input_->PushKey(DIK_DOWN) || input_->PushKey(DIK_S)){
+	} else if (input_->PushKey(DIK_DOWN) || input_->PushKey(DIK_S)) {
 		moveDirection_ = { 0.0f,-1.0f,0.0f };
-	} 
-
-	if (input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A)){
+	} else if (input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A)) {
 		moveDirection_ = { -1.0f,0.0f,0.0f };
-	} 
-
-	if (input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D)){
+	} else if (input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D)) {
 		moveDirection_ = { 1.0f,0.0f,0.0f };
+	} else {
+		moveDirection_ = { 0.0f,0.0f,0.0f };
 	}
+
+
 
 	deltaTime_ = GameTime::GetDeltaTime();
 

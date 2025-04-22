@@ -73,8 +73,10 @@ void TitleScene::Update()
 
 
 	mpInfo_->Update();
-    player_->Update();
 
+    if (isDebugCamera_) {
+        player_->Update();
+    }
 
     UpdateCameraMode();
 	UpdateCamera();
