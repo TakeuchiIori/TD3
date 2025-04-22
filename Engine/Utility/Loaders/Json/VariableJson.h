@@ -98,6 +98,46 @@ public:
         {
             ImGui::DragFloat4(label.c_str(), reinterpret_cast<float*>(ptr_), 0.1f);
         }
+        
+        // Enum の場合
+        else if constexpr (std::is_enum_v<T>) {
+            const auto& names = GetEnumNames<T>();
+            int current = static_cast<int>(*ptr_);
+            std::string label = name + "##" + uniqueID;
+            if (ImGui::BeginCombo(label.c_str(), names[current].c_str())) {
+                for (int i = 0; i < names.size(); ++i) {
+                    bool isSelected = (i == current);
+                    if (ImGui::Selectable(names[i].c_str(), isSelected)) {
+                        current = i;
+                        *ptr_ = static_cast<T>(i);
+                    }
+                    if (isSelected) {
+                        ImGui::SetItemDefaultFocus();
+                    }
+                }
+                ImGui::EndCombo();
+            }
+        } else if constexpr (std::is_same_v<T, std::vector<Vector3>>)
+        {
+            ImGui::Text("%s", name.c_str());
+            for (size_t i = 0; i < ptr_->size(); ++i)
+            {
+                std::string pointLabel = "Point " + std::to_string(i) + "##" + uniqueID;
+                ImGui::DragFloat3(pointLabel.c_str(), &(*ptr_)[i].x, 0.1f);
+            }
+
+            if (ImGui::Button(("Add##" + uniqueID).c_str()))
+            {
+                ptr_->push_back(Vector3{ 0,0,0 });
+            }
+            ImGui::SameLine();
+            if (ImGui::Button(("Clear##" + uniqueID).c_str()))
+            {
+                ptr_->clear();
+            }
+        }
+
+
 #endif // _DEBUG
 
     }

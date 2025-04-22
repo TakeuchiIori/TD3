@@ -1,5 +1,6 @@
 #include "Matrix4x4.h"
 #include <numbers>
+#include <MathFunc.h>
 
 Matrix4x4::Matrix4x4(std::initializer_list<float> list) {
 	if (list.size() != 16) {
@@ -574,4 +575,33 @@ DirectX::XMMATRIX ConvertToXMMATRIX(const Matrix4x4& matrix) {
 	return result;
 }
 
+Matrix4x4 MakeLookAtMatrix(const Vector3& eye, const Vector3& target, const Vector3& up)
+{
+	Vector3 zAxis = Normalize(target - eye);     // forward
+	Vector3 xAxis = Normalize(Cross(up, zAxis)); // right
+	Vector3 yAxis = Cross(zAxis, xAxis);         // up（再計算）
 
+	Matrix4x4 result = {};
+
+	result.m[0][0] = xAxis.x;
+	result.m[1][0] = xAxis.y;
+	result.m[2][0] = xAxis.z;
+	result.m[3][0] = -Dot(xAxis, eye);
+
+	result.m[0][1] = yAxis.x;
+	result.m[1][1] = yAxis.y;
+	result.m[2][1] = yAxis.z;
+	result.m[3][1] = -Dot(yAxis, eye);
+
+	result.m[0][2] = zAxis.x;
+	result.m[1][2] = zAxis.y;
+	result.m[2][2] = zAxis.z;
+	result.m[3][2] = -Dot(zAxis, eye);
+
+	result.m[0][3] = 0.0f;
+	result.m[1][3] = 0.0f;
+	result.m[2][3] = 0.0f;
+	result.m[3][3] = 1.0f;
+
+	return result;
+}
