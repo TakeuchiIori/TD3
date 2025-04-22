@@ -135,6 +135,18 @@ private:
 
 	void HeartPos();
 
+	void HeadDir() {
+		worldTransform_.rotation_.z = 0;
+		if (moveHistory_.size() > 1)
+		{
+
+			// 進行方向（XY平面）からラジアン角を計算
+			Vector3 dir = Normalize(worldTransform_.translation_ - moveHistory_.back()); // 方向ベクトル（単位ベクトル）
+			float angle = std::atan2(dir.y, dir.x);  // XY平面での角度
+			worldTransform_.rotation_.z = angle + 3.0f * std::numbers::pi_v<float> / 2.0f;
+		}
+	}
+
 
 #ifdef _DEBUG
 	// デバッグ用 (ImGuiとか)
@@ -206,10 +218,9 @@ private:
 	std::unique_ptr<JsonManager> jsonCollider_;
 
 	std::shared_ptr<OBBCollider> obbCollider_;
-	//std::shared_ptr<AABBCollider> aabbCollider_;
 	std::shared_ptr<AABBCollider> nextAabbCollider_;
 	WorldTransform nextWorldTransform_;
-	//std::shared_ptr<SphereCollider> sphereCollider_;
+	WorldTransform modelWT_;
 	
 	MapChipCollision mpCollision_;
 	MapChipCollision::ColliderRect colliderRect_;
