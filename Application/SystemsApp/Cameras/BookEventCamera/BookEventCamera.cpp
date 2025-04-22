@@ -33,10 +33,36 @@ void BookEventCamera::Update()
 
     translate_ = EvaluateSpline(t_);
 
+    // ターゲットがあれば、その位置を向くようにビュー行列を作る
     if (target_) {
-		matView_ = MakeLookAtMatrix(translate_, target_->translation_, Vector3(0, 3, 0));
+        rotate_ = GetEulerAnglesFromToDirection(translate_, target_->translation_);
+        matView_ = Inverse(MakeAffineMatrix(scale_, rotate_, translate_));
     }
 }
+
+void BookEventCamera::FollowProsess()
+{
+    // ターゲットがない場合は処理しない
+    if (target_ == nullptr)
+    {
+        return;
+    }
+    Vector3 offset = offset_;
+
+
+
+    Matrix4x4 rotate = MakeRotateMatrixXYZ(rotate_);
+
+    offset = TransformNormal(offset, rotate);
+
+    // このゲーム用にX、Z軸は無視する
+    Vector3 targetTranslate = Vector3(0.0f, target_->translation_.y, 0);
+
+    translate_ = targetTranslate + offset;
+
+    matView_ = Inverse(MakeAffineMatrix(scale_, rotate_, translate_));
+}
+
 
 
 void BookEventCamera::Draw(Camera* camera)
@@ -47,33 +73,6 @@ void BookEventCamera::Draw(Camera* camera)
     }
 }
 
-
-void BookEventCamera::GenerateControlPoints(const Vector3& endPos, int num)
-{
-	controlPoints_.clear();
-
-    num = (std::max)(num, 4);
-
-    Vector3 startPos = translate_;
-
-
-    for (int i = 0; i < num; i++) {
-		float t = static_cast<float>(i) / static_cast<float>(num - 1);
-
-		Vector3 point = Lerp(startPos, endPos, t);
-
-        ///point.x -= std::sin(t * std::numbers::pi_v<float>) * 20.0f;
-
-		controlPoints_.push_back(point);
-    }
-
-    t_ = 0.0f;
-}
-
-void BookEventCamera::AddControlPoint(const Vector3& point)
-{
-	controlPoints_.push_back(point);
-}
 
 void BookEventCamera::RegisterControlPoints()
 {
@@ -112,23 +111,3 @@ Vector3 BookEventCamera::EvaluateSpline(float t)
 
 }
 
-void BookEventCamera::ImGui()
-{
-//#ifdef _DEBUG
-//    if (ImGui::TreeNode("Control Points")) {
-//        for (size_t i = 0; i < controlPoints_.size(); ++i) {
-//            std::string label = "Point " + std::to_string(i);
-//            ImGui::DragFloat3(label.c_str(), &controlPoints_[i].x, 0.1f);
-//        }
-//
-//        if (ImGui::Button("Add Point")) {
-//            controlPoints_.push_back({ 0, 0, 0 });
-//        }
-//        if (ImGui::Button("Clear Points")) {
-//            controlPoints_.clear();
-//        }
-//        ImGui::TreePop();
-//    }
-//#endif // _DEBUG
-
-}

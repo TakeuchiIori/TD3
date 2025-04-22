@@ -408,3 +408,14 @@ Vector3 Slerp(const Vector3& v0, const Vector3& v1, float t)
     // 最終的に "方向 * 補間した長さ"
     return { dir.x * lenT, dir.y * lenT, dir.z * lenT };
 }
+
+Vector3 GetEulerAnglesFromToDirection(const Vector3& from, const Vector3& to)
+{
+    Vector3 dir = Normalize(to - from);
+
+    // Yaw（Y軸回転）とPitch（X軸回転）を使う
+    float yaw = std::atan2(dir.x, dir.z);                  // 左右
+    float pitch = std::asin(-dir.y);                       // 上下
+
+    return Vector3(pitch, yaw, 0.0f); // Z軸回転（Roll）は0でOK
+}
