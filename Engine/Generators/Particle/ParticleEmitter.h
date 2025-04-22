@@ -41,14 +41,14 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update();
+	void UpdateTime();
 
 	/// <summary>
 	/// 設定したオブジェクトに追従する
 	/// </summary>
 	/// <param name="name"></param>
 	/// <param name="transform"></param>
-	void FollowEmit(const std::string& name, const Vector3& transform);
+	void FollowEmit(const Vector3& transform);
 
 	/// <summary>
 	/// パーティクルを指定した位置で発生
@@ -70,10 +70,10 @@ private:
 	void InitJson();
 
 
-    public:
+public:
 
 	void SetPosition(const Vector3& position) { emitter_.transform = position; };
-	void SetCount(uint32_t& setcount) { emitter_.count= setcount; };
+	void SetCount(uint32_t& setcount) { emitter_.count = setcount; };
 
 private:
 
@@ -81,9 +81,9 @@ private:
 	/// エミッター構造体
 	/// </summary>
 	struct Emitter {
-		std::string name; 
+		std::string name;
 		Vector3 transform;
-		uint32_t count; 
+		uint32_t count;
 		float frequency;			// 頻度
 		float frequencyTime;		// 頻度時間
 	};
@@ -92,8 +92,7 @@ private:
 	Emitter emitter_{};
 	float deltaTime_ = 1.0f / 60.0f;
 
-	std::unique_ptr<JsonManager> jsonManager_;
-	bool isUpdateTime_ = false;
+	std::unique_ptr<JsonManager> jsonManager_;;
 
 };
 

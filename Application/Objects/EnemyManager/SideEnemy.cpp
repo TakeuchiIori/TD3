@@ -53,13 +53,14 @@ void SideEnemy::InitJson()
 void SideEnemy::Update()
 {
 	FaintUpdate(player_);
-	if (!IsStop()) // 攻撃を食らったら次まで気絶
+	if (!isAlive_) {
+		//aabbCollider_->~AABBCollider();
+		obbCollider_->~OBBCollider();
+		return;
+	}
+
+	if (!IsStop()) // 攻撃を食らったら次まで動かない
 	{
-		if (!isAlive_) {
-			//aabbCollider_->~AABBCollider();
-			obbCollider_->~OBBCollider();
-			return;
-		}
 		Move();
 
 		Vector3 newPos = worldTransform_.translation_ + velocity_;
@@ -82,7 +83,10 @@ void SideEnemy::Update()
 
 void SideEnemy::Draw()
 {
-	obj_->Draw(camera_, worldTransform_);
+	if (!IsStop()) // 攻撃を食らったら次まで描画しない
+	{
+		obj_->Draw(camera_, worldTransform_);
+	}
 }
 
 void SideEnemy::DrawCollision()

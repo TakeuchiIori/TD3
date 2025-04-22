@@ -33,7 +33,7 @@ void Grass::Initialize(Camera* camera)
 	worldTransform_.UpdateMatrix();
 
 	growthAreaWT_.Initialize();
-	growthAreaWT_.scale_ = { 2.5f,2.5f,2.5f };
+	growthAreaWT_.scale_ = { growthAreaScaleF_,growthAreaScaleF_,growthAreaScaleF_ };
 	growthAreaWT_.translation_ = worldTransform_.translation_;
 	growthAreaWT_.UpdateMatrix();
 
@@ -73,8 +73,9 @@ void Grass::InitCollision()
 void Grass::InitJson()
 {
 	/*jsonManager_ = std::make_unique<JsonManager>("grassObj", "Resources/JSON/");
-
-	jsonCollider_ = std::make_unique<JsonManager>("grassCollider", "Resources/JSON/");
+	jsonManager_->SetCategory("Objects");
+	jsonManager_->Register("唾を吐ける範囲", &growthAreaScaleF_);*/
+	/*jsonCollider_ = std::make_unique<JsonManager>("grassCollider", "Resources/JSON/");
 	aabbCollider_->InitJson(jsonCollider_.get());*/
 }
 
@@ -146,7 +147,7 @@ void Grass::OnCollision(BaseCollider* self, BaseCollider* other)
 						{
 							obj_->SetMaterialColor(growthColor_);
 							behaviortRquest_ = BehaviorGrass::Growth;
-							particleEmitter_->FollowEmit("GrowthParticle",worldTransform_.translation_);
+							particleEmitter_->FollowEmit(worldTransform_.translation_);
 						}
 					}
 				}
@@ -167,11 +168,11 @@ void Grass::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDir
 #ifdef _DEBUG
 void Grass::DebugGrass()
 {
+	growthAreaWT_.scale_ = { growthAreaScaleF_,growthAreaScaleF_,growthAreaScaleF_ };
 	float t = 1.0f - (growthTimer_ / kGrowthTime_);
 	ImGui::Begin("DebugGrass");
 	ImGui::DragFloat("t", &t);
 	ImGui::Text("%d", enter);
-
 	ImGui::End();
 }
 #endif // _DEBUG
