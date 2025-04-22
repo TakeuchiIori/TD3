@@ -76,7 +76,7 @@ void DebugCamera::UpdateInput()
         Vector3 transformedMove = TransformNormal(moveDelta, rotMat);
 
         // 移動を適用
-        translate_ += transformedMove;
+        //translate_ += transformedMove;
     } else {
         isDragging_ = false;
     }

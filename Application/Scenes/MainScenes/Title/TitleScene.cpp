@@ -93,11 +93,11 @@ void TitleScene::Update()
 	book_->Update();
 
 
+    bookEventCamera_.RegisterControlPoints();
     UpdateCameraMode();
 	UpdateCamera();
-
 	cameraManager_.UpdateAllCameras();
-
+    
     LightManager::GetInstance()->ShowLightingEditor();
     CollisionManager::GetInstance()->Update();
     JsonManager::ImGuiManager();
@@ -146,6 +146,7 @@ void TitleScene::DrawObject()
 	mpInfo_->Draw();
 	player_->Draw();
 	book_->Draw();
+	bookEventCamera_.Draw(sceneCamera_.get());
 }
 
 void TitleScene::DrawSprite()
@@ -228,7 +229,7 @@ void TitleScene::UpdateCamera()
 	case CameraMode::BOOK_EVENT:
 	{
 		if (isBookTrigger_) {
-            bookEventCamera_.GenerateControlPoints(book_->GetCenterPosition(), 7);
+            
 			bookEventCamera_.Update();
 			sceneCamera_->SetFovY(bookEventCamera_.GetFov());
 			sceneCamera_->viewMatrix_ = bookEventCamera_.matView_;

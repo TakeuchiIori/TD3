@@ -3,16 +3,13 @@
 
 // c++
 #include <numbers>
+#include <string>
 
 void BookEventCamera::Initialize()
 {
-    controlPoints_.clear();
-    //controlPoints_.push_back({ 0, 10, -60 });
-    //controlPoints_.push_back({ 0, 8, -40 });
-    //controlPoints_.push_back({ 0, 6, -20 });
-    //controlPoints_.push_back({ 0, 5, 0 });
     translate_.z = -40.0f;
     InitJson();
+	t_ = 0.0f;
 }
 
 void BookEventCamera::InitJson()
@@ -20,24 +17,36 @@ void BookEventCamera::InitJson()
 	jsonManager_ = std::make_unique<JsonManager>("BookEventCamera", "Resources/JSON/");
 	jsonManager_->SetCategory("Cameras");
 	jsonManager_->SetSubCategory("BookEventCamera");
-	//jsonManager_->Register("Translate", &translate_);
 	jsonManager_->Register("Rotate", &rotate_);
 	jsonManager_->Register("カメラの移動速度", &speed_);
+
+
+    jsonManager_->Register("制御点", &controlPoints_);
 }
 
 void BookEventCamera::Update()
 {
     t_ += speed_;
-    if (t_ >= float(controlPoints_.size() - 3)) {
-        t_ = float(controlPoints_.size() - 3);
+    if (t_ > float(controlPoints_.size()-1)) {
+        t_ = float(controlPoints_.size()-1);
     }
 
     translate_ = EvaluateSpline(t_);
 
     if (target_) {
-		matView_ = MakeLookAtMatrix(translate_, target_->translation_, Vector3(0, 1, 0));
+		matView_ = MakeLookAtMatrix(translate_, target_->translation_, Vector3(0, 3, 0));
     }
 }
+
+
+void BookEventCamera::Draw(Camera* camera)
+{
+    for (size_t i = 0; i < obj_.size(); ++i) {
+        wt_[i]->UpdateMatrix();
+        obj_[i]->Draw(camera,*wt_[i]);
+    }
+}
+
 
 void BookEventCamera::GenerateControlPoints(const Vector3& endPos, int num)
 {
@@ -66,30 +75,60 @@ void BookEventCamera::AddControlPoint(const Vector3& point)
 	controlPoints_.push_back(point);
 }
 
+void BookEventCamera::RegisterControlPoints()
+{
+    if (wt_.size() < controlPoints_.size()) {
+        for (size_t i = wt_.size(); i < controlPoints_.size(); ++i) {
+            auto wt = std::make_unique<WorldTransform>();
+            wt->Initialize();
+            wt->translation_ = controlPoints_[i];
+            wt_.push_back(std::move(wt));
+
+            auto obj = std::make_unique<Object3d>();
+            obj->Initialize();
+            obj->SetModel("unitCube.obj");
+            obj->SetMaterialColor({ 1.0f, 0.0f, 1.0f, 1.0f });
+            obj_.push_back(std::move(obj));
+        }
+    }
+
+    // 制御点からワールドトランスフォームを更新
+    for (size_t i = 0; i < std::min(wt_.size(), controlPoints_.size()); ++i) {
+        wt_[i]->translation_ = controlPoints_[i];
+    }
+}
+
 Vector3 BookEventCamera::EvaluateSpline(float t)
 {
-	int count = static_cast<int>(controlPoints_.size());
-	if (count < 4) {
-        return Vector3(0, 0, 0);
-	}
+    if (controlPoints_.size() < 2) return Vector3{};
 
-    int i = std::clamp(int(t), 1, count - 3);
-    float localT = t - float(i);
+    int seg = std::clamp(int(t), 0, int(controlPoints_.size() - 2));
+    float localT = t - float(seg);
 
-    const Vector3& p0 = controlPoints_[i - 1];
-    const Vector3& p1 = controlPoints_[i];
-    const Vector3& p2 = controlPoints_[i + 1];
-    const Vector3& p3 = controlPoints_[i + 2];
-
-    return
-        0.5f * (
-            (2.0f * p1) +
-            (-p0 + p2) * localT +
-            (2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3) * localT * localT +
-            (-p0 + 3.0f * p1 - 3.0f * p2 + p3) * localT * localT * localT
-            );
+    return Lerp(controlPoints_[seg], controlPoints_[seg + 1], localT);
 
 
 
+
+}
+
+void BookEventCamera::ImGui()
+{
+//#ifdef _DEBUG
+//    if (ImGui::TreeNode("Control Points")) {
+//        for (size_t i = 0; i < controlPoints_.size(); ++i) {
+//            std::string label = "Point " + std::to_string(i);
+//            ImGui::DragFloat3(label.c_str(), &controlPoints_[i].x, 0.1f);
+//        }
+//
+//        if (ImGui::Button("Add Point")) {
+//            controlPoints_.push_back({ 0, 0, 0 });
+//        }
+//        if (ImGui::Button("Clear Points")) {
+//            controlPoints_.clear();
+//        }
+//        ImGui::TreePop();
+//    }
+//#endif // _DEBUG
 
 }

@@ -118,7 +118,26 @@ public:
                 }
                 ImGui::EndCombo();
             }
+        } else if constexpr (std::is_same_v<T, std::vector<Vector3>>)
+        {
+            ImGui::Text("%s", name.c_str());
+            for (size_t i = 0; i < ptr_->size(); ++i)
+            {
+                std::string pointLabel = "Point " + std::to_string(i) + "##" + uniqueID;
+                ImGui::DragFloat3(pointLabel.c_str(), &(*ptr_)[i].x, 0.1f);
+            }
+
+            if (ImGui::Button(("Add##" + uniqueID).c_str()))
+            {
+                ptr_->push_back(Vector3{ 0,0,0 });
+            }
+            ImGui::SameLine();
+            if (ImGui::Button(("Clear##" + uniqueID).c_str()))
+            {
+                ptr_->clear();
+            }
         }
+
 
 #endif // _DEBUG
 
