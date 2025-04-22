@@ -93,6 +93,10 @@ public:
 		};
 	}
 
+	WorldTransform& GetWorldTransform() {
+		return worldTransform_;
+	}
+
 	// 衝突イベント（共通で受け取る）
 	void OnEnterCollision(BaseCollider* self, BaseCollider* other);
 	void OnCollision(BaseCollider* self, BaseCollider* other);

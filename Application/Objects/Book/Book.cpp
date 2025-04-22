@@ -86,6 +86,10 @@ void Book::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
 	{
+		if (OnBookTrigger_)
+		{
+			OnBookTrigger_();
+		}
 		obj_->SetMaterialColor(Vector3{ 1.0,1.0f,0.0f });
 	}
 }

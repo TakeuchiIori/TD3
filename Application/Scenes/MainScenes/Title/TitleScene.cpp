@@ -31,6 +31,7 @@ void TitleScene::Initialize()
     cameraMode_ = CameraMode::DEFAULT;
     followCamera_.Initialize();
     debugCamera_.Initialize();
+	bookEventCamera_.Initialize();
 
     // オーディオファイルのロード（例: MP3）
     soundData = Audio::GetInstance()->LoadAudio(L"Resources./images./harpohikunezumi.mp3");
@@ -49,12 +50,17 @@ void TitleScene::Initialize()
 
 	player_ = std::make_unique<TitlePlayer>(mpInfo_->GetMapChipField());
 	player_->Initialize(sceneCamera_.get());
+	bookEventCamera_.SetTarget(player_->GetWorldTransform());
 
 	book_ = std::make_unique<Book>(mpInfo_->GetMapChipField());
 	book_->Initialize(sceneCamera_.get());
+    book_->OnBookTrigger_ = [this]() {
+        cameraMode_ = CameraMode::BOOK_EVENT;
+        this->isBookTrigger_ = true;
+     };
 
 
-
+    
 }
 
 /// <summary>
@@ -65,9 +71,9 @@ void TitleScene::Update()
     GameTime::Update();
     GameTime::ImGui();
 
-    if (Input::GetInstance()->PushKey(DIK_RETURN) || Input::GetInstance()->IsPadPressed(0,GamePadButton::A)) {
-        sceneManager_->ChangeScene("Game");
-    }
+    //if (Input::GetInstance()->PushKey(DIK_RETURN) || Input::GetInstance()->IsPadPressed(0,GamePadButton::A)) {
+    //    sceneManager_->ChangeScene("Game");
+    //}
 
 #ifdef _DEBUG
     if ((Input::GetInstance()->TriggerKey(DIK_LCONTROL)) || Input::GetInstance()->IsPadTriggered(0, GamePadButton::RT)) {
@@ -178,6 +184,9 @@ void TitleScene::UpdateCameraMode()
 	if (ImGui::Button("Debug Camera")) {
 		cameraMode_ = CameraMode::DEBUG;
 	}
+	if (ImGui::Button("Book Event")) {
+		cameraMode_ = CameraMode::BOOK_EVENT;
+	}
     ImGui::End();
 #endif
 }
@@ -214,6 +223,22 @@ void TitleScene::UpdateCamera()
             sceneCamera_->UpdateMatrix();
         }
     }
+
+    break;
+	case CameraMode::BOOK_EVENT:
+	{
+		if (isBookTrigger_) {
+            bookEventCamera_.GenerateControlPoints(book_->GetCenterPosition(), 7);
+			bookEventCamera_.Update();
+			sceneCamera_->SetFovY(bookEventCamera_.GetFov());
+			sceneCamera_->viewMatrix_ = bookEventCamera_.matView_;
+			sceneCamera_->transform_.translate = bookEventCamera_.translate_;
+			sceneCamera_->transform_.rotate = bookEventCamera_.rotate_;
+
+			sceneCamera_->UpdateMatrix();
+		} 
+	}
+    break;
 
     default:
         break;

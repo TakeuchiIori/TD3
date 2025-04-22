@@ -25,7 +25,7 @@
 #include "../../../SystemsApp/Cameras/DebugCamera/DebugCamera.h"
 #include "../../../SystemsApp/Cameras/FollowCamera/FollowCamera.h"
 #include "../../../SystemsApp/Cameras/TopDownCamera/TopDownCamera.h"
-
+#include "../../../SystemsApp/Cameras/BookEventCamera/BookEventCamera.h"
 // app
 #include "Player/TitlePlayer.h" 
 #include "Book/Book.h"
@@ -37,8 +37,8 @@ class TitleScene : public BaseScene
 	{
 		DEFAULT,
 		FOLLOW,
-		DEBUG
-
+		DEBUG,
+		BOOK_EVENT
 	};
 
 public:
@@ -116,6 +116,7 @@ private:
 	CameraManager cameraManager_;
 	FollowCamera followCamera_;
 	DebugCamera debugCamera_;
+	BookEventCamera bookEventCamera_;
 	bool isDebugCamera_ = false;
 
 	/*=================================================================
@@ -143,7 +144,7 @@ private:
 	=================================================================*/
 	
 	std::unique_ptr<MapChipInfo> mpInfo_;
-
+	bool isBookTrigger_ = false;
 
 
 	/*=================================================================

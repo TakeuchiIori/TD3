@@ -152,3 +152,6 @@ Matrix4x4 TranslationMatrixFromVector3(const Vector3& translate);
 Vector3 MatrixToEuler(const Matrix4x4& m);
 
 DirectX::XMMATRIX ConvertToXMMATRIX(const Matrix4x4& matrix);
+
+
+Matrix4x4 MakeLookAtMatrix(const Vector3& eye, const Vector3& target, const Vector3& up = { 0.0f, 1.0f, 0.0f });

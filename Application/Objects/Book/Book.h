@@ -66,6 +66,8 @@ public:
 	void MapChipOnCollision(const CollisionInfo& info);
 	void Reset();
 
+	std::function<void()> OnBookTrigger_ = nullptr;
+
 private:
 
 	/// <summary>
