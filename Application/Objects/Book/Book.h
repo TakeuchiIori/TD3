@@ -9,7 +9,7 @@
 #include "WorldTransform/WorldTransform.h"
 #include "Systems/GameTime/GameTime.h"
 #include "Loaders/Json/JsonManager.h"
-
+#include "Systems/UI/UIBase.h"
 
 // app
 #include "BaseObject/BaseObject.h"
@@ -48,6 +48,7 @@ public:
 	/// 更新処理
 	/// </summary>
 	void Update() override;
+	void UpdateSprite();
 	void UpdateMatrix();
 
 
@@ -55,6 +56,7 @@ public:
 	///  描画処理
 	/// </summary>
 	void Draw() override;
+	void DrawSprite();
 	void DrawCollision();
 
 
@@ -113,6 +115,11 @@ private:
 
 	// コライダー
 	std::shared_ptr<OBBCollider> obbCollider_;
+
+
+	// UI関連
+	std::unique_ptr<UIBase> uiBook_;
+	Vector3 offset_ = {0.0f,-15.0,0.0f};
 
 
 	// マップチップ

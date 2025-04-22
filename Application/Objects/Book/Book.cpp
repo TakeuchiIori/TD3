@@ -24,6 +24,10 @@ void Book::Initialize(Camera* camera)
 	InitCollision();
 	InitJson();
 
+
+	uiBook_ = std::make_unique<UIBase>("UIBook");
+	uiBook_->Initialize("Resources/JSON/UI/BookUI.json");
+
 }
 
 void Book::InitCollision()
@@ -50,6 +54,20 @@ void Book::Update()
 {
 	UpdateMatrix();
 	obbCollider_->Update();
+	UpdateSprite();
+}
+
+void Book::UpdateSprite()
+{
+	Vector3 newPos = worldTransform_.translation_;
+	Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
+	Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
+	newPos = Transform(newPos, matViewProjectionViewport);
+	newPos += offset_;
+	uiBook_->SetPosition(newPos);
+
+	uiBook_->Update();
+	uiBook_->ImGUi();
 }
 
 void Book::UpdateMatrix()
@@ -61,6 +79,11 @@ void Book::Draw()
 {
 	obj_->Draw(BaseObject::camera_, worldTransform_);
 
+}
+
+void Book::DrawSprite()
+{
+	uiBook_->Draw();
 }
 
 void Book::DrawCollision()

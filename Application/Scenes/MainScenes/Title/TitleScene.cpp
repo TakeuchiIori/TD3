@@ -170,6 +170,7 @@ void TitleScene::DrawObject()
 
 void TitleScene::DrawSprite()
 {
+    book_->DrawSprite();
 }
 
 void TitleScene::DrawAnimation()
