@@ -137,7 +137,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Utility\Loaders\Model\Material\MaterialManager.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Model\Material\MaterialUV.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Model\Mesh\Mesh.cpp" />
-    <ClCompile Include="Engine\Utility\Loaders\Model\Mesh\MeshPrimitive.cpp" />
     <ClCompile Include="Engine\Utility\Systems\MapChip\MapChipCollision.cpp" />
     <ClCompile Include="Engine\Utility\Systems\MapChip\MapChipField.cpp" />
     <ClCompile Include="Engine\Utility\Systems\MapChip\MapChipInfo.cpp" />
@@ -234,7 +233,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Utility\Collision\OBB\OBBCollider.h" />
     <ClInclude Include="Engine\Utility\Collision\Sphere\SphereCollider.h" />
     <ClInclude Include="Engine\Utility\Debugger\Logger.h" />
-    <ClInclude Include="Engine\Utility\Loaders\Json\EnumUtils.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\Animation\Animation.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\Animation\AnimationSystem.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\Material\Material.h" />
@@ -243,7 +241,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Utility\Loaders\Model\Material\MaterialManager.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\Material\MaterialUV.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\Mesh\Mesh.h" />
-    <ClInclude Include="Engine\Utility\Loaders\Model\Mesh\MeshPrimitive.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\ModelUtils.h" />
     <ClInclude Include="Engine\Utility\Systems\MapChip\MapChipCollision.h" />
     <ClInclude Include="Engine\Utility\Systems\MapChip\MapChipField.h" />
@@ -313,6 +310,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Scenes\MainScenes\Transitions\Base\TransitionFactory.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\Mesh.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\ModelTest.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\ModelLoader.h" />
     <ClInclude Include="Application\Objects\Player\Player.h" />
     <ClInclude Include="Application\Objects\Player\PlayerMapCollision.h" />
     <ClInclude Include="Application\Objects\Player\PlayerBody.h" />
