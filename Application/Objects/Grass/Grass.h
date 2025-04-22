@@ -62,8 +62,11 @@ public:
 		obj_->SetMaterialColor(defaultColor_);
 		if(behavior_ != BehaviorGrass::Growth)
 		{
-			isLarge_ = false;
-			behaviortRquest_ = BehaviorGrass::Repop;
+			if(behavior_ == BehaviorGrass::Eaten)
+			{
+				isLarge_ = false;
+				behaviortRquest_ = BehaviorGrass::Repop;
+			}
 		}
 		else
 		{
@@ -193,6 +196,7 @@ private:
 
 	Vector3 defaultScale_ = { 1.0f,1.0f,1.0f };
 	Vector3 growthScale_ = { 1.8f,1.8f,1.8f };
+	float growthAreaScaleF_ = 4.5f;
 
 	// 食べる処理
 	float eatenTimer_ = 0.0f;
