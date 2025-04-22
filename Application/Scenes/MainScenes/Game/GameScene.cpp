@@ -59,6 +59,7 @@ void GameScene::Initialize()
 	stageManager_ = std::make_unique<StageManager>();
 	stageManager_->SetMapChipInfo(mpInfo_.get());
 	stageManager_->Initialize(sceneCamera_.get());
+	stageManager_->SetFollowCamera(&followCamera_);
 
 
 	followCamera_.SetTarget(stageManager_->GetPlayer()->GetWorldTransform());
@@ -138,6 +139,8 @@ void GameScene::Update()
 			stageManager_->NotDebugCameraUpdate();
 		}
 		stageManager_->Update();
+
+		
 	}
 
 	giraffe_->Update();

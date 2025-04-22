@@ -2,6 +2,7 @@
 
 #include "Stage.h"
 #include "Systems/MapChip/MapChipInfo.h"
+#include "../SystemsApp/Cameras/FollowCamera/FollowCamera.h"
 
 class StageManager
 {
@@ -46,11 +47,14 @@ public:
 
 	bool IsClear() { return stageList_[currentStageNum_]->IsClear() || input_->TriggerKey(DIK_L); }
 
+	void SetFollowCamera(FollowCamera* camera) { followCamera_ = camera; }
+
 
 private:
 	Input* input_ = nullptr;
 
 	Camera* camera_ = nullptr;
+	FollowCamera* followCamera_ = nullptr;
 
 	std::vector<std::unique_ptr<Stage>> stageList_;
 	MapChipInfo* mpInfo_ = nullptr;
@@ -61,5 +65,9 @@ private:
 	std::unique_ptr<Player> player_;
 	std::unique_ptr<EnemyManager> enemyManager_;
 	std::unique_ptr<GrassManager> grassManager_;
+
+	float cameraScrollStart_ = 16.0f;
+	float cameraScrollEnd_ = 22.0f;
+	float offsetY_ = 2.0f;
 };
 

@@ -24,6 +24,10 @@ public:
 
     void SetTarget(const WorldTransform& target) { target_ = &target; }
 
+    void SetOffsetY(float Y) { offset_.y = Y; }
+
+    float GetOffsetY() { return offset_.y; }
+
 private:
 
     std::unique_ptr <JsonManager> jsonManager_;
