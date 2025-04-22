@@ -12,7 +12,7 @@
 
 void DebugCamera::Initialize()
 {
-    InitJson();
+    
 
     // カメラの初期位置を設定
     translate_ = { 0.0f, 6.0f, -40.0f };
@@ -20,6 +20,8 @@ void DebugCamera::Initialize()
     // 初期のマウス位置を取得
     Input* input = Input::GetInstance();
     prevMousePos_ = input->GetMousePosition();
+
+    InitJson();
 }
 
 void DebugCamera::Update()

@@ -7,7 +7,7 @@
 
 void BookEventCamera::Initialize()
 {
-    translate_.z = -40.0f;
+    translate_.z = -82.5f;
     InitJson();
 	t_ = 0.0f;
 }

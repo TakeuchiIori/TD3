@@ -146,7 +146,9 @@ void TitleScene::DrawObject()
 	mpInfo_->Draw();
 	player_->Draw();
 	book_->Draw();
-	bookEventCamera_.Draw(sceneCamera_.get());
+	
+    // カメラ描画
+    //bookEventCamera_.Draw(sceneCamera_.get());
 }
 
 void TitleScene::DrawSprite()
