@@ -32,7 +32,7 @@ void Book::InitCollision()
 		this,
 		&worldTransform_,
 		camera_,
-		static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)
+		static_cast<uint32_t>(CollisionTypeIdDef::kBook)
 	);
 }
 
@@ -84,10 +84,15 @@ void Book::Move()
 
 void Book::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
+	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+	{
+		obj_->SetMaterialColor(Vector3{ 1.0,1.0f,0.0f });
+	}
 }
 
 void Book::OnCollision(BaseCollider* self, BaseCollider* other)
 {
+
 }
 
 void Book::OnExitCollision(BaseCollider* self, BaseCollider* other)
