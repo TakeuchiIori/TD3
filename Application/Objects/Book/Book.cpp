@@ -25,8 +25,9 @@ void Book::Initialize(Camera* camera)
 	InitJson();
 
 
-	uiBook_ = std::make_unique<UIBase>("UIBook");
-	uiBook_->Initialize("Resources/JSON/UI/BookUI.json");
+	uiBook_ = std::make_unique<Sprite>();
+	uiBook_->Initialize("Resources/Textures/Option/operation_yodare.png");
+	uiBook_->SetSize({ 150.0f, 100.0f });
 
 }
 
@@ -45,7 +46,6 @@ void Book::InitJson()
 	jsonManager_ = std::make_unique<JsonManager>("Book", "Resources/JSON/");
 	jsonManager_->SetCategory("Objects");
 	jsonManager_->SetSubCategory("Book");
-
 	jsonCollider_ = std::make_unique<JsonManager>("BookCollider", "Resources/JSON/");
 	obbCollider_->InitJson(jsonCollider_.get());
 }
@@ -67,7 +67,7 @@ void Book::UpdateSprite()
 	uiBook_->SetPosition(newPos);
 
 	uiBook_->Update();
-	uiBook_->ImGUi();
+	//uiBook_->ImGUi();
 }
 
 void Book::UpdateMatrix()

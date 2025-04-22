@@ -13,9 +13,9 @@
     "flipY": false,
     "name": "UIBook",
     "position": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0
+        "x": 1116.638916015625,
+        "y": 306.868896484375,
+        "z": 0.9997876882553101
     },
     "rotation": {
         "x": 0.0,
@@ -23,14 +23,14 @@
         "z": 0.0
     },
     "scale": {
-        "x": 16.0,
-        "y": 16.0
+        "x": 119.5,
+        "y": 80.5
     },
     "textureLeftTop": {
         "x": 0.0,
         "y": 0.0
     },
-    "texturePath": "./Resources/images/white.png",
+    "texturePath": "./Resources/Textures/Option/operation_yodare.png",
     "textureSize": {
         "x": 16.0,
         "y": 16.0

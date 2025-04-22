@@ -118,8 +118,8 @@ private:
 
 
 	// UI関連
-	std::unique_ptr<UIBase> uiBook_;
-	Vector3 offset_ = {0.0f,-15.0,0.0f};
+	std::unique_ptr<Sprite> uiBook_;
+	Vector3 offset_ = {-50.0f,-100.0,0.0f};
 
 
 	// マップチップ
