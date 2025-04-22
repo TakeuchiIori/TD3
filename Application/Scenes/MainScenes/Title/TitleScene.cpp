@@ -13,25 +13,27 @@
 #include "LightManager/LightManager.h"
 #include "Sprite/SpriteCommon.h"
 #include <Collision/Core/CollisionManager.h>
+#include <Systems/GameTime/GameTIme.h>
+#include <Loaders/Json/JsonManager.h>
+
 /// <summary>
 /// 初期化処理
 /// </summary>
 void TitleScene::Initialize()
 {
+    GameTime::Initailzie();
     // カメラの生成
     sceneCamera_ = cameraManager_.AddCamera();
     Object3dCommon::GetInstance()->SetDefaultCamera(sceneCamera_.get());
     // 初期カメラモード設定
-    cameraMode_ = CameraMode::DEBUG;
+    cameraMode_ = CameraMode::DEFAULT;
     followCamera_.Initialize();
     debugCamera_.Initialize();
 
     // オーディオファイルのロード（例: MP3）
     soundData = Audio::GetInstance()->LoadAudio(L"Resources./images./harpohikunezumi.mp3");
-
     //// オーディオの再生
     //sourceVoice = Audio::GetInstance()->SoundPlayAudio(soundData);
-
     //// 音量の設定（0.0f ～ 1.0f）
     //Audio::GetInstance()->SetVolume(sourceVoice, 0.05f); // 80%の音量に設定
 
@@ -41,6 +43,11 @@ void TitleScene::Initialize()
 	mpInfo_->Initialize();
 	mpInfo_->SetCamera(sceneCamera_.get());
 
+
+
+	player_ = std::make_unique<TitlePlayer>(mpInfo_->GetMapChipField());
+	player_->Initialize(sceneCamera_.get());
+
 }
 
 /// <summary>
@@ -48,7 +55,10 @@ void TitleScene::Initialize()
 /// </summary>
 void TitleScene::Update()
 {
-    if (Input::GetInstance()->PushKey(DIK_SPACE) || Input::GetInstance()->IsPadPressed(0,GamePadButton::A)) {
+    GameTime::Update();
+    GameTime::ImGui();
+
+    if (Input::GetInstance()->PushKey(DIK_RETURN) || Input::GetInstance()->IsPadPressed(0,GamePadButton::A)) {
         sceneManager_->ChangeScene("Game");
     }
 
@@ -63,7 +73,7 @@ void TitleScene::Update()
 
 
 	mpInfo_->Update();
-
+    player_->Update();
 
 
     UpdateCameraMode();
@@ -73,8 +83,7 @@ void TitleScene::Update()
 
     LightManager::GetInstance()->ShowLightingEditor();
     CollisionManager::GetInstance()->Update();
-
-
+    JsonManager::ImGuiManager();
 }
 
 
@@ -118,6 +127,7 @@ void TitleScene::DrawOffScreen()
 void TitleScene::DrawObject()
 {
 	mpInfo_->Draw();
+	player_->Draw();
 }
 
 void TitleScene::DrawSprite()

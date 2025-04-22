@@ -26,6 +26,10 @@
 #include "../../../SystemsApp/Cameras/FollowCamera/FollowCamera.h"
 #include "../../../SystemsApp/Cameras/TopDownCamera/TopDownCamera.h"
 
+// app
+#include "Player/TitlePlayer.h" 
+
+
 class TitleScene : public BaseScene
 {
 
@@ -121,6 +125,16 @@ private:
 	=================================================================*/
 	Audio::SoundData soundData;
 	IXAudio2SourceVoice* sourceVoice;
+
+
+	/*=================================================================
+
+								オブジェクト
+
+	=================================================================*/
+	std::unique_ptr<TitlePlayer> player_;
+
+
 
 	/*=================================================================
 
