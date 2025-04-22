@@ -145,7 +145,7 @@ private:
 	
 	std::unique_ptr<MapChipInfo> mpInfo_;
 	bool isBookTrigger_ = false;
-
+	bool isStartEvent_ = false;
 
 	/*=================================================================
 

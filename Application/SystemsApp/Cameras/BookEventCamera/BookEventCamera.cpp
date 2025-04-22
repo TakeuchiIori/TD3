@@ -1,5 +1,5 @@
 #include "BookEventCamera.h"
-
+#include "Systems/GameTime/GameTime.h"
 
 // c++
 #include <numbers>
@@ -33,11 +33,17 @@ void BookEventCamera::Update()
 
     translate_ = EvaluateSpline(t_);
 
+
     // ターゲットがあれば、その位置を向くようにビュー行列を作る
     if (target_) {
         rotate_ = GetEulerAnglesFromToDirection(translate_, target_->translation_);
         matView_ = Inverse(MakeAffineMatrix(scale_, rotate_, translate_));
     }
+
+    if (isFinishedMove_ && t_ >= float(controlPoints_.size() - 1.0f)) {
+        isFinishedMove_();
+    }
+
 }
 
 void BookEventCamera::FollowProsess()

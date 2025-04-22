@@ -54,11 +54,21 @@ void TitleScene::Initialize()
 
 	book_ = std::make_unique<Book>(mpInfo_->GetMapChipField());
 	book_->Initialize(sceneCamera_.get());
+
+
+
+
+    // コールバック関数
     book_->OnBookTrigger_ = [this]() {
         cameraMode_ = CameraMode::BOOK_EVENT;
         this->isBookTrigger_ = true;
+        // 時間止める
+        GameTime::Pause();
      };
 
+	bookEventCamera_.isFinishedMove_ = [this]() {
+		this->isStartEvent_ = true;
+		};
 
     
 }
@@ -70,6 +80,13 @@ void TitleScene::Update()
 {
     GameTime::Update();
     GameTime::ImGui();
+
+    if (isStartEvent_) {
+		// ここにイベントの処理を書く
+		// 例えば、シーン遷移やアニメーションの開始など
+		SceneManager::GetInstance()->ChangeScene("Game");
+		isStartEvent_ = false;
+    }
 
     //if (Input::GetInstance()->PushKey(DIK_RETURN) || Input::GetInstance()->IsPadPressed(0,GamePadButton::A)) {
     //    sceneManager_->ChangeScene("Game");

@@ -35,6 +35,8 @@ public:
 
 public:
 
+	// 移動完了時のコールバック関数を登録
+    std::function<void()> isFinishedMove_ = nullptr;
     Vector3 translate_ = { 0,0,0 };
     Vector3 scale_ = { 1,1,1 };
     Vector3 rotate_ = { 0,0,0 };

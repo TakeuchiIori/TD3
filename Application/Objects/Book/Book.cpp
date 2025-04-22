@@ -43,8 +43,7 @@ void Book::InitJson()
 	jsonManager_->SetSubCategory("Book");
 
 	jsonCollider_ = std::make_unique<JsonManager>("BookCollider", "Resources/JSON/");
-	jsonCollider_->SetCategory("Collider");
-	jsonCollider_->SetSubCategory("BookCollider");
+	obbCollider_->InitJson(jsonCollider_.get());
 }
 
 void Book::Update()
