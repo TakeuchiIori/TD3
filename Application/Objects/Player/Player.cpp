@@ -29,18 +29,22 @@ void Player::Initialize(Camera* camera)
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = { 2.0f,6.0f,0.0f };
 	worldTransform_.scale_ = { 0.99f,0.99f,0.99f };
+	modelWT_.Initialize();
+	modelWT_.parent_ = &worldTransform_;
+	modelWT_.rotation_.y = std::numbers::pi_v<float>;
 	//worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
 	nextWorldTransform_.Initialize();
 	nextWorldTransform_.translation_ = worldTransform_.translation_;
 	nextWorldTransform_.scale_ = worldTransform_.scale_;
 
 	worldTransform_.UpdateMatrix();
+	modelWT_.UpdateMatrix();
 	nextWorldTransform_.UpdateMatrix();
 
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("unitCube.obj");
+	obj_->SetModel("head.obj");
 	obj_->SetMaterialColor(defaultColorV4_);
 
 	for (size_t i = 0; i < kMaxHP_; ++i)
@@ -134,6 +138,8 @@ void Player::Update()
 
 	HeartPos();
 
+	HeadDir();
+
 	UpdateMatrices();
 	
 	//aabbCollider_->Update();
@@ -147,13 +153,18 @@ void Player::Update()
 
 void Player::Draw()
 {
-	obj_->Draw(BaseObject::camera_, worldTransform_);
-	for (const auto& body : playerBodys_) {
+	obj_->Draw(camera_, modelWT_);
+
+	for (const auto& body : playerBodys_) 
+	{
 		body->Draw();
 	}
-	for (const auto& body : stuckGrassList_) {
+
+	for (const auto& body : stuckGrassList_) 
+	{
 		body->Draw();
 	}
+
 	for (size_t i = 0; i < drawCount_; ++i)
 	{
 		haerts_[i]->Draw();
@@ -344,6 +355,7 @@ void Player::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDi
 void Player::UpdateMatrices()
 {
 	worldTransform_.UpdateMatrix();
+	modelWT_.UpdateMatrix();
 	nextWorldTransform_.UpdateMatrix();
 	for (const auto& body : playerBodys_) 
 	{
@@ -471,8 +483,8 @@ void Player::UpBody()
 {
 	moveDirection_ = { 0,1,0 };
 	moveHistory_.push_back(worldTransform_.translation_);
-	worldTransform_.rotation_.z = 0;
-
+	//worldTransform_.rotation_.z = 0;
+	HeadDir();
 	// 体の出現
 	ExtendBody();
 	std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
@@ -488,8 +500,8 @@ void Player::DownBody()
 	moveDirection_ = { 0,-1,0 };
 	moveHistory_.push_back(worldTransform_.translation_);
 
-	worldTransform_.rotation_.z = std::numbers::pi_v<float>;
-
+	//worldTransform_.rotation_.z = std::numbers::pi_v<float>;
+	HeadDir();
 	ExtendBody();
 	std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
 	body->Initialize(BaseObject::camera_);
@@ -504,8 +516,8 @@ void Player::LeftBody()
 	moveDirection_ = { -1,0,0 };
 	moveHistory_.push_back(worldTransform_.translation_);
 
-	worldTransform_.rotation_.z = std::numbers::pi_v<float> / 2.0f;
-
+	//worldTransform_.rotation_.z = std::numbers::pi_v<float> / 2.0f;
+	HeadDir();
 	ExtendBody();
 	std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
 	body->Initialize(BaseObject::camera_);
@@ -521,8 +533,8 @@ void Player::RightBody()
 	moveHistory_.push_back(worldTransform_.translation_);
 
 
-	worldTransform_.rotation_.z = 3.0f * std::numbers::pi_v<float> / 2.0f;
-
+	//worldTransform_.rotation_.z = 3.0f * std::numbers::pi_v<float> / 2.0f;
+	HeadDir();
 	ExtendBody();
 	std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
 	body->Initialize(BaseObject::camera_);
