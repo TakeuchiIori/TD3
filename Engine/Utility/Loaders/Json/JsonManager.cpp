@@ -207,72 +207,75 @@ void JsonManager::ImGui(const std::string& className)
 // JsonManager.cpp の ImGuiManager を修正
 void JsonManager::ImGuiManager()
 {
-
 #ifdef _DEBUG
-	ImGui::Begin("JsonManager", nullptr, ImGuiWindowFlags_MenuBar);
+	ImGui::Begin("JsonManager");
 
-	if (ImGui::BeginMenuBar()) {
-		if (ImGui::BeginMenu("オプション")) {
+	ImGui::Text("Select Category:");
 
-			if (ImGui::MenuItem("全て保存")) {
-				for (auto& [name, instance] : instances) {
-					instance->Save();
-				}
-			}
-
-			ImGui::EndMenu();
-		}
-		ImGui::EndMenuBar();
-	}
-
-	static char filterBuffer[128] = "";
-	ImGui::InputTextWithHint("##Filter", "クラス名でフィルター", filterBuffer, IM_ARRAYSIZE(filterBuffer));
-
+	// カテゴリ > （サブカテゴリ or 直クラス）
 	std::map<std::string, std::map<std::string, std::vector<std::string>>> treeMap;
+
 	for (const auto& [name, manager] : instances) {
+		Logger("Instance: " + name + "\n");
 		std::string cat = manager->GetCategory().empty() ? "Uncategorized" : manager->GetCategory();
-		std::string subCat = manager->GetSubCategory().empty() ? "__NoSubCategory__" : manager->GetSubCategory();
-		if (strlen(filterBuffer) == 0 || name.find(filterBuffer) != std::string::npos) {
-			treeMap[cat][subCat].push_back(name);
+		std::string subCat = manager->GetSubCategory();
+
+		// サブカテゴリが空なら「__NoSubCategory__」という特殊キーにする
+		if (subCat.empty()) {
+			subCat = "__NoSubCategory__";
 		}
+
+		treeMap[cat][subCat].push_back(name);
 	}
 
 	ImGui::BeginChild("ClassTree", ImVec2(0, 0), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+
 	for (const auto& [cat, subMap] : treeMap) {
-		if (ImGui::CollapsingHeader(cat.c_str(), ImGuiTreeNodeFlags_None)) {
-			for (const auto& [subCat, classList] : subMap) {
-				if (subCat != "__NoSubCategory__") {
-					if (ImGui::TreeNode(subCat.c_str())) {
-						for (const auto& className : classList) {
-							if (ImGui::Selectable(className.c_str(), selectedClass == className)) {
-								selectedClass = className;
-							}
-						}
-						ImGui::TreePop();
-					}
-				} else {
+		if (ImGui::TreeNode(cat.c_str())) {
+			for (const auto& [subCat, rawclassList] : subMap) {
+				// __NoSubCategory__ ならそのままボタンだけ表示
+				std::vector<std::string> classList = rawclassList; // コピーしてソート用に
+				std::sort(classList.begin(), classList.end());
+				if (subCat == "__NoSubCategory__") {
 					for (const auto& className : classList) {
-						if (ImGui::Selectable(className.c_str(), selectedClass == className)) {
+						if (ImGui::Button(className.c_str(), ImVec2(250, 30))) {
 							selectedClass = className;
 						}
 					}
+				} else {
+					if (ImGui::TreeNode(subCat.c_str())) {
+						for (const auto& className : classList) {
+							if (ImGui::Button(className.c_str(), ImVec2(250, 30))) {
+								selectedClass = className;
+							}
+						}
+						ImGui::TreePop(); // subCat
+					}
 				}
 			}
+			ImGui::TreePop(); // cat
 		}
 	}
+
 	ImGui::EndChild();
 
+	// （以下、選択クラスの表示などはそのまま）
 	if (!selectedClass.empty()) {
 		auto it = instances.find(selectedClass);
 		if (it != instances.end()) {
 			JsonManager* instance = it->second;
 
-			ImGui::SeparatorText(selectedClass.c_str());
-			ImGui::PushID(selectedClass.c_str());
-			ImGui::BeginChild("VariableList", ImVec2(0, 300), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+			ImGui::TextColored(ImVec4(1.0f, 0.6f, 0.2f, 1.0f), "[ %s ]", selectedClass.c_str());
+			//ImGui::Separator();
 
+			ImGui::PushID(selectedClass.c_str());
+
+			// 変数表示もスクロールできるように
+			ImGui::BeginChild("VariableList", ImVec2(0, 300), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+			// ▼ グループ化：ピリオドで分割してツリー構造に分類
 			std::map<std::string, std::vector<std::pair<std::string, IVariableJson*>>> groupedVars;
 			std::vector<std::pair<std::string, IVariableJson*>> flatVars;
+
 			for (auto& [key, var] : instance->variables_) {
 				if (instance->treeKeys_.contains(key)) {
 					size_t dotPos = key.find('.');
@@ -283,6 +286,9 @@ void JsonManager::ImGuiManager()
 					flatVars.emplace_back(key, var.get());
 				}
 			}
+
+
+			// ▼ ツリー表示
 			for (auto& [group, vars] : groupedVars) {
 				if (ImGui::TreeNode(group.c_str())) {
 					for (auto& [name, var] : vars) {
@@ -291,16 +297,20 @@ void JsonManager::ImGuiManager()
 					ImGui::TreePop();
 				}
 			}
+
+			// ▼ 通常の変数（ピリオドなし）
 			for (auto& [key, var] : flatVars) {
 				var->ShowImGui(key, selectedClass);
 			}
+
 			ImGui::EndChild();
 
-			if (ImGui::Button("保存")) {
+			if (ImGui::Button(("Save " + selectedClass).c_str())) {
 				std::string message = format("{}.json Saved!!.", selectedClass);
 				MessageBoxA(nullptr, message.c_str(), "JsonManager", 0);
 				instance->Save();
 			}
+
 			ImGui::PopID();
 		}
 	}

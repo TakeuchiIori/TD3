@@ -3,7 +3,6 @@
 #include <memory>
 #include <string>
 #include "ConversionJson.h"
-#include "EnumUtils.h"
 
 #ifdef _DEBUG
 #include <imgui.h>
@@ -99,7 +98,7 @@ public:
         {
             ImGui::DragFloat4(label.c_str(), reinterpret_cast<float*>(ptr_), 0.1f);
         }
-
+        
         // Enum の場合
         else if constexpr (std::is_enum_v<T>) {
             const auto& names = GetEnumNames<T>();

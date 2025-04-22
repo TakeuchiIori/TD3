@@ -46,10 +46,26 @@ void StageManager::Update()
 
 	
 	stageList_[currentStageNum_]->Update();
+	///////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////
+	// カメラスクロール
+	if (player_->GetCenterPosition().y < cameraScrollStart_)
+	{
+		followCamera_->SetOffsetY(cameraScrollStart_ + offsetY_ - player_->GetCenterPosition().y);
+	}
+	else if (cameraScrollEnd_ + player_->GetCenterPosition().y >= stageList_[currentStageNum_]->GetCheckPoint())
+	{
+		float offset = (cameraScrollEnd_ - offsetY_ + player_->GetCenterPosition().y) - stageList_[currentStageNum_]->GetCheckPoint();
+		followCamera_->SetOffsetY(-offset);
+#ifdef _DEBUG
+		/*ImGui::Begin("Scroll");
+		ImGui::Text("%.2f", offset);
+		ImGui::End();*/
+#endif // _DEBUG
+	}
 
 	if (player_->EndReturn())
 	{
-
 		grassManager_->Repop();
 	}
 }

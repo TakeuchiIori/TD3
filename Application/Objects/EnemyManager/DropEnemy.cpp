@@ -47,36 +47,40 @@ void DropEnemy::InitJson()
 
 void DropEnemy::Update()
 {
+	FaintUpdate(player_);
 	if (!isAlive_) {
 		obbCollider_->~OBBCollider();
 		return;
 	}
 
-	if (!IsStop()) // 攻撃を食らったら次まで気絶
+	if (!IsStop()) // 攻撃を食らったら次まで動かない
 	{
 		Move();
+
+
+		Vector3 newPos = worldTransform_.translation_ + velocity_;
+		mpCollision_.DetectAndResolveCollision(
+			colliderRect_,  // 衝突判定用矩形
+			newPos,    // 更新される位置（衝突解決後）
+			velocity_,      // 更新される速度
+			MapChipCollision::CollisionFlag::All,  // すべての方向をチェック
+			[this](const CollisionInfo& info) {
+				// 衝突時の処理（例：特殊ブロック対応）
+				MapChipOnCollision(info);
+			}
+		);
+		worldTransform_.translation_ = newPos;
 	}
-
-
-	Vector3 newPos = worldTransform_.translation_ + velocity_;
-	mpCollision_.DetectAndResolveCollision(
-		colliderRect_,  // 衝突判定用矩形
-		newPos,    // 更新される位置（衝突解決後）
-		velocity_,      // 更新される速度
-		MapChipCollision::CollisionFlag::All,  // すべての方向をチェック
-		[this](const CollisionInfo& info) {
-			// 衝突時の処理（例：特殊ブロック対応）
-			MapChipOnCollision(info);
-		}
-	);
-	worldTransform_.translation_ = newPos;
 	worldTransform_.UpdateMatrix();
 	obbCollider_->Update();
 }
 
 void DropEnemy::Draw()
 {
-	obj_->Draw(camera_, worldTransform_);
+	if (!IsStop()) // 攻撃を食らったら次まで描画しない
+	{
+		obj_->Draw(camera_, worldTransform_);
+	}
 }
 
 void DropEnemy::DrawCollision()
