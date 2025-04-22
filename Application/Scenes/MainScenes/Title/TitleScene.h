@@ -28,7 +28,7 @@
 
 // app
 #include "Player/TitlePlayer.h" 
-
+#include "Book/Book.h"
 
 class TitleScene : public BaseScene
 {
@@ -133,7 +133,7 @@ private:
 
 	=================================================================*/
 	std::unique_ptr<TitlePlayer> player_;
-
+	std::unique_ptr<Book> book_;
 
 
 	/*=================================================================

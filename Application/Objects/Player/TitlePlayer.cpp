@@ -1,4 +1,7 @@
 #include "TitlePlayer.h"
+#include "Collision/OBB/OBBCollider.h"
+#include "Collision/Core/ColliderFactory.h"
+
 
 TitlePlayer::~TitlePlayer()
 {
@@ -19,13 +22,19 @@ void TitlePlayer::Initialize(Camera* camera)
 	input_ = Input::GetInstance();
 
 
-
+	InitCollision();
 	InitJson();
 
 }
 
 void TitlePlayer::InitCollision()
 {
+	obbCollider_ = ColliderFactory::Create<OBBCollider>(
+		this,
+		&worldTransform_,
+		camera_,
+		static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)
+	);
 }
 
 void TitlePlayer::InitJson()
@@ -47,6 +56,7 @@ void TitlePlayer::Update()
 
 
 	UpdateMatrix();
+	obbCollider_->Update();
 }
 
 void TitlePlayer::UpdateMatrix()
@@ -62,6 +72,7 @@ void TitlePlayer::Draw()
 
 void TitlePlayer::DrawCollision()
 {
+	obbCollider_->Draw();
 }
 
 void TitlePlayer::MapChipOnCollision(const CollisionInfo& info)

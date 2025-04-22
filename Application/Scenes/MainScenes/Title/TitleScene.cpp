@@ -25,6 +25,8 @@ void TitleScene::Initialize()
     // カメラの生成
     sceneCamera_ = cameraManager_.AddCamera();
     Object3dCommon::GetInstance()->SetDefaultCamera(sceneCamera_.get());
+    ParticleManager::GetInstance()->SetCamera(sceneCamera_.get());
+    CollisionManager::GetInstance()->Initialize();
     // 初期カメラモード設定
     cameraMode_ = CameraMode::DEFAULT;
     followCamera_.Initialize();
@@ -47,6 +49,11 @@ void TitleScene::Initialize()
 
 	player_ = std::make_unique<TitlePlayer>(mpInfo_->GetMapChipField());
 	player_->Initialize(sceneCamera_.get());
+
+	book_ = std::make_unique<Book>(mpInfo_->GetMapChipField());
+	book_->Initialize(sceneCamera_.get());
+
+
 
 }
 
@@ -74,9 +81,11 @@ void TitleScene::Update()
 
 	mpInfo_->Update();
 
-    if (isDebugCamera_) {
+    if (!isDebugCamera_) {
         player_->Update();
     }
+	book_->Update();
+
 
     UpdateCameraMode();
 	UpdateCamera();
@@ -130,6 +139,7 @@ void TitleScene::DrawObject()
 {
 	mpInfo_->Draw();
 	player_->Draw();
+	book_->Draw();
 }
 
 void TitleScene::DrawSprite()
@@ -142,6 +152,8 @@ void TitleScene::DrawAnimation()
 
 void TitleScene::DrawLine()
 {
+    player_->DrawCollision();
+	book_->DrawCollision();
 }
 
 /// <summary>

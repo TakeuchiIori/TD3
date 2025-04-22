@@ -118,6 +118,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\CheckPoint\CheckPoint.cpp" />
     <ClCompile Include="Application\Objects\Grass\Branch.cpp" />
     <ClCompile Include="Application\Objects\EnemyManager\EnemyEditor.cpp" />
+    <ClCompile Include="Application\Objects\Book\Book.cpp" />
     <ClCompile Include="Engine\Generators\OffScreen\OffScreen.cpp" />
     <ClCompile Include="Engine\Graphics\Culling\OcclusionCullingManager.cpp" />
     <ClCompile Include="Engine\Utility\Collision\AABB\AABBCollider.cpp" />
@@ -221,6 +222,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\CheckPoint\CheckPoint.h" />
     <ClInclude Include="Application\Objects\Grass\Branch.h" />
     <ClInclude Include="Application\Objects\EnemyManager\EnemyEditor.h" />
+    <ClInclude Include="Application\Objects\Book\Book.h" />
     <ClInclude Include="Engine\Generators\OffScreen\OffScreen.h" />
     <ClInclude Include="Engine\Graphics\Culling\OcclusionCullingManager.h" />
     <ClInclude Include="Engine\Utility\Collision\AABB\AABBCollider.h" />
