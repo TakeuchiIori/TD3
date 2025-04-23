@@ -126,9 +126,9 @@ void GameScene::Update()
 	{
 		mpInfo_->Update();
 
-		if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
+		/*if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
 			picture_->Update();
-		}
+		}*/
 
 
 		//test_->UpdateAnimation();
