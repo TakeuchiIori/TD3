@@ -15,6 +15,7 @@ void StageEditor::Save(const std::string& filename)
             nlohmann::json cpJson;
             cpJson["checkPointNumber"] = cp.checkPointNumber;
             cpJson["height"] = cp.height;
+            cpJson["initX"] = cp.initX;
 
             for (const auto& obj : cp.objects) {
                 cpJson["objects"].push_back({
@@ -64,6 +65,7 @@ void StageEditor::Load(const std::string& filename)
                 CheckPointStruct cp;
                 if (cpJson.contains("checkPointNumber")) cp.checkPointNumber = cpJson["checkPointNumber"];
                 if (cpJson.contains("height")) cp.height = cpJson["height"];
+                if (cpJson.contains("initX")) cp.initX = cpJson["initX"];
 
                 if (cpJson.contains("objects")) {
                     for (const auto& objJson : cpJson["objects"]) {
@@ -84,42 +86,6 @@ void StageEditor::Load(const std::string& filename)
 
         stages_.push_back(stage);
     }
-    /*std::ifstream file(filename);
-    if (!file.is_open()) return;
-
-    nlohmann::json j;
-    file >> j;
-    stages_.clear();
-
-    for (const auto& stageJson : j["stages"]) {
-        StageStruct stage;
-        stage.stageNumber = stageJson["stageNumber"];
-
-        for (const auto& def : stageJson["objectDefinitions"]) {
-            stage.objectDefinitions.push_back({ def["id"], def["name"] });
-        }
-
-        for (const auto& cpJson : stageJson["checkPoints"]) {
-            CheckPointStruct cp;
-            cp.checkPointNumber = cpJson["checkPointNumber"];
-            cp.height = cpJson["height"];
-
-            for (const auto& objJson : cpJson["objects"]) {
-                PlacedObject obj;
-                obj.id = objJson["id"];
-                obj.position = {
-                    objJson["position"]["x"],
-                    objJson["position"]["y"],
-                    objJson["position"]["z"]
-                };
-                cp.objects.push_back(obj);
-            }
-
-            stage.checkPoints.push_back(cp);
-        }
-
-        stages_.push_back(stage);
-    }*/
 }
 
 void StageEditor::DrawEditorUI()
@@ -194,6 +160,7 @@ void StageEditor::DrawEditorUI()
                     CheckPointStruct& cp = stage.checkPoints[selectedCheckPointIndex];
                     ImGui::InputInt("チェックポイントの番号", &cp.checkPointNumber);
                     ImGui::DragFloat("チェックポイントの高さ", &cp.height, 0.1f);
+                    ImGui::DragFloat("初期のX座標", &cp.initX, 0.1f);
 
                     for (int i = 0; i < cp.objects.size(); ++i) {
                         PlacedObject& obj = cp.objects[i];
