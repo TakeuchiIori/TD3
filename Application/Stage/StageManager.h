@@ -46,7 +46,6 @@ public:
 	float GetCheckPoint() const { return stageList_[currentStageNum_]->GetCheckPoint(); }
 
 	bool IsClear() { return stageList_[currentStageNum_]->IsClear() || input_->TriggerKey(DIK_L); }
-
 	void SetFollowCamera(FollowCamera* camera) { followCamera_ = camera; }
 
 

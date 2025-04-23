@@ -126,7 +126,6 @@ void GameScene::Update()
 	{
 		mpInfo_->Update();
 
-
 		if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
 			picture_->Update();
 		}
@@ -140,7 +139,6 @@ void GameScene::Update()
 		}
 		stageManager_->Update();
 
-		
 	}
 
 	giraffe_->Update();
