@@ -42,7 +42,10 @@ public:
 
 	void SetGrassWorldTransform(WorldTransform* grassWorldTransform) { grassWorldTransform_ = grassWorldTransform; }
 
-	void SetPos(Vector3 pos) { worldTransform_.translation_ = pos; }
+	void SetPos(Vector3 pos) { 
+		worldTransform_.translation_ = pos;
+		collisionWT_.translation_ = pos;
+	}
 public:
 	Vector3 GetCenterPosition() const
 	{

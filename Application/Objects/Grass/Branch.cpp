@@ -37,7 +37,7 @@ void Branch::InitCollision()
 {
 	aabbCollider_ = ColliderFactory::Create<AABBCollider>(
 		this,
-		&worldTransform_,
+		&collisionWT_,
 		camera_,
 		static_cast<uint32_t>(CollisionTypeIdDef::kBranch)
 	);
