@@ -119,7 +119,7 @@ private:
 
 
 	void TimerManager();
-
+	void TimerZero();
 
 	void ExtendBody();
 

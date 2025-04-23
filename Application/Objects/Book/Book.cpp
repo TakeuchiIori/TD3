@@ -35,10 +35,10 @@ void Book::Initialize(Camera* camera)
 
 void Book::InitializeSprite()
 {
-	uiBook_ = std::make_unique<Sprite>();
-	uiBook_->Initialize("Resources/Textures/Option/yomu.png");
-	uiBook_->SetSize({ 150.0f, 100.0f });
-	uiBook_->SetAnchorPoint({ 0.5f, 0.5f });
+	uiBook_[0] = std::make_unique<Sprite>();
+	uiBook_[0]->Initialize("Resources/Textures/Option/yomu.png");
+	uiBook_[0]->SetSize({ 150.0f, 100.0f });
+	uiBook_[0]->SetAnchorPoint({ 0.5f, 0.5f });
 
 
 	uiReadBook_[0] = std::make_unique<Sprite>();
@@ -50,6 +50,10 @@ void Book::InitializeSprite()
 	uiReadBook_[1]->Initialize("Resources/images/white.png");
 	uiReadBook_[1]->SetSize({ 1280.0f, 720.0f });
 	uiReadBook_[1]->SetColor({ 0.0f, 0.0f, 0.0f, 0.5f });
+
+	uiBook_[1] = std::make_unique<Sprite>();
+	uiBook_[1]->Initialize("Resources/Textures/Option/close.png");
+	uiBook_[1]->SetSize({ 200.0f, 150.0f });
 }
 
 void Book::InitCollision()
@@ -70,6 +74,7 @@ void Book::InitJson()
 	jsonManager_->Register("Rotate", &worldTransform_.rotation_);
 	jsonManager_->Register("Offset", &offset_);
 	jsonManager_->Register("OffsetReadUI", &offsetReadUI_);
+	jsonManager_->Register("offsetUI_", &offsetUI_);
 
 	jsonCollider_ = std::make_unique<JsonManager>("BookCollider", "Resources/JSON/");
 	obbCollider_->InitJson(jsonCollider_.get());
@@ -101,12 +106,13 @@ void Book::UpdateSprite()
 	// 線形補間ベースで補間（時間依存に）
 	uiScaleCurrent_ += (uiScaleTarget_ - uiScaleCurrent_) * (1.0f - std::exp(-easeSpeed * delta));
 
+
 	// サイズ反映
 	Vector2 scaledSize = {
 		uiSizeBase_.x * uiScaleCurrent_,
 		uiSizeBase_.y * uiScaleCurrent_
 	};
-	uiBook_->SetSize(scaledSize);
+	uiBook_[0]->SetSize(scaledSize);
 
 	// スケールが小さくなりすぎたら描画停止
 	if (uiScaleCurrent_ < 0.01f) {
@@ -119,8 +125,11 @@ void Book::UpdateSprite()
 	Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
 	newPos = Transform(newPos, matViewProjectionViewport);
 	newPos += offset_;
-	uiBook_->SetPosition(newPos);
-	uiBook_->Update();
+	uiBook_[0]->SetPosition(newPos);
+	uiBook_[0]->Update();
+
+	uiBook_[1]->SetPosition(offsetUI_);
+	uiBook_[1]->Update();
 }
 
 void Book::UpdateMatrix()
@@ -160,6 +169,10 @@ void Book::UpdateReadBook()
 			isDrawReadUI_ = false;  // 非表示
 
 
+			hasReadBookShown_ = false;
+			readBookDelayTimer_ = 0.0f;
+			isCloseIconVisible_ = false;
+
 			if (OffBookTrigger_) {
 				OffBookTrigger_();
 			}
@@ -176,6 +189,15 @@ void Book::UpdateReadBook()
 		uiSizeReadBase_.y * uiReadScaleCurrent_
 	};
 	uiReadBook_[0]->SetSize(scaledSize);
+
+	// 読書UIが出てからの3秒タイマー
+	if (hasReadBookShown_ && !isCloseIconVisible_) {
+		readBookDelayTimer_ += GameTime::GetUnscaledDeltaTime();
+		if (readBookDelayTimer_ >= 3.0f) {
+			isCloseIconVisible_ = true;
+		}
+	}
+
 
 	// 表示中のみ位置更新
 	if (isDrawReadUI_) {
@@ -196,16 +218,28 @@ void Book::DrawSprite()
 {
 	if (isDrawUI_) {
 		if (uiScaleCurrent_ > 0.01f) {
-			uiBook_->Draw();
+			uiBook_[0]->Draw();
 		}
 	}
+
+
+
 
 	if (isDrawBack_)
 		uiReadBook_[1]->Draw();
 
 
+	if (isCloseIconVisible_) {
+		uiBook_[1]->Draw();
+	}
+
 	if (isDrawReadUI_) {
 		uiReadBook_[0]->Draw();
+
+		if (!hasReadBookShown_) {
+			hasReadBookShown_ = true;
+			readBookDelayTimer_ = 0.0f;
+		}
 	}
 }
 
@@ -265,6 +299,7 @@ void Book::OnExitCollision(BaseCollider* self, BaseCollider* other)
 	{
 		uiScaleTarget_ = 0.0f;
 		obj_->SetMaterialColor(Vector3{ 0.0,1.0f,0.0f });
+
 	}
 }
 

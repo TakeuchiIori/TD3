@@ -23,6 +23,7 @@
 // C++
 
 class Camera;
+class Player;
 class Book: public BaseObject
 {
 public:
@@ -115,13 +116,16 @@ public:
 	void OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir);
 
 
+	void SetPlayer(Player* player) { player_ = player; }
 	void SetIsDrawUI(bool isDrawUI) { isDrawUI_ = isDrawUI; }
 	void SetIsDrawReadUI(bool isDrawReadUI) { isDrawReadUI_ = isDrawReadUI; }
+	void SetIsCloseIconVisible(bool isCloseIconVisible) { isCloseIconVisible_ = isCloseIconVisible; }
 
 private:
 
 	// ポインタ
 	Input* input_ = nullptr;
+	Player* player_ = nullptr;
 
 	std::unique_ptr<JsonManager> jsonManager_;
 	std::unique_ptr<JsonManager> jsonCollider_;
@@ -131,9 +135,17 @@ private:
 
 
 	// UI関連
-	std::unique_ptr<Sprite> uiBook_;
+	std::unique_ptr<Sprite> uiBook_[2];
 	bool isDrawUI_ = false;
-	Vector3 offset_ = {-50.0f,-100.0,0.0f};
+	Vector3 offset_ = {-50.0f,-100.0f,0.0f};
+	Vector3 offsetUI_ = {};
+
+	bool hasReadBookShown_ = false;
+	float readBookDelayTimer_ = 0.0f;
+	bool isCloseIconVisible_ = false;
+
+
+
 
 
 	// 本を読むUI
