@@ -208,15 +208,6 @@ void GameScreen::Update()
 	// 
 	///////////////////////////////////////////////////////////////////////////
 
-	//Vector3 playerPos = player_->GetWorldTransform().translation_;
-	//Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
-	//Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
-	//playerPos = Transform(playerPos, matViewProjectionViewport);
-	//playerPos += offsetYodare_;
-	//uiYodare_->SetPosition(playerPos);
-	//uiYodare_->Update();
-
-
 
 	bool canSpit = player_->CanSpitting();
 	float deltaTime_ = GameTime::GetDeltaTime();
