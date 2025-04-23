@@ -13,7 +13,7 @@ void Book::Initialize(Camera* camera)
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
 	obj_->SetModel("book.obj");
-	obj_->SetMaterialColor(Vector3{0.0,1.0f,0.0f});
+	obj_->SetMaterialColor(Vector3{ 0.0,1.0f,0.0f });
 	worldTransform_.Initialize();
 
 	worldTransform_.translation_ = { 25.0f,2.0f,0.0f };
@@ -26,7 +26,7 @@ void Book::Initialize(Camera* camera)
 
 
 	uiBook_ = std::make_unique<Sprite>();
-	uiBook_->Initialize("Resources/Textures/Option/operation_yodare.png");
+	uiBook_->Initialize("Resources/Textures/Option/yomu.png");
 	uiBook_->SetSize({ 150.0f, 100.0f });
 
 }
@@ -85,7 +85,9 @@ void Book::Draw()
 
 void Book::DrawSprite()
 {
-	uiBook_->Draw();
+	if (isDrawUI_) {
+		uiBook_->Draw();
+	}
 }
 
 void Book::DrawCollision()
@@ -110,16 +112,24 @@ void Book::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
 	{
-		if (OnBookTrigger_)
-		{
-			OnBookTrigger_();
-		}
+		isDrawUI_ = true;
+
 		obj_->SetMaterialColor(Vector3{ 1.0,1.0f,0.0f });
 	}
 }
 
 void Book::OnCollision(BaseCollider* self, BaseCollider* other)
 {
+	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) {
+		if (input_->IsPadPressed(0, GamePadButton::A)) {
+			if (OnBookTrigger_)
+			{
+				OnBookTrigger_();
+			}
+
+		}
+	}
+
 
 }
 

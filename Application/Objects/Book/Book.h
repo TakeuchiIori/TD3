@@ -119,6 +119,7 @@ private:
 
 	// UI関連
 	std::unique_ptr<Sprite> uiBook_;
+	bool isDrawUI_ = false;
 	Vector3 offset_ = {-50.0f,-100.0,0.0f};
 
 

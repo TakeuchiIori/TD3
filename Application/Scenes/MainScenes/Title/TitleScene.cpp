@@ -84,7 +84,7 @@ void TitleScene::Update()
     if (isStartEvent_) {
 		// ここにイベントの処理を書く
 		// 例えば、シーン遷移やアニメーションの開始など
-		SceneManager::GetInstance()->ChangeScene("Game");
+		//SceneManager::GetInstance()->ChangeScene("Game");
 		isStartEvent_ = false;
     }
 
