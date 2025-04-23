@@ -46,6 +46,8 @@ void Book::InitJson()
 	jsonManager_ = std::make_unique<JsonManager>("Book", "Resources/JSON/");
 	jsonManager_->SetCategory("Objects");
 	jsonManager_->SetSubCategory("Book");
+	jsonManager_->Register("Rotate", &worldTransform_.rotation_);
+
 	jsonCollider_ = std::make_unique<JsonManager>("BookCollider", "Resources/JSON/");
 	obbCollider_->InitJson(jsonCollider_.get());
 }
