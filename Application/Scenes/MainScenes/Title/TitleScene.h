@@ -14,11 +14,23 @@
 #include "WorldTransform./WorldTransform.h"
 #include "Drawer/LineManager/Line.h"
 #include "../Transitions/Fade/Fade.h"
+#include "Systems/MapChip/MapChipInfo.h"
+
+
 
 // Math
 #include "Vector3.h"
 
-
+// Cameras
+#include "../../../SystemsApp/Cameras/DebugCamera/DebugCamera.h"
+#include "../../../SystemsApp/Cameras/FollowCamera/FollowCamera.h"
+#include "../../../SystemsApp/Cameras/TopDownCamera/TopDownCamera.h"
+#include "../../../SystemsApp/Cameras/BookEventCamera/BookEventCamera.h"
+#include "../../../SystemsApp/Cameras/DefaultCamera/DefaultCamera.h"
+// app
+#include "Player/TitlePlayer.h" 
+#include "Book/Book.h"
+#include "../SpriteApp/ScreenApp/TitleScreen.h"
 
 class TitleScene : public BaseScene
 {
@@ -27,9 +39,8 @@ class TitleScene : public BaseScene
 	{
 		DEFAULT,
 		FOLLOW,
-		TOP_DOWN,
-		FPS
-
+		DEBUG,
+		BOOK_EVENT
 	};
 
 public:
@@ -58,9 +69,29 @@ public:
 	/// </summary>
 	void DrawOffScreen() override;
 
-	Matrix4x4 GetViewProjection() override { return currentCamera_->viewProjectionMatrix_; }
+	Matrix4x4 GetViewProjection() override { return sceneCamera_->viewProjectionMatrix_; }
 
 private:
+
+	/// <summary>
+	/// 3Dオブジェクトの描画
+	/// </summary>
+	void DrawObject();
+
+	/// <summary>
+	/// 2Dスプライトの描画
+	/// </summary>
+	void DrawSprite();
+
+	/// <summary>
+	/// アニメーション描画
+	/// </summary>
+	void DrawAnimation();
+
+	/// <summary>
+	/// 線描画
+	/// </summary>
+	void DrawLine();
 
 
 	/// <summary>
@@ -76,15 +107,58 @@ private:
 
 
 private:
-	// カメラ
+
+	/*=================================================================
+
+								カメラ
+
+	=================================================================*/
 	CameraMode cameraMode_;
-	std::shared_ptr<Camera> currentCamera_;
+	std::shared_ptr<Camera> sceneCamera_;
 	CameraManager cameraManager_;
-	// サウンド
+
+	DefaultCamera defaultCamera_;
+	FollowCamera followCamera_;
+	DebugCamera debugCamera_;
+	BookEventCamera bookEventCamera_;
+	bool isDebugCamera_ = false;
+
+	/*=================================================================
+
+								サウンド
+
+	=================================================================*/
 	Audio::SoundData soundData;
 	IXAudio2SourceVoice* sourceVoice;
 
 
-	std::unique_ptr<Sprite> sprite_;
+	/*=================================================================
+
+								オブジェクト
+
+	=================================================================*/
+	std::unique_ptr<TitlePlayer> player_;
+	std::unique_ptr<Book> book_;
+
+
+	/*=================================================================
+
+								その他
+
+	=================================================================*/
+	
+	std::unique_ptr<MapChipInfo> mpInfo_;
+	std::unique_ptr<TitleScreen> titleScreen_;
+	bool isBookTrigger_ = false;
+	bool isStartEvent_ = false;
+	bool isAlreadyRead_ = false;  // 本を読んだことがあるか
+
+	/*=================================================================
+
+							ゲームシーンに移行
+
+	=================================================================*/
+	bool isGameScene_ = false;
+
 };
 
