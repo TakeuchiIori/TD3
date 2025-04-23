@@ -29,6 +29,15 @@ void StageManager::Initialize(Camera* camera)
 
 
 	ReloadObject();
+
+
+	// コロンスプライトの初期化
+	transSprite_ = std::make_unique<Sprite>();
+	transSprite_->Initialize("Resources/Textures/In_Game/checkpointTrans.png");
+	transSprite_->SetAnchorPoint({ 0.5f, 0.5f });
+	transSpritePos_ = { 660,startY_,0 };
+	transSprite_->SetPosition(transSpritePos_);
+	transSprite_->SetSize(Vector2{ 616, 1024 });
 }
 
 void StageManager::InitJson()
@@ -42,6 +51,9 @@ void StageManager::Update()
 	{
 		ReloadObject();
 	}
+	ImGui::Begin("transp");
+	ImGui::DragFloat3("pos", &transSpritePos_.x, 0.1f);
+	ImGui::End();
 #endif // _DEBUG
 
 	
@@ -68,6 +80,11 @@ void StageManager::Draw()
 void StageManager::DrawCollision()
 {
 	stageList_[currentStageNum_]->DrawCollision();
+}
+
+void StageManager::DrawTransition()
+{
+	transSprite_->Draw();
 }
 
 void StageManager::CameraScroll()
@@ -97,6 +114,8 @@ bool StageManager::CheckPointTransition()
 {
 	Stage::TransitionType type = stageList_[currentStageNum_]->ReachCheckPoint();
 	isTransition_ = false;
+	transSprite_->Update();
+	transSprite_->SetPosition(transSpritePos_);
 	switch (type)
 	{
 	case Stage::TransitionType::kNone:
@@ -109,6 +128,8 @@ bool StageManager::CheckPointTransition()
 			float halfTransTime = kTransitionTime_ / 2.0f; // ちょうど真ん中
 
 			transitionTimer_ += deltaTime_;
+			float t = transitionTimer_ / kTransitionTime_;
+			transSpritePos_.y = Lerp(startY_, endY_, t);
 
 			if (prevTimer < halfTransTime && transitionTimer_ >= halfTransTime)
 			{

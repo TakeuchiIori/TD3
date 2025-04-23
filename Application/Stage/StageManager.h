@@ -1,4 +1,5 @@
 #pragma once
+#include "Systems/UI/UIBase.h"
 
 #include "Stage.h"
 #include "Systems/MapChip/MapChipInfo.h"
@@ -27,7 +28,7 @@ public:
 
 	void DrawCollision();
 
-	void DrawTransition() {};
+	void DrawTransition();
 
 	bool CheckPointTransition();
 
@@ -81,5 +82,10 @@ private:
 
 	float kTransitionTime_ = 2.0f;
 	float transitionTimer_ = 0.0f;
+
+	std::unique_ptr<Sprite> transSprite_;
+	Vector3 transSpritePos_{};
+	float startY_ = 720.0f + 512.0f;
+	float endY_ = -512.0f;
 };
 
