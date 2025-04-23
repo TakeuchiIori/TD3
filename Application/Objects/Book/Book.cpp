@@ -12,7 +12,7 @@ void Book::Initialize(Camera* camera)
 
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("unitCube.obj");
+	obj_->SetModel("book.obj");
 	obj_->SetMaterialColor(Vector3{0.0,1.0f,0.0f});
 	worldTransform_.Initialize();
 
