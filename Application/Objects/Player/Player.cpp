@@ -223,7 +223,7 @@ void Player::Reset()
 }
 
 
-
+#pragma region // 判定
 
 
 void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
@@ -351,6 +351,9 @@ void Player::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDi
 		}
 	}
 }
+
+#pragma endregion
+
 
 void Player::UpdateMatrices()
 {
@@ -483,8 +486,6 @@ void Player::UpBody()
 {
 	moveDirection_ = { 0,1,0 };
 	moveHistory_.push_back(worldTransform_.translation_);
-	//worldTransform_.rotation_.z = 0;
-	HeadDir();
 	// 体の出現
 	ExtendBody();
 	std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
@@ -499,9 +500,6 @@ void Player::DownBody()
 {
 	moveDirection_ = { 0,-1,0 };
 	moveHistory_.push_back(worldTransform_.translation_);
-
-	//worldTransform_.rotation_.z = std::numbers::pi_v<float>;
-	HeadDir();
 	ExtendBody();
 	std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
 	body->Initialize(BaseObject::camera_);
@@ -515,9 +513,6 @@ void Player::LeftBody()
 {
 	moveDirection_ = { -1,0,0 };
 	moveHistory_.push_back(worldTransform_.translation_);
-
-	//worldTransform_.rotation_.z = std::numbers::pi_v<float> / 2.0f;
-	HeadDir();
 	ExtendBody();
 	std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
 	body->Initialize(BaseObject::camera_);
@@ -531,10 +526,6 @@ void Player::RightBody()
 {
 	moveDirection_ = { 1,0,0 };
 	moveHistory_.push_back(worldTransform_.translation_);
-
-
-	//worldTransform_.rotation_.z = 3.0f * std::numbers::pi_v<float> / 2.0f;
-	HeadDir();
 	ExtendBody();
 	std::unique_ptr<PlayerBody> body = std::make_unique<PlayerBody>();
 	body->Initialize(BaseObject::camera_);
@@ -657,6 +648,15 @@ void Player::TimerManager()
 			body->SetColor(changeColor_);
 		}
 	}
+}
+
+void Player::TimerZero()
+{
+	extendTimer_ = 0;
+	boostCoolTimer_ = 0;
+	boostTimer_ = 0;
+	createGrassTimer_ = 0;
+	invincibleTimer_ = 0;
 }
 
 bool Player::IsPopGrass()
@@ -958,7 +958,7 @@ void Player::BehaviorReturnInit()
 	speed_ = returnSpeed_;
 	moveDirection_ = { 0,0,0 };
 	isCollisionBody = false;
-	extendTimer_ = 0;
+	TimerZero();
 }
 
 void Player::BehaviorReturnUpdate()

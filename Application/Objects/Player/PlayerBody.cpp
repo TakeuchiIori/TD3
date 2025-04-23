@@ -25,7 +25,7 @@ void PlayerBody::Initialize(Camera* camera)
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("unitCube.obj");
+	obj_->SetModel("neck.obj");
 	obj_->SetMaterialColor({ 0.90625f,0.87109f,0.125f,1.0f });
 
 	InitCollision();
@@ -57,6 +57,7 @@ void PlayerBody::Update()
 	worldTransform_.UpdateMatrix();
 	ExtendUpdate();
 	obj_->uvScale = { worldTransform_.scale_.x, worldTransform_.scale_.y };
+	obj_->uvTranslate.x = -(worldTransform_.scale_.x - 1.0f) * 0.5f;
 	// ↓上左ok
 	//obj_->uvTranslate = { -(worldTransform_.scale_.x - 1.0f), -(worldTransform_.scale_.y - 1.0f) };
 
