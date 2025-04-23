@@ -40,6 +40,7 @@ public:
 	/// </summary>
 	/// <param name="camera"></param>
 	void Initialize(Camera* camera) override;
+	void InitializeSprite();
 	void InitCollision();
 	void InitJson();
 
@@ -50,7 +51,7 @@ public:
 	void Update() override;
 	void UpdateSprite();
 	void UpdateMatrix();
-
+	void UpdateReadBook();
 
 	/// <summary>
 	///  描画処理
@@ -66,16 +67,10 @@ public:
 	/// </summary>
 	/// <param name="info"></param>
 	void MapChipOnCollision(const CollisionInfo& info);
-	void Reset();
 
 	std::function<void()> OnBookTrigger_ = nullptr;
 
 private:
-
-	/// <summary>
-	/// 移動関数
-	/// </summary>
-	void Move();
 
 	/// <summary>
 	/// UIの更新処理
@@ -123,6 +118,15 @@ private:
 	std::unique_ptr<Sprite> uiBook_;
 	bool isDrawUI_ = false;
 	Vector3 offset_ = {-50.0f,-100.0,0.0f};
+
+
+	// 本を読むUI
+	std::unique_ptr<Sprite> uiReadBook_[2];
+
+
+
+
+
 
 	// UI補完
 	Vector2 uiSizeBase_ = { 150.0f, 100.0f };

@@ -25,10 +25,22 @@ void Book::Initialize(Camera* camera)
 	InitJson();
 
 
+	InitializeSprite();
+
+}
+
+void Book::InitializeSprite()
+{
 	uiBook_ = std::make_unique<Sprite>();
 	uiBook_->Initialize("Resources/Textures/Option/yomu.png");
 	uiBook_->SetSize({ 150.0f, 100.0f });
 	uiBook_->SetAnchorPoint({ 0.5f, 0.5f });
+
+
+	uiReadBook_[0] = std::make_unique<Sprite>();
+	uiReadBook_[0]->Initialize("Resources/Textures/Option/book.png");
+	uiReadBook_[0]->AdjustTaxtureSize();
+	uiReadBook_[0]->SetAnchorPoint({ 0.5f, 0.5f });
 
 }
 
@@ -96,6 +108,12 @@ void Book::UpdateMatrix()
 	worldTransform_.UpdateMatrix();
 }
 
+void Book::UpdateReadBook()
+{
+
+
+}
+
 void Book::Draw()
 {
 	obj_->Draw(BaseObject::camera_, worldTransform_);
@@ -137,7 +155,7 @@ void Book::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 void Book::OnCollision(BaseCollider* self, BaseCollider* other)
 {
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) {
-		if (input_->IsPadPressed(0, GamePadButton::A)) {
+		if (Input::GetInstance()->IsPadPressed(0, GamePadButton::A)) {
 			if (OnBookTrigger_)
 			{
 				OnBookTrigger_();
