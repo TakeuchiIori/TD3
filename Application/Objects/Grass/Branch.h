@@ -66,6 +66,8 @@ public:
 private:
 	WorldTransform* grassWorldTransform_ = nullptr;
 
+	WorldTransform collisionWT_;
+
 	std::shared_ptr<AABBCollider> aabbCollider_;
 
 	//std::unique_ptr<JsonManager> jsonManager_;
