@@ -5,6 +5,7 @@
 
 TitlePlayer::~TitlePlayer()
 {
+	obbCollider_->~OBBCollider();
 }
 
 void TitlePlayer::Initialize(Camera* camera)
@@ -187,6 +188,7 @@ void TitlePlayer::MapChipOnCollision(const CollisionInfo& info)
 
 void TitlePlayer::Reset()
 {
+
 }
 
 void TitlePlayer::Move()

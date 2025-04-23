@@ -6,6 +6,7 @@
 
 Book::~Book()
 {
+	obbCollider_->~OBBCollider();
 }
 
 void Book::Initialize(Camera* camera)
@@ -271,7 +272,7 @@ void Book::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
 	{
 		uiScaleTarget_ = 1.0f;
-		obj_->SetMaterialColor(Vector3{ 1.0,1.0f,0.0f });
+		//obj_->SetMaterialColor(Vector3{ 1.0,1.0f,0.0f });
 	}
 }
 
@@ -298,7 +299,7 @@ void Book::OnExitCollision(BaseCollider* self, BaseCollider* other)
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
 	{
 		uiScaleTarget_ = 0.0f;
-		obj_->SetMaterialColor(Vector3{ 0.0,1.0f,0.0f });
+		//obj_->SetMaterialColor(Vector3{ 0.0,1.0f,0.0f });
 
 	}
 }
