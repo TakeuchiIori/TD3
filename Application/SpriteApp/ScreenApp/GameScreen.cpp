@@ -3,9 +3,12 @@
 #include "./Player/Player.h"
 #include "Systems/Camera/Camera.h"
 #include "../Core/WinApp/WinApp.h"
+
 // Math 
 #include "MathFunc.h"
 #include "Matrix4x4.h"
+#include <Systems/GameTime/GameTIme.h>
+#include "Easing.h"
 
 void GameScreen::Initialize()
 {
@@ -61,8 +64,9 @@ void GameScreen::Initialize()
 	// ImGuiの描画やめる
 	for (uint32_t i = 0; i < 2; i++) {
 		grass_[i]->isDrawImGui_ = false;
+		//grass_[i]->SetScale({ 30.0f, 30.0f });
 	}
-	
+
 	///////////////////////////////////////////////////////////////////////////
 	// 
 	// 制限時間の初期化
@@ -112,6 +116,23 @@ void GameScreen::Initialize()
 	}
 
 
+	uiYodare_ = std::make_unique<Sprite>();
+	uiYodare_->Initialize("Resources/Textures/Option/yodareUI.png");
+	uiYodare_->SetSize({ 60.0f, 60.0f });
+	uiYodare_->SetAnchorPoint({ 0.5f, 0.5f });
+
+
+	InitJson();
+
+}
+
+void GameScreen::InitJson()
+{
+	jsonManager_ = std::make_unique<JsonManager>("YodareUI", "Resources/JSON/UI");
+	jsonManager_->SetCategory("UI");
+	jsonManager_->Register("OffsetYodare", &offsetYodare_);
+	jsonManager_->Register("OffsetGrass", &offsetGrass_);
+	jsonManager_->Register("Offset", &offset_);
 }
 
 void GameScreen::Update()
@@ -155,28 +176,6 @@ void GameScreen::Update()
 		if (i == 1) {
 			float ratio = player_->GetUIGrassGauge();
 
-			Vector4 bottomColor{};
-			Vector4 topColor{};
-
-			if (ratio < 0.5f) {
-				// 緑 → 黄
-				float t = ratio / 0.5f; // 0〜1に再マッピング
-				bottomColor = { 0.0f, 1.0f, 0.0f, 1.0f }; // 緑
-				topColor = {
-					1.0f * t,             // 赤が増える
-					1.0f,                 // 緑そのまま
-					0.0f, 1.0f
-				}; // 緑→黄
-			} else {
-				// 黄 → 赤
-				float t = (ratio - 0.5f) / 0.5f;
-				bottomColor = { 1.0f, 1.0f, 0.0f, 1.0f }; // 黄
-				topColor = {
-					1.0f,             // 赤
-					1.0f - t,         // 緑が減る
-					0.0f, 1.0f
-				}; // 黄→赤
-			}
 
 			Vector2 baseSize = { 55.0f, 55.0f }; // 草画像の本来のサイズ
 
@@ -202,6 +201,63 @@ void GameScreen::Update()
 	///////////////////////////////////////////////////////////////////////////
 	baseLimit_->Update();
 	UpdateLimit();
+
+	///////////////////////////////////////////////////////////////////////////
+	// 
+	// ヨダレの更新処理
+	// 
+	///////////////////////////////////////////////////////////////////////////
+
+
+	bool canSpit = player_->CanSpitting();
+	float deltaTime_ = GameTime::GetDeltaTime();
+
+	// 状態遷移判定
+	if (canSpit && yodareState_ == YodareState::Hidden) {
+		yodareState_ = YodareState::Appearing;
+		yodareTimer_ = 0.0f;
+	} else if (!canSpit && yodareState_ == YodareState::Visible) {
+		yodareState_ = YodareState::Disappearing;
+		yodareTimer_ = 0.0f;
+	}
+
+	// イージング処理
+	if (yodareState_ == YodareState::Appearing) {
+		yodareTimer_ += deltaTime_;
+		float t = std::min(yodareTimer_ / yodareEaseTime_, 1.0f);
+		t = Easing::easeOutQuad(t);
+		uiYodare_->SetSize({ t * 60.0f, t * 60.0f });
+
+		if (yodareTimer_ >= yodareEaseTime_) {
+			yodareState_ = YodareState::Visible;
+		}
+	} else if (yodareState_ == YodareState::Disappearing) {
+		yodareTimer_ += deltaTime_;
+		float t = 1.0f - std::min(yodareTimer_ / yodareEaseTime_, 1.0f);
+		t = Easing::easeInQuad(t);
+		uiYodare_->SetSize({ t * 60.0f, t * 60.0f });
+
+		if (yodareTimer_ >= yodareEaseTime_) {
+			yodareState_ = YodareState::Hidden;
+		}
+	} else if (yodareState_ == YodareState::Visible) {
+		// スケールを周期的に変化させて目立たせる
+		float pulse = std::sin(static_cast<float>(GameTime::GetTotalTime()) * 5.0f) * 0.1f; // 鼓動みたいな動き
+		float baseScale = 60.0f;
+		float scale = baseScale * (1.0f + pulse);
+		uiYodare_->SetSize({ scale, scale });
+	}
+
+	if (yodareState_ != YodareState::Hidden) {
+		Vector3 playerPos = player_->GetWorldTransform().translation_;
+		Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
+		Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
+		playerPos = Transform(playerPos, matViewProjectionViewport);
+		playerPos += offsetYodare_;
+		uiYodare_->SetPosition(playerPos);
+		uiYodare_->Update();
+	}
+
 
 	Updatedistance();
 }
@@ -243,6 +299,10 @@ void GameScreen::Draw()
 
 	for (const auto& sprite : ditSprites_) {
 		sprite->Draw();
+	}
+
+	if (yodareState_ != YodareState::Hidden) {
+		uiYodare_->Draw();
 	}
 
 }
@@ -308,7 +368,7 @@ void GameScreen::Updatedistance()
 	// 配置と更新
 	float spacing = 20.0f;
 	for (int i = 0; i < 4; ++i) {
-		ditSprites_[i]->SetPosition({ playerPos.x - 10 + spacing * i, playerPos.y - 50, 0.0f });
+		ditSprites_[i]->SetPosition({ playerPos.x - 10 + spacing * i, playerPos.y - 80, 0.0f });
 		ditSprites_[i]->Update();
 	}
 
