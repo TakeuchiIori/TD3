@@ -730,6 +730,7 @@ void Player::TakeDamage()
 		{
 			HP_--;
 			isRed_ = true;
+			camera_->Shake(0.3f, { -0.5f,-0.5f }, { 0.5f,0.5f });
 			if (HP_ <= 0)
 			{
 				extendTimer_ = 0;
