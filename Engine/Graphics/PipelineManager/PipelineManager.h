@@ -8,31 +8,20 @@
 #include <dxcapi.h>
 #include <vector>
 #include <unordered_map>
+#include <array>
+
+// Engine
+#include "Loaders/Json/EnumUtils.h"
 
 
 class DirectXCommon;
 class PipelineManager
 {
-public: 
-	// ブレンドモード構造体
-	enum BlendMode {
-		// 通常のブレンド
-		kBlendModeNormal,
-		// 加算
-		kBlendModeAdd,
-		// 減算
-		kBlendModeSubtract,
-		// 乗算
-		kBlendModeMultiply,
-		// スクリーン
-		kBlendModeScreen,
+public:
 
-		// 利用してはいけない
-		kCount0fBlendMode,
-	};
 	// コンストラクタとデストラクタ
-	 PipelineManager() = default;
-	~ PipelineManager() = default;
+	PipelineManager() = default;
+	~PipelineManager() = default;
 
 	static  PipelineManager* GetInstance();
 
@@ -43,6 +32,8 @@ public:
 	D3D12_BLEND_DESC GetBlendDesc(BlendMode _mode);
 	ID3D12RootSignature* GetRootSignature(const std::string& key);
 	ID3D12PipelineState* GetPipeLineStateObject(const std::string& key);
+
+
 
 private:
 
@@ -77,7 +68,7 @@ private:
 	/// </summary>
 	void CreatePSO_Particle();
 
-	ID3D12PipelineState* GetBlendModePSO(BlendMode blendMode);
+
 
 	/*=================================================================
 
@@ -144,6 +135,25 @@ public:
 	//	return particleDepthStencilDesc_;
 	//}
 
+	ID3D12PipelineState* GetBlendModePSO(BlendMode blendMode);
+
+	/// <summary>
+	/// 現在のパーティクル用 PSO を取得
+	/// </summary>
+	ID3D12PipelineState* GetCurrentParticlePSO() {
+		return GetBlendModePSO(blendMode_);
+	}
+
+	/// <summary>
+	/// パーティクル用のブレンドモードを設定
+	/// </summary>
+	void SetParticleBlendMode(BlendMode mode) {
+		if (blendMode_ != mode) {
+			blendMode_ = mode;
+		}
+	}
+
+
 
 private:
 	PipelineManager(const  PipelineManager&) = delete;
@@ -160,6 +170,7 @@ private:
 	// パーティクルで使用
 	D3D12_RASTERIZER_DESC particleRasterrizerDesc_{};
 	D3D12_DEPTH_STENCIL_DESC particleDepthStencilDesc_{};
+	std::array<D3D12_INPUT_ELEMENT_DESC, 3> particleInputElements_;
 	D3D12_INPUT_LAYOUT_DESC particleInputLayoutDesc_{};
 	Microsoft::WRL::ComPtr<IDxcBlob> particleVertexShaderBlob_;
 	Microsoft::WRL::ComPtr<IDxcBlob> particlePixelShaderBlob_;
