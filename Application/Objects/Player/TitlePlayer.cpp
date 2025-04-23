@@ -28,8 +28,10 @@ void TitlePlayer::Initialize(Camera* camera)
 	neckTransform_.Initialize();
 	bodyTransform_.Initialize();
 
-	neckTransform_.SetParent(&worldTransform_);
-	bodyTransform_.SetParent(&worldTransform_);
+	neckTransform_.SetParent(nullptr); // 首は独立
+	bodyTransform_.SetParent(nullptr); // 体も独立
+	//worldTransform_.SetParent(&neckTransform_); // 頭は首の上に乗る
+
 
 	neckTransform_.useAnchorPoint_ = true;
 	neckTransform_.SetAnchorPoint({ 0.0, -1.0f,0.0f });
@@ -86,11 +88,23 @@ void TitlePlayer::Update()
 
 	if (isFinishedReadBook_) {
 		if (Input::GetInstance()->IsPadPressed(0, GamePadButton::A)) {
-			neckTransform_.scale_.y += 1.0f;
-			worldTransform_.translation_.y = neckTransform_.scale_.y;
-			bodyTransform_.translation_.y = 2.0f;
+			neckTransform_.scale_.y += 0.1f;
+
+			Matrix4x4 neckMat = neckTransform_.matWorld_;
+			Vector3 neckPos = {
+				neckMat.m[3][0],
+				neckMat.m[3][1],
+				neckMat.m[3][2]
+			};
+
+			float stretchY = neckTransform_.scale_.y;
+			worldTransform_.translation_ = neckPos + Vector3(0.0f, stretchY, 0.0f);
 		}
 	}
+
+	// スケールによる伸びを考慮して頭を移動
+
+
 
 	UpdateMatrix();
 	obbCollider_->Update();
@@ -98,9 +112,10 @@ void TitlePlayer::Update()
 
 void TitlePlayer::UpdateMatrix()
 {
-	worldTransform_.UpdateMatrix();
 	neckTransform_.UpdateMatrix();
-	bodyTransform_.UpdateMatrix();
+	worldTransform_.UpdateMatrix(); // 首の後に更新（親子反映）
+	bodyTransform_.UpdateMatrix();  // 体は独立
+
 }
 
 void TitlePlayer::Draw()
@@ -150,6 +165,8 @@ void TitlePlayer::Move()
 	velocity_ = moveDirection_ * defaultSpeed_ * deltaTime_;
 
 	Vector3 newPos = worldTransform_.translation_ + velocity_;
+	Vector3 newNeckPos = neckTransform_.translation_ + velocity_;
+	Vector3 newBodyPos = bodyTransform_.translation_ + velocity_;
 
 	mpCollision_.DetectAndResolveCollision(
 		colliderRect_,							// 衝突判定用矩形
@@ -162,8 +179,31 @@ void TitlePlayer::Move()
 		}
 	);
 
-	worldTransform_.translation_ = newPos;
+	mpCollision_.DetectAndResolveCollision(
+		colliderRect_,							// 衝突判定用矩形
+		newNeckPos,									// 更新される位置（衝突解決後）
+		velocity_,								// 更新される速度
+		MapChipCollision::CollisionFlag::All,	// すべての方向をチェック
+		[this](const CollisionInfo& info) {
+			// 衝突時の処理（例：特殊ブロック対応）
+			MapChipOnCollision(info);
+		}
+	);
 
+	mpCollision_.DetectAndResolveCollision(
+		colliderRect_,							// 衝突判定用矩形
+		newBodyPos,									// 更新される位置（衝突解決後）
+		velocity_,								// 更新される速度
+		MapChipCollision::CollisionFlag::All,	// すべての方向をチェック
+		[this](const CollisionInfo& info) {
+			// 衝突時の処理（例：特殊ブロック対応）
+			MapChipOnCollision(info);
+		}
+	);
+
+	worldTransform_.translation_ = newPos;
+	neckTransform_.translation_ = newNeckPos;
+	bodyTransform_.translation_ = newBodyPos;
 
 }
 
