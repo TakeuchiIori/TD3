@@ -77,8 +77,10 @@ private:
 	/// </summary>
 	void Move();
 
-
-
+	/// <summary>
+	/// UIの更新処理
+	/// </summary>
+	void UpdateUI();
 
 
 
@@ -122,6 +124,11 @@ private:
 	bool isDrawUI_ = false;
 	Vector3 offset_ = {-50.0f,-100.0,0.0f};
 
+	// UI補完
+	Vector2 uiSizeBase_ = { 150.0f, 100.0f };
+	float uiScaleT_ = 0.0f;
+	float uiScaleTarget_ = 0.0f;
+	float uiScaleCurrent_ = 0.0f;
 
 	// マップチップ
 	MapChipCollision mpCollision_;
