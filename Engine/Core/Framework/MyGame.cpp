@@ -1,7 +1,5 @@
 #include "MyGame.h"
 #include "Particle./ParticleManager.h"
-#include "Loaders/Model/Mesh/MeshPrimitive.h"
-
 
 const std::string defaultTexturePath = "Resources/Textures/Particle/";
 void MyGame::Initialize()
@@ -18,19 +16,14 @@ void MyGame::Initialize()
 	offScreen_->SetEffectType(OffScreen::OffScreenEffectType::Copy);
 	offScreen_->Initialize();
 #ifdef _DEBUG
-	SceneManager::GetInstance()->ChangeScene("Game");
+	SceneManager::GetInstance()->ChangeScene("Title");
 #else
-	SceneManager::GetInstance()->ChangeScene("Game");
+	SceneManager::GetInstance()->ChangeScene("Title");
 #endif
 	// パーティクルマネージャ生成
 	ParticleManager::GetInstance()->Initialize(srvManager_);
-	auto planeMesh = MeshPrimitive::Createplane(1.0f, 1.0f);
 	ParticleManager::GetInstance()->CreateParticleGroup("GrowthParticle", defaultTexturePath + "growth.png");
 	ParticleManager::GetInstance()->CreateParticleGroup("GameScene", defaultTexturePath + "circle.png");
-
-	ParticleManager::GetInstance()->SetPrimitiveMesh("GrowthParticle", planeMesh);
-	ParticleManager::GetInstance()->SetPrimitiveMesh("GameScene", planeMesh);
-
 }
 
 void MyGame::Finalize()

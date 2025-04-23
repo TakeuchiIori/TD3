@@ -19,7 +19,7 @@ void BaseEnemy::FaintUpdate(Player* player)
 			player->beforebehavior_ != player->behavior_)
 		{
 
-			obbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kEnemy));
+			// obbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kEnemy));
 			isTakeAttack_ = false;
 			isFaint_ = true;
 		}

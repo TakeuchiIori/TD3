@@ -76,9 +76,10 @@ protected:
 	{ 
 		obj_->SetMaterialColor(Vector3{ 0.3f,0.3f,0.3f });
 		obbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
-		if(!isFaint_)
+		if(isTakeAttack_)
 		{
-			isTakeAttack_ = true;
+			isTakeAttack_ = false;
+			isFaint_ = true;
 		}
 	}
 

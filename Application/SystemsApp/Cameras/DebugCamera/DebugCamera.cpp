@@ -12,7 +12,7 @@
 
 void DebugCamera::Initialize()
 {
-    InitJson();
+    
 
     // カメラの初期位置を設定
     translate_ = { 0.0f, 6.0f, -40.0f };
@@ -20,6 +20,8 @@ void DebugCamera::Initialize()
     // 初期のマウス位置を取得
     Input* input = Input::GetInstance();
     prevMousePos_ = input->GetMousePosition();
+
+    InitJson();
 }
 
 void DebugCamera::Update()
@@ -76,7 +78,7 @@ void DebugCamera::UpdateInput()
         Vector3 transformedMove = TransformNormal(moveDelta, rotMat);
 
         // 移動を適用
-        translate_ += transformedMove;
+        //translate_ += transformedMove;
     } else {
         isDragging_ = false;
     }
