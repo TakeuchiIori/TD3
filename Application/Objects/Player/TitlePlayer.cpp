@@ -28,11 +28,8 @@ void TitlePlayer::Initialize(Camera* camera)
 	neckTransform_.Initialize();
 	bodyTransform_.Initialize();
 
-	// ★首は体にくっつく
-	neckTransform_.SetParent(&bodyTransform_);
-	// ★頭は首にくっつく（←重要！！）
-	worldTransform_.SetParent(&neckTransform_);
-
+	neckTransform_.SetParent(&worldTransform_);
+	bodyTransform_.SetParent(&worldTransform_);
 
 	neckTransform_.useAnchorPoint_ = true;
 	neckTransform_.SetAnchorPoint({ 0.0, -1.0f,0.0f });
