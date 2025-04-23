@@ -12,6 +12,8 @@ public:
     void Initialize();
 	void InitJson();
     void Update();
+    float GetFov() const { return (fov_ >= 110.0f) ? fov_ : fov_; }
+
 
     Vector3 translate_ = { 15,0,-80 };
     Vector3 scale_ = { 1,1,1 };
@@ -19,7 +21,7 @@ public:
     Matrix4x4 matView_ = {};
 
 private:
-
+    float fov_ = 0.45f;
 	std::unique_ptr<JsonManager> jsonManager_;
 };
 

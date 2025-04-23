@@ -29,7 +29,7 @@ void Book::Initialize(Camera* camera)
 
 
 	InitializeSprite();
-	InitEvent();
+	//InitEvent();
 
 }
 
@@ -79,6 +79,7 @@ void Book::InitEvent()
 {
 	uiReadScaleT_ = 0.0f;
 	uiReadScaleTarget_ = 0.0f;
+	isScaling_ = false;
 	uiReadScaleState_ = UIReadScaleState::Growing;
 	isDrawReadUI_ = true;
 	isDrawBack_ = true;
@@ -89,6 +90,7 @@ void Book::Update()
 	UpdateMatrix();
 	obbCollider_->Update();
 	UpdateSprite();
+	UpdateReadBook();
 }
 
 void Book::UpdateSprite()
@@ -128,13 +130,15 @@ void Book::UpdateMatrix()
 
 void Book::UpdateReadBook()
 {
-	const float speed = 8.0f; // イージング速度
+	const float speed = 10.0f; // イージング速度
 	float delta = GameTime::GameTime::GetUnscaledDeltaTime();
-
+	
 	if (Input::GetInstance()->IsPadTriggered(0, GamePadButton::A))
 	{
-		uiReadScaleState_ = UIReadScaleState::Shrinking;
-		isDrawBack_ = false;
+		if (isScaling_) {
+			uiReadScaleState_ = UIReadScaleState::Shrinking;
+			isDrawBack_ = false;
+		}
 	}
 
 	// 補間進行
@@ -144,6 +148,7 @@ void Book::UpdateReadBook()
 		if (std::abs(uiReadScaleCurrent_ - 1.0f) < 0.01f) {
 			uiReadScaleCurrent_ = 1.0f;
 			uiReadScaleState_ = UIReadScaleState::None;
+			isScaling_ = true;
 		}
 		break;
 	}
@@ -153,6 +158,11 @@ void Book::UpdateReadBook()
 			uiReadScaleCurrent_ = 0.0f;
 			uiReadScaleState_ = UIReadScaleState::None;
 			isDrawReadUI_ = false;  // 非表示
+
+
+			if (OffBookTrigger_) {
+				OffBookTrigger_();
+			}
 		}
 		break;
 	}
@@ -190,8 +200,8 @@ void Book::DrawSprite()
 		}
 	}
 
-	if(isDrawBack_)
-	uiReadBook_[1]->Draw();
+	if (isDrawBack_)
+		uiReadBook_[1]->Draw();
 
 
 	if (isDrawReadUI_) {
@@ -225,7 +235,7 @@ void Book::MapChipOnCollision(const CollisionInfo& info)
 void Book::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
-	{ 
+	{
 		uiScaleTarget_ = 1.0f;
 		obj_->SetMaterialColor(Vector3{ 1.0,1.0f,0.0f });
 	}
@@ -234,12 +244,15 @@ void Book::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 void Book::OnCollision(BaseCollider* self, BaseCollider* other)
 {
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) {
-		if (Input::GetInstance()->IsPadPressed(0, GamePadButton::A)) {
-			if (OnBookTrigger_)
-			{
-				OnBookTrigger_();
-			}
+		
+		if (GameTime::IsPause() == false) {
+			if (Input::GetInstance()->IsPadPressed(0, GamePadButton::A)) {
+				if (OnBookTrigger_)
+				{
+					OnBookTrigger_();
+				}
 
+			}
 		}
 	}
 

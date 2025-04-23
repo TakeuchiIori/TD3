@@ -212,6 +212,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Stage\StageEditor.cpp" />
     <ClCompile Include="Application\Objects\Player\PlayerHaert.cpp" />
     <ClCompile Include="Application\Objects\Player\TitlePlayer.cpp" />
+    <ClCompile Include="Application\SpriteApp\ScreenApp\TitleScreen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -330,6 +331,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Stage\StageManager.h" />
     <ClInclude Include="Application\Stage\StageEditor.h" />
     <ClInclude Include="Application\Objects\Player\TitlePlayer.h" />
+    <ClInclude Include="Application\SpriteApp\ScreenApp\TitleScreen.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">

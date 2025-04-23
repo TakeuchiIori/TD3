@@ -82,6 +82,7 @@ public:
 	void MapChipOnCollision(const CollisionInfo& info);
 
 	std::function<void()> OnBookTrigger_ = nullptr;
+	std::function<void()> OffBookTrigger_ = nullptr;
 
 private:
 
@@ -139,6 +140,7 @@ private:
 	std::unique_ptr<Sprite> uiReadBook_[2];
 	bool isDrawReadUI_ = false;
 	bool isDrawBack_ = false;
+	bool isScaling_ = false;
 	Vector3 offsetReadUI_{};
 	Vector2 uiSizeReadBase_ = { 1000,600 };
 

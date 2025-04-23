@@ -30,6 +30,7 @@
 // app
 #include "Player/TitlePlayer.h" 
 #include "Book/Book.h"
+#include "../SpriteApp/ScreenApp/TitleScreen.h"
 
 class TitleScene : public BaseScene
 {
@@ -147,8 +148,10 @@ private:
 	=================================================================*/
 	
 	std::unique_ptr<MapChipInfo> mpInfo_;
+	std::unique_ptr<TitleScreen> titleScreen_;
 	bool isBookTrigger_ = false;
 	bool isStartEvent_ = false;
+	bool isAlreadyRead_ = false;  // 本を読んだことがあるか
 
 	/*=================================================================
 

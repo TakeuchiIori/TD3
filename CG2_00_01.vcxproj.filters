@@ -112,6 +112,7 @@
     <ClCompile Include="Application\Objects\Book\Book.cpp" />
     <ClCompile Include="Application\SystemsApp\Cameras\BookEventCamera\BookEventCamera.cpp" />
     <ClCompile Include="Application\SystemsApp\Cameras\DefaultCamera\DefaultCamera.cpp" />
+    <ClCompile Include="Application\SpriteApp\ScreenApp\TitleScreen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -230,6 +231,7 @@
     <ClInclude Include="Application\Objects\Book\Book.h" />
     <ClInclude Include="Application\SystemsApp\Cameras\BookEventCamera\BookEventCamera.h" />
     <ClInclude Include="Application\SystemsApp\Cameras\DefaultCamera\DefaultCamera.h" />
+    <ClInclude Include="Application\SpriteApp\ScreenApp\TitleScreen.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />
