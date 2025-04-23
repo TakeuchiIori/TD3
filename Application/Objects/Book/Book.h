@@ -10,6 +10,7 @@
 #include "Systems/GameTime/GameTime.h"
 #include "Loaders/Json/JsonManager.h"
 #include "Systems/UI/UIBase.h"
+#include "Easing.h"
 
 // app
 #include "BaseObject/BaseObject.h"
@@ -26,6 +27,15 @@ class Book: public BaseObject
 {
 public:
 
+	enum class UIReadScaleState {
+		None,
+		Growing,
+		Shrinking
+	};
+	UIReadScaleState uiReadScaleState_ = UIReadScaleState::None;
+
+
+
 	~Book() override;
 	Book(MapChipField* mapChipField)
 		: velocity_(0, 0, 0),
@@ -40,9 +50,10 @@ public:
 	/// </summary>
 	/// <param name="camera"></param>
 	void Initialize(Camera* camera) override;
+	void InitializeSprite();
 	void InitCollision();
 	void InitJson();
-
+	void InitEvent();
 
 	/// <summary>
 	/// 更新処理
@@ -50,7 +61,7 @@ public:
 	void Update() override;
 	void UpdateSprite();
 	void UpdateMatrix();
-
+	void UpdateReadBook();
 
 	/// <summary>
 	///  描画処理
@@ -59,26 +70,26 @@ public:
 	void DrawSprite();
 	void DrawCollision();
 
-
+	/// <summary>
+	/// 本を読むイベント
+	/// </summary>
+	void ReadEvent();
 
 	/// <summary>
 	/// マップチップの判定処理
 	/// </summary>
 	/// <param name="info"></param>
 	void MapChipOnCollision(const CollisionInfo& info);
-	void Reset();
 
 	std::function<void()> OnBookTrigger_ = nullptr;
+	std::function<void()> OffBookTrigger_ = nullptr;
 
 private:
 
 	/// <summary>
-	/// 移動関数
+	/// UIの更新処理
 	/// </summary>
-	void Move();
-
-
-
+	void UpdateUI();
 
 
 
@@ -104,6 +115,8 @@ public:
 	void OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir);
 
 
+	void SetIsDrawUI(bool isDrawUI) { isDrawUI_ = isDrawUI; }
+	void SetIsDrawReadUI(bool isDrawReadUI) { isDrawReadUI_ = isDrawReadUI; }
 
 private:
 
@@ -119,7 +132,31 @@ private:
 
 	// UI関連
 	std::unique_ptr<Sprite> uiBook_;
+	bool isDrawUI_ = false;
 	Vector3 offset_ = {-50.0f,-100.0,0.0f};
+
+
+	// 本を読むUI
+	std::unique_ptr<Sprite> uiReadBook_[2];
+	bool isDrawReadUI_ = false;
+	bool isDrawBack_ = false;
+	bool isScaling_ = false;
+	Vector3 offsetReadUI_{};
+	Vector2 uiSizeReadBase_ = { 1000,600 };
+
+	float uiReadScaleT_ = 0.0f;
+	float uiReadScaleTarget_ = 0.0f;
+	float uiReadScaleCurrent_ = 0.0f;
+	float readScaleDuration_ = 1.0f;
+
+
+	// UI補完
+	Vector2 uiSizeBase_ = { 150.0f, 100.0f };
+	float uiScaleT_ = 0.0f;
+	float uiScaleTarget_ = 0.0f;
+	float uiScaleCurrent_ = 0.0f;
+	Easing::Function easeFunctionGrow_ = Easing::Function::EaseOutQuad;
+	Easing::Function easeFunctionShrink_ = Easing::Function::EaseInQuad;
 
 
 	// マップチップ

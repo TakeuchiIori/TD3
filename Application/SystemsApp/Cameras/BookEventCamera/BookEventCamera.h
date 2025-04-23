@@ -70,5 +70,7 @@ private:
 
 	float t_ = 0.0f;
     float speed_ = 0.01f;
+    bool hasCalledFinish_= false;
+
 };
 

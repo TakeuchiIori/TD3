@@ -26,9 +26,11 @@
 #include "../../../SystemsApp/Cameras/FollowCamera/FollowCamera.h"
 #include "../../../SystemsApp/Cameras/TopDownCamera/TopDownCamera.h"
 #include "../../../SystemsApp/Cameras/BookEventCamera/BookEventCamera.h"
+#include "../../../SystemsApp/Cameras/DefaultCamera/DefaultCamera.h"
 // app
 #include "Player/TitlePlayer.h" 
 #include "Book/Book.h"
+#include "../SpriteApp/ScreenApp/TitleScreen.h"
 
 class TitleScene : public BaseScene
 {
@@ -114,6 +116,8 @@ private:
 	CameraMode cameraMode_;
 	std::shared_ptr<Camera> sceneCamera_;
 	CameraManager cameraManager_;
+
+	DefaultCamera defaultCamera_;
 	FollowCamera followCamera_;
 	DebugCamera debugCamera_;
 	BookEventCamera bookEventCamera_;
@@ -144,8 +148,10 @@ private:
 	=================================================================*/
 	
 	std::unique_ptr<MapChipInfo> mpInfo_;
+	std::unique_ptr<TitleScreen> titleScreen_;
 	bool isBookTrigger_ = false;
 	bool isStartEvent_ = false;
+	bool isAlreadyRead_ = false;  // 本を読んだことがあるか
 
 	/*=================================================================
 

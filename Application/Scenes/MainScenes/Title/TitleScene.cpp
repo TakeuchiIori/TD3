@@ -21,24 +21,27 @@
 /// </summary>
 void TitleScene::Initialize()
 {
-    GameTime::Initailzie();
-    // カメラの生成
-    sceneCamera_ = cameraManager_.AddCamera();
-    Object3dCommon::GetInstance()->SetDefaultCamera(sceneCamera_.get());
-    ParticleManager::GetInstance()->SetCamera(sceneCamera_.get());
-    CollisionManager::GetInstance()->Initialize();
-    // 初期カメラモード設定
-    cameraMode_ = CameraMode::DEFAULT;
-    followCamera_.Initialize();
-    debugCamera_.Initialize();
+	GameTime::Initailzie();
+	// カメラの生成
+	sceneCamera_ = cameraManager_.AddCamera();
+	Object3dCommon::GetInstance()->SetDefaultCamera(sceneCamera_.get());
+	ParticleManager::GetInstance()->SetCamera(sceneCamera_.get());
+	CollisionManager::GetInstance()->Initialize();
+	// 初期カメラモード設定
+	cameraMode_ = CameraMode::DEFAULT;
+
+	// 各カメラの初期化
+	defaultCamera_.Initialize();
+	followCamera_.Initialize();
+	debugCamera_.Initialize();
 	bookEventCamera_.Initialize();
 
-    // オーディオファイルのロード（例: MP3）
-    soundData = Audio::GetInstance()->LoadAudio(L"Resources./images./harpohikunezumi.mp3");
-    //// オーディオの再生
-    //sourceVoice = Audio::GetInstance()->SoundPlayAudio(soundData);
-    //// 音量の設定（0.0f ～ 1.0f）
-    //Audio::GetInstance()->SetVolume(sourceVoice, 0.05f); // 80%の音量に設定
+	// オーディオファイルのロード（例: MP3）
+	soundData = Audio::GetInstance()->LoadAudio(L"Resources./images./harpohikunezumi.mp3");
+	//// オーディオの再生
+	//sourceVoice = Audio::GetInstance()->SoundPlayAudio(soundData);
+	//// 音量の設定（0.0f ～ 1.0f）
+	//Audio::GetInstance()->SetVolume(sourceVoice, 0.05f); // 80%の音量に設定
 
 
 
@@ -56,21 +59,37 @@ void TitleScene::Initialize()
 	book_->Initialize(sceneCamera_.get());
 
 
+	titleScreen_ = std::make_unique<TitleScreen>();
+	titleScreen_->Initialize();
+	titleScreen_->SetCamera(sceneCamera_.get());
 
 
-    // コールバック関数
-    book_->OnBookTrigger_ = [this]() {
-        cameraMode_ = CameraMode::BOOK_EVENT;
-        this->isBookTrigger_ = true;
-        // 時間止める
-        GameTime::Pause();
-     };
+	// 本を読み始めたら
+	book_->OnBookTrigger_ = [this]() {
+		// 時間止める
+		if (!isAlreadyRead_) {
+			cameraMode_ = CameraMode::BOOK_EVENT; // 最初だけカメラ演出あり
+			this->isBookTrigger_ = true;
+		} else {
+			book_->InitEvent(); // その場で読書開始
+		}
+		book_->SetIsDrawUI(false);
+		GameTime::Pause();
+		};
 
+	// カメラが終点に着いたら
 	bookEventCamera_.isFinishedMove_ = [this]() {
 		this->isStartEvent_ = true;
 		};
 
-    
+	// 本を読み終えてAボタンが押されたら
+	book_->OffBookTrigger_ = [this]() {
+		isAlreadyRead_ = true;
+		cameraMode_ = CameraMode::DEFAULT;
+		GameTime::Resume();
+		};
+
+
 }
 
 /// <summary>
@@ -78,46 +97,48 @@ void TitleScene::Initialize()
 /// </summary>
 void TitleScene::Update()
 {
-    GameTime::Update();
-    GameTime::ImGui();
+	GameTime::Update();
+	GameTime::ImGui();
 
-    if (isStartEvent_) {
-		// ここにイベントの処理を書く
-		// 例えば、シーン遷移やアニメーションの開始など
-		SceneManager::GetInstance()->ChangeScene("Game");
+	/*=================================================================
+
+								イベントの処理
+
+	=================================================================*/
+	if (isStartEvent_) {
+
+		book_->InitEvent();
 		isStartEvent_ = false;
-    }
-
-    //if (Input::GetInstance()->PushKey(DIK_RETURN) || Input::GetInstance()->IsPadPressed(0,GamePadButton::A)) {
-    //    sceneManager_->ChangeScene("Game");
-    //}
+	}
 
 #ifdef _DEBUG
-    if ((Input::GetInstance()->TriggerKey(DIK_LCONTROL)) || Input::GetInstance()->IsPadTriggered(0, GamePadButton::RT)) {
-        isDebugCamera_ = !isDebugCamera_;
-    }
+	if ((Input::GetInstance()->TriggerKey(DIK_LCONTROL)) || Input::GetInstance()->IsPadTriggered(0, GamePadButton::RT)) {
+		isDebugCamera_ = !isDebugCamera_;
+	}
 #endif // _DEBUG
- 
+
 
 
 
 
 	mpInfo_->Update();
 
-    if (!isDebugCamera_) {
-        player_->Update();
-    }
+	if (!isDebugCamera_) {
+		player_->Update();
+	}
 	book_->Update();
+	titleScreen_->Update();
 
 
-    bookEventCamera_.RegisterControlPoints();
-    UpdateCameraMode();
+
+	bookEventCamera_.RegisterControlPoints();
+	UpdateCameraMode();
 	UpdateCamera();
 	cameraManager_.UpdateAllCameras();
-    
-    LightManager::GetInstance()->ShowLightingEditor();
-    CollisionManager::GetInstance()->Update();
-    JsonManager::ImGuiManager();
+
+	LightManager::GetInstance()->ShowLightingEditor();
+	CollisionManager::GetInstance()->Update();
+	JsonManager::ImGuiManager();
 }
 
 
@@ -126,34 +147,34 @@ void TitleScene::Update()
 /// </summary>
 void TitleScene::Draw()
 {
-    //---------
-    // 3D
-    //---------
-    Object3dCommon::GetInstance()->DrawPreference();
-    LightManager::GetInstance()->SetCommandList();
-    DrawObject();
+	//---------
+	// 3D
+	//---------
+	Object3dCommon::GetInstance()->DrawPreference();
+	LightManager::GetInstance()->SetCommandList();
+	DrawObject();
 
 
-    //---------
-    // Animation
-    //---------
-    SkinningManager::GetInstance()->DrawPreference();
-    LightManager::GetInstance()->SetCommandList();
-    DrawAnimation();
-    DrawLine();
+	//---------
+	// Animation
+	//---------
+	SkinningManager::GetInstance()->DrawPreference();
+	LightManager::GetInstance()->SetCommandList();
+	DrawAnimation();
+	DrawLine();
 
 }
 
 void TitleScene::DrawOffScreen()
 {
-    // Particle
-    //----------
-    ParticleManager::GetInstance()->Draw();
-    //----------
-    // Sprite
-    //----------
-    SpriteCommon::GetInstance()->DrawPreference();
-    DrawSprite();
+	// Particle
+	//----------
+	ParticleManager::GetInstance()->Draw();
+	//----------
+	// Sprite
+	//----------
+	SpriteCommon::GetInstance()->DrawPreference();
+	DrawSprite();
 
 
 }
@@ -163,14 +184,15 @@ void TitleScene::DrawObject()
 	mpInfo_->Draw();
 	player_->Draw();
 	book_->Draw();
-	
-    // カメラ描画
-    //bookEventCamera_.Draw(sceneCamera_.get());
+
+	// 制御点描画
+	//bookEventCamera_.Draw(sceneCamera_.get());
 }
 
 void TitleScene::DrawSprite()
 {
-    book_->DrawSprite();
+	titleScreen_->Draw();
+	book_->DrawSprite();
 }
 
 void TitleScene::DrawAnimation()
@@ -179,7 +201,7 @@ void TitleScene::DrawAnimation()
 
 void TitleScene::DrawLine()
 {
-    player_->DrawCollision();
+	player_->DrawCollision();
 	book_->DrawCollision();
 }
 
@@ -188,68 +210,72 @@ void TitleScene::DrawLine()
 /// </summary>
 void TitleScene::Finalize()
 {
-    cameraManager_.RemoveCamera(sceneCamera_);
+	cameraManager_.RemoveCamera(sceneCamera_);
 }
 
 
 void TitleScene::UpdateCameraMode()
 {
 #ifdef _DEBUG
-    ImGui::Begin("Camera Mode");
-    if (ImGui::Button("DEFAULT Camera")) {
-        cameraMode_ = CameraMode::DEFAULT;
-    }
-    if (ImGui::Button("Follow Camera")) {
-        cameraMode_ = CameraMode::FOLLOW;
-    }
+	ImGui::Begin("Camera Mode");
+	if (ImGui::Button("DEFAULT Camera")) {
+		cameraMode_ = CameraMode::DEFAULT;
+	}
+	if (ImGui::Button("Follow Camera")) {
+		cameraMode_ = CameraMode::FOLLOW;
+	}
 	if (ImGui::Button("Debug Camera")) {
 		cameraMode_ = CameraMode::DEBUG;
 	}
 	if (ImGui::Button("Book Event")) {
 		cameraMode_ = CameraMode::BOOK_EVENT;
 	}
-    ImGui::End();
+	ImGui::End();
 #endif
 }
 
 void TitleScene::UpdateCamera()
 {
-    switch (cameraMode_)
-    {
-    case CameraMode::DEFAULT:
-    {
-        sceneCamera_->DefaultCamera();
-        sceneCamera_->UpdateMatrix();
-    }
-    break;
-    case CameraMode::FOLLOW:
-    {
+	switch (cameraMode_)
+	{
+	case CameraMode::DEFAULT:
+	{
+		defaultCamera_.Update();
+		sceneCamera_->SetFovY(defaultCamera_.GetFov());
+		sceneCamera_->viewMatrix_ = defaultCamera_.matView_;
+		sceneCamera_->transform_.translate = defaultCamera_.translate_;
+		sceneCamera_->transform_.rotate = defaultCamera_.rotate_;
+		sceneCamera_->UpdateMatrix();
+	}
+	break;
+	case CameraMode::FOLLOW:
+	{
 
-        followCamera_.Update();
-        sceneCamera_->viewMatrix_ = followCamera_.matView_;
-        sceneCamera_->transform_.translate = followCamera_.translate_;
-        sceneCamera_->transform_.rotate = followCamera_.rotate_;
+		followCamera_.Update();
+		sceneCamera_->viewMatrix_ = followCamera_.matView_;
+		sceneCamera_->transform_.translate = followCamera_.translate_;
+		sceneCamera_->transform_.rotate = followCamera_.rotate_;
 
-        sceneCamera_->UpdateMatrix();
-    }
-    break;
-    case CameraMode::DEBUG:
-    {
-        if (isDebugCamera_) {
-            debugCamera_.Update();
-            sceneCamera_->SetFovY(debugCamera_.GetFov());
-            sceneCamera_->viewMatrix_ = debugCamera_.matView_;
-            sceneCamera_->transform_.translate = debugCamera_.translate_;
-            sceneCamera_->transform_.rotate = debugCamera_.rotate_;
-            sceneCamera_->UpdateMatrix();
-        }
-    }
+		sceneCamera_->UpdateMatrix();
+	}
+	break;
+	case CameraMode::DEBUG:
+	{
+		if (isDebugCamera_) {
+			debugCamera_.Update();
+			//sceneCamera_->SetFovY(debugCamera_.GetFov());
+			sceneCamera_->viewMatrix_ = debugCamera_.matView_;
+			sceneCamera_->transform_.translate = debugCamera_.translate_;
+			sceneCamera_->transform_.rotate = debugCamera_.rotate_;
+			sceneCamera_->UpdateMatrix();
+		}
+	}
 
-    break;
+	break;
 	case CameraMode::BOOK_EVENT:
 	{
 		if (isBookTrigger_) {
-            
+
 			bookEventCamera_.Update();
 			sceneCamera_->SetFovY(bookEventCamera_.GetFov());
 			sceneCamera_->viewMatrix_ = bookEventCamera_.matView_;
@@ -257,13 +283,13 @@ void TitleScene::UpdateCamera()
 			sceneCamera_->transform_.rotate = bookEventCamera_.rotate_;
 
 			sceneCamera_->UpdateMatrix();
-		} 
+		}
 	}
-    break;
+	break;
 
-    default:
-        break;
-    }
+	default:
+		break;
+	}
 }
 
 
