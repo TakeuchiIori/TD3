@@ -223,7 +223,7 @@ void Player::Reset()
 }
 
 
-
+#pragma region // 判定
 
 
 void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
@@ -351,6 +351,9 @@ void Player::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDi
 		}
 	}
 }
+
+#pragma endregion
+
 
 void Player::UpdateMatrices()
 {
