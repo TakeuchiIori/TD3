@@ -45,6 +45,11 @@ void Book::InitializeSprite()
 	uiReadBook_[0]->Initialize("Resources/Textures/Option/book.png");
 	uiReadBook_[0]->AdjustTaxtureSize();
 	uiReadBook_[0]->SetAnchorPoint({ 0.5f, 0.5f });
+
+	uiReadBook_[1] = std::make_unique<Sprite>();
+	uiReadBook_[1]->Initialize("Resources/images/white.png");
+	uiReadBook_[1]->SetSize({ 1280.0f, 720.0f });
+	uiReadBook_[1]->SetColor({ 0.0f, 0.0f, 0.0f, 0.5f });
 }
 
 void Book::InitCollision()
@@ -76,6 +81,7 @@ void Book::InitEvent()
 	uiReadScaleTarget_ = 0.0f;
 	uiReadScaleState_ = UIReadScaleState::Growing;
 	isDrawReadUI_ = true;
+	isDrawBack_ = true;
 }
 
 void Book::Update()
@@ -128,6 +134,7 @@ void Book::UpdateReadBook()
 	if (Input::GetInstance()->IsPadTriggered(0, GamePadButton::A))
 	{
 		uiReadScaleState_ = UIReadScaleState::Shrinking;
+		isDrawBack_ = false;
 	}
 
 	// 補間進行
@@ -164,6 +171,7 @@ void Book::UpdateReadBook()
 	if (isDrawReadUI_) {
 		uiReadBook_[0]->SetPosition(offsetReadUI_);
 		uiReadBook_[0]->Update();
+		uiReadBook_[1]->Update();
 	}
 }
 
@@ -181,6 +189,10 @@ void Book::DrawSprite()
 			uiBook_->Draw();
 		}
 	}
+
+	if(isDrawBack_)
+	uiReadBook_[1]->Draw();
+
 
 	if (isDrawReadUI_) {
 		uiReadBook_[0]->Draw();

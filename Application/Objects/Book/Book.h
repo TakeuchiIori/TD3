@@ -138,6 +138,7 @@ private:
 	// 本を読むUI
 	std::unique_ptr<Sprite> uiReadBook_[2];
 	bool isDrawReadUI_ = false;
+	bool isDrawBack_ = false;
 	Vector3 offsetReadUI_{};
 	Vector2 uiSizeReadBase_ = { 1000,600 };
 
