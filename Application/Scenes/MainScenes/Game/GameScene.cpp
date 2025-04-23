@@ -135,10 +135,13 @@ void GameScene::Update()
 		//test_->UpdateAnimation();
 		testWorldTransform_.UpdateMatrix();
 
-		if (!isDebugCamera_) {
-			stageManager_->NotDebugCameraUpdate();
+		if(!stageManager_->CheckPointTransition())
+		{
+			if (!isDebugCamera_) {
+				stageManager_->NotDebugCameraUpdate();
+			}
+			stageManager_->Update();
 		}
-		stageManager_->Update();
 
 		
 	}

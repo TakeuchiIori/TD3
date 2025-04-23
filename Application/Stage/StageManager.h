@@ -27,7 +27,13 @@ public:
 
 	void DrawCollision();
 
+	void DrawTransition() {};
+
+	bool CheckPointTransition();
+
 private:
+	void CameraScroll();
+
 	void ReloadObject();
 
 public:
@@ -69,5 +75,12 @@ private:
 	float cameraScrollStart_ = 16.0f;
 	float cameraScrollEnd_ = 22.0f;
 	float offsetY_ = 2.0f;
+
+	bool isTransition_ = false; // ポイント遷移中か
+
+	float deltaTime_ = 1.0f / 60.0f;
+
+	float kTransitionTime_ = 2.0f;
+	float transitionTimer_ = 0.0f;
 };
 
