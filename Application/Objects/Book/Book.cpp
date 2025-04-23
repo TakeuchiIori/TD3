@@ -81,15 +81,14 @@ void Book::UpdateSprite()
 		return;
 	}
 
+	// 座標変換
 	Vector3 newPos = worldTransform_.translation_;
 	Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
 	Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
 	newPos = Transform(newPos, matViewProjectionViewport);
 	newPos += offset_;
 	uiBook_->SetPosition(newPos);
-	//uiBook_->SetSize(Vector2{ uiScaleCurrent_, uiScaleCurrent_ });
 	uiBook_->Update();
-	//uiBook_->ImGUi();
 }
 
 void Book::UpdateMatrix()

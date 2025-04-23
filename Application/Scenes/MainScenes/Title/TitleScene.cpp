@@ -29,6 +29,9 @@ void TitleScene::Initialize()
     CollisionManager::GetInstance()->Initialize();
     // 初期カメラモード設定
     cameraMode_ = CameraMode::DEFAULT;
+
+    // 各カメラの初期化
+    defaultCamera_.Initialize();
     followCamera_.Initialize();
     debugCamera_.Initialize();
 	bookEventCamera_.Initialize();
@@ -164,7 +167,7 @@ void TitleScene::DrawObject()
 	player_->Draw();
 	book_->Draw();
 	
-    // カメラ描画
+    // 制御点描画
     //bookEventCamera_.Draw(sceneCamera_.get());
 }
 
@@ -218,7 +221,10 @@ void TitleScene::UpdateCamera()
     {
     case CameraMode::DEFAULT:
     {
-        sceneCamera_->DefaultCamera();
+		defaultCamera_.Update();
+		sceneCamera_->viewMatrix_ = defaultCamera_.matView_;
+		sceneCamera_->transform_.translate = defaultCamera_.translate_;
+		sceneCamera_->transform_.rotate = defaultCamera_.rotate_;
         sceneCamera_->UpdateMatrix();
     }
     break;

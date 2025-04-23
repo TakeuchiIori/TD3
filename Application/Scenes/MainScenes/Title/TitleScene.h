@@ -26,6 +26,7 @@
 #include "../../../SystemsApp/Cameras/FollowCamera/FollowCamera.h"
 #include "../../../SystemsApp/Cameras/TopDownCamera/TopDownCamera.h"
 #include "../../../SystemsApp/Cameras/BookEventCamera/BookEventCamera.h"
+#include "../../../SystemsApp/Cameras/DefaultCamera/DefaultCamera.h"
 // app
 #include "Player/TitlePlayer.h" 
 #include "Book/Book.h"
@@ -114,6 +115,8 @@ private:
 	CameraMode cameraMode_;
 	std::shared_ptr<Camera> sceneCamera_;
 	CameraManager cameraManager_;
+
+	DefaultCamera defaultCamera_;
 	FollowCamera followCamera_;
 	DebugCamera debugCamera_;
 	BookEventCamera bookEventCamera_;
