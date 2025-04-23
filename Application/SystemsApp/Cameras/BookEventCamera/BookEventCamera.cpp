@@ -10,6 +10,7 @@ void BookEventCamera::Initialize()
     translate_.z = -82.5f;
     InitJson();
 	t_ = 0.0f;
+	hasCalledFinish_ = false;
 }
 
 void BookEventCamera::InitJson()
@@ -40,8 +41,9 @@ void BookEventCamera::Update()
         matView_ = Inverse(MakeAffineMatrix(scale_, rotate_, translate_));
     }
 
-    if (isFinishedMove_ && t_ >= float(controlPoints_.size() - 1.0f)) {
+    if (!hasCalledFinish_ && isFinishedMove_ && t_ >= float(controlPoints_.size() - 1.0f)) {
         isFinishedMove_();
+        hasCalledFinish_ = true;
     }
 
 }

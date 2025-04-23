@@ -85,11 +85,7 @@ void TitlePlayer::Reset()
 
 void TitlePlayer::Move()
 {
-	if (input_->PushKey(DIK_UP) || input_->PushKey(DIK_W)) {
-		moveDirection_ = { 0.0f,1.0f,0.0f };
-	} else if (input_->PushKey(DIK_DOWN) || input_->PushKey(DIK_S)) {
-		moveDirection_ = { 0.0f,-1.0f,0.0f };
-	} else if (input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A)) {
+	if (input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A)) {
 		moveDirection_ = { -1.0f,0.0f,0.0f };
 	} else if (input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D)) {
 		moveDirection_ = { 1.0f,0.0f,0.0f };
@@ -97,7 +93,16 @@ void TitlePlayer::Move()
 		moveDirection_ = { 0.0f,0.0f,0.0f };
 	}
 
+	// パッド入力の追加（左スティック）
+	Vector2 padInput = input_->GetLeftStickInput(0); // 0番コントローラー前提
+	moveDirection_.x += padInput.x;
 
+	float dir = Length(moveDirection_);
+	
+	// 正規化（斜め移動防止）
+	if (dir > 1.0f) {
+		moveDirection_ = Normalize(moveDirection_);
+	}
 
 	deltaTime_ = GameTime::GetDeltaTime();
 
