@@ -13,14 +13,35 @@ void TitlePlayer::Initialize(Camera* camera)
 
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("unitCube.obj");
+	obj_->SetModel("head.obj");
+
+	neck_ = std::make_unique<Object3d>();
+	neck_->Initialize();
+	neck_->SetModel("neck.obj");
+
+	body_ = std::make_unique<Object3d>();
+	body_->Initialize();
+	body_->SetModel("body.obj");
+
 
 	worldTransform_.Initialize();
+	neckTransform_.Initialize();
+	bodyTransform_.Initialize();
+
+	// ★首は体にくっつく
+	neckTransform_.SetParent(&bodyTransform_);
+	// ★頭は首にくっつく（←重要！！）
+	worldTransform_.SetParent(&neckTransform_);
+
+
+	neckTransform_.useAnchorPoint_ = true;
+	neckTransform_.SetAnchorPoint({ 0.0, -1.0f,0.0f });
 
 	worldTransform_.translation_ = { 2.0f,2.0f,0.0f };
 
 	input_ = Input::GetInstance();
 
+	isFinishedReadBook_ = true;
 
 	InitCollision();
 	InitJson();
@@ -44,8 +65,20 @@ void TitlePlayer::InitJson()
 	jsonManager_->SetSubCategory("TitlePlayer");
 	jsonManager_->Register("通常時の移動速度", &defaultSpeed_);
 
+	jsonManager_->SetTreePrefix("頭");
+	jsonManager_->Register("頭の位置", &worldTransform_.translation_);
+	jsonManager_->Register("頭の回転", &worldTransform_.rotation_);
 
+	jsonManager_->SetTreePrefix("首");
+	jsonManager_->Register("首の位置", &neckTransform_.translation_);
+	jsonManager_->Register("首の回転", &neckTransform_.rotation_);
 
+	jsonManager_->SetTreePrefix("体");
+	jsonManager_->Register("体の位置", &bodyTransform_.translation_);
+	jsonManager_->Register("体の回転", &bodyTransform_.rotation_);
+
+	jsonCollider_ = std::make_unique<JsonManager>("TitlePlayerCollider", "Resources/JSON/");
+	obbCollider_->InitJson(jsonCollider_.get());
 
 }
 
@@ -54,6 +87,13 @@ void TitlePlayer::Update()
 
 	Move();
 
+	if (isFinishedReadBook_) {
+		if (Input::GetInstance()->IsPadPressed(0, GamePadButton::A)) {
+			neckTransform_.scale_.y += 1.0f;
+			worldTransform_.translation_.y = neckTransform_.scale_.y;
+			bodyTransform_.translation_.y = 2.0f;
+		}
+	}
 
 	UpdateMatrix();
 	obbCollider_->Update();
@@ -62,11 +102,15 @@ void TitlePlayer::Update()
 void TitlePlayer::UpdateMatrix()
 {
 	worldTransform_.UpdateMatrix();
+	neckTransform_.UpdateMatrix();
+	bodyTransform_.UpdateMatrix();
 }
 
 void TitlePlayer::Draw()
 {
 	obj_->Draw(BaseObject::camera_, worldTransform_);
+	neck_->Draw(BaseObject::camera_, neckTransform_);
+	body_->Draw(BaseObject::camera_, bodyTransform_);
 
 }
 

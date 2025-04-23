@@ -85,6 +85,7 @@ void TitleScene::Initialize()
 	// 本を読み終えてAボタンが押されたら
 	book_->OffBookTrigger_ = [this]() {
 		isAlreadyRead_ = true;
+		player_->SetIsFinishedReadBook(true);
 		cameraMode_ = CameraMode::DEFAULT;
 		GameTime::Resume();
 		};
