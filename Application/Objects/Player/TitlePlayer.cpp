@@ -41,7 +41,7 @@ void TitlePlayer::Initialize(Camera* camera)
 
 	input_ = Input::GetInstance();
 
-	isFinishedReadBook_ = true;
+	isFinishedReadBook_ = false;
 
 	InitCollision();
 	InitJson();
@@ -91,24 +91,29 @@ void TitlePlayer::Update()
 
 	UpdateMatrix();
 
+	Matrix4x4 neckMat = neckTransform_.matWorld_;
+	Vector3 neckPos = {
+		neckMat.m[3][0],
+		neckMat.m[3][1],
+		neckMat.m[3][2]
+	};
+
+
+
 	if (isFinishedReadBook_) {
 		if (Input::GetInstance()->IsPadPressed(0, GamePadButton::A)) {
-			neckTransform_.scale_.y += 0.1f;
+			isScaling_ = true;
+			
 		}
 
-		Matrix4x4 neckMat = neckTransform_.matWorld_;
-		Vector3 neckPos = {
-			neckMat.m[3][0],
-			neckMat.m[3][1],
-			neckMat.m[3][2]
-		};
-
-		float stretchY = neckTransform_.scale_.y;
-		worldTransform_.translation_ = neckPos + Vector3(0.0f, stretchY + 1.0f, 0.0f);
-
-		worldTransform_.UpdateMatrix();
+		if (isScaling_) {
+			neckTransform_.scale_.y += 0.1f;
+		}
+	
 	}
-
+	float stretchY = neckTransform_.scale_.y;
+	worldTransform_.translation_ = neckPos + Vector3(0.0f, stretchY + 1.0f, 0.0f);
+	worldTransform_.UpdateMatrix();
 	// スケールによる伸びを考慮して頭を移動
 
 
@@ -198,6 +203,10 @@ void TitlePlayer::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 
 void TitlePlayer::OnCollision(BaseCollider* self, BaseCollider* other)
 {
+	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kBook))
+	{
+		isScaling_ = false;
+	}
 }
 
 void TitlePlayer::OnExitCollision(BaseCollider* self, BaseCollider* other)

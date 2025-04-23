@@ -141,6 +141,7 @@ private:
 	float defaultSpeed_ = 3.0f;
 
 	bool isFinishedReadBook_ = false;
+	bool isScaling_ = false;
 
 };
 

@@ -160,6 +160,11 @@ void Sprite::CreateVertex()
 	vertexData[5].color = vertexData[2].color;
 
 
+	//for (int i = 0; i < numVertices_; ++i) {
+	//	vertexData[i].color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 全頂点フルカラー・不透明
+	//}
+
+
 }
 
 void Sprite::IndexResource()
