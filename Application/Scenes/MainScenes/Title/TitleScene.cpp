@@ -177,7 +177,7 @@ void TitleScene::DrawOffScreen()
 {
 	// Particle
 	//----------
-	ParticleManager::GetInstance()->Draw();
+	//ParticleManager::GetInstance()->Draw();
 	//----------
 	// Sprite
 	//----------

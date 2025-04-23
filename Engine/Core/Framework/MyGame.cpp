@@ -17,7 +17,7 @@ void MyGame::Initialize()
 	offScreen_->SetEffectType(OffScreen::OffScreenEffectType::Copy);
 	offScreen_->Initialize();
 #ifdef _DEBUG
-	SceneManager::GetInstance()->ChangeScene("Game");
+	SceneManager::GetInstance()->ChangeScene("Title");
 #else
 	SceneManager::GetInstance()->ChangeScene("Title");
 #endif
