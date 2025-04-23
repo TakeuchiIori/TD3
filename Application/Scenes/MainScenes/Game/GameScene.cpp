@@ -235,6 +235,7 @@ void GameScene::DrawObject()
 void GameScene::DrawSprite()
 {
 	gameScreen_->Draw();
+	stageManager_->DrawTransition();
 }
 
 void GameScene::DrawAnimation()
