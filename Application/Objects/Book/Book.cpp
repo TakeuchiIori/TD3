@@ -2,6 +2,8 @@
 #include "Collision/OBB/OBBCollider.h"
 #include "Collision/Core/ColliderFactory.h"
 
+#include "Easing.h"
+
 Book::~Book()
 {
 }
@@ -20,12 +22,14 @@ void Book::Initialize(Camera* camera)
 
 	input_ = Input::GetInstance();
 
+	isDrawUI_ = true;
 
 	InitCollision();
 	InitJson();
 
 
 	InitializeSprite();
+	InitEvent();
 
 }
 
@@ -41,7 +45,6 @@ void Book::InitializeSprite()
 	uiReadBook_[0]->Initialize("Resources/Textures/Option/book.png");
 	uiReadBook_[0]->AdjustTaxtureSize();
 	uiReadBook_[0]->SetAnchorPoint({ 0.5f, 0.5f });
-
 }
 
 void Book::InitCollision()
@@ -61,9 +64,18 @@ void Book::InitJson()
 	jsonManager_->SetSubCategory("Book");
 	jsonManager_->Register("Rotate", &worldTransform_.rotation_);
 	jsonManager_->Register("Offset", &offset_);
+	jsonManager_->Register("OffsetReadUI", &offsetReadUI_);
 
 	jsonCollider_ = std::make_unique<JsonManager>("BookCollider", "Resources/JSON/");
 	obbCollider_->InitJson(jsonCollider_.get());
+}
+
+void Book::InitEvent()
+{
+	uiReadScaleT_ = 0.0f;
+	uiReadScaleTarget_ = 0.0f;
+	uiReadScaleState_ = UIReadScaleState::Growing;
+	isDrawReadUI_ = true;
 }
 
 void Book::Update()
@@ -110,9 +122,51 @@ void Book::UpdateMatrix()
 
 void Book::UpdateReadBook()
 {
+	const float speed = 8.0f; // イージング速度
+	float delta = GameTime::GameTime::GetUnscaledDeltaTime();
 
+	if (Input::GetInstance()->IsPadTriggered(0, GamePadButton::A))
+	{
+		uiReadScaleState_ = UIReadScaleState::Shrinking;
+	}
 
+	// 補間進行
+	switch (uiReadScaleState_) {
+	case UIReadScaleState::Growing: {
+		uiReadScaleCurrent_ += (1.0f - uiReadScaleCurrent_) * (1.0f - std::exp(-speed * delta));
+		if (std::abs(uiReadScaleCurrent_ - 1.0f) < 0.01f) {
+			uiReadScaleCurrent_ = 1.0f;
+			uiReadScaleState_ = UIReadScaleState::None;
+		}
+		break;
+	}
+	case UIReadScaleState::Shrinking: {
+		uiReadScaleCurrent_ += (0.0f - uiReadScaleCurrent_) * (1.0f - std::exp(-speed * delta));
+		if (uiReadScaleCurrent_ < 0.01f) {
+			uiReadScaleCurrent_ = 0.0f;
+			uiReadScaleState_ = UIReadScaleState::None;
+			isDrawReadUI_ = false;  // 非表示
+		}
+		break;
+	}
+	default:
+		break;
+	}
+
+	// スケール反映
+	Vector2 scaledSize = {
+		uiSizeReadBase_.x * uiReadScaleCurrent_,
+		uiSizeReadBase_.y * uiReadScaleCurrent_
+	};
+	uiReadBook_[0]->SetSize(scaledSize);
+
+	// 表示中のみ位置更新
+	if (isDrawReadUI_) {
+		uiReadBook_[0]->SetPosition(offsetReadUI_);
+		uiReadBook_[0]->Update();
+	}
 }
+
 
 void Book::Draw()
 {
@@ -122,14 +176,27 @@ void Book::Draw()
 
 void Book::DrawSprite()
 {
-	if (uiScaleCurrent_ > 0.01f) {
-		uiBook_->Draw();
+	if (isDrawUI_) {
+		if (uiScaleCurrent_ > 0.01f) {
+			uiBook_->Draw();
+		}
+	}
+
+	if (isDrawReadUI_) {
+		uiReadBook_[0]->Draw();
 	}
 }
 
 void Book::DrawCollision()
 {
 	obbCollider_->Draw();
+}
+
+void Book::ReadEvent()
+{
+
+	UpdateReadBook();
+
 }
 
 void Book::UpdateUI()

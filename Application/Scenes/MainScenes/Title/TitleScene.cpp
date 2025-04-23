@@ -65,15 +65,15 @@ void TitleScene::Initialize()
     book_->OnBookTrigger_ = [this]() {
         cameraMode_ = CameraMode::BOOK_EVENT;
         this->isBookTrigger_ = true;
+        book_->SetIsDrawUI(false);
         // 時間止める
         GameTime::Pause();
      };
 
 	bookEventCamera_.isFinishedMove_ = [this]() {
 		this->isStartEvent_ = true;
+       // book_->InitEvent();
 		};
-
-    
 }
 
 /// <summary>
@@ -84,16 +84,15 @@ void TitleScene::Update()
     GameTime::Update();
     GameTime::ImGui();
 
-    if (isStartEvent_) {
-		// ここにイベントの処理を書く
-		// 例えば、シーン遷移やアニメーションの開始など
-		//SceneManager::GetInstance()->ChangeScene("Game");
-		isStartEvent_ = false;
-    }
+    /*=================================================================
 
-    //if (Input::GetInstance()->PushKey(DIK_RETURN) || Input::GetInstance()->IsPadPressed(0,GamePadButton::A)) {
-    //    sceneManager_->ChangeScene("Game");
-    //}
+                                イベントの処理
+
+    =================================================================*/
+    if (isStartEvent_) {
+	
+        book_->ReadEvent();
+    }
 
 #ifdef _DEBUG
     if ((Input::GetInstance()->TriggerKey(DIK_LCONTROL)) || Input::GetInstance()->IsPadTriggered(0, GamePadButton::RT)) {
