@@ -129,6 +129,7 @@ private:
 
 
 	// ワールドトランスフォーム
+	WorldTransform rootTransform_; // 全体を動かすための親
 	WorldTransform worldTransform_;
 	WorldTransform neckTransform_;
 	WorldTransform bodyTransform_;
