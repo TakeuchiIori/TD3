@@ -118,6 +118,10 @@ void TitleScene::Update()
 	}
 #endif // _DEBUG
 
+	if (player_->GetWorldTransform().translation_.y > 20.0f) {
+		SceneManager::GetInstance()->ChangeScene("Game");
+	}
+
 
 
 
@@ -164,6 +168,9 @@ void TitleScene::Draw()
 	DrawAnimation();
 	DrawLine();
 
+	SpriteCommon::GetInstance()->DrawPreference();
+	DrawSprite();
+
 }
 
 void TitleScene::DrawOffScreen()
@@ -174,8 +181,7 @@ void TitleScene::DrawOffScreen()
 	//----------
 	// Sprite
 	//----------
-	SpriteCommon::GetInstance()->DrawPreference();
-	DrawSprite();
+
 
 
 }
@@ -192,6 +198,7 @@ void TitleScene::DrawObject()
 
 void TitleScene::DrawSprite()
 {
+	player_->DrawSprite();
 	titleScreen_->Draw();
 	book_->DrawSprite();
 }

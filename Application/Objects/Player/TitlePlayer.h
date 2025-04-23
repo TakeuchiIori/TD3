@@ -9,7 +9,7 @@
 #include "WorldTransform/WorldTransform.h"
 #include "Systems/GameTime/GameTime.h"
 #include "Loaders/Json/JsonManager.h"
-
+#include "Sprite/Sprite.h"
 
 // app
 #include "BaseObject/BaseObject.h"
@@ -49,6 +49,7 @@ public:
 	/// </summary>
 	void Update() override;
 	void UpdateMatrix();
+	void UpdateSprite();
 
 
 	/// <summary>
@@ -56,7 +57,7 @@ public:
 	/// </summary>
 	void Draw() override;
 	void DrawCollision();
-
+	void DrawSprite();
 
 
 	/// <summary>
@@ -113,7 +114,8 @@ private:
 	std::unique_ptr<Object3d> neck_;
 	std::unique_ptr<Object3d> body_;
 
-
+	std::unique_ptr<Sprite> uiA_;
+	Vector3 offsetUI_ = {};
 
 
 	std::unique_ptr<JsonManager> jsonManager_;

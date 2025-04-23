@@ -46,6 +46,11 @@ void TitlePlayer::Initialize(Camera* camera)
 	InitCollision();
 	InitJson();
 
+
+	uiA_ = std::make_unique<Sprite>();
+	uiA_->Initialize("Resources/Textures/Option/A.png");
+	uiA_->SetSize({ 50.0f, 50.0f });
+	uiA_->SetAnchorPoint({ 0.5f, 0.5f });
 }
 
 void TitlePlayer::InitCollision()
@@ -64,6 +69,7 @@ void TitlePlayer::InitJson()
 	jsonManager_->SetCategory("Objects");
 	jsonManager_->SetSubCategory("TitlePlayer");
 	jsonManager_->Register("通常時の移動速度", &defaultSpeed_);
+	jsonManager_->Register("offset", &offsetUI_);
 
 	jsonManager_->SetTreePrefix("頭");
 	jsonManager_->Register("root", &rootTransform_.translation_);
@@ -119,6 +125,8 @@ void TitlePlayer::Update()
 
 
 	obbCollider_->Update();
+
+	UpdateSprite();
 }
 
 void TitlePlayer::UpdateMatrix()
@@ -132,6 +140,27 @@ void TitlePlayer::UpdateMatrix()
 
 }
 
+void TitlePlayer::UpdateSprite()
+{
+
+	// ぷりぷり処理（sin波）
+	const float pulseSpeed = 6.0f; // 速度（数値が大きいほど速く変動）
+	const float pulseScale = 0.1f; // 変動幅
+	float time = GameTime::GetTotalTime(); // 時間取得（秒）
+	float scale = 1.0f + std::sin(time * pulseSpeed) * pulseScale;
+
+	uiA_->SetSize({ 50.0f * scale, 50.0f * scale }); // ぷりぷりスケール反映
+
+
+	Vector3 playerPos = rootTransform_.translation_;
+	Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
+	Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
+	playerPos = Transform(playerPos, matViewProjectionViewport);
+	playerPos += offsetUI_;
+	uiA_->SetPosition(playerPos);
+	uiA_->Update();
+}
+
 void TitlePlayer::Draw()
 {
 	obj_->Draw(BaseObject::camera_, worldTransform_);
@@ -143,6 +172,13 @@ void TitlePlayer::Draw()
 void TitlePlayer::DrawCollision()
 {
 	obbCollider_->Draw();
+}
+
+void TitlePlayer::DrawSprite()
+{
+	if (isFinishedReadBook_) {
+		uiA_->Draw();
+	}
 }
 
 void TitlePlayer::MapChipOnCollision(const CollisionInfo& info)
