@@ -9,7 +9,7 @@
 #include "WorldTransform/WorldTransform.h"
 #include "Systems/GameTime/GameTime.h"
 #include "Loaders/Json/JsonManager.h"
-
+#include "Sprite/Sprite.h"
 
 // app
 #include "BaseObject/BaseObject.h"
@@ -49,6 +49,7 @@ public:
 	/// </summary>
 	void Update() override;
 	void UpdateMatrix();
+	void UpdateSprite();
 
 
 	/// <summary>
@@ -56,7 +57,7 @@ public:
 	/// </summary>
 	void Draw() override;
 	void DrawCollision();
-
+	void DrawSprite();
 
 
 	/// <summary>
@@ -103,12 +104,19 @@ public:
 	void OnExitCollision(BaseCollider* self, BaseCollider* other);
 	void OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir);
 
-
+	void SetIsFinishedReadBook(bool isFinishedReadBook) { isFinishedReadBook_ = isFinishedReadBook; }
 
 private:
 
 	// ポインタ
 	Input* input_ = nullptr;
+
+	std::unique_ptr<Object3d> neck_;
+	std::unique_ptr<Object3d> body_;
+
+	std::unique_ptr<Sprite> uiA_;
+	Vector3 offsetUI_ = {};
+
 
 	std::unique_ptr<JsonManager> jsonManager_;
 	std::unique_ptr<JsonManager> jsonCollider_;
@@ -123,8 +131,10 @@ private:
 
 
 	// ワールドトランスフォーム
+	WorldTransform rootTransform_; // 全体を動かすための親
 	WorldTransform worldTransform_;
-
+	WorldTransform neckTransform_;
+	WorldTransform bodyTransform_;
 
 	// 移動
 	float deltaTime_ = 0.0f;
@@ -132,7 +142,8 @@ private:
 	Vector3 moveDirection_ = {};
 	float defaultSpeed_ = 3.0f;
 
-
+	bool isFinishedReadBook_ = false;
+	bool isScaling_ = false;
 
 };
 
