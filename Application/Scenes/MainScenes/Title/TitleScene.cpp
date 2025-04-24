@@ -209,8 +209,12 @@ void TitleScene::DrawAnimation()
 
 void TitleScene::DrawLine()
 {
+#ifdef _DEBUG
 	player_->DrawCollision();
 	book_->DrawCollision();
+
+#endif // _DEBUG
+
 }
 
 /// <summary>
