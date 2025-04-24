@@ -134,6 +134,9 @@ void GameScreen::Initialize()
 	uiYodare_->SetSize({ 60.0f, 60.0f });
 	uiYodare_->SetAnchorPoint({ 0.5f, 0.5f });
 
+	uiYodareop_ = std::make_unique<Sprite>();
+	uiYodareop_->Initialize("Resources/Textures/Option/yodareUI.png");
+	uiYodare_->SetSize({ 60.0f, 60.0f });
 
 	InitJson();
 

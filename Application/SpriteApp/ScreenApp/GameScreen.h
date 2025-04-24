@@ -104,6 +104,9 @@ private:
 	std::unique_ptr<Sprite> uiYodare_;
 	Vector3 offsetYodare_ = Vector3(0.0f, 0.0f, 0.0f);
 
+	std::unique_ptr<Sprite> uiYodareop_;
+	Vector3 offsetYodareop_ = Vector3(0.0f, 0.0f, 0.0f);
+
 
 	std::unique_ptr<JsonManager> jsonManager_;
 };
