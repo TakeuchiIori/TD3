@@ -311,11 +311,22 @@ private:
 	Vector2 stick = {};
 	float threshold = 0.5f;
 
-	Audio::SoundData soundData = {};
-	IXAudio2SourceVoice* sourceVoice = nullptr;
+
+	// サウンド
+	Audio::SoundData soundDataGrow = {};
+	IXAudio2SourceVoice* sourceVoiceGrow = nullptr;
 
 	Audio::SoundData soundDataBoost = {};
 	IXAudio2SourceVoice* sourceVoiceBoost = nullptr;
+
+	Audio::SoundData soundDataDamage = {};
+	IXAudio2SourceVoice* sourceVoiceDamage = nullptr;
+
+	Audio::SoundData soundDataEat = {};
+	IXAudio2SourceVoice* sourceVoiceEat = nullptr;
+
+	Audio::SoundData soundDataYodare = {};
+	IXAudio2SourceVoice* sourceVoiceYodare = nullptr;
 
 public:
 	// 振る舞い
