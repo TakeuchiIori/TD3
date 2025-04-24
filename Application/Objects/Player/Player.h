@@ -211,6 +211,14 @@ public: // getter&setter
 
 	Vector3 GetColor() { return changeColor_; }
 
+	float GetUIBoostGauge() { 
+		if (behavior_ == BehaviorPlayer::Boost)
+		{
+			return 0.0f;
+		}
+		return 1.0f - boostCoolTimer_ / kBoostCT_;
+	}
+
 private:
 	Input* input_ = nullptr;
 

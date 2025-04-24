@@ -82,6 +82,13 @@ private:
 	std::unique_ptr<UIBase> baseLimit_;
 
 
+
+	std::unique_ptr<Sprite> boost_[2];
+	uint32_t numBoost_ = 2;
+	Vector3 offsetB_ = Vector3(-20.0f, -40.0f, 0.0f);
+	Vector3 offsetBoost_ = Vector3(0.0f, 55.0f, 0.0f);
+
+
 	// 制限時間関連
 	std::unique_ptr<Sprite> colonSprite_;
 	std::array<std::unique_ptr<Sprite>, 5> timeSprites_;
