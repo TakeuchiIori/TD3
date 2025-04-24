@@ -87,6 +87,10 @@ private:
 	uint32_t numBoost_ = 2;
 	Vector3 offsetB_ = Vector3(1100.0f, 200.0f, 0.0f);
 
+	std::unique_ptr<Sprite> heart_[3];
+	uint32_t numHeart_ = 3;
+	Vector3 offsetH_ = Vector3(1000.0f, 310.0f, 0.0f);
+
 
 	// 制限時間関連
 	std::unique_ptr<Sprite> colonSprite_;
