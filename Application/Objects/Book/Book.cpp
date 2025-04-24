@@ -93,6 +93,9 @@ void Book::InitEvent()
 
 void Book::Update()
 {
+	float time = GameTime::GetTotalTime();
+	float scale = 1.0f + std::sin(time * 1.5f) * 0.1f; // ±3%くらい
+	worldTransform_.scale_ = { scale, scale, scale };
 	UpdateMatrix();
 	obbCollider_->Update();
 	UpdateSprite();

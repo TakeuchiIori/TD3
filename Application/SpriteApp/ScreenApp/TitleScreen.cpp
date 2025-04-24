@@ -114,14 +114,14 @@ void TitleScreen::Draw()
 	{
 		for (uint32_t i = 3; i < controllerOption_; i++)
 		{
-			option_[i]->Draw();
+			//option_[i]->Draw();
 		}
 	} else
 
 	{
 		for (uint32_t i = 0; i < keyBoardOption_; i++)
 		{
-			option_[i]->Draw();
+			//option_[i]->Draw();
 		}
 	}
 
