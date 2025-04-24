@@ -363,6 +363,8 @@ Particle ParticleManager::MakeNewParticle(const std::string& name, std::mt19937&
 
 	}
 
+
+
 	// Color
 	particle.color = {
 		getValue(params.baseColor.minColor.x, params.baseColor.maxColor.x, params.isRandom, randomEngine),
@@ -520,6 +522,8 @@ void ParticleManager::InitJson(const std::string& name)
 	jsonManagers_[name]->SetTreePrefix("回転");
 	jsonManagers_[name]->Register("最小", &particleParameters_[name].baseTransform.rotateMin);
 	jsonManagers_[name]->Register("最大", &particleParameters_[name].baseTransform.rotateMax);
+	jsonManagers_[name]->Register("方向へ回転", &particleParameters_[name].isRotateDirection);
+	
 
 
 	jsonManagers_[name]->SetTreePrefix("UV");
@@ -556,7 +560,7 @@ void ParticleManager::InitJson(const std::string& name)
 	jsonManagers_[name]->Register("方向最大", &particleParameters_[name].randomDirectionMax);
 	jsonManagers_[name]->Register("加速度", &particleParameters_[name].randomForce);
 	jsonManagers_[name]->Register("Z軸をランダムに回転", &particleParameters_[name].isRandomRotate);
-	jsonManagers_[name]->Register("ランダムの速度", &particleParameters_[name].isUnRandomSpeed);
+	jsonManagers_[name]->Register("ランダムの方向に飛ばす", &particleParameters_[name].isUnRandomSpeed);
 
 	// ---------------------- その他 ----------------------
 	jsonManagers_[name]->SetTreePrefix("その他");

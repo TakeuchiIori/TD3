@@ -152,6 +152,8 @@ public:
 
 		Vector3 direction = { 1.0f,1.0f,0.0f }; // 方向;
 		bool isUnRandomSpeed = false;
+
+		bool isRotateDirection = false;
 		float speed = 1.0f;
 	};
 
