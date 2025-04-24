@@ -223,7 +223,10 @@ void GameScene::DrawAnimation()
 
 void GameScene::DrawLine()
 {
+#ifdef _DEBUG
 	stageManager_->DrawCollision();
+#endif // _DEBUG
+
 }
 
 

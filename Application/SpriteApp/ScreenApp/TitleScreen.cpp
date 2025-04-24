@@ -1,5 +1,7 @@
 #include "TitleScreen.h"
 #include "Systems/Input/Input.h"
+#include "Systems/GameTime/GameTime.h"
+#include "Systems/Input/Input.h"
 
 void TitleScreen::Initialize()
 {
@@ -39,6 +41,19 @@ void TitleScreen::Initialize()
 	option_[5]->Initialize("Resources/JSON/UI/Controller_5.json");
 
 
+	title_ = std::make_unique<Sprite>();
+	title_->Initialize("Resources/Textures/BackGround/title.png");
+	title_->SetAnchorPoint({ 0.5f, 0.5f });
+
+	InitJson();
+}
+
+void TitleScreen::InitJson()
+{
+	jsonManager_ = std::make_unique<JsonManager>("TitleScene", "Resources/JSON/UI/");
+	jsonManager_->SetCategory("UI");
+	jsonManager_->Register("OffsetTitle", &offset[0]);
+
 }
 
 void TitleScreen::Update()
@@ -58,6 +73,33 @@ void TitleScreen::Update()
 	{
 		option_[i]->Update();
 	}
+
+
+
+	Vector2 stickInput = Input::GetInstance()->GetLeftStickInput(0);
+	if (!isFadingTitle_ && (std::abs(stickInput.x) > 0.1f || std::abs(stickInput.y) > 0.1f)) {
+		isFadingTitle_ = true;
+	}
+	if (isFadingTitle_) {
+		titleAlpha_ -= 0.02f; // 徐々に透明に（速度は調整OK）
+		titleAlpha_ = std::clamp(titleAlpha_, 0.0f, 1.0f);
+
+		title_->SetColor({ 1.0f, 1.0f, 1.0f, titleAlpha_ }); // RGBA
+	}
+
+
+	// Update内の最後に追加
+	titleAnimTimer_ += 0.016f; // deltaTime相当、適宜調整
+
+	float bobbing = std::sin(titleAnimTimer_ * 2.0f) * 5.0f; // 揺れの強さ調整
+	Vector3 pos = offset[0];
+	pos.y += bobbing;
+	
+
+
+	title_->SetPosition(pos);
+	title_->Update();
+
 
 }
 
@@ -82,4 +124,6 @@ void TitleScreen::Draw()
 			option_[i]->Draw();
 		}
 	}
+
+	title_->Draw();
 }
