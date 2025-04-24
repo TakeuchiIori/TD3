@@ -130,10 +130,13 @@ void GameScreen::Initialize()
 
 
 	uiYodare_ = std::make_unique<Sprite>();
-	uiYodare_->Initialize("Resources/Textures/Option/yodareUI.png");
+	uiYodare_->Initialize("Resources/Textures/Option/operation_yodare.png");
 	uiYodare_->SetSize({ 60.0f, 60.0f });
 	uiYodare_->SetAnchorPoint({ 0.5f, 0.5f });
 
+	uiYodareop_ = std::make_unique<Sprite>();
+	uiYodareop_->Initialize("Resources/Textures/Option/yodareUI.png");
+	uiYodare_->SetSize({ 60.0f, 60.0f });
 
 	InitJson();
 
@@ -273,7 +276,7 @@ void GameScreen::Update()
 		yodareTimer_ += deltaTime_;
 		float t = std::min(yodareTimer_ / yodareEaseTime_, 1.0f);
 		t = Easing::easeOutQuad(t);
-		uiYodare_->SetSize({ t * 60.0f, t * 60.0f });
+		uiYodare_->SetSize({ t * 125.0f, t * 100.0f });
 
 		if (yodareTimer_ >= yodareEaseTime_) {
 			yodareState_ = YodareState::Visible;
@@ -282,7 +285,7 @@ void GameScreen::Update()
 		yodareTimer_ += deltaTime_;
 		float t = 1.0f - std::min(yodareTimer_ / yodareEaseTime_, 1.0f);
 		t = Easing::easeInQuad(t);
-		uiYodare_->SetSize({ t * 60.0f, t * 60.0f });
+		uiYodare_->SetSize({ t * 125.0f, t * 100.0f });
 
 		if (yodareTimer_ >= yodareEaseTime_) {
 			yodareState_ = YodareState::Hidden;
@@ -290,9 +293,9 @@ void GameScreen::Update()
 	} else if (yodareState_ == YodareState::Visible) {
 		// スケールを周期的に変化させて目立たせる
 		float pulse = std::sin(static_cast<float>(GameTime::GetTotalTime()) * 5.0f) * 0.1f; // 鼓動みたいな動き
-		float baseScale = 60.0f;
-		float scale = baseScale * (1.0f + pulse);
-		uiYodare_->SetSize({ scale, scale });
+		Vector2 baseScale = { 125.0f,100.0f };
+		Vector2 scale = baseScale * (1.0f + pulse);
+		uiYodare_->SetSize({ scale.x, scale.y });
 	}
 
 	if (yodareState_ != YodareState::Hidden) {
@@ -304,6 +307,8 @@ void GameScreen::Update()
 		uiYodare_->SetPosition(playerPos);
 		uiYodare_->Update();
 	}
+
+
 
 
 	Updatedistance();
@@ -424,4 +429,3 @@ void GameScreen::Updatedistance()
 	}
 
 }
-

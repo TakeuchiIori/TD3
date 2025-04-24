@@ -54,6 +54,7 @@ public:
 
 	SoundData LoadWave(const char* filename);
 	SoundData LoadAudio(const wchar_t* filename); // .mp3, .mp4 用
+	void StopAudio(IXAudio2SourceVoice* pSourceVoice);
 	void SoundUnload(SoundData* soundData);
 
 	IXAudio2SourceVoice* SoundPlayWave(const SoundData& soundData);
