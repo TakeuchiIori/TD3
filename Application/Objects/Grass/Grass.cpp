@@ -289,12 +289,26 @@ void Grass::BehaviorGrowthUpdate()
 
 void Grass::BehaviorRepopInit()
 {
-	worldTransform_.scale_ = defaultScale_;
+	worldTransform_.scale_ = { 0.0f, 0.0f, 0.0f }; // ここもスケール初期化しといた方が無難
+	repopWait_ = false;
+	repopTimer_ = kRepopTime_;
 }
 
 void Grass::BehaviorRepopUpdate()
 {
-	behaviortRquest_ = BehaviorGrass::Root;
+	if (repopWait_) {
+		repopWait_ = false; // ← ここで最初の1回だけ false にする
+		return;
+	}
+	if (0 < repopTimer_)
+	{
+		repopTimer_ -= deltaTime_;
+		float t = 1.0f - repopTimer_ / kRepopTime_;
+		worldTransform_.scale_ = Lerp(Vector3{ 0,0,0 }, defaultScale_, t);
+	} else
+	{
+		behaviortRquest_ = BehaviorGrass::Root;
+	}
 }
 
 void Grass::BehaviorDeleteInit()
