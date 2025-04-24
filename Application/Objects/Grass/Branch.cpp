@@ -17,6 +17,10 @@ void Branch::Initialize(Camera* camera)
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = grassWorldTransform_->translation_;
 	worldTransform_.useAnchorPoint_ = true;
+
+	collisionWT_.Initialize();
+	collisionWT_.translation_ = grassWorldTransform_->translation_;
+	collisionWT_.useAnchorPoint_ = true;
 	
 
 	// オブジェクトの初期化
@@ -33,7 +37,7 @@ void Branch::InitCollision()
 {
 	aabbCollider_ = ColliderFactory::Create<AABBCollider>(
 		this,
-		&worldTransform_,
+		&collisionWT_,
 		camera_,
 		static_cast<uint32_t>(CollisionTypeIdDef::kBranch)
 	);
@@ -50,6 +54,7 @@ void Branch::InitJson()
 void Branch::Update()
 {
 	worldTransform_.UpdateMatrix();
+	collisionWT_.UpdateMatrix();
 	aabbCollider_->Update();
 }
 
@@ -69,6 +74,10 @@ void Branch::SetRight()
 	worldTransform_.anchorPoint_ = { -1.0f,0.0f,0.0f };
 	float scaleX = rightLimit_ - grassWorldTransform_->translation_.x;
 	worldTransform_.scale_ = { scaleX * 0.5f,0.5f,0.5f };
+
+	collisionWT_.translation_.x += 4.0f;
+	collisionWT_.anchorPoint_ = { -1.0f,0.0f,0.0f };
+	collisionWT_.scale_ = { scaleX * 0.5f,0.5f,0.5f };
 }
 
 void Branch::SetLeft()
@@ -77,6 +86,10 @@ void Branch::SetLeft()
 	worldTransform_.anchorPoint_ = { 1.0f,0.0f,0.0f };
 	float scaleX = grassWorldTransform_->translation_.x - leftLimit_;
 	worldTransform_.scale_ = { scaleX * 0.5f,0.5f,0.5f };
+
+	collisionWT_.translation_.x += -4.0f;
+	collisionWT_.anchorPoint_ = { 1.0f,0.0f,0.0f };
+	collisionWT_.scale_ = { scaleX * 0.5f,0.5f,0.5f };
 }
 
 void Branch::OnEnterCollision(BaseCollider* self, BaseCollider* other)

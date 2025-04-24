@@ -1,9 +1,11 @@
 #include "JsonManager.h"
 #include <filesystem>
+#include "Debugger/Logger.h"
 
 JsonManager::JsonManager(const std::string& fileName, const std::string& folderPath)
 	: fileName_(fileName), folderPath_(folderPath)
 {
+	//Logger("JsonManager Created: " + fileName_ + "\n");
 	// ファイルが見つからなかったら作成
 	if (!std::filesystem::exists(folderPath))
 	{
@@ -15,6 +17,9 @@ JsonManager::JsonManager(const std::string& fileName, const std::string& folderP
 		instances[fileName] = this; // 一意のインスタンスのみ登録
 		LoadAll();
 	}
+
+	
+
 }
 
 JsonManager::~JsonManager()
@@ -211,6 +216,7 @@ void JsonManager::ImGuiManager()
 	std::map<std::string, std::map<std::string, std::vector<std::string>>> treeMap;
 
 	for (const auto& [name, manager] : instances) {
+		Logger("Instance: " + name + "\n");
 		std::string cat = manager->GetCategory().empty() ? "Uncategorized" : manager->GetCategory();
 		std::string subCat = manager->GetSubCategory();
 

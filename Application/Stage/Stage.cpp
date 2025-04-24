@@ -30,6 +30,7 @@ void Stage::InitCheckPoint()
 
 	Vector3 pos = player_->GetCenterPosition();
 	player_->Reset();
+	pos.x = StageEditor::Instance()->GetInitX(currentStageNum_, currentCheckPoint_);
 	player_->SetPos({ pos.x, 2.0f, pos.z });
 	ReloadObject();
 }
@@ -38,7 +39,6 @@ void Stage::Update()
 {
 	enemyManager_->Update();
 	grassManager_->Update();
-	ReachCheckPoint();
 
 	checkPoint_.DebugUpdate();
 #ifdef _DEBUG
@@ -76,21 +76,27 @@ void Stage::DrawCollision()
 	enemyManager_->DrawCollisions();
 }
 
-void Stage::ReachCheckPoint()
+Stage::TransitionType Stage::ReachCheckPoint()
 {
-	if (player_->GetCenterPosition().y >= *checkPoint_.GetCheckPointHight())
+	if (player_->GetCenterPosition().y >= *checkPoint_.GetCheckPointHight() && transitionType_ == TransitionType::kNone)
 	{
-		if (currentStageNum_ < StageEditor::Instance()->GetMaxCheckPointNumber(currentStageNum_))
+		if (currentCheckPoint_ < StageEditor::Instance()->GetMaxCheckPointNumber(currentStageNum_))
 		{
 			currentCheckPoint_++;
+			transitionType_ = TransitionType::kCheckPoint;
 		}
 		else if (currentStageNum_ < StageEditor::Instance()->GetMaxStageNumber())
 		{
 			currentStageNum_++;
+			transitionType_ = TransitionType::kStage;
 		}
-
-		InitCheckPoint();
+		else 
+		{
+			isClear_ = true;
+			transitionType_ = TransitionType::kClear;
+		}
 	}
+	return transitionType_;
 }
 
 bool Stage::StageSelector(const char* label)

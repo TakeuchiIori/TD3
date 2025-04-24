@@ -73,6 +73,11 @@ public:
 	void SetMapWorld(const Matrix4x4& world) { transformData_->World = world; }
 	const Matrix4x4& GetMatWorld() { return matWorld_; }
 
+	/// <summary>
+	///  親ワールドトランスフォームの設定
+	/// </summary>
+	void SetParent(const WorldTransform* parent) { parent_ = parent; }
+
 
 private:
 

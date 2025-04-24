@@ -17,6 +17,14 @@
 class Stage
 {
 public:
+	enum TransitionType
+	{
+		kNone,
+		kCheckPoint,
+		kStage,
+		kClear,
+	};
+public:
 	// デフォルトコンストラクタ
 	Stage() = default;
 	~Stage() = default;
@@ -43,7 +51,7 @@ public:
 	void DrawCollision();
 
 	// チェックポイントにたどり着いたときの処理
-	void ReachCheckPoint();
+	TransitionType ReachCheckPoint();
 
 private:
 	bool StageSelector(const char* label = "StageSelector");
@@ -63,6 +71,10 @@ public:
 	float GetCheckPoint();
 	Vector3 GetCheckPointPos();
 
+	bool IsClear() { return isClear_; }
+
+	void TransitionEnd() { transitionType_ = TransitionType::kNone; }
+
 private:
 	int currentStageNum_ = 0;
 
@@ -79,5 +91,9 @@ private:
 	int checkPointElements_ = 0;
 
 	int currentCheckPoint_ = 0;						// チェックポイント番号
+
+	bool isClear_ = false;
+
+	TransitionType transitionType_ = TransitionType::kNone;
 };
 

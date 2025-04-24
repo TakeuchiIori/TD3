@@ -7,6 +7,7 @@
 #include "Collision/Sphere/SphereCollider.h"
 #include "Collision/AABB/AABBCollider.h"
 #include "Loaders/Json/JsonManager.h"
+#include "Particle/ParticleEmitter.h"
 
 // Collision
 #include "Collision/Sphere/SphereCollider.h"
@@ -74,7 +75,7 @@ public:
 
 	void Reset();
 
-public:
+public: // 衝突判定用
 	Vector3 GetCenterPosition() const { 
 		return
 		{
@@ -119,7 +120,7 @@ private:
 
 
 	void TimerManager();
-
+	void TimerZero();
 
 	void ExtendBody();
 
@@ -133,57 +134,18 @@ private:
 
 	void Eliminate(); // 敵を倒した時
 
-	void HeartPos() {
-		drawCount_ = 0;
-		if(HP_ > 0)
+	void HeartPos();
+
+	void HeadDir() {
+		worldTransform_.rotation_.z = 0;
+		if (moveHistory_.size() > 1)
 		{
-			std::vector<PointWithDirection> result;
-			const float length = 1.4f;
-			float targetDistance = length;
-			float accumulated = 0.0f;
-			std::list<Vector3> v = moveHistory_;
-			v.push_back(worldTransform_.translation_);
-			auto it = v.rbegin();
-			if (it == v.rend()) return;
 
-			Vector3 prev = *it;
-			++it;
-
-			while (it != v.rend() && result.size() < HP_) {
-				Vector3 curr = *it;
-				float segLen = Length(prev - curr);
-
-				if (accumulated + segLen >= targetDistance) {
-					float remain = targetDistance - accumulated;
-					float t = remain / segLen;
-
-					// 補間して位置を算出
-					Vector3 position = prev + (curr - prev) * t;
-					position.z -= 1.0f;
-
-					// 進行方向（XY平面）からラジアン角を計算
-					Vector3 dir = Normalize(curr - prev); // 方向ベクトル（単位ベクトル）
-					float angle = std::atan2(dir.y, dir.x);  // XY平面での角度
-
-					result.push_back({ position, angle });
-
-					targetDistance += length;
-				}
-				else {
-					accumulated += segLen;
-					prev = curr;
-					++it;
-				}
-			}
-			drawCount_ = result.size();
-			for (size_t i = 0; i < result.size(); ++i)
-			{
-				haerts_[i]->SetPos(result[i].position);
-				haerts_[i]->SetRotaZ(result[i].radian + (std::numbers::pi_v<float> / 2.0f));
-			}
+			// 進行方向（XY平面）からラジアン角を計算
+			Vector3 dir = Normalize(worldTransform_.translation_ - moveHistory_.back()); // 方向ベクトル（単位ベクトル）
+			float angle = std::atan2(dir.y, dir.x);  // XY平面での角度
+			worldTransform_.rotation_.z = angle + 3.0f * std::numbers::pi_v<float> / 2.0f;
 		}
-
-		// resultに3つの配置場所が入っている（足りなければ少ない場合もある）
 	}
 
 
@@ -192,57 +154,36 @@ private:
 	void DebugPlayer();
 #endif // _DEBUG
 
-private: // プレイヤーのふるまい
 
-	/// <summary>
-	/// ふるまい全体の初期化
-	/// </summary>
+private: // プレイヤーのふるまい
+	// ふるまい全体の初期化
 	void BehaviorInitialize();
-	/// <summary>
-	/// ふるまい全体の更新
-	/// </summary>
+	// ふるまい全体の更新
 	void BehaviorUpdate();
 
 
-	/// <summary>
-	/// 停止状態初期化
-	/// </summary>
+	// 停止状態初期化
 	void BehaviorRootInit();
-	/// <summary>
-	/// 停止状態更新
-	/// </summary>
+	// 停止状態更新
 	void BehaviorRootUpdate();
 
 
-	/// <summary>
-	/// 移動状態初期化
-	/// </summary>
+	// 移動状態初期化
 	void BehaviorMovingInit();
-	/// <summary>
-	/// 移動状態更新
-	/// </summary>
+	// 移動状態更新
 	void BehaviorMovingUpdate();
 
 
-	/// <summary>
-	/// 加速状態初期化
-	/// </summary>
+	// 加速状態初期化
 	void BehaviorBoostInit();
-	/// <summary>
-	/// 加速状態更新
-	/// </summary>
+	// 加速状態更新
 	void BehaviorBoostUpdate();
 
 
-	/// <summary>
-	/// 帰還状態初期化
-	/// </summary>
+	// 帰還状態初期化
 	void BehaviorReturnInit();
-	/// <summary>
-	/// 帰還状態更新
-	/// </summary>
+	// 帰還状態更新
 	void BehaviorReturnUpdate();
-
 
 
 public: // getter&setter
@@ -254,46 +195,43 @@ public: // getter&setter
 
 	bool IsBoost() { return behavior_ == BehaviorPlayer::Boost; }
 
-	bool EndReturn()
-	{
-		if (behaviortRquest_ == BehaviorPlayer::Root)
-		{
-			return true;
-		}
-		return false;
-	}
+	bool EndReturn() { return behaviortRquest_ == BehaviorPlayer::Root; }
 
 	bool IsPopGrass();
 
-	float GetTimeLimit() 
-	{ 
-		if (extendTimer_ < 0) 
-		{
-			extendTimer_ = 0;
-		}
-		return extendTimer_;
-	}
-
-	int32_t GetMaxHP() { return kMaxHP_; }		// 最大HPの取得
-	int32_t GetHP() { return HP_; }				// 現在のHPの取得
-
-	bool CanSpitting() { return canSpitting_; }	// 唾を吐けるか
-
+	// タイムリミットを取得
+	float GetTimeLimit() { return extendTimer_ > 0 ? extendTimer_ : 0; }
+	// 最大HPの取得
+	int32_t GetMaxHP() { return kMaxHP_; }	
+	// 現在のHPの取得
+	int32_t GetHP() { return HP_; }				
+	// 唾を吐けるか
+	bool CanSpitting() { return canSpitting_; }	
+	// 草ゲージのUIを表示するための値
 	float GetUIGrassGauge() { return UIGauge_; }
 
 	Vector3 GetColor() { return changeColor_; }
 
+	float GetUIBoostGauge() { 
+		if (behavior_ == BehaviorPlayer::Boost)
+		{
+			return 0.0f;
+		}
+		return 1.0f - boostCoolTimer_ / kBoostCT_;
+	}
+
 private:
 	Input* input_ = nullptr;
+	
+	std::unique_ptr<ParticleEmitter> emitter_;
 
 	std::unique_ptr<JsonManager> jsonManager_;
 	std::unique_ptr<JsonManager> jsonCollider_;
 
 	std::shared_ptr<OBBCollider> obbCollider_;
-	//std::shared_ptr<AABBCollider> aabbCollider_;
 	std::shared_ptr<AABBCollider> nextAabbCollider_;
 	WorldTransform nextWorldTransform_;
-	//std::shared_ptr<SphereCollider> sphereCollider_;
+	WorldTransform modelWT_;
 	
 	MapChipCollision mpCollision_;
 	MapChipCollision::ColliderRect colliderRect_;
@@ -373,11 +311,22 @@ private:
 	Vector2 stick = {};
 	float threshold = 0.5f;
 
-	Audio::SoundData soundData;
-	IXAudio2SourceVoice* sourceVoice;
 
-	Audio::SoundData soundDataBoost;
-	IXAudio2SourceVoice* sourceVoiceBoost;
+	// サウンド
+	Audio::SoundData soundDataGrow = {};
+	IXAudio2SourceVoice* sourceVoiceGrow = nullptr;
+
+	Audio::SoundData soundDataBoost = {};
+	IXAudio2SourceVoice* sourceVoiceBoost = nullptr;
+
+	Audio::SoundData soundDataDamage = {};
+	IXAudio2SourceVoice* sourceVoiceDamage = nullptr;
+
+	Audio::SoundData soundDataEat = {};
+	IXAudio2SourceVoice* sourceVoiceEat = nullptr;
+
+	Audio::SoundData soundDataYodare = {};
+	IXAudio2SourceVoice* sourceVoiceYodare = nullptr;
 
 public:
 	// 振る舞い

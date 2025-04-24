@@ -1,5 +1,6 @@
 #pragma once
 #include "Systems/UI/UIBase.h"
+#include "Loaders/Json/JsonManager.h"
 
 class Player;
 class Camera;
@@ -7,6 +8,20 @@ class CheckPoint;
 class GameScreen
 {
 public:
+
+	enum class YodareState {
+		Hidden,
+		Appearing,
+		Visible,
+		Disappearing
+	};
+
+	YodareState yodareState_ = YodareState::Hidden;
+	float yodareTimer_ = 0.0f;
+	const float yodareEaseTime_ = 0.3f;
+
+
+
 	GameScreen() = default;
 	~GameScreen() = default;
 
@@ -14,6 +29,7 @@ public:
 	/// 初期化
 	/// </summary>
 	void Initialize();
+	void InitJson();
 
 	/// <summary>
 	/// 更新
@@ -66,6 +82,12 @@ private:
 	std::unique_ptr<UIBase> baseLimit_;
 
 
+
+	std::unique_ptr<Sprite> boost_[2];
+	uint32_t numBoost_ = 2;
+	Vector3 offsetB_ = Vector3(1100.0f, 200.0f, 0.0f);
+
+
 	// 制限時間関連
 	std::unique_ptr<Sprite> colonSprite_;
 	std::array<std::unique_ptr<Sprite>, 5> timeSprites_;
@@ -78,5 +100,14 @@ private:
 	std::array<std::string, 10> disPaths_;
 	std::string mTexturePath_ = "Resources/Textures/Each_Number/m.png";
 
+
+	std::unique_ptr<Sprite> uiYodare_;
+	Vector3 offsetYodare_ = Vector3(0.0f, 0.0f, 0.0f);
+
+	std::unique_ptr<Sprite> uiYodareop_;
+	Vector3 offsetYodareop_ = Vector3(0.0f, 0.0f, 0.0f);
+
+
+	std::unique_ptr<JsonManager> jsonManager_;
 };
 

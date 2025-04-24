@@ -34,15 +34,31 @@ void ParticleEmitter::UpdateTime()
 
 }
 
-void ParticleEmitter::FollowEmit(const std::string& name, const Vector3& transform)
+void ParticleEmitter::FollowEmit(const Vector3& transform)
 {
-	ParticleManager::GetInstance()->Emit(name, transform, emitter_.count);
+	ParticleManager::GetInstance()->Emit(emitter_.name, transform, emitter_.count);
 }
 
 void ParticleEmitter::Emit()
 {
 	ParticleManager::GetInstance()->Emit(emitter_.name, emitter_.transform, emitter_.count);
 }
+
+/// <summary>
+/// from から to に向かってパーティクルを発生させる
+/// </summary>
+void ParticleEmitter::EmitFromTo(const Vector3& from, const Vector3& to)
+{
+	Vector3 direction = Normalize(to - from); // 単位方向ベクトル
+	ParticleManager::ParticleParameters& params = ParticleManager::GetInstance()->GetParameters(emitter_.name);
+
+	// 明示的に中心方向に向かわせる設定
+	params.randomFromCenter = false;
+	params.direction= direction;
+
+	ParticleManager::GetInstance()->Emit(emitter_.name, from, emitter_.count);
+}
+
 
 void ParticleEmitter::ShowImGui()
 {
@@ -90,12 +106,4 @@ void ParticleEmitter::ShowImGui()
 	ImGui::End();
 #endif // _DEBUG
 
-}
-
-void ParticleEmitter::InitJson() {
-	//jsonManager_ = new JsonManager("パーティクル : " + emitter_.name, "Resources/JSON");
-	//jsonManager_->Register("Frequency", &emitter_.frequency);
- //   jsonManager_->Register("FrequencyTime", &emitter_.frequencyTime);
- //   jsonManager_->Register("Count", &emitter_.count);
- //   jsonManager_->Register("Position", &emitter_.transform.translate);
 }

@@ -3,9 +3,12 @@
 #include "./Player/Player.h"
 #include "Systems/Camera/Camera.h"
 #include "../Core/WinApp/WinApp.h"
+
 // Math 
 #include "MathFunc.h"
 #include "Matrix4x4.h"
+#include <Systems/GameTime/GameTIme.h>
+#include "Easing.h"
 
 void GameScreen::Initialize()
 {
@@ -62,6 +65,20 @@ void GameScreen::Initialize()
 	for (uint32_t i = 0; i < 2; i++) {
 		grass_[i]->isDrawImGui_ = false;
 	}
+
+	///////////////////////////////////////////////////////////////////////////
+	// 
+	// ブーストの初期化
+	// 
+	///////////////////////////////////////////////////////////////////////////
+	boost_[0] = std::make_unique<Sprite>();
+	boost_[0]->Initialize("Resources/Textures/In_Game/dashGauge_base.png");
+	boost_[0]->SetAnchorPoint({ 1.0f, 0.0f });
+	boost_[0]->SetSize({ 100.0f, 100.0f });
+	boost_[1] = std::make_unique<Sprite>();
+	boost_[1]->Initialize("Resources/Textures/In_Game/dashGauge_fill.png");
+	boost_[1]->SetAnchorPoint({ 1.0f, 0.0f });
+	boost_[1]->SetSize({ 100.0f, 100.0f });
 	
 	///////////////////////////////////////////////////////////////////////////
 	// 
@@ -112,6 +129,27 @@ void GameScreen::Initialize()
 	}
 
 
+	uiYodare_ = std::make_unique<Sprite>();
+	uiYodare_->Initialize("Resources/Textures/Option/operation_yodare.png");
+	uiYodare_->SetSize({ 60.0f, 60.0f });
+	uiYodare_->SetAnchorPoint({ 0.5f, 0.5f });
+
+	uiYodareop_ = std::make_unique<Sprite>();
+	uiYodareop_->Initialize("Resources/Textures/Option/yodareUI.png");
+	uiYodareop_->SetSize({ 120.0f, 120.0f });
+
+	InitJson();
+
+}
+
+void GameScreen::InitJson()
+{
+	jsonManager_ = std::make_unique<JsonManager>("YodareUI", "Resources/JSON/UI");
+	jsonManager_->SetCategory("UI");
+	jsonManager_->Register("OffsetYodare", &offsetYodare_);
+	jsonManager_->Register("OffsetGrass", &offsetGrass_);
+	jsonManager_->Register("Offset", &offset_);
+	jsonManager_->Register("offsetYodareop_", &offsetYodareop_);
 }
 
 void GameScreen::Update()
@@ -155,28 +193,6 @@ void GameScreen::Update()
 		if (i == 1) {
 			float ratio = player_->GetUIGrassGauge();
 
-			Vector4 bottomColor{};
-			Vector4 topColor{};
-
-			if (ratio < 0.5f) {
-				// 緑 → 黄
-				float t = ratio / 0.5f; // 0〜1に再マッピング
-				bottomColor = { 0.0f, 1.0f, 0.0f, 1.0f }; // 緑
-				topColor = {
-					1.0f * t,             // 赤が増える
-					1.0f,                 // 緑そのまま
-					0.0f, 1.0f
-				}; // 緑→黄
-			} else {
-				// 黄 → 赤
-				float t = (ratio - 0.5f) / 0.5f;
-				bottomColor = { 1.0f, 1.0f, 0.0f, 1.0f }; // 黄
-				topColor = {
-					1.0f,             // 赤
-					1.0f - t,         // 緑が減る
-					0.0f, 1.0f
-				}; // 黄→赤
-			}
 
 			Vector2 baseSize = { 55.0f, 55.0f }; // 草画像の本来のサイズ
 
@@ -194,6 +210,40 @@ void GameScreen::Update()
 		grass_[i]->Update();
 
 	}
+	for (uint32_t i = 0; i < 2; i++) {
+		grass_[i]->ImGUi();
+	}
+	///////////////////////////////////////////////////////////////////////////
+	// 
+	// ブーストのUIの更新処理
+	// 
+	///////////////////////////////////////////////////////////////////////////
+	for (UINT32 i = 0; i < numBoost_; i++)
+	{
+		Vector3 playerPos = offsetB_;
+		boost_[0]->SetPosition(playerPos);
+		//grass_[1]->SetPosition(playerPos + offsetGrass_);
+
+		if (i == 1) {
+			float ratio = player_->GetUIBoostGauge();
+
+
+			Vector2 baseSize = { 100.0f, 100.0f }; // ブースト画像の本来のサイズ
+
+			// 補正用オフセット計算（比率1.0なら0、0.5なら半分ズレる）
+			playerPos.y += baseSize.y * (1.0f - ratio);
+			Vector3 position = playerPos;
+			//position.y += yOffset;
+
+			boost_[1]->SetPosition(position);
+			// UV設定（比率に応じて縦方向に縮小 & 下から満ちる）
+			boost_[1]->SetSize({ baseSize.x, baseSize.y * ratio });
+			boost_[1]->SetUVScale({ 1.0f, ratio });
+			boost_[1]->SetUVTranslate({ 0.0f, 1.0f - ratio });
+		}
+		boost_[i]->Update();
+
+	}
 
 	///////////////////////////////////////////////////////////////////////////
 	// 
@@ -202,6 +252,68 @@ void GameScreen::Update()
 	///////////////////////////////////////////////////////////////////////////
 	baseLimit_->Update();
 	UpdateLimit();
+
+	///////////////////////////////////////////////////////////////////////////
+	// 
+	// ヨダレの更新処理
+	// 
+	///////////////////////////////////////////////////////////////////////////
+
+
+	bool canSpit = player_->CanSpitting();
+	float deltaTime_ = GameTime::GetDeltaTime();
+
+	// 状態遷移判定
+	if (canSpit && yodareState_ == YodareState::Hidden) {
+		yodareState_ = YodareState::Appearing;
+		yodareTimer_ = 0.0f;
+	} else if (!canSpit && yodareState_ == YodareState::Visible) {
+		yodareState_ = YodareState::Disappearing;
+		yodareTimer_ = 0.0f;
+	}
+
+	// イージング処理
+	if (yodareState_ == YodareState::Appearing) {
+		yodareTimer_ += deltaTime_;
+		float t = std::min(yodareTimer_ / yodareEaseTime_, 1.0f);
+		t = Easing::easeOutQuad(t);
+		uiYodare_->SetSize({ t * 125.0f, t * 100.0f });
+
+		if (yodareTimer_ >= yodareEaseTime_) {
+			yodareState_ = YodareState::Visible;
+		}
+	} else if (yodareState_ == YodareState::Disappearing) {
+		yodareTimer_ += deltaTime_;
+		float t = 1.0f - std::min(yodareTimer_ / yodareEaseTime_, 1.0f);
+		t = Easing::easeInQuad(t);
+		uiYodare_->SetSize({ t * 125.0f, t * 100.0f });
+
+		if (yodareTimer_ >= yodareEaseTime_) {
+			yodareState_ = YodareState::Hidden;
+		}
+	} else if (yodareState_ == YodareState::Visible) {
+		// スケールを周期的に変化させて目立たせる
+		float pulse = std::sin(static_cast<float>(GameTime::GetTotalTime()) * 5.0f) * 0.1f; // 鼓動みたいな動き
+		Vector2 baseScale = { 125.0f,100.0f };
+		Vector2 scale = baseScale * (1.0f + pulse);
+		uiYodare_->SetSize({ scale.x, scale.y });
+	}
+
+	if (yodareState_ != YodareState::Hidden) {
+		Vector3 playerPos = player_->GetWorldTransform().translation_;
+		Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
+		Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
+		playerPos = Transform(playerPos, matViewProjectionViewport);
+		playerPos += offsetYodare_;
+		uiYodare_->SetPosition(playerPos);
+		uiYodare_->Update();
+	}
+
+	uiYodareop_->SetPosition(offsetYodareop_);
+	uiYodareop_->Update();
+
+
+
 
 	Updatedistance();
 }
@@ -235,6 +347,10 @@ void GameScreen::Draw()
 	}
 
 
+	boost_[1]->Draw();
+	boost_[0]->Draw();
+
+
 	baseLimit_->Draw();
 
 	for (const auto& sprite : timeSprites_) {
@@ -244,6 +360,12 @@ void GameScreen::Draw()
 	for (const auto& sprite : ditSprites_) {
 		sprite->Draw();
 	}
+
+	if (yodareState_ != YodareState::Hidden) {
+		uiYodare_->Draw();
+	}
+
+	uiYodareop_->Draw();
 
 }
 
@@ -288,7 +410,7 @@ void GameScreen::Updatedistance()
 	playerPos = Transform(playerPos, matViewProjectionViewport);
 
 	// 時間をfloatで取得（例：9.83）
-	float dit = checkPointPos_ - (player_->GetCenterPosition().y );
+	float dit = std::max<float>(0, checkPointPos_ - (player_->GetCenterPosition().y));
 	//if (dit > 10.0f) dit = 10.0f;  // 最大10秒
 
 // 整数部と小数部に分ける
@@ -308,9 +430,8 @@ void GameScreen::Updatedistance()
 	// 配置と更新
 	float spacing = 20.0f;
 	for (int i = 0; i < 4; ++i) {
-		ditSprites_[i]->SetPosition({ playerPos.x - 10 + spacing * i, playerPos.y - 50, 0.0f });
+		ditSprites_[i]->SetPosition({ playerPos.x - 10 + spacing * i, playerPos.y - 80, 0.0f });
 		ditSprites_[i]->Update();
 	}
 
 }
-

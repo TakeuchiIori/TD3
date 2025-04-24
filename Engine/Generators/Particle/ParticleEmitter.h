@@ -48,16 +48,25 @@ public:
 	/// </summary>
 	/// <param name="name"></param>
 	/// <param name="transform"></param>
-	void FollowEmit(const std::string& name, const Vector3& transform);
+	void FollowEmit(const Vector3& transform);
 
 	/// <summary>
 	/// パーティクルを指定した位置で発生
 	/// </summary>
 	void Emit();
 
+	/// <summary>
+	/// fromからtoの方向へ飛ばす
+	/// </summary>
+	/// <param name="from"></param>
+	/// <param name="to"></param>
+	void EmitFromTo(const Vector3& from, const Vector3& to);
+
 private:
 
 
+
+	
 
 	/// <summary>
 	/// ImGui

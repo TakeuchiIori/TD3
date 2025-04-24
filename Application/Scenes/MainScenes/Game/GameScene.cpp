@@ -30,7 +30,6 @@ void GameScene::Initialize()
 	srand(static_cast<unsigned int>(time(nullptr))); // 乱数シード設定
 	// カメラの生成
 	sceneCamera_ = cameraManager_.AddCamera();
-	//playerCamera_ = cameraManager_.AddCamera();
 	GameTime::Initailzie();
 
     // 初期カメラモード設定
@@ -38,11 +37,6 @@ void GameScene::Initialize()
 
 	CollisionManager::GetInstance()->Initialize();
 
-	//stageManager_.Initialize(sceneCamera_.get());
-
-	picture_ = std::make_unique<Picture>();
-	picture_->Initialize();
-	picture_->SetCamera(sceneCamera_.get());
 
 
 	followCamera_.Initialize();
@@ -55,21 +49,18 @@ void GameScene::Initialize()
 	mpInfo_->Initialize();
 	mpInfo_->SetCamera(sceneCamera_.get());
 
+	// エディターの初期化
 	stageEditor_ = StageEditor::Instance();
 	stageEditor_->Load("Resources/JSON/StageEditor/StageEditor.json");
-
+	// ステージの初期化
 	stageManager_ = std::make_unique<StageManager>();
 	stageManager_->SetMapChipInfo(mpInfo_.get());
 	stageManager_->Initialize(sceneCamera_.get());
+	stageManager_->SetFollowCamera(&followCamera_);
 
 
 	followCamera_.SetTarget(stageManager_->GetPlayer()->GetWorldTransform());
 
-
-	// 敵
-	/*enemyManager_ = std::make_unique<EnemyManager>();
-	enemyManager_->SetPlayer(stageManager_->GetPlayer());
-	enemyManager_->Initialize(sceneCamera_.get(), mpInfo_->GetMapChipField());*/
 
 	giraffe_ = std::make_unique<Giraffe>();
 	giraffe_->Initialize();
@@ -79,11 +70,6 @@ void GameScene::Initialize()
     ground_ = std::make_unique<Ground>();
     ground_->Initialize(sceneCamera_.get());
 
-	//test_ = std::make_unique<Object3d>();
-	//test_->Initialize();
-	//test_->SetModel("walk.gltf", true);
-	//test->SetModel("sneakWalk.gltf", true);
-	testWorldTransform_.Initialize();
 
 
 	//// オーディオファイルのロード（例: MP3）
@@ -92,8 +78,6 @@ void GameScene::Initialize()
 	sourceVoice = Audio::GetInstance()->SoundPlayAudio(soundData,true);
 	// 音量の設定（0.0f ～ 1.0f）
 	Audio::GetInstance()->SetVolume(sourceVoice, 0.1f); // 80%の音量に設定
-
-	
 
 
 	gameScreen_ = std::make_unique<GameScreen>();
@@ -105,7 +89,7 @@ void GameScene::Initialize()
 	//=====================================================//
 	/*                  これより下は触るな危険　　　　　　　   　*/
 	//=====================================================//
-	//OcclusionCullingManager::GetInstance()->Initialize();
+
 }
 
 /// <summary>
@@ -123,29 +107,29 @@ void GameScene::Update()
 	stageEditor_->DrawEditorUI();
 #endif // _DEBUG
 
-
-	mpInfo_->Update();
-	
-
-	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
-		picture_->Update();
-    }
-    
-
-	//test_->UpdateAnimation();
-	testWorldTransform_.UpdateMatrix();
-
-	if (!isDebugCamera_) {
-		stageManager_->NotDebugCameraUpdate();
+	// クリアしたとき
+	if (stageManager_->IsClear()) {
+		sceneManager_->ChangeScene("Clear");
 	}
-	stageManager_->Update();
+	// プレイ中
+	else
+	{
+		mpInfo_->Update();
 
 
-	//enemyManager_->Update();
+
+		if(!stageManager_->CheckPointTransition())
+		{
+			if (!isDebugCamera_) {
+				stageManager_->NotDebugCameraUpdate();
+			}
+			stageManager_->Update();
+		}
+
+	}
 
 	giraffe_->Update();
 	ground_->Update();
-
 
 	ParticleManager::GetInstance()->Update();
 	// カメラ更新
@@ -187,8 +171,7 @@ void GameScene::Draw()
 	Object3dCommon::GetInstance()->DrawPreference();
 	LightManager::GetInstance()->SetCommandList();
 	DrawObject();
-	///line_->RegisterLine(start_, end_);
-	///line_->DrawLine();
+
 
 	//---------
 	// Animation
@@ -198,7 +181,7 @@ void GameScene::Draw()
 	DrawAnimation();
 	DrawLine();
 
-	//OcclusionCullingManager::GetInstance()->ResolvedOcclusionQuery();
+
 }
 
 void GameScene::DrawOffScreen()
@@ -206,6 +189,8 @@ void GameScene::DrawOffScreen()
 
 	//----------
 	// Particle
+	//----------
+	ParticleManager::GetInstance()->Draw();
 	//----------
 	ParticleManager::GetInstance()->Draw();
 	//----------
@@ -222,24 +207,26 @@ void GameScene::DrawObject()
 	giraffe_->Draw();
 	mpInfo_->Draw();
 	ground_->Draw();
-	//enemyManager_->Draw();
 	stageManager_->Draw();
 }
 
 void GameScene::DrawSprite()
 {
 	gameScreen_->Draw();
+	stageManager_->DrawTransition();
 }
 
 void GameScene::DrawAnimation()
 {
-	//test_->Draw(sceneCamera_.get(), testWorldTransform_);
+
 }
 
 void GameScene::DrawLine()
 {
+#ifdef _DEBUG
 	stageManager_->DrawCollision();
-	//enemyManager_->DrawCollisions();
+#endif // _DEBUG
+
 }
 
 
@@ -249,6 +236,7 @@ void GameScene::DrawLine()
 void GameScene::Finalize()
 {
 	cameraManager_.RemoveCamera(sceneCamera_);
+	Audio::GetInstance()->StopAudio(sourceVoice);
 }
 
 
@@ -292,25 +280,20 @@ void GameScene::UpdateCamera()
 		sceneCamera_->viewMatrix_ = followCamera_.matView_;
 		sceneCamera_->transform_.translate = followCamera_.translate_;
 		sceneCamera_->transform_.rotate = followCamera_.rotate_;
-
 		sceneCamera_->UpdateMatrix();
 	}
 	break;
 	case CameraMode::TOP_DOWN:
 	{
-
-
 		topDownCamera_.Update();
 		sceneCamera_->viewMatrix_ = topDownCamera_.matView_;
 		sceneCamera_->transform_.translate = topDownCamera_.translate_;
 		sceneCamera_->transform_.rotate = topDownCamera_.rotate_;
-
 		sceneCamera_->UpdateMatrix();
 	}
 	break;
 	case CameraMode::FPS:
 	{
-		//sceneCamera_->UpdateMatrix();
 	}
 	break;
 

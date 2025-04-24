@@ -39,7 +39,10 @@ PixelShaderOutput main(VertexShaderOutput input)
     }
     else
     {
-        output.color = gMaterial.color * textureColor;
+        float alpha = gMaterial.color.a * textureColor.a;
+        output.color.rgb = gMaterial.color.rgb * textureColor.rgb;
+        output.color.a = alpha;
+
     }
    // output.color = float4(gDirectionalLight.direction, 1);
        // output.color = float4(input.normal/2+0.5, 1);

@@ -170,6 +170,16 @@ Vector3 lerp(const Vector3& a, const Vector3& b, float t);
 float lerp(float a, float b, float t);
 
 Vector3 Slerp(const Vector3& v0, const Vector3& v1, float t);
+
+/// <summary>
+/// formからtoまでの方向を取得
+/// </summary>
+/// <param name="from"></param>
+/// <param name="to"></param>
+/// <returns></returns>
+Vector3 GetEulerAnglesFromToDirection(const Vector3& from, const Vector3& to);
+
+
 std::vector<double> CubicSplineInterpolation(
     const std::vector<double>& xData,
     const std::vector<double>& yData,

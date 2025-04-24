@@ -108,6 +108,12 @@
     <ClCompile Include="Engine\Utility\Loaders\Model\Material\MaterialUV.cpp" />
     <ClCompile Include="Application\Objects\Player\PlayerHaert.cpp" />
     <ClCompile Include="Application\Objects\Giraffe\Giraffe.cpp" />
+    <ClCompile Include="Application\Objects\Player\TitlePlayer.cpp" />
+    <ClCompile Include="Application\Objects\Book\Book.cpp" />
+    <ClCompile Include="Application\SystemsApp\Cameras\BookEventCamera\BookEventCamera.cpp" />
+    <ClCompile Include="Application\SystemsApp\Cameras\DefaultCamera\DefaultCamera.cpp" />
+    <ClCompile Include="Application\SpriteApp\ScreenApp\TitleScreen.cpp" />
+    <ClCompile Include="Engine\Utility\Loaders\Model\Mesh\MeshPrimitive.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -222,6 +228,13 @@
     <ClInclude Include="Engine\Utility\Loaders\Model\Material\MaterialUV.h" />
     <ClInclude Include="Application\Objects\Player\PlayerHaert.h" />
     <ClInclude Include="Application\Objects\Giraffe\Giraffe.h" />
+    <ClInclude Include="Application\Objects\Player\TitlePlayer.h" />
+    <ClInclude Include="Application\Objects\Book\Book.h" />
+    <ClInclude Include="Application\SystemsApp\Cameras\BookEventCamera\BookEventCamera.h" />
+    <ClInclude Include="Application\SystemsApp\Cameras\DefaultCamera\DefaultCamera.h" />
+    <ClInclude Include="Application\SpriteApp\ScreenApp\TitleScreen.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Json\EnumUtils.h" />
+    <ClInclude Include="Engine\Utility\Loaders\Model\Mesh\MeshPrimitive.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />

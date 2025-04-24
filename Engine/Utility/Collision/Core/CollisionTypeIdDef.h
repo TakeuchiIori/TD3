@@ -13,5 +13,6 @@ enum class CollisionTypeIdDef : uint32_t
 	kGrowthArea,	// 草の成長範囲
 	kBranch,		// 枝
 	kEnemy,			// 敵
+	kBook,			// タイトルシーンの本
 	kNone			// 当たり判定なし
 };
