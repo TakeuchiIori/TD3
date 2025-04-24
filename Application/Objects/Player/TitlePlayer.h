@@ -145,5 +145,6 @@ private:
 	bool isFinishedReadBook_ = false;
 	bool isScaling_ = false;
 
+	float targetRotationY_;
 };
 
