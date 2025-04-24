@@ -215,6 +215,9 @@ private:
 
 	float  centerX_ = 16.0f;
 
+	float kRepopTime_ = 0.5f;
+	float repopTimer_ = 0.0f;
+	bool repopWait_ = false;
 
 	// 振る舞い
 	BehaviorGrass behavior_ = BehaviorGrass::Root;
