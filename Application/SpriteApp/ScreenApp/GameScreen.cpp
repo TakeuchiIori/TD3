@@ -74,11 +74,11 @@ void GameScreen::Initialize()
 	boost_[0] = std::make_unique<Sprite>();
 	boost_[0]->Initialize("Resources/Textures/In_Game/dashGauge_base.png");
 	boost_[0]->SetAnchorPoint({ 1.0f, 0.0f });
-	boost_[0]->SetSize({ 55.0f, 55.0f });
+	boost_[0]->SetSize({ 100.0f, 100.0f });
 	boost_[1] = std::make_unique<Sprite>();
 	boost_[1]->Initialize("Resources/Textures/In_Game/dashGauge_fill.png");
 	boost_[1]->SetAnchorPoint({ 1.0f, 0.0f });
-	boost_[1]->SetSize({ 55.0f, 55.0f });
+	boost_[1]->SetSize({ 100.0f, 100.0f });
 	
 	///////////////////////////////////////////////////////////////////////////
 	// 
@@ -216,11 +216,7 @@ void GameScreen::Update()
 	///////////////////////////////////////////////////////////////////////////
 	for (UINT32 i = 0; i < numBoost_; i++)
 	{
-		Vector3 playerPos = player_->GetWorldTransform().translation_;
-		Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
-		Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
-		playerPos = Transform(playerPos, matViewProjectionViewport);
-		playerPos += offsetB_;
+		Vector3 playerPos = offsetB_;
 		boost_[0]->SetPosition(playerPos);
 		//grass_[1]->SetPosition(playerPos + offsetGrass_);
 
@@ -228,7 +224,7 @@ void GameScreen::Update()
 			float ratio = player_->GetUIBoostGauge();
 
 
-			Vector2 baseSize = { 55.0f, 55.0f }; // ブースト画像の本来のサイズ
+			Vector2 baseSize = { 100.0f, 100.0f }; // ブースト画像の本来のサイズ
 
 			// 補正用オフセット計算（比率1.0なら0、0.5なら半分ズレる）
 			playerPos.y += baseSize.y * (1.0f - ratio);
