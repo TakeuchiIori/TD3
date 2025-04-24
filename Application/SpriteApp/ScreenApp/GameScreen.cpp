@@ -79,6 +79,15 @@ void GameScreen::Initialize()
 	boost_[1]->Initialize("Resources/Textures/In_Game/dashGauge_fill.png");
 	boost_[1]->SetAnchorPoint({ 1.0f, 0.0f });
 	boost_[1]->SetSize({ 100.0f, 100.0f });
+
+	for (int i = 0; i < numHeart_; i++)
+	{
+		heart_[i] = std::make_unique<Sprite>();
+		heart_[i]->Initialize("Resources/Textures/In_Game/hp.png");
+		heart_[i]->SetSize({ 70.0f, 70.0f });
+		heart_[i]->SetPosition(offsetH_ + Vector3{ 70,0,0 } *float(i));
+		heart_[i]->Update();
+	}
 	
 	///////////////////////////////////////////////////////////////////////////
 	// 
@@ -349,6 +358,11 @@ void GameScreen::Draw()
 
 	boost_[1]->Draw();
 	boost_[0]->Draw();
+
+	for (int i = 0; i < player_->GetHP(); i++)
+	{
+		heart_[i]->Draw();
+	}
 
 
 	baseLimit_->Draw();
