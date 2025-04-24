@@ -17,7 +17,7 @@ void MyGame::Initialize()
 	offScreen_->SetEffectType(OffScreen::OffScreenEffectType::Copy);
 	offScreen_->Initialize();
 #ifdef _DEBUG
-	SceneManager::GetInstance()->ChangeScene("Title");
+	SceneManager::GetInstance()->ChangeScene("Game");
 #else
 	SceneManager::GetInstance()->ChangeScene("Title");
 #endif
@@ -25,11 +25,10 @@ void MyGame::Initialize()
 
 	ParticleManager::GetInstance()->Initialize(srvManager_);
 	auto planeMesh = MeshPrimitive::Createplane(1.0f, 1.0f);
+
 	ParticleManager::GetInstance()->Initialize(srvManager_);
 	ParticleManager::GetInstance()->CreateParticleGroup("GrowthParticle", defaultTexturePath + "growth.png");
-	ParticleManager::GetInstance()->CreateParticleGroup("GameScene", defaultTexturePath + "circle.png");
 
-	ParticleManager::GetInstance()->SetPrimitiveMesh("GameScene", planeMesh);
 	ParticleManager::GetInstance()->SetPrimitiveMesh("GrowthParticle", planeMesh);
 }
 
