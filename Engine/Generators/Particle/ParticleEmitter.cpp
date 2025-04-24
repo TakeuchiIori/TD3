@@ -44,6 +44,23 @@ void ParticleEmitter::Emit()
 	ParticleManager::GetInstance()->Emit(emitter_.name, emitter_.transform, emitter_.count);
 }
 
+/// <summary>
+/// from から to に向かってパーティクルを発生させる
+/// </summary>
+void ParticleEmitter::EmitFromTo(const Vector3& from, const Vector3& to)
+{
+	Vector3 direction = Normalize(to - from); // 単位方向ベクトル
+	ParticleManager::ParticleParameters& params = ParticleManager::GetInstance()->GetParameters(emitter_.name);
+
+	// 明示的に中心方向に向かわせる設定
+	params.randomFromCenter = false;
+	params.baseVelocity.velocityMin = direction;
+	params.baseVelocity.velocityMax = direction;
+
+	ParticleManager::GetInstance()->Emit(emitter_.name, from, emitter_.count);
+}
+
+
 void ParticleEmitter::ShowImGui()
 {
 #ifdef _DEBUG

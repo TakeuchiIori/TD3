@@ -206,6 +206,12 @@ public: // メンバ関数
 	/// </summary>
 	void SetPrimitiveMesh(const std::string& groupName,
 		const std::shared_ptr<Mesh>& mesh);
+
+	/// <summary>
+	/// パラメータ参照取得
+	/// </summary>
+	ParticleParameters& GetParameters(const std::string& name) { return particleParameters_[name]; }
+
 private:
 
 

@@ -55,9 +55,18 @@ public:
 	/// </summary>
 	void Emit();
 
+	/// <summary>
+	/// fromからtoの方向へ飛ばす
+	/// </summary>
+	/// <param name="from"></param>
+	/// <param name="to"></param>
+	void EmitFromTo(const Vector3& from, const Vector3& to);
+
 private:
 
 
+
+	
 
 	/// <summary>
 	/// ImGui
