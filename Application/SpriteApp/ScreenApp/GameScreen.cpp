@@ -136,7 +136,7 @@ void GameScreen::Initialize()
 
 	uiYodareop_ = std::make_unique<Sprite>();
 	uiYodareop_->Initialize("Resources/Textures/Option/yodareUI.png");
-	uiYodare_->SetSize({ 60.0f, 60.0f });
+	uiYodareop_->SetSize({ 120.0f, 120.0f });
 
 	InitJson();
 
@@ -149,6 +149,7 @@ void GameScreen::InitJson()
 	jsonManager_->Register("OffsetYodare", &offsetYodare_);
 	jsonManager_->Register("OffsetGrass", &offsetGrass_);
 	jsonManager_->Register("Offset", &offset_);
+	jsonManager_->Register("offsetYodareop_", &offsetYodareop_);
 }
 
 void GameScreen::Update()
@@ -308,6 +309,9 @@ void GameScreen::Update()
 		uiYodare_->Update();
 	}
 
+	uiYodareop_->SetPosition(offsetYodareop_);
+	uiYodareop_->Update();
+
 
 
 
@@ -360,6 +364,8 @@ void GameScreen::Draw()
 	if (yodareState_ != YodareState::Hidden) {
 		uiYodare_->Draw();
 	}
+
+	uiYodareop_->Draw();
 
 }
 
