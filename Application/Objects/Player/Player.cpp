@@ -108,8 +108,11 @@ void Player::InitJson()
 	jsonManager_->Register("草が詰まるまでの時間", &kCreateGrassTime_);
 	jsonManager_->Register("無敵時間", &kInvincibleTime_);
 
-	/*jsonManager_->Register("伸びられるタイマーの限界値", &kMaxHP_);
-	jsonManager_->Register("伸びられるタイマーの限界値", &kMaxGrassGauge_);*/
+	jsonManager_->Register("HPの最大値", &kMaxHP_);
+	jsonManager_->Register("草ゲージの最大値", &kMaxGrassGauge_);
+
+	jsonManager_->Register("通常の草の回復量(sec)", &grassTime_);
+	jsonManager_->Register("大きい草の回復量(sec)", &largeGrassTime_);
 
 	jsonCollider_ = std::make_unique<JsonManager>("playerCollider", "Resources/JSON/");
 	//aabbCollider_->InitJson(jsonCollider_.get());
@@ -248,6 +251,17 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 				{
 					createGrassTimer_ = kCreateGrassTime_;
 					isCreateGrass_ = true;
+				}
+			}
+			else
+			{
+				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.1f)
+				{
+					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + (grassTime_ / 2.0f));
+				}
+				else
+				{
+					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + (largeGrassTime_ / 2.0f));
 				}
 			}
 		}
@@ -716,6 +730,7 @@ void Player::TakeDamage()
 		{
 			HP_--;
 			isRed_ = true;
+			camera_->Shake(0.3f, { -0.5f,-0.5f }, { 0.5f,0.5f });
 			if (HP_ <= 0)
 			{
 				extendTimer_ = 0;
