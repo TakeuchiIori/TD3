@@ -88,7 +88,16 @@ void TitleScreen::Update()
 	}
 
 
-	title_->SetPosition(offset[0]);
+	// Update内の最後に追加
+	titleAnimTimer_ += 0.016f; // deltaTime相当、適宜調整
+
+	float bobbing = std::sin(titleAnimTimer_ * 2.0f) * 5.0f; // 揺れの強さ調整
+	Vector3 pos = offset[0];
+	pos.y += bobbing;
+	
+
+
+	title_->SetPosition(pos);
 	title_->Update();
 
 
