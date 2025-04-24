@@ -248,7 +248,7 @@ void TitlePlayer::OnCollision(BaseCollider* self, BaseCollider* other)
 {
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kBook))
 	{
-		isScaling_ = false;
+		//isScaling_ = false;
 	}
 }
 
