@@ -64,9 +64,22 @@ void GameScreen::Initialize()
 	// ImGuiの描画やめる
 	for (uint32_t i = 0; i < 2; i++) {
 		grass_[i]->isDrawImGui_ = false;
-		//grass_[i]->SetScale({ 30.0f, 30.0f });
 	}
 
+	///////////////////////////////////////////////////////////////////////////
+	// 
+	// ブーストの初期化
+	// 
+	///////////////////////////////////////////////////////////////////////////
+	boost_[0] = std::make_unique<Sprite>();
+	boost_[0]->Initialize("Resources/Textures/In_Game/dashGauge_base.png");
+	boost_[0]->SetAnchorPoint({ 1.0f, 0.0f });
+	boost_[0]->SetSize({ 100.0f, 100.0f });
+	boost_[1] = std::make_unique<Sprite>();
+	boost_[1]->Initialize("Resources/Textures/In_Game/dashGauge_fill.png");
+	boost_[1]->SetAnchorPoint({ 1.0f, 0.0f });
+	boost_[1]->SetSize({ 100.0f, 100.0f });
+	
 	///////////////////////////////////////////////////////////////////////////
 	// 
 	// 制限時間の初期化
@@ -193,6 +206,40 @@ void GameScreen::Update()
 		grass_[i]->Update();
 
 	}
+	for (uint32_t i = 0; i < 2; i++) {
+		grass_[i]->ImGUi();
+	}
+	///////////////////////////////////////////////////////////////////////////
+	// 
+	// ブーストのUIの更新処理
+	// 
+	///////////////////////////////////////////////////////////////////////////
+	for (UINT32 i = 0; i < numBoost_; i++)
+	{
+		Vector3 playerPos = offsetB_;
+		boost_[0]->SetPosition(playerPos);
+		//grass_[1]->SetPosition(playerPos + offsetGrass_);
+
+		if (i == 1) {
+			float ratio = player_->GetUIBoostGauge();
+
+
+			Vector2 baseSize = { 100.0f, 100.0f }; // ブースト画像の本来のサイズ
+
+			// 補正用オフセット計算（比率1.0なら0、0.5なら半分ズレる）
+			playerPos.y += baseSize.y * (1.0f - ratio);
+			Vector3 position = playerPos;
+			//position.y += yOffset;
+
+			boost_[1]->SetPosition(position);
+			// UV設定（比率に応じて縦方向に縮小 & 下から満ちる）
+			boost_[1]->SetSize({ baseSize.x, baseSize.y * ratio });
+			boost_[1]->SetUVScale({ 1.0f, ratio });
+			boost_[1]->SetUVTranslate({ 0.0f, 1.0f - ratio });
+		}
+		boost_[i]->Update();
+
+	}
 
 	///////////////////////////////////////////////////////////////////////////
 	// 
@@ -289,6 +336,10 @@ void GameScreen::Draw()
 	{
 		grass_[i]->Draw();
 	}
+
+
+	boost_[1]->Draw();
+	boost_[0]->Draw();
 
 
 	baseLimit_->Draw();
