@@ -147,7 +147,7 @@ void Grass::OnCollision(BaseCollider* self, BaseCollider* other)
 						{
 							obj_->SetMaterialColor(growthColor_);
 							behaviortRquest_ = BehaviorGrass::Growth;
-							particleEmitter_->FollowEmit(worldTransform_.translation_);
+							particleEmitter_->EmitFromTo(player_->GetCenterPosition(), worldTransform_.translation_);
 						}
 					}
 				}

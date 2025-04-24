@@ -7,6 +7,7 @@
 #include "Collision/Sphere/SphereCollider.h"
 #include "Collision/AABB/AABBCollider.h"
 #include "Loaders/Json/JsonManager.h"
+#include "Particle/ParticleEmitter.h"
 
 // Collision
 #include "Collision/Sphere/SphereCollider.h"
@@ -213,6 +214,8 @@ public: // getter&setter
 
 private:
 	Input* input_ = nullptr;
+	
+	std::unique_ptr<ParticleEmitter> emitter_;
 
 	std::unique_ptr<JsonManager> jsonManager_;
 	std::unique_ptr<JsonManager> jsonCollider_;

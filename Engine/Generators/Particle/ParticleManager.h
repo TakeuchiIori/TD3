@@ -149,6 +149,10 @@ public:
 		// 生成時にランダムのスケール
 		bool isRandomScale = false;
 		Vector2 minmaxScale = { 0.0f, 1.0f };
+
+		Vector3 direction = { 1.0f,1.0f,0.0f }; // 方向;
+		bool isUnRandomSpeed = false;
+		float speed = 1.0f;
 	};
 
 

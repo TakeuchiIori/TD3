@@ -54,8 +54,7 @@ void ParticleEmitter::EmitFromTo(const Vector3& from, const Vector3& to)
 
 	// 明示的に中心方向に向かわせる設定
 	params.randomFromCenter = false;
-	params.baseVelocity.velocityMin = direction;
-	params.baseVelocity.velocityMax = direction;
+	params.direction= direction;
 
 	ParticleManager::GetInstance()->Emit(emitter_.name, from, emitter_.count);
 }

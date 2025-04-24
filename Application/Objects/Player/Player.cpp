@@ -68,6 +68,9 @@ void Player::Initialize(Camera* camera)
 	// 音量の設定（0.0f ～ 1.0f）
 	//Audio::GetInstance()->SetVolume(sourceVoice, 0.5f);
 
+
+	emitter_ = std::make_unique<ParticleEmitter>("YodareParticle",worldTransform_.translation_,3);
+	emitter_->Initialize("Yodare");
 }
 
 void Player::InitCollision()
@@ -304,7 +307,7 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 				{
 					// 唾を吐く
 					 
-					
+					emitter_->EmitFromTo(worldTransform_.translation_, other->GetWorldTransform().translation_);
 					// オーディオの再生
 					sourceVoice = Audio::GetInstance()->SoundPlayAudio(soundData, false);
 					
