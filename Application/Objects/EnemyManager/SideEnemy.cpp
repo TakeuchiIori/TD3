@@ -53,7 +53,7 @@ void SideEnemy::InitJson()
 void SideEnemy::KnockBackDir()
 {
 	// 吹っ飛び方向の計算（プレイヤー中心 - 敵中心 → 正規化）
-	Vector3 direction = Normalize(player_->GetCenterPosition() - GetCenterPosition());
+	Vector3 direction = Normalize(GetCenterPosition() - player_->GetCenterPosition());
 	ApplyKnockback(direction, 0.6f); // ← 距離調整可能
 }
 
