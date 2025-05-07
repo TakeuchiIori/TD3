@@ -17,6 +17,11 @@ Player::~Player()
 	//aabbCollider_->~AABBCollider();
 	obbCollider_->~OBBCollider();
 	nextAabbCollider_->~AABBCollider();
+	Audio::GetInstance()->StopAudio(sourceVoiceGrow);
+	Audio::GetInstance()->StopAudio(sourceVoiceBoost);
+	Audio::GetInstance()->StopAudio(sourceVoiceDamage);
+	Audio::GetInstance()->StopAudio(sourceVoiceEat);
+	Audio::GetInstance()->StopAudio(sourceVoiceYodare);
 }
 
 void Player::Initialize(Camera* camera)
@@ -63,11 +68,18 @@ void Player::Initialize(Camera* camera)
 	//colliderRct_.height = 2.0f;
 	//colliderRct_.width = 2.0f;
 
-	soundData = Audio::GetInstance()->LoadAudio(L"Resources/Audio/Grow.mp3");
+	soundDataGrow = Audio::GetInstance()->LoadAudio(L"Resources/Audio/Grow.mp3");
 	soundDataBoost = Audio::GetInstance()->LoadAudio(L"Resources/Audio/Boost.mp3");
+
+	soundDataDamage = Audio::GetInstance()->LoadAudio(L"Resources/Audio/damage.mp3");
+	soundDataEat = Audio::GetInstance()->LoadAudio(L"Resources/Audio/eat.mp3");
+	soundDataYodare = Audio::GetInstance()->LoadAudio(L"Resources/Audio/yodare.mp3");
 	// 音量の設定（0.0f ～ 1.0f）
 	//Audio::GetInstance()->SetVolume(sourceVoice, 0.5f);
 
+
+	emitter_ = std::make_unique<ParticleEmitter>("YodareParticle",worldTransform_.translation_,3);
+	emitter_->Initialize("Yodare");
 }
 
 void Player::InitCollision()
@@ -235,7 +247,8 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 	{
 		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrass)) // 草を食べたら
 		{
-
+			// オーディオの再生
+			sourceVoiceEat = Audio::GetInstance()->SoundPlayAudio(soundDataEat, false);
 			if (kMaxGrassGauge_ > grassGauge_ && createGrassTimer_ <= 0)
 			{
 				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.1f)
@@ -303,10 +316,10 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 				if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
 				{
 					// 唾を吐く
-					 
-					
+					sourceVoiceYodare = Audio::GetInstance()->SoundPlayAudio(soundDataYodare, false);
+					emitter_->EmitFromTo(worldTransform_.translation_, other->GetWorldTransform().translation_);
 					// オーディオの再生
-					sourceVoice = Audio::GetInstance()->SoundPlayAudio(soundData, false);
+					sourceVoiceGrow = Audio::GetInstance()->SoundPlayAudio(soundDataGrow, false);
 					
 				}
 			}
@@ -731,6 +744,9 @@ void Player::TakeDamage()
 			HP_--;
 			isRed_ = true;
 			camera_->Shake(0.3f, { -0.5f,-0.5f }, { 0.5f,0.5f });
+
+			// オーディオの再生
+			sourceVoiceDamage = Audio::GetInstance()->SoundPlayAudio(soundDataDamage, false);
 			if (HP_ <= 0)
 			{
 				extendTimer_ = 0;

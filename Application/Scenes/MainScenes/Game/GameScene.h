@@ -148,26 +148,21 @@ private:
 
     =================================================================*/
 
-	std::unique_ptr<ParticleEmitter> particleEmitter_;
+
 
     /*=================================================================
 
                                スプライト関連
 
     =================================================================*/
-    Vector3 weaponPos;
-    //std::unique_ptr<Sprite> sprite_;
-    //std::vector<std::unique_ptr<Sprite>> sprites;
 	std::unique_ptr<GameScreen> gameScreen_;
+
 
     /*=================================================================
 
                                オブジェクト関連
 
     =================================================================*/
-    std::unique_ptr<Object3d> test_;
-    std::unique_ptr<Picture> picture_;
-    WorldTransform testWorldTransform_;
     std::unique_ptr<Ground> ground_;
     std::unique_ptr<Giraffe> giraffe_;
 
@@ -178,10 +173,7 @@ private:
                                    線
 
     =================================================================*/
-    std::unique_ptr<Line> line_;
-    std::unique_ptr<Line> boneLine_;
-    Vector3 start_ = { 0.0f, 0.0f, 0.0f };
-    Vector3 end_ = { 10.0f, 0.0f, 10.0f };
+
 
     /*=================================================================
 

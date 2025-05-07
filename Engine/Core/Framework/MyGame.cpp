@@ -25,12 +25,19 @@ void MyGame::Initialize()
 
 	ParticleManager::GetInstance()->Initialize(srvManager_);
 	auto planeMesh = MeshPrimitive::Createplane(1.0f, 1.0f);
-	ParticleManager::GetInstance()->Initialize(srvManager_);
-	ParticleManager::GetInstance()->CreateParticleGroup("GrowthParticle", defaultTexturePath + "growth.png");
-	ParticleManager::GetInstance()->CreateParticleGroup("GameScene", defaultTexturePath + "circle.png");
 
-	ParticleManager::GetInstance()->SetPrimitiveMesh("GameScene", planeMesh);
+	ParticleManager::GetInstance()->Initialize(srvManager_);
+
+	
+	
+	
+	ParticleManager::GetInstance()->CreateParticleGroup("GrowthParticle", defaultTexturePath + "growth.png");
+	ParticleManager::GetInstance()->CreateParticleGroup("YodareParticle", defaultTexturePath + "yodare.png");
+
+
+
 	ParticleManager::GetInstance()->SetPrimitiveMesh("GrowthParticle", planeMesh);
+	ParticleManager::GetInstance()->SetPrimitiveMesh("YodareParticle", planeMesh);
 }
 
 void MyGame::Finalize()

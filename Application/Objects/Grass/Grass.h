@@ -28,6 +28,7 @@ enum class BehaviorGrass
 	Growth,
 	Repop,
 	Delete,
+	Falling,
 };
 
 class Grass :
@@ -155,6 +156,18 @@ private: // ふるまい
 	/// 削除状態更新
 	/// </summary>
 	void BehaviorDeleteUpdate();
+
+
+	/// <summary>
+	/// 落下状態初期化
+	/// </summary>
+	void BehaviorFallingInit();
+	/// <summary>
+	/// 落下状態更新
+	/// </summary>
+	void BehaviorFallingUpdate();
+
+
 	
 
 public: // getter & setter
@@ -171,6 +184,8 @@ public: // getter & setter
 	void SetPlayer(Player* player) { player_ = player; }
 
 	bool IsDelete() { return behavior_ == BehaviorGrass::Delete; }
+
+	void StartFalling() { behaviortRquest_ = BehaviorGrass::Falling; }
 
 private:
 	Player* player_ = nullptr;
@@ -215,6 +230,13 @@ private:
 
 	float  centerX_ = 16.0f;
 
+	float kRepopTime_ = 0.5f;
+	float repopTimer_ = 0.0f;
+	bool repopWait_ = false;
+
+	float kFallTime_ = 1.5f; // 1.5秒後に削除
+	float fallTimer_ = 0.0f;
+	Vector3 fallVelocity_ = {}; // 落下速度
 
 	// 振る舞い
 	BehaviorGrass behavior_ = BehaviorGrass::Root;

@@ -82,6 +82,16 @@ private:
 	std::unique_ptr<UIBase> baseLimit_;
 
 
+
+	std::unique_ptr<Sprite> boost_[2];
+	uint32_t numBoost_ = 2;
+	Vector3 offsetB_ = Vector3(1100.0f, 200.0f, 0.0f);
+
+	std::unique_ptr<Sprite> heart_[3];
+	uint32_t numHeart_ = 3;
+	Vector3 offsetH_ = Vector3(1000.0f, 310.0f, 0.0f);
+
+
 	// 制限時間関連
 	std::unique_ptr<Sprite> colonSprite_;
 	std::array<std::unique_ptr<Sprite>, 5> timeSprites_;
@@ -97,6 +107,9 @@ private:
 
 	std::unique_ptr<Sprite> uiYodare_;
 	Vector3 offsetYodare_ = Vector3(0.0f, 0.0f, 0.0f);
+
+	std::unique_ptr<Sprite> uiYodareop_;
+	Vector3 offsetYodareop_ = Vector3(0.0f, 0.0f, 0.0f);
 
 
 	std::unique_ptr<JsonManager> jsonManager_;

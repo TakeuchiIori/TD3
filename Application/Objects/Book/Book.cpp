@@ -93,6 +93,9 @@ void Book::InitEvent()
 
 void Book::Update()
 {
+	float time = GameTime::GetTotalTime();
+	float scale = 1.0f + std::sin(time * 1.5f) * 0.1f; // ±3%くらい
+	worldTransform_.scale_ = { scale, scale, scale };
 	UpdateMatrix();
 	obbCollider_->Update();
 	UpdateSprite();
@@ -143,7 +146,7 @@ void Book::UpdateReadBook()
 	const float speed = 10.0f; // イージング速度
 	float delta = GameTime::GameTime::GetUnscaledDeltaTime();
 	
-	if (Input::GetInstance()->IsPadTriggered(0, GamePadButton::A))
+	if (Input::GetInstance()->PushKey(DIK_SPACE) || Input::GetInstance()->IsPadTriggered(0, GamePadButton::A) || Input::GetInstance()->TriggerKey(DIK_E))
 	{
 		if (isScaling_) {
 			uiReadScaleState_ = UIReadScaleState::Shrinking;
@@ -281,7 +284,7 @@ void Book::OnCollision(BaseCollider* self, BaseCollider* other)
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) {
 		
 		if (GameTime::IsPause() == false) {
-			if (Input::GetInstance()->IsPadPressed(0, GamePadButton::A)) {
+			if (Input::GetInstance()->PushKey(DIK_SPACE) || Input::GetInstance()->IsPadPressed(0, GamePadButton::A) || Input::GetInstance()->TriggerKey(DIK_E)) {
 				if (OnBookTrigger_)
 				{
 					OnBookTrigger_();

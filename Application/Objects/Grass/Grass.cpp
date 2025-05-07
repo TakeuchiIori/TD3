@@ -47,6 +47,7 @@ void Grass::Initialize(Camera* camera)
 	branch_ = std::make_unique<Branch>();
 	branch_->SetGrassWorldTransform(&worldTransform_);
 	branch_->Initialize(camera_);
+	branch_->SetParentGrass(this);
 
 	InitCollision();
 	InitJson();
@@ -82,10 +83,6 @@ void Grass::InitJson()
 void Grass::Update()
 {
 	branch_->SetPlayerBoost(player_->IsBoost());
-	if (branch_->IsDelete())
-	{
-		behaviortRquest_ = BehaviorGrass::Delete;
-	}
 	BehaviorInitialize();
 	BehaviorUpdate();
 	worldTransform_.UpdateMatrix();
@@ -203,6 +200,9 @@ void Grass::BehaviorInitialize()
 		case BehaviorGrass::Delete:
 			BehaviorDeleteInit();
 			break;
+		case BehaviorGrass::Falling:
+			BehaviorFallingInit();
+			break;
 		}
 		// 振る舞いリクエストをリセット
 		behaviortRquest_ = std::nullopt;
@@ -228,6 +228,9 @@ void Grass::BehaviorUpdate()
 		break;
 	case BehaviorGrass::Delete:
 		BehaviorDeleteUpdate();
+		break;
+	case BehaviorGrass::Falling:
+		BehaviorFallingUpdate();
 		break;
 	}
 }
@@ -289,12 +292,26 @@ void Grass::BehaviorGrowthUpdate()
 
 void Grass::BehaviorRepopInit()
 {
-	worldTransform_.scale_ = defaultScale_;
+	worldTransform_.scale_ = { 0.0f, 0.0f, 0.0f }; // ここもスケール初期化しといた方が無難
+	repopWait_ = false;
+	repopTimer_ = kRepopTime_;
 }
 
 void Grass::BehaviorRepopUpdate()
 {
-	behaviortRquest_ = BehaviorGrass::Root;
+	if (repopWait_) {
+		repopWait_ = false; // ← ここで最初の1回だけ false にする
+		return;
+	}
+	if (0 < repopTimer_)
+	{
+		repopTimer_ -= deltaTime_;
+		float t = 1.0f - repopTimer_ / kRepopTime_;
+		worldTransform_.scale_ = Lerp(Vector3{ 0,0,0 }, defaultScale_, t);
+	} else
+	{
+		behaviortRquest_ = BehaviorGrass::Root;
+	}
 }
 
 void Grass::BehaviorDeleteInit()
@@ -304,6 +321,27 @@ void Grass::BehaviorDeleteInit()
 
 void Grass::BehaviorDeleteUpdate()
 {
+}
+
+void Grass::BehaviorFallingInit() {
+	fallVelocity_ = { 0.0f, -0.2f, 0.0f }; // 落下速度
+	fallTimer_ = kFallTime_;              // タイマー初期化
+	aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));        // タイマー初期化
+}
+
+void Grass::BehaviorFallingUpdate() {
+	worldTransform_.translation_ += fallVelocity_;
+	//SetPos(worldTransform_.translation_);
+	worldTransform_.UpdateMatrix();
+
+	// タイマー減算
+	if (fallTimer_ > 0.0f) {
+		obj_->SetAlpha(fallTimer_ / kFallTime_);
+		fallTimer_ -= deltaTime_;
+	}
+	else {
+		behaviortRquest_ = BehaviorGrass::Delete;
+	}
 }
 
 void Grass::SetPos(Vector3 pos)

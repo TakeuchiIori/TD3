@@ -37,9 +37,6 @@ void GameScene::Initialize()
 
 	CollisionManager::GetInstance()->Initialize();
 
-	picture_ = std::make_unique<Picture>();
-	picture_->Initialize();
-	picture_->SetCamera(sceneCamera_.get());
 
 
 	followCamera_.Initialize();
@@ -73,11 +70,6 @@ void GameScene::Initialize()
     ground_ = std::make_unique<Ground>();
     ground_->Initialize(sceneCamera_.get());
 
-	//test_ = std::make_unique<Object3d>();
-	//test_->Initialize();
-	//test_->SetModel("walk.gltf", true);
-	//test->SetModel("sneakWalk.gltf", true);
-	testWorldTransform_.Initialize();
 
 
 	//// オーディオファイルのロード（例: MP3）
@@ -87,8 +79,6 @@ void GameScene::Initialize()
 	// 音量の設定（0.0f ～ 1.0f）
 	Audio::GetInstance()->SetVolume(sourceVoice, 0.1f); // 80%の音量に設定
 
-	
-	particleEmitter_ = std::make_unique<ParticleEmitter>("GameScene", Vector3{0,0,0}, 20);
 
 	gameScreen_ = std::make_unique<GameScreen>();
 	gameScreen_->SetCamera(sceneCamera_.get());
@@ -99,7 +89,7 @@ void GameScene::Initialize()
 	//=====================================================//
 	/*                  これより下は触るな危険　　　　　　　   　*/
 	//=====================================================//
-	//OcclusionCullingManager::GetInstance()->Initialize();
+
 }
 
 /// <summary>
@@ -115,10 +105,6 @@ void GameScene::Update()
 		isDebugCamera_ = !isDebugCamera_;
 	}
 	stageEditor_->DrawEditorUI();
-
-	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
-		sceneManager_->ChangeScene("Clear");
-	}
 #endif // _DEBUG
 
 	// クリアしたとき
@@ -130,13 +116,7 @@ void GameScene::Update()
 	{
 		mpInfo_->Update();
 
-		/*if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
-			picture_->Update();
-		}*/
 
-
-		//test_->UpdateAnimation();
-		testWorldTransform_.UpdateMatrix();
 
 		if(!stageManager_->CheckPointTransition())
 		{
@@ -150,7 +130,6 @@ void GameScene::Update()
 
 	giraffe_->Update();
 	ground_->Update();
-	particleEmitter_->Emit();
 
 	ParticleManager::GetInstance()->Update();
 	// カメラ更新
@@ -192,8 +171,7 @@ void GameScene::Draw()
 	Object3dCommon::GetInstance()->DrawPreference();
 	LightManager::GetInstance()->SetCommandList();
 	DrawObject();
-	///line_->RegisterLine(start_, end_);
-	///line_->DrawLine();
+
 
 	//---------
 	// Animation
@@ -203,7 +181,7 @@ void GameScene::Draw()
 	DrawAnimation();
 	DrawLine();
 
-	//OcclusionCullingManager::GetInstance()->ResolvedOcclusionQuery();
+
 }
 
 void GameScene::DrawOffScreen()
@@ -240,12 +218,15 @@ void GameScene::DrawSprite()
 
 void GameScene::DrawAnimation()
 {
-	//test_->Draw(sceneCamera_.get(), testWorldTransform_);
+
 }
 
 void GameScene::DrawLine()
 {
+#ifdef _DEBUG
 	stageManager_->DrawCollision();
+#endif // _DEBUG
+
 }
 
 
@@ -255,6 +236,7 @@ void GameScene::DrawLine()
 void GameScene::Finalize()
 {
 	cameraManager_.RemoveCamera(sceneCamera_);
+	Audio::GetInstance()->StopAudio(sourceVoice);
 }
 
 
@@ -298,25 +280,20 @@ void GameScene::UpdateCamera()
 		sceneCamera_->viewMatrix_ = followCamera_.matView_;
 		sceneCamera_->transform_.translate = followCamera_.translate_;
 		sceneCamera_->transform_.rotate = followCamera_.rotate_;
-
 		sceneCamera_->UpdateMatrix();
 	}
 	break;
 	case CameraMode::TOP_DOWN:
 	{
-
-
 		topDownCamera_.Update();
 		sceneCamera_->viewMatrix_ = topDownCamera_.matView_;
 		sceneCamera_->transform_.translate = topDownCamera_.translate_;
 		sceneCamera_->transform_.rotate = topDownCamera_.rotate_;
-
 		sceneCamera_->UpdateMatrix();
 	}
 	break;
 	case CameraMode::FPS:
 	{
-		//sceneCamera_->UpdateMatrix();
 	}
 	break;
 

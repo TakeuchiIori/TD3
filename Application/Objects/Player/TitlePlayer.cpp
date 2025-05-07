@@ -108,7 +108,7 @@ void TitlePlayer::Update()
 
 
 	if (isFinishedReadBook_) {
-		if (Input::GetInstance()->IsPadPressed(0, GamePadButton::A)) {
+		if (Input::GetInstance()->PushKey(DIK_SPACE) || Input::GetInstance()->IsPadPressed(0, GamePadButton::A) || Input::GetInstance()->TriggerKey(DIK_E)) {
 			isScaling_ = true;
 			
 		}
@@ -193,46 +193,51 @@ void TitlePlayer::Reset()
 
 void TitlePlayer::Move()
 {
+	Vector3 oldDirection = moveDirection_;
+
 	if (input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A)) {
-		moveDirection_ = { -1.0f,0.0f,0.0f };
+		moveDirection_ = { -1.0f, 0.0f, 0.0f };
 	} else if (input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D)) {
-		moveDirection_ = { 1.0f,0.0f,0.0f };
+		moveDirection_ = { 1.0f, 0.0f, 0.0f };
 	} else {
-		moveDirection_ = { 0.0f,0.0f,0.0f };
+		moveDirection_ = { 0.0f, 0.0f, 0.0f };
 	}
 
-	// パッド入力の追加（左スティック）
-	Vector2 padInput = input_->GetLeftStickInput(0); // 0番コントローラー前提
+	Vector2 padInput = input_->GetLeftStickInput(0);
 	moveDirection_.x += padInput.x;
 
 	float dir = Length(moveDirection_);
-	
-	// 正規化（斜め移動防止）
 	if (dir > 1.0f) {
 		moveDirection_ = Normalize(moveDirection_);
 	}
 
 	deltaTime_ = GameTime::GetDeltaTime();
-
 	velocity_ = moveDirection_ * defaultSpeed_ * deltaTime_;
-
 	Vector3 newPos = rootTransform_.translation_ + velocity_;
+
+	// ▼ X軸を前方とした向き計算と補間
+	if (LengthSquared(moveDirection_) > 0.0001f) {
+		float targetAngle = std::atan2(moveDirection_.z, moveDirection_.x); // X軸前提
+		targetRotationY_ = -targetAngle; // 左手座標系ならマイナスをつける
+
+		// 滑らかに回転補間
+		rootTransform_.rotation_.y += (targetRotationY_ - rootTransform_.rotation_.y) * (1.0f - std::exp(-10.0f * deltaTime_));
+		worldTransform_.rotation_.y = rootTransform_.rotation_.y;
+	}
 
 
 	mpCollision_.DetectAndResolveCollision(
-		colliderRect_,							// 衝突判定用矩形
-		newPos,									// 更新される位置（衝突解決後）
-		velocity_,								// 更新される速度
-		MapChipCollision::CollisionFlag::All,	// すべての方向をチェック
+		colliderRect_,
+		newPos,
+		velocity_,
+		MapChipCollision::CollisionFlag::All,
 		[this](const CollisionInfo& info) {
-			// 衝突時の処理（例：特殊ブロック対応）
 			MapChipOnCollision(info);
 		}
 	);
 
-	//rootTransform_.translation_ = worldTransform_.translation_;
 	rootTransform_.translation_ = newPos;
-	
+
 }
 
 void TitlePlayer::OnEnterCollision(BaseCollider* self, BaseCollider* other)
@@ -243,7 +248,7 @@ void TitlePlayer::OnCollision(BaseCollider* self, BaseCollider* other)
 {
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kBook))
 	{
-		isScaling_ = false;
+		//isScaling_ = false;
 	}
 }
 

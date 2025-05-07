@@ -7,6 +7,7 @@
 #include "Collision/Sphere/SphereCollider.h"
 #include "Collision/AABB/AABBCollider.h"
 #include "Loaders/Json/JsonManager.h"
+#include "Particle/ParticleEmitter.h"
 
 // Collision
 #include "Collision/Sphere/SphereCollider.h"
@@ -211,8 +212,18 @@ public: // getter&setter
 
 	Vector3 GetColor() { return changeColor_; }
 
+	float GetUIBoostGauge() { 
+		if (behavior_ == BehaviorPlayer::Boost)
+		{
+			return 0.0f;
+		}
+		return 1.0f - boostCoolTimer_ / kBoostCT_;
+	}
+
 private:
 	Input* input_ = nullptr;
+	
+	std::unique_ptr<ParticleEmitter> emitter_;
 
 	std::unique_ptr<JsonManager> jsonManager_;
 	std::unique_ptr<JsonManager> jsonCollider_;
@@ -300,11 +311,22 @@ private:
 	Vector2 stick = {};
 	float threshold = 0.5f;
 
-	Audio::SoundData soundData = {};
-	IXAudio2SourceVoice* sourceVoice = nullptr;
+
+	// サウンド
+	Audio::SoundData soundDataGrow = {};
+	IXAudio2SourceVoice* sourceVoiceGrow = nullptr;
 
 	Audio::SoundData soundDataBoost = {};
 	IXAudio2SourceVoice* sourceVoiceBoost = nullptr;
+
+	Audio::SoundData soundDataDamage = {};
+	IXAudio2SourceVoice* sourceVoiceDamage = nullptr;
+
+	Audio::SoundData soundDataEat = {};
+	IXAudio2SourceVoice* sourceVoiceEat = nullptr;
+
+	Audio::SoundData soundDataYodare = {};
+	IXAudio2SourceVoice* sourceVoiceYodare = nullptr;
 
 public:
 	// 振る舞い

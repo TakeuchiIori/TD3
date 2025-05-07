@@ -191,31 +191,24 @@ void ParticleManager::UpdateParticles()
 
 			particle.currentTime += kDeltaTime;
 
-			// 中心から放射するランダム加速
-			if (prm.randomFromCenter) {
-				// ① ランダム方向ベクトルを作る
-				Vector3 randDir = {
-					dx(randomEngine_),   // X
-					dy(randomEngine_),   // Y
-					dz(randomEngine_)    // Z
-				};
+			//// 中心から放射するランダム加速
+			//if (prm.randomFromCenter) {
+			//	// ① ランダム方向ベクトルを作る
+			//	Vector3 randDir = {
+			//		dx(randomEngine_),   // X
+			//		dy(randomEngine_),   // Y
+			//		dz(randomEngine_)    // Z
+			//	};
 
-				// ② 正規化して単位ベクトルへ
-				Vector3 dir = Normalize(randDir);
+			//	// ② 正規化して単位ベクトルへ
+			//	Vector3 dir = Normalize(randDir);
 
-				// ③ 加速度として付与
-				particle.velocity += dir * prm.randomForce;
-			}
-
-
+			//	// ③ 加速度として付与
+			//	particle.velocity += dir * prm.randomForce;
+			//}
 
 
-			// 位置揺らぎ（Enable）
-			if (prm.isRandom) {
-				particle.transform.translate.x += rx(randomEngine_) * kDeltaTime;
-				particle.transform.translate.y += ry(randomEngine_) * kDeltaTime;
-				particle.transform.translate.z += rz(randomEngine_) * kDeltaTime;
-			}
+
 
 			//// 加速度フィールド
 			//if (IsWithinAABB(particle.transform.translate, accelerationField.area)) {
@@ -223,7 +216,7 @@ void ParticleManager::UpdateParticles()
 			//}
 
 			// 移動
-			particle.transform.translate += particle.velocity * kDeltaTime;
+			particle.transform.translate += particle.velocity * kDeltaTime ;
 
 
 			// α フェード
@@ -335,31 +328,42 @@ Particle ParticleManager::MakeNewParticle(const std::string& name, std::mt19937&
 
 	// Velocity
 	if (params.randomFromCenter) {
-		auto safeMinMax = [](float a, float b) {
-			return std::minmax(a, b);
-			};
-		auto [minX, maxX] = safeMinMax(params.randomDirectionMin.x, params.randomDirectionMax.x);
-		auto [minY, maxY] = safeMinMax(params.randomDirectionMin.y, params.randomDirectionMax.y);
-		auto [minZ, maxZ] = safeMinMax(params.randomDirectionMin.z, params.randomDirectionMax.z);
+		//auto safeMinMax = [](float a, float b) {
+		//	return std::minmax(a, b);
+		//	};
+		//auto [minX, maxX] = safeMinMax(params.randomDirectionMin.x, params.randomDirectionMax.x);
+		//auto [minY, maxY] = safeMinMax(params.randomDirectionMin.y, params.randomDirectionMax.y);
+		//auto [minZ, maxZ] = safeMinMax(params.randomDirectionMin.z, params.randomDirectionMax.z);
 
-		std::uniform_real_distribution<float> randDirX(minX, maxX);
-		std::uniform_real_distribution<float> randDirY(minY, maxY);
-		std::uniform_real_distribution<float> randDirZ(minZ, maxZ);
+		//std::uniform_real_distribution<float> randDirX(minX, maxX);
+		//std::uniform_real_distribution<float> randDirY(minY, maxY);
+		//std::uniform_real_distribution<float> randDirZ(minZ, maxZ);
 
-		Vector3 dir = { randDirX(randomEngine), randDirY(randomEngine), randDirZ(randomEngine) };
-		dir = Normalize(dir);
+		//Vector3 dir = { randDirX(randomEngine), randDirY(randomEngine), randDirZ(randomEngine) };
+		//dir = Normalize(dir);
 
-		Vector3 minV = params.baseVelocity.velocityMin;
-		Vector3 maxV = params.baseVelocity.velocityMax;
-		float averageSpeed = Length((minV + maxV) * 0.5f);
-		particle.velocity = dir * averageSpeed;
+		//Vector3 minV = params.baseVelocity.velocityMin;
+		//Vector3 maxV = params.baseVelocity.velocityMax;
+		//float averageSpeed = Length((minV + maxV) * 0.5f);
+		//particle.velocity = dir * averageSpeed;
 	} else {
-		particle.velocity = {
-			getValue(params.baseVelocity.velocityMin.x, params.baseVelocity.velocityMax.x, params.isRandom, randomEngine),
-			getValue(params.baseVelocity.velocityMin.y, params.baseVelocity.velocityMax.y, params.isRandom, randomEngine),
-			getValue(params.baseVelocity.velocityMin.z, params.baseVelocity.velocityMax.z, params.isRandom, randomEngine)
-		};
+		if (params.isUnRandomSpeed) {
+			particle.velocity = {
+				getValue(params.baseVelocity.velocityMin.x, params.baseVelocity.velocityMax.x, params.isRandom, randomEngine),
+				getValue(params.baseVelocity.velocityMin.y, params.baseVelocity.velocityMax.y, params.isRandom, randomEngine),
+				getValue(params.baseVelocity.velocityMin.z, params.baseVelocity.velocityMax.z, params.isRandom, randomEngine)
+			};
+		} else {
+			// 明示的に設定された方向（すでに正規化されてる前提でもOKだが念のためNormalize）
+			Vector3 dir = Normalize(params.direction);
+
+			// 固定スピードを掛けて速度ベクトルに
+			particle.velocity = dir * params.speed;
+		}
+
 	}
+
+
 
 	// Color
 	particle.color = {
@@ -445,7 +449,12 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 	particleGroup.blendMode = BlendMode::kBlendModeAdd;
 	particleGroup.graphicsPipelineState = PipelineManager::GetInstance()->GetBlendModePSO(particleGroup.blendMode);
 
-	InitJson(name);
+
+
+	// 初期値書く
+	InitJson(name); // ← この if の中に入れる or 後に書かない
+	
+
 
 }
 
@@ -513,6 +522,8 @@ void ParticleManager::InitJson(const std::string& name)
 	jsonManagers_[name]->SetTreePrefix("回転");
 	jsonManagers_[name]->Register("最小", &particleParameters_[name].baseTransform.rotateMin);
 	jsonManagers_[name]->Register("最大", &particleParameters_[name].baseTransform.rotateMax);
+	jsonManagers_[name]->Register("方向へ回転", &particleParameters_[name].isRotateDirection);
+	
 
 
 	jsonManagers_[name]->SetTreePrefix("UV");
@@ -528,6 +539,8 @@ void ParticleManager::InitJson(const std::string& name)
 	jsonManagers_[name]->SetTreePrefix("速度");
 	jsonManagers_[name]->Register("最小", &particleParameters_[name].baseVelocity.velocityMin);
 	jsonManagers_[name]->Register("最大", &particleParameters_[name].baseVelocity.velocityMax);
+	jsonManagers_[name]->Register("方向", &particleParameters_[name].direction);
+	jsonManagers_[name]->Register("速度", &particleParameters_[name].speed);
 
 	// ---------------------- カラー設定 ----------------------
 	jsonManagers_[name]->SetTreePrefix("カラー");
@@ -542,11 +555,12 @@ void ParticleManager::InitJson(const std::string& name)
 	// ---------------------- ランダム設定 ----------------------
 	jsonManagers_[name]->SetTreePrefix("ランダム");
 	jsonManagers_[name]->Register("有効", &particleParameters_[name].isRandom);
-	jsonManagers_[name]->Register("中心から", &particleParameters_[name].randomFromCenter);
+	jsonManagers_[name]->Register("中心からランダム", &particleParameters_[name].randomFromCenter);
 	jsonManagers_[name]->Register("方向最小", &particleParameters_[name].randomDirectionMin);
 	jsonManagers_[name]->Register("方向最大", &particleParameters_[name].randomDirectionMax);
 	jsonManagers_[name]->Register("加速度", &particleParameters_[name].randomForce);
 	jsonManagers_[name]->Register("Z軸をランダムに回転", &particleParameters_[name].isRandomRotate);
+	jsonManagers_[name]->Register("ランダムの方向に飛ばす", &particleParameters_[name].isUnRandomSpeed);
 
 	// ---------------------- その他 ----------------------
 	jsonManagers_[name]->SetTreePrefix("その他");
@@ -554,7 +568,7 @@ void ParticleManager::InitJson(const std::string& name)
 	jsonManagers_[name]->Register("ブレンドモード", &particleGroups_[name].blendMode);
 	jsonManagers_[name]->Register("ビルボード", &particleParameters_[name].useBillboard);
 
-	//jsonManagers_[name]->ClearTreePrefix();
+	jsonManagers_[name]->ClearTreePrefix();
 
 
 }

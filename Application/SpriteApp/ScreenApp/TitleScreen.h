@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Systems/UI/UIBase.h"
+#include "Sprite/Sprite.h"
+#include "Vector3.h"
+#include "Loaders/Json/JsonManager.h"
 
 class Camera;
 class TitleScreen
@@ -10,6 +13,7 @@ public:
 	/// 初期化
 	/// </summary>
 	void Initialize();
+	void InitJson();
 
 	/// <summary>
 	/// 更新
@@ -36,6 +40,13 @@ private:
 	uint32_t keyBoardOption_ = 3;
 	uint32_t controllerOption_ = 4;
 
+	std::unique_ptr<Sprite> title_;
+	Vector3 offset[1];
+	float titleAnimTimer_ = 0.0f;
+	bool isFadingTitle_ = false;
+	float titleAlpha_ = 1.0f;
 
+
+	std::unique_ptr<JsonManager> jsonManager_;
 };
 
