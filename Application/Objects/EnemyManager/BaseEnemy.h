@@ -90,6 +90,10 @@ protected:
 			isTakeAttack_ = false;
 			isFaint_ = true;
 		}
+		else
+		{
+			isTakeAttack_ = true;
+		}
 	}
 
 public:

@@ -60,8 +60,6 @@ void DropEnemy::Update()
 		return;
 	}
 
-	KnockBack();
-
 	if (!IsStop()) // 攻撃を食らったら次まで動かない
 	{
 		Move();
@@ -80,13 +78,15 @@ void DropEnemy::Update()
 		);
 		worldTransform_.translation_ = newPos;
 	}
+
+	KnockBack();
 	worldTransform_.UpdateMatrix();
 	obbCollider_->Update();
 }
 
 void DropEnemy::Draw()
 {
-	if (!IsStop()) // 攻撃を食らったら次まで描画しない
+	if (!isFaint_) // 攻撃を食らったら次まで描画しない
 	{
 		obj_->Draw(camera_, worldTransform_);
 	}
@@ -123,7 +123,7 @@ void DropEnemy::OnDirectionCollision(BaseCollider* self, BaseCollider* other, Hi
 {
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
 	{
-		if (player_->behavior_ == BehaviorPlayer::Boost)
+		if (player_->behavior_ == BehaviorPlayer::Boost && !isHit)
 		{
 			isHit = true;
 			TakeAttack();
