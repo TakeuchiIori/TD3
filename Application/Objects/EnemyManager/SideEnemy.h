@@ -80,6 +80,8 @@ private:
 	void InitCollision();
 	void InitJson();
 
+	void KnockBackDir();
+
 private:
 	/*=======================================================
 	
@@ -97,7 +99,6 @@ private:
 							プレイヤー
 
 	==========================================================*/
-	Player* player_ = nullptr;
 	MapChipCollision mpCollision_;
 	MapChipCollision::ColliderRect colliderRect_;
 	Vector3 startPos_;

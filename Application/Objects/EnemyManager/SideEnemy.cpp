@@ -50,6 +50,13 @@ void SideEnemy::InitJson()
 	jsonCollider_->SetCategory("Colliders");
 }
 
+void SideEnemy::KnockBackDir()
+{
+	// 吹っ飛び方向の計算（プレイヤー中心 - 敵中心 → 正規化）
+	Vector3 direction = Normalize(GetCenterPosition() - player_->GetCenterPosition());
+	ApplyKnockback(direction, 0.6f); // ← 距離調整可能
+}
+
 void SideEnemy::Update()
 {
 	FaintUpdate(player_);
@@ -76,6 +83,8 @@ void SideEnemy::Update()
 		);
 		worldTransform_.translation_ = newPos;
 	}
+
+	KnockBack();
 	worldTransform_.UpdateMatrix();
 	//aabbCollider_->Update();
 	obbCollider_->Update();
@@ -83,7 +92,7 @@ void SideEnemy::Update()
 
 void SideEnemy::Draw()
 {
-	if (!IsStop()) // 攻撃を食らったら次まで描画しない
+	if (!isFaint_) // 攻撃を食らったら次まで描画しない
 	{
 		obj_->Draw(camera_, worldTransform_);
 	}
@@ -123,10 +132,11 @@ void SideEnemy::OnDirectionCollision(BaseCollider* self, BaseCollider* other, Hi
 {
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
 	{
-		if (player_->behavior_ == BehaviorPlayer::Boost)
+		if (player_->behavior_ == BehaviorPlayer::Boost && !isHit)
 		{
 			isHit = true;
 			TakeAttack();
+			KnockBackDir();
 		}
 		HitDirection selfDir = Collision::GetSelfLocalHitDirection(self, other);
 		HitDirection otherDir = Collision::GetSelfLocalHitDirection(other, self);
