@@ -1,4 +1,5 @@
 #include "Branch.h"
+#include "Grass.h"
 
 #include "Collision/Core/ColliderFactory.h"
 
@@ -53,6 +54,10 @@ void Branch::InitJson()
 
 void Branch::Update()
 {
+	if (isBroken_)
+	{
+		BrokenUpdate();
+	}
 	worldTransform_.UpdateMatrix();
 	collisionWT_.UpdateMatrix();
 	aabbCollider_->Update();
@@ -68,12 +73,29 @@ void Branch::DrawCollision()
 	aabbCollider_->Draw();
 }
 
+void Branch::BrokenUpdate()
+{
+	fallTimer_ -= 1.0f / 60.0f; // 仮の deltaTime
+
+	// 回転 & 落下
+	worldTransform_.rotation_.z += rotationVelocityZ_ * rotateDir;
+	worldTransform_.translation_ += fallVelocity_;
+
+	// 縮小
+	worldTransform_.scale_ = fallScale_ * (fallTimer_/kFallDuration_);
+
+	if (fallTimer_ <= 0.0f) {
+	}
+}
+
 void Branch::SetRight()
 {
 	worldTransform_.translation_.x += 2.0f;
 	worldTransform_.anchorPoint_ = { -1.0f,0.0f,0.0f };
 	float scaleX = rightLimit_ - grassWorldTransform_->translation_.x;
 	worldTransform_.scale_ = { scaleX * 0.5f,0.5f,0.5f };
+	fallScale_ = worldTransform_.scale_;
+	rotateDir = 1.0f;
 
 	collisionWT_.translation_.x += 4.0f;
 	collisionWT_.anchorPoint_ = { -1.0f,0.0f,0.0f };
@@ -86,6 +108,8 @@ void Branch::SetLeft()
 	worldTransform_.anchorPoint_ = { 1.0f,0.0f,0.0f };
 	float scaleX = grassWorldTransform_->translation_.x - leftLimit_;
 	worldTransform_.scale_ = { scaleX * 0.5f,0.5f,0.5f };
+	fallScale_ = worldTransform_.scale_;
+	rotateDir = -1.0f;
 
 	collisionWT_.translation_.x += -4.0f;
 	collisionWT_.anchorPoint_ = { 1.0f,0.0f,0.0f };
@@ -98,8 +122,14 @@ void Branch::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 	{
 		if (isPlayerBoost_)
 		{
-			isDelete_ = true;
+			isBroken_ = true;
+			fallTimer_ = kFallDuration_;
+
 			aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
+
+			if (parentGrass_) {
+				parentGrass_->StartFalling();
+			}
 		}
 	}
 }
