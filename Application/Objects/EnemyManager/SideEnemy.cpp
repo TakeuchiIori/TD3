@@ -50,6 +50,13 @@ void SideEnemy::InitJson()
 	jsonCollider_->SetCategory("Colliders");
 }
 
+void SideEnemy::KnockBackDir()
+{
+	// 吹っ飛び方向の計算（プレイヤー中心 - 敵中心 → 正規化）
+	Vector3 direction = Normalize(player_->GetCenterPosition() - GetCenterPosition());
+	ApplyKnockback(direction, 0.6f); // ← 距離調整可能
+}
+
 void SideEnemy::Update()
 {
 	FaintUpdate(player_);
@@ -58,6 +65,8 @@ void SideEnemy::Update()
 		obbCollider_->~OBBCollider();
 		return;
 	}
+
+	KnockBack();
 
 	if (!IsStop()) // 攻撃を食らったら次まで動かない
 	{
@@ -127,6 +136,7 @@ void SideEnemy::OnDirectionCollision(BaseCollider* self, BaseCollider* other, Hi
 		{
 			isHit = true;
 			TakeAttack();
+			KnockBackDir();
 		}
 		HitDirection selfDir = Collision::GetSelfLocalHitDirection(self, other);
 		HitDirection otherDir = Collision::GetSelfLocalHitDirection(other, self);
