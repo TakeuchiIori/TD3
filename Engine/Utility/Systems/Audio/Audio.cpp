@@ -195,6 +195,28 @@ void Audio::StopAudio(IXAudio2SourceVoice* pSourceVoice)
 	}
 }
 
+/// <summary>
+///  指定時間をかけて音声をフェードアウトし、停止する
+/// </summary>
+void Audio::FadeOutAndStop(IXAudio2SourceVoice* pSourceVoice, float durationSeconds)
+{
+    if (!pSourceVoice || durationSeconds <= 0.0f) {
+        return;
+    }
+
+    const int steps = 30; // フェード段階の数（多いほど滑らか）
+    const float sleepMillis = (durationSeconds / steps) * 1000.0f;
+
+    for (int i = 0; i <= steps; ++i) {
+        float volume = 1.0f - static_cast<float>(i) / steps;
+        pSourceVoice->SetVolume(volume);
+        Sleep(static_cast<DWORD>(sleepMillis));
+    }
+
+    pSourceVoice->Stop();
+    pSourceVoice->DestroyVoice();
+}
+
 
 void Audio::SoundUnload(SoundData* soundData)
 {
