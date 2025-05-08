@@ -107,4 +107,6 @@ private:
 
 
 	static bool isHit;
+	Audio::SoundData soundData_ = {};
+	IXAudio2SourceVoice* sourceVoice_ = nullptr;
 };

@@ -24,6 +24,7 @@ void DropEnemy::Initialize(Camera* camera)
 
 	InitCollision();
 	//InitJson();
+	soundData_ = Audio::GetInstance()->LoadAudio(L"Resources/Audio/fly.mp3");
 }
 
 void DropEnemy::InitCollision()
@@ -141,6 +142,7 @@ void DropEnemy::OnDirectionCollision(BaseCollider* self, BaseCollider* other, Hi
 				{
 					isTakeAttack_ = true;
 					TakeAttack();
+					sourceVoice_ = Audio::GetInstance()->SoundPlayAudio(soundData_, false);
 				}
 			}
 		}
