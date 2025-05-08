@@ -26,7 +26,7 @@ void Grass::Initialize(Camera* camera)
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
-	worldTransform_.scale_ = { 0.8f,0.8f,0.8f };
+	worldTransform_.scale_ = { 2.0f,2.0f,2.0f };
 
 	//
 	worldTransform_.translation_ = { 8.0f,5.0f,6.0f };
@@ -50,7 +50,7 @@ void Grass::Initialize(Camera* camera)
 	branch_->SetParentGrass(this);
 
 	InitCollision();
-	InitJson();
+	///InitJson();
 
 	particleEmitter_ = std::make_unique<ParticleEmitter>("GrowthParticle", worldTransform_.translation_, 20);
 }
@@ -63,6 +63,8 @@ void Grass::InitCollision()
 		camera_,
 		static_cast<uint32_t>(CollisionTypeIdDef::kGrass)
 	);
+
+
 	aabbGrowthCollider_ = ColliderFactory::Create<AABBCollider>(
 		this,
 		&growthAreaWT_,
@@ -73,11 +75,8 @@ void Grass::InitCollision()
 
 void Grass::InitJson()
 {
-	/*jsonManager_ = std::make_unique<JsonManager>("grassObj", "Resources/JSON/");
-	jsonManager_->SetCategory("Objects");
-	jsonManager_->Register("唾を吐ける範囲", &growthAreaScaleF_);*/
-	/*jsonCollider_ = std::make_unique<JsonManager>("grassCollider", "Resources/JSON/");
-	aabbCollider_->InitJson(jsonCollider_.get());*/
+	jsonCollider_ = std::make_unique<JsonManager>("grassCollider", "Resources/JSON/");
+	aabbCollider_->InitJson(jsonCollider_.get());
 }
 
 void Grass::Update()
@@ -93,15 +92,62 @@ void Grass::Update()
 	aabbGrowthCollider_->Update();
 
 
+
+	UpdateLeaf();
+
 #ifdef _DEBUG
 	DebugGrass();
 #endif // _DEBUG
+}
+
+void Grass::UpdateLeaf()
+{
+	for (size_t i = 0; i < fallingLeaves_.size(); ++i) {
+		auto& leaf = fallingLeaves_[i];
+
+		// Swing: 左右ゆらゆら
+		float swingX = std::sin(leaf.swingPhase + leaf.lifetime * 4.0f) * 0.02f;
+
+		// Float: 上下ゆらゆら（微小）
+		float floatY = std::sin(leaf.floatPhase + leaf.lifetime * 6.0f) * 0.003f;
+
+		// 落下速度（弱めの重力）
+		leaf.velocity.y -= 0.0006f;
+
+		// 位置更新
+		leaf.wt->translation_ += leaf.velocity;
+		leaf.wt->translation_.x += swingX;
+		leaf.wt->translation_.y += floatY;
+
+		// 回転も少し変化
+		leaf.wt->rotation_ += leaf.angularVelocity;
+
+		// アップデート
+		leaf.wt->UpdateMatrix();
+
+		// 透明度フェード
+		leaf.alpha -= deltaTime_ / leaf.lifetime;
+		leaf.obj->SetAlpha(leaf.alpha);
+
+		// 削除処理
+		if (leaf.alpha <= 0.0f) {
+			fallingLeaves_.erase(fallingLeaves_.begin() + i);
+			--i;
+		}
+	}
+
+
 }
 
 void Grass::Draw()
 {
 	obj_->Draw(BaseObject::camera_, worldTransform_);
 	branch_->Draw();
+	for (auto& leaf : fallingLeaves_) {
+		leaf.obj->Draw(camera_, *leaf.wt);
+	}
+
+
 }
 
 void Grass::DrawCollision()
@@ -119,6 +165,7 @@ void Grass::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 		{
 			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
 			{
+				DropLeaves(10);
 				//worldTransform_.scale_ = { 0.0f,0.0f,0.0f };
 				aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
 				enter++;
@@ -361,3 +408,40 @@ void Grass::SetPos(Vector3 pos)
 		branch_->SetRight();
 	}
 }
+
+/// <summary>
+/// 葉っぱを落とす
+/// </summary>
+void Grass::DropLeaves(int count) {
+	for (int i = 0; i < count; ++i) {
+		FallingLeaf leaf;
+		leaf.obj = std::make_unique<Object3d>();
+		leaf.obj->Initialize();
+		leaf.obj->SetModel("leaf.obj");
+
+		leaf.wt = std::make_unique<WorldTransform>();
+		leaf.wt->Initialize();
+		leaf.wt->translation_ = worldTransform_.translation_ + Vector3{ 0.0f, 1.0f, 0.0f };
+		leaf.wt->scale_ = { 1.5f, 1.5f, 1.5f };
+
+		// 初期落下速度はほぼ0（ふわふわ）
+		leaf.velocity = {
+			((rand() % 100) / 100.0f - 0.5f) * 0.005f,
+			-((rand() % 10) / 100.0f + 0.005f),
+			((rand() % 100) / 100.0f - 0.5f) * 0.005f
+		};
+
+		leaf.angularVelocity = {
+			((rand() % 100) / 100.0f - 0.5f) * 0.02f,
+			((rand() % 100) / 100.0f - 0.5f) * 0.02f,
+			((rand() % 100) / 100.0f - 0.5f) * 0.02f
+		};
+
+		leaf.swingPhase = ((rand() % 100) / 100.0f) * 6.28f;
+		leaf.floatPhase = ((rand() % 100) / 100.0f) * 6.28f;
+
+		fallingLeaves_.emplace_back(std::move(leaf));
+	}
+}
+
+
