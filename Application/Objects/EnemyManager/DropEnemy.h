@@ -97,6 +97,8 @@ private:
 	/// </summary>
 	void InitJson();
 
+	void KnockBackDir();
+
 private:
 
 	/*=======================================================
@@ -116,7 +118,6 @@ private:
 							プレイヤー
 
 	==========================================================*/
-	Player* player_ = nullptr;
 	// マップチップとの当たり判定
 	MapChipCollision mpCollision_;
 	MapChipCollision::ColliderRect colliderRect_;
@@ -125,4 +126,6 @@ private:
 
 
 	static bool isHit;
+	Audio::SoundData soundData_ = {};
+	IXAudio2SourceVoice* sourceVoice_ = nullptr;
 };

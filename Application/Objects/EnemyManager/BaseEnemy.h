@@ -3,6 +3,7 @@
 #include "../BaseObject/BaseObject.h"
 #include "Systems/MapChip/MapChipCollision.h"
 #include "Loaders/Json/JsonManager.h"
+#include "Systems/Audio/Audio.h"
 
 // Collision
 #include "Collision/Sphere/SphereCollider.h"
@@ -59,7 +60,8 @@ public:
 	virtual const char* GetTypeName() const = 0;
 
 	// 攻撃を食らったら次まで気絶
-	bool IsStop() const { 
+	bool IsStop() const 
+	{ 
 		if(isTakeAttack_ || isFaint_)
 		{
 			return true;
@@ -69,6 +71,14 @@ public:
 	}
 
 	void FaintUpdate(Player* player);
+
+	void ApplyKnockback(const Vector3& direction, float power) 
+	{
+		knockbackVelocity_ = direction * power;
+		knockbackTimer_ = kKnockbackDuration_;
+	}
+
+	void KnockBack();
 
 protected:
 	// 攻撃を受けた時
@@ -80,6 +90,10 @@ protected:
 		{
 			isTakeAttack_ = false;
 			isFaint_ = true;
+		}
+		else
+		{
+			isTakeAttack_ = true;
 		}
 	}
 
@@ -99,6 +113,8 @@ public:
 
 
 protected:
+	Player* player_ = nullptr;
+
 	bool isTakeAttack_ = false;
 	bool isFaint_ = false;
 
@@ -110,6 +126,10 @@ protected:
 
 	std::unique_ptr<JsonManager> jsonManager_;
 	std::unique_ptr<JsonManager> jsonCollider_;
+
+	Vector3 knockbackVelocity_ = {};
+	float knockbackTimer_ = 0.0f;
+	const float kKnockbackDuration_ = 0.5f;
 
 };
 

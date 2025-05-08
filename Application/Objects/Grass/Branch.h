@@ -6,7 +6,9 @@
 // Collision
 #include "Collision/AABB/AABBCollider.h"
 #include "Loaders/Json/JsonManager.h"
+#include "Systems/Audio/Audio.h"
 
+class Grass;
 
 class Branch :
     public BaseObject
@@ -19,6 +21,7 @@ public:
 	void Initialize(Camera* camera) override;
 	void InitCollision();
 	void InitJson();
+	void SetParentGrass(Grass* grass) { parentGrass_ = grass; }
 
 	/// <summary>
 	/// 更新
@@ -32,10 +35,11 @@ public:
 
 	void DrawCollision();
 
+private:
+	void BrokenUpdate();
+
 public:
 	void SetPlayerBoost(bool boost) { isPlayerBoost_ = boost; }
-
-	bool IsDelete() { return isDelete_; }
 
 	void SetRight();
 	void SetLeft();
@@ -79,8 +83,22 @@ private:
 	float rightLimit_ = 34.0f;
 	float leftLimit_ = 0.0f;
 
-	bool isDelete_ = false;
-
 	bool isPlayerBoost_ = false;
+
+	Grass* parentGrass_ = nullptr;
+
+	bool isBroken_ = false;
+	float fallTimer_ = 0.0f;
+	const float kFallDuration_ = 1.5f;
+	Vector3 fallVelocity_ = { 0.0f, -0.1f, 0.0f };
+	float rotationVelocityZ_ = 0.01f;
+	float rotateDir = 0;
+	Vector3 fallScale_ = {};
+
+
+
+	Audio::SoundData soundDataBranch_ = {};
+	IXAudio2SourceVoice* sourceVoiceBranch_ = nullptr;
+
 };
 

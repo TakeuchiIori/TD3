@@ -108,7 +108,7 @@ void TitlePlayer::Update()
 
 
 	if (isFinishedReadBook_) {
-		if (Input::GetInstance()->IsPadPressed(0, GamePadButton::A)) {
+		if (Input::GetInstance()->PushKey(DIK_SPACE) || Input::GetInstance()->IsPadPressed(0, GamePadButton::A) || Input::GetInstance()->TriggerKey(DIK_E)) {
 			isScaling_ = true;
 			
 		}
@@ -177,7 +177,7 @@ void TitlePlayer::DrawCollision()
 
 void TitlePlayer::DrawSprite()
 {
-	if (isFinishedReadBook_) {
+	if (showUI_) {
 		uiA_->Draw();
 	}
 }

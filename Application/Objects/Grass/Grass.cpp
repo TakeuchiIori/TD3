@@ -26,7 +26,7 @@ void Grass::Initialize(Camera* camera)
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
-	worldTransform_.scale_ = { 1.0f,1.0f,1.0f };
+	worldTransform_.scale_ = { 0.8f,0.8f,0.8f };
 
 	//
 	worldTransform_.translation_ = { 8.0f,5.0f,6.0f };
@@ -40,13 +40,14 @@ void Grass::Initialize(Camera* camera)
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("unitCube.obj");
+	obj_->SetModel("grass.obj");
 	obj_->SetMaterialColor(defaultColor_);
 
 	// 枝の初期化
 	branch_ = std::make_unique<Branch>();
 	branch_->SetGrassWorldTransform(&worldTransform_);
 	branch_->Initialize(camera_);
+	branch_->SetParentGrass(this);
 
 	InitCollision();
 	InitJson();
@@ -82,10 +83,6 @@ void Grass::InitJson()
 void Grass::Update()
 {
 	branch_->SetPlayerBoost(player_->IsBoost());
-	if (branch_->IsDelete())
-	{
-		behaviortRquest_ = BehaviorGrass::Delete;
-	}
 	BehaviorInitialize();
 	BehaviorUpdate();
 	worldTransform_.UpdateMatrix();
@@ -145,9 +142,11 @@ void Grass::OnCollision(BaseCollider* self, BaseCollider* other)
 					{
 						if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
 						{
-							obj_->SetMaterialColor(growthColor_);
-							behaviortRquest_ = BehaviorGrass::Growth;
-							particleEmitter_->FollowEmit(worldTransform_.translation_);
+							if (worldTransform_.scale_.x != 0.0f) {
+								obj_->SetMaterialColor(growthColor_);
+								behaviortRquest_ = BehaviorGrass::Growth;
+								particleEmitter_->FollowEmit(worldTransform_.translation_);
+							}
 						}
 					}
 				}
@@ -203,6 +202,9 @@ void Grass::BehaviorInitialize()
 		case BehaviorGrass::Delete:
 			BehaviorDeleteInit();
 			break;
+		case BehaviorGrass::Falling:
+			BehaviorFallingInit();
+			break;
 		}
 		// 振る舞いリクエストをリセット
 		behaviortRquest_ = std::nullopt;
@@ -228,6 +230,9 @@ void Grass::BehaviorUpdate()
 		break;
 	case BehaviorGrass::Delete:
 		BehaviorDeleteUpdate();
+		break;
+	case BehaviorGrass::Falling:
+		BehaviorFallingUpdate();
 		break;
 	}
 }
@@ -318,6 +323,27 @@ void Grass::BehaviorDeleteInit()
 
 void Grass::BehaviorDeleteUpdate()
 {
+}
+
+void Grass::BehaviorFallingInit() {
+	fallVelocity_ = { 0.0f, -0.2f, 0.0f }; // 落下速度
+	fallTimer_ = kFallTime_;              // タイマー初期化
+	aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));        // タイマー初期化
+}
+
+void Grass::BehaviorFallingUpdate() {
+	worldTransform_.translation_ += fallVelocity_;
+	//SetPos(worldTransform_.translation_);
+	worldTransform_.UpdateMatrix();
+
+	// タイマー減算
+	if (fallTimer_ > 0.0f) {
+		obj_->SetAlpha(fallTimer_ / kFallTime_);
+		fallTimer_ -= deltaTime_;
+	}
+	else {
+		behaviortRquest_ = BehaviorGrass::Delete;
+	}
 }
 
 void Grass::SetPos(Vector3 pos)
