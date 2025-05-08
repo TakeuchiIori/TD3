@@ -26,7 +26,7 @@ void Grass::Initialize(Camera* camera)
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
-	worldTransform_.scale_ = { 1.2f,1.2f,1.2f };
+	worldTransform_.scale_ = { 2.0f,2.0f,2.0f };
 
 	//
 	worldTransform_.translation_ = { 8.0f,5.0f,6.0f };
