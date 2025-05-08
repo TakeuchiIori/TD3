@@ -142,9 +142,11 @@ void Grass::OnCollision(BaseCollider* self, BaseCollider* other)
 					{
 						if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
 						{
-							obj_->SetMaterialColor(growthColor_);
-							behaviortRquest_ = BehaviorGrass::Growth;
-							particleEmitter_->FollowEmit(worldTransform_.translation_);
+							if (worldTransform_.scale_.x != 0.0f) {
+								obj_->SetMaterialColor(growthColor_);
+								behaviortRquest_ = BehaviorGrass::Growth;
+								particleEmitter_->FollowEmit(worldTransform_.translation_);
+							}
 						}
 					}
 				}

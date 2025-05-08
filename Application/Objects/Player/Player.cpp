@@ -315,12 +315,13 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 				canSpitting_ = true;
 				if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
 				{
-					// 唾を吐く
-					sourceVoiceYodare = Audio::GetInstance()->SoundPlayAudio(soundDataYodare, false);
-					emitter_->EmitFromTo(worldTransform_.translation_, other->GetWorldTransform().translation_);
-					// オーディオの再生
-					sourceVoiceGrow = Audio::GetInstance()->SoundPlayAudio(soundDataGrow, false);
-					
+					if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrass) && other->GetWorldTransform().scale_.x != 0) {
+						// 唾を吐く
+						sourceVoiceYodare = Audio::GetInstance()->SoundPlayAudio(soundDataYodare, false);
+						emitter_->EmitFromTo(worldTransform_.translation_, other->GetWorldTransform().translation_);
+						// オーディオの再生
+						sourceVoiceGrow = Audio::GetInstance()->SoundPlayAudio(soundDataGrow, false);
+					}
 				}
 			}
 		}
