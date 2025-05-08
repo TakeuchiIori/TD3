@@ -177,7 +177,7 @@ void TitlePlayer::DrawCollision()
 
 void TitlePlayer::DrawSprite()
 {
-	if (isFinishedReadBook_) {
+	if (showUI_) {
 		uiA_->Draw();
 	}
 }

@@ -105,7 +105,7 @@ public:
 	void OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir);
 
 	void SetIsFinishedReadBook(bool isFinishedReadBook) { isFinishedReadBook_ = isFinishedReadBook; }
-
+	void SetShowUI(bool showUI) { showUI_ = showUI; }
 private:
 
 	// ポインタ
@@ -143,6 +143,7 @@ private:
 	float defaultSpeed_ = 3.0f;
 
 	bool isFinishedReadBook_ = false;
+	bool showUI_ = false;
 	bool isScaling_ = false;
 
 	float targetRotationY_;
