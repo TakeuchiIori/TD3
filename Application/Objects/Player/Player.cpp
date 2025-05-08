@@ -317,7 +317,7 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 				{
 						// 唾を吐く
 						sourceVoiceYodare = Audio::GetInstance()->SoundPlayAudio(soundDataYodare, false);
-						emitter_->EmitFromTo(worldTransform_.translation_, other->GetWorldTransform().translation_);
+						//emitter_->EmitFromTo(worldTransform_.translation_, other->GetWorldTransform().translation_);
 						// オーディオの再生
 						sourceVoiceGrow = Audio::GetInstance()->SoundPlayAudio(soundDataGrow, false);
 				}
