@@ -26,7 +26,7 @@ void Grass::Initialize(Camera* camera)
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
-	worldTransform_.scale_ = { 1.0f,1.0f,1.0f };
+	worldTransform_.scale_ = { 0.8f,0.8f,0.8f };
 
 	//
 	worldTransform_.translation_ = { 8.0f,5.0f,6.0f };
@@ -40,7 +40,7 @@ void Grass::Initialize(Camera* camera)
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("unitCube.obj");
+	obj_->SetModel("grass.obj");
 	obj_->SetMaterialColor(defaultColor_);
 
 	// 枝の初期化
