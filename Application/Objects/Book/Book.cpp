@@ -276,6 +276,7 @@ void Book::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 	{
 		uiScaleTarget_ = 1.0f;
 		//obj_->SetMaterialColor(Vector3{ 1.0,1.0f,0.0f });
+		isColliding_ = true;
 	}
 }
 
@@ -303,6 +304,7 @@ void Book::OnExitCollision(BaseCollider* self, BaseCollider* other)
 	{
 		uiScaleTarget_ = 0.0f;
 		//obj_->SetMaterialColor(Vector3{ 0.0,1.0f,0.0f });
+		isColliding_ = false;
 
 	}
 }

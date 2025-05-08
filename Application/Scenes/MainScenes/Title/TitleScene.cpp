@@ -85,7 +85,7 @@ void TitleScene::Initialize()
 	// 本を読み終えてAボタンが押されたら
 	book_->OffBookTrigger_ = [this]() {
 		isAlreadyRead_ = true;
-		player_->SetIsFinishedReadBook(true);
+		//player_->SetIsFinishedReadBook(true);
 		cameraMode_ = CameraMode::DEFAULT;
 		GameTime::Resume();
 		};
@@ -117,6 +117,16 @@ void TitleScene::Update()
 		isDebugCamera_ = !isDebugCamera_;
 	}
 #endif // _DEBUG
+
+	if (isAlreadyRead_) {
+		if (Input::GetInstance()->IsPadTriggered(0, GamePadButton::A)) {
+			// 本に当たっていないときだけ、首を伸ばすフラグをONにする
+			if (!book_->IsColliding()) {
+				// 読書が終わっている前提で
+				player_->SetIsFinishedReadBook(true);
+			}
+		}
+	}
 
 	if (player_->GetWorldTransform().translation_.y > 20.0f) {
 		SceneManager::GetInstance()->ChangeScene("Game");
