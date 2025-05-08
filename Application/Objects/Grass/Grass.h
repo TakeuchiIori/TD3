@@ -50,6 +50,7 @@ public:
 	/// 更新
 	/// </summary>
 	void Update() override;
+	void UpdateLeaf();
 
 	/// <summary>
 	/// 描画
@@ -169,9 +170,13 @@ private: // ふるまい
 
 
 	
+	void DropLeaves(int count);
+
 
 public: // getter & setter
 	void SetPos(Vector3 pos);
+
+	
 
 	Vector3 GetPos() { return worldTransform_.translation_; }
 
@@ -199,7 +204,7 @@ private:
 	WorldTransform growthAreaWT_;
 
 	//std::unique_ptr<JsonManager> jsonManager_;
-	//std::unique_ptr<JsonManager> jsonCollider_;
+	std::unique_ptr<JsonManager> jsonCollider_;
 
 	// 枝
 	std::unique_ptr<Branch> branch_;
@@ -249,5 +254,27 @@ private:
 
 	// パーティクル
 	std::unique_ptr<ParticleEmitter> particleEmitter_;
+
+
+	// 葉っぱの落下モデル管理
+	//std::vector<std::unique_ptr<Object3d>> fallingLeaves_;
+	std::vector<std::unique_ptr<WorldTransform>> fallingLeafTransforms_;
+	std::vector<Vector3> fallingLeafVelocities_;
+	float fallingLeafLifetime_ = 1.5f; // 落下時間
+
+	struct FallingLeaf {
+		std::unique_ptr<Object3d> obj;
+		std::unique_ptr<WorldTransform> wt;
+		Vector3 velocity;
+		Vector3 angularVelocity;
+		float swingPhase = 0.0f;
+		float floatPhase = 0.0f;
+		float lifetime = 1.5f;
+		float alpha = 1.0f;
+	};
+	std::vector<FallingLeaf> fallingLeaves_;
+
+
+
 };
 
