@@ -6,6 +6,7 @@
 // Collision
 #include "Collision/AABB/AABBCollider.h"
 #include "Loaders/Json/JsonManager.h"
+#include "Systems/Audio/Audio.h"
 
 class Grass;
 
@@ -93,6 +94,11 @@ private:
 	float rotationVelocityZ_ = 0.01f;
 	float rotateDir = 0;
 	Vector3 fallScale_ = {};
+
+
+
+	Audio::SoundData soundDataBranch_ = {};
+	IXAudio2SourceVoice* sourceVoiceBranch_ = nullptr;
 
 };
 

@@ -3,6 +3,7 @@
 
 #include "Collision/Core/ColliderFactory.h"
 
+
 #ifdef _DEBUG
 #include "imgui.h"
 #endif // _DEBUG
@@ -32,6 +33,8 @@ void Branch::Initialize(Camera* camera)
 
 	InitCollision();
 	InitJson();
+
+	soundDataBranch_ = Audio::GetInstance()->LoadAudio(L"Resources/Audio/fold.mp3");
 }
 
 void Branch::InitCollision()
@@ -129,6 +132,7 @@ void Branch::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 
 			if (parentGrass_) {
 				parentGrass_->StartFalling();
+				sourceVoiceBranch_ = Audio::GetInstance()->SoundPlayAudio(soundDataBranch_, false);
 			}
 		}
 	}
