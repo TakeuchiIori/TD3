@@ -93,12 +93,6 @@ private:
 	void UpdateUI();
 
 
-
-
-
-
-
-
 public:
 	Vector3 GetCenterPosition() const {
 		return
@@ -108,6 +102,8 @@ public:
 			worldTransform_.matWorld_.m[3][2]
 		};
 	}
+
+	std::shared_ptr<OBBCollider> GetCollider() const { return obbCollider_; }
 
 	// 衝突イベント（共通で受け取る）
 	void OnEnterCollision(BaseCollider* self, BaseCollider* other);
@@ -120,6 +116,11 @@ public:
 	void SetIsDrawUI(bool isDrawUI) { isDrawUI_ = isDrawUI; }
 	void SetIsDrawReadUI(bool isDrawReadUI) { isDrawReadUI_ = isDrawReadUI; }
 	void SetIsCloseIconVisible(bool isCloseIconVisible) { isCloseIconVisible_ = isCloseIconVisible; }
+
+	bool IsColliding() const { return isColliding_; }
+	void SetColliding(bool flag) { isColliding_ = flag; }
+
+
 
 private:
 
@@ -143,7 +144,7 @@ private:
 	bool hasReadBookShown_ = false;
 	float readBookDelayTimer_ = 0.0f;
 	bool isCloseIconVisible_ = false;
-
+	bool isColliding_ = false;
 
 
 
