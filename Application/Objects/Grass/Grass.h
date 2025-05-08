@@ -214,8 +214,8 @@ private:
 
 	const float deltaTime_ = 1.0f / 60.0f; // 仮対応
 
-	Vector3 defaultScale_ = { 0.8f,0.8f,0.8f };
-	Vector3 growthScale_ = { 1.2f,1.2f,1.2f };
+	Vector3 defaultScale_ = { 2.0f,2.0f,2.0f };
+	Vector3 growthScale_ = { 2.8f,2.8f,2.8f };
 	float growthAreaScaleF_ = 4.5f;
 
 	// 食べる処理
