@@ -61,7 +61,7 @@ void MapChipInfo::Update()
 		for (auto& obj2 : obj) {
 			if (obj2) {
 				obj2->SetMaterialColor(color_[0]);
-				obj2->SetAlpha(alpha_[0]);
+				//obj2->SetAlpha(alpha_[0]);
 			}
 		}
 	}
@@ -70,7 +70,7 @@ void MapChipInfo::Update()
 		for (auto& obj2 : obj) {
 			if (obj2) {
 				obj2->SetMaterialColor(color_[1]);
-				obj2->SetAlpha(alpha_[1]);
+				//obj2->SetAlpha(alpha_[1]);
 			}
 		}
 	}
