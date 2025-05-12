@@ -6,6 +6,7 @@
 
 
 // Math
+#include "Vector2.h"
 #include "Vector4.h"
 
 /// <summary>
@@ -24,7 +25,8 @@ public:
 		DepthOutline,
 		Sepia,
 		Grayscale,
-		Vignette
+		Vignette,
+		RadialBlur
 	};
 
 	/// <summary>
@@ -61,6 +63,7 @@ private:
 	void CreateBoxFilterResource();
 	void CreateGaussFilterResource();
 	void CreateMaterialResource();
+	void CreateRadialBlurResource();
 
 private:
 
@@ -81,6 +84,14 @@ private:
 		int padding[3];
 		Vector4 outlineColor;
 	};
+	struct RadialBlurForGPU {
+		Vector2 direction;
+		Vector2 center;
+		float width;
+		int sampleCount;
+		bool isRadial;
+		float padding[1];
+	};
 
 	DirectXCommon* dxCommon_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
@@ -94,6 +105,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	Material* materialData_ = nullptr;
 	Matrix4x4 projectionInverse_;
+
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> radialBlurResource_;
+	RadialBlurForGPU* radialBlurData_ = nullptr;
 
 	OffScreenEffectType effectType_ = OffScreenEffectType::DepthOutline;
 };
