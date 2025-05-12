@@ -138,6 +138,12 @@ void GameScreen::Initialize()
 	}
 
 
+	///////////////////////////////////////////////////////////////////////////
+	// 
+	// よだれのスプライト初期化
+	// 
+	///////////////////////////////////////////////////////////////////////////
+
 	uiYodare_ = std::make_unique<Sprite>();
 	uiYodare_->Initialize("Resources/Textures/Option/operation_yodare.png");
 	uiYodare_->SetSize({ 60.0f, 60.0f });
@@ -303,7 +309,7 @@ void GameScreen::Update()
 	} else if (yodareState_ == YodareState::Visible) {
 		// スケールを周期的に変化させて目立たせる
 		float pulse = std::sin(static_cast<float>(GameTime::GetTotalTime()) * 5.0f) * 0.1f; // 鼓動みたいな動き
-		Vector2 baseScale = { 125.0f,100.0f };
+		Vector2 baseScale = { 130.0f,100.0f };
 		Vector2 scale = baseScale * (1.0f + pulse);
 		uiYodare_->SetSize({ scale.x, scale.y });
 	}
