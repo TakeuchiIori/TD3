@@ -114,6 +114,7 @@
     <ClCompile Include="Application\SystemsApp\Cameras\DefaultCamera\DefaultCamera.cpp" />
     <ClCompile Include="Application\SpriteApp\ScreenApp\TitleScreen.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Model\Mesh\MeshPrimitive.cpp" />
+    <ClCompile Include="Application\SystemsApp\AppAudio\AudioVolumeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -235,6 +236,7 @@
     <ClInclude Include="Application\SpriteApp\ScreenApp\TitleScreen.h" />
     <ClInclude Include="Engine\Utility\Loaders\Json\EnumUtils.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\Mesh\MeshPrimitive.h" />
+    <ClInclude Include="Application\SystemsApp\AppAudio\AudioVolumeManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />

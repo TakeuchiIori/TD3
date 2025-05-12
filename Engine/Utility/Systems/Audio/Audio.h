@@ -64,6 +64,11 @@ public:
 
 	// 音量設定
 	void SetVolume(IXAudio2SourceVoice* pSourceVoice, float volume);
+	// マスターボリューム
+	void SetMasterVolume(float volume) { masterVoice_->SetVolume(volume); }
+
+public:
+	IXAudio2* GetXAudio2() { return xAudio2_; }
 
 private:
 	// シングルトンパターン
