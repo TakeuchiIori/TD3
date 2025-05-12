@@ -1,6 +1,9 @@
 #pragma once
-#include "wrl.h"
+
+// C++
+#include <wrl.h>
 #include <d3d12.h>
+#include <unordered_map>
 
 #include "Matrix4x4.h"
 
@@ -30,6 +33,14 @@ public:
 	};
 
 	/// <summary>
+	/// シングルトンインスタンス取得
+	/// </summary>
+	static OffScreen* GetInstance() {
+		static OffScreen instance;
+		return &instance;
+	}
+
+	/// <summary>
 	/// 初期化
 	/// </summary>
 	void Initialize();
@@ -49,7 +60,7 @@ public:
 	/// エフェクトの種類を設定する
 	/// </summary>
 	/// <param name="type">エフェクトの種類</param>
-	void SetEffectType(OffScreenEffectType type) { effectType_ = type; }
+	void SetEffectType(OffScreenEffectType type) {effectType_ = type;}
 
 	/// <summary>
 	/// 現在のエフェクトタイプを取得
@@ -59,6 +70,10 @@ public:
 
 
 private:
+	OffScreen() = default;
+	~OffScreen() = default;
+	OffScreen(const OffScreen&) = delete;
+	OffScreen& operator=(const OffScreen&) = delete;
 
 	void CreateBoxFilterResource();
 	void CreateGaussFilterResource();
@@ -67,9 +82,11 @@ private:
 
 private:
 
+	/*=================================================================
 
+							 　リソース管理
 
-
+	=================================================================*/
 
 	struct KernelForGPU {
 		int kernelSize;
@@ -94,19 +111,26 @@ private:
 	};
 
 	DirectXCommon* dxCommon_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState_ = nullptr;
 
+	struct OffScreenPipeline {
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;
+	};
+	std::unordered_map<OffScreenEffectType, OffScreenPipeline> pipelineMap_;
+
+
+	// ぼかし用
 	Microsoft::WRL::ComPtr<ID3D12Resource> boxResource_;
 	KernelForGPU* boxData_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> gaussResource_;
 	GaussKernelForGPU* gaussData_ = nullptr;
 
+	// デプスアウトライン用
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	Material* materialData_ = nullptr;
 	Matrix4x4 projectionInverse_;
 
-
+	// ラジアルブラー用
 	Microsoft::WRL::ComPtr<ID3D12Resource> radialBlurResource_;
 	RadialBlurForGPU* radialBlurData_ = nullptr;
 

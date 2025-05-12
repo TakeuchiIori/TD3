@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #include "Collision/Core/CollisionManager.h"
+#include "../Generators/OffScreen/OffScreen.h"
 
 #ifdef _DEBUG
 #include "imgui.h"
@@ -965,6 +966,7 @@ void Player::BehaviorBoostInit()
 	boostTimer_ = kBoostTime_;
 	invincibleTimer_ = kBoostTime_; // ブースト中無敵に
 	sourceVoiceBoost = Audio::GetInstance()->SoundPlayAudio(soundDataBoost, false);
+	OffScreen::GetInstance()->SetEffectType(OffScreen::OffScreenEffectType::RadialBlur);
 }
 
 void Player::BehaviorBoostUpdate()

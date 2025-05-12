@@ -6,75 +6,55 @@ void OffScreen::Initialize()
 {
 	dxCommon_ = DirectXCommon::GetInstance();
 
-	switch (effectType_) {
-	case OffScreenEffectType::Copy:
-		rootSignature_ = PipelineManager::GetInstance()->GetRootSignature("OffScreen");
-		pipelineState_ = PipelineManager::GetInstance()->GetPipeLineStateObject("OffScreen");
-		break;
-	case OffScreenEffectType::GaussSmoothing:
-		rootSignature_ = PipelineManager::GetInstance()->GetRootSignature("GaussSmoothing");
-		pipelineState_ = PipelineManager::GetInstance()->GetPipeLineStateObject("GaussSmoothing");
-		break;
-	case OffScreenEffectType::DepthOutline:
-		rootSignature_ = PipelineManager::GetInstance()->GetRootSignature("DepthOutLine");
-		pipelineState_ = PipelineManager::GetInstance()->GetPipeLineStateObject("DepthOutLine");
-		break;
-	case OffScreenEffectType::Sepia:
-		rootSignature_ = PipelineManager::GetInstance()->GetRootSignature("Sepia");
-		pipelineState_ = PipelineManager::GetInstance()->GetPipeLineStateObject("Sepia");
-		break;
-	case OffScreenEffectType::Grayscale:
-		rootSignature_ = PipelineManager::GetInstance()->GetRootSignature("Grayscale");
-		pipelineState_ = PipelineManager::GetInstance()->GetPipeLineStateObject("Grayscale");
-		break;
-	case OffScreenEffectType::Vignette:
-		rootSignature_ = PipelineManager::GetInstance()->GetRootSignature("Vignette");
-		pipelineState_ = PipelineManager::GetInstance()->GetPipeLineStateObject("Vignette");
-		break;
-	case OffScreenEffectType::RadialBlur:
-		rootSignature_ = PipelineManager::GetInstance()->GetRootSignature("RadialBlur");
-		pipelineState_ = PipelineManager::GetInstance()->GetPipeLineStateObject("RadialBlur");
-		break;
-	}
+	// 全種類のエフェクト用PSO/RSを一括で登録
+	auto pipelineManager = PipelineManager::GetInstance();
+
+	auto Register = [&](OffScreenEffectType type, const std::string& name) {
+		OffScreenPipeline p;
+		p.rootSignature = pipelineManager->GetRootSignature(name);
+		p.pipelineState = pipelineManager->GetPipeLineStateObject(name);
+		pipelineMap_[type] = p;
+		};
+
+	Register(OffScreenEffectType::Copy, "OffScreen");
+	Register(OffScreenEffectType::GaussSmoothing, "GaussSmoothing");
+	Register(OffScreenEffectType::DepthOutline, "DepthOutLine");
+	Register(OffScreenEffectType::Sepia, "Sepia");
+	Register(OffScreenEffectType::Grayscale, "Grayscale");
+	Register(OffScreenEffectType::Vignette, "Vignette");
+	Register(OffScreenEffectType::RadialBlur, "RadialBlur");
 
 	CreateMaterialResource();
 	CreateRadialBlurResource();
 }
 
 
-
-
 void OffScreen::Draw()
 {
-	// 共通設定
-	materialData_->Inverse = Inverse(projectionInverse_);
-	dxCommon_->GetCommandList()->SetPipelineState(pipelineState_.Get());
-	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
+	auto& pipeline = pipelineMap_[effectType_];
+	dxCommon_->GetCommandList()->SetPipelineState(pipeline.pipelineState.Get());
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(pipeline.rootSignature.Get());
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
+	materialData_->Inverse = Inverse(projectionInverse_);
+
+	// 各種 RootParameter 設定（省略せず維持）
 	switch (effectType_) {
 	case OffScreenEffectType::Copy:
-		// RootParameter = 1つ: テクスチャのみ
 		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, dxCommon_->GetOffScreenGPUHandle());
 		break;
-
 	case OffScreenEffectType::GaussSmoothing:
-		// RootParameter = 2つ: テクスチャ + ガウスパラメータ
 		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, dxCommon_->GetOffScreenGPUHandle());
 		dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, gaussResource_->GetGPUVirtualAddress());
 		break;
-
 	case OffScreenEffectType::DepthOutline:
-		// RootParameter = 3つ: テクスチャ + Depth + Material
 		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, dxCommon_->GetOffScreenGPUHandle());
 		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, dxCommon_->GetDepthGPUHandle());
 		dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(2, materialResource_->GetGPUVirtualAddress());
 		break;
-
 	case OffScreenEffectType::Sepia:
 	case OffScreenEffectType::Grayscale:
 	case OffScreenEffectType::Vignette:
-		// BaseOffScreen系: RootParameter = 1つのみ（テクスチャ）
 		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, dxCommon_->GetOffScreenGPUHandle());
 		break;
 	case OffScreenEffectType::RadialBlur:
@@ -85,6 +65,7 @@ void OffScreen::Draw()
 
 	dxCommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 }
+
 
 
 void OffScreen::CreateBoxFilterResource()
@@ -118,11 +99,11 @@ void OffScreen::CreateRadialBlurResource()
 {
 	radialBlurResource_ = dxCommon_->CreateBufferResource(sizeof(RadialBlurForGPU));
 	radialBlurResource_->Map(0, nullptr, reinterpret_cast<void**>(&radialBlurData_));
-	radialBlurResource_->Unmap(0, nullptr);
 	radialBlurData_->direction = { 0.0f, 0.0f };
 	radialBlurData_->center = { 0.5f, 0.5f };
 	radialBlurData_->width = 0.001f;
 	radialBlurData_->sampleCount = 10;
 	radialBlurData_->isRadial = true;
+	radialBlurResource_->Unmap(0, nullptr);
 }
 
