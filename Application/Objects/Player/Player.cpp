@@ -5,6 +5,8 @@
 
 #include "Collision/Core/CollisionManager.h"
 
+#include "../Application/SystemsApp/AppAudio/AudioVolumeManager.h"
+
 #ifdef _DEBUG
 #include "imgui.h"
 #include "string"
@@ -249,6 +251,7 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 		{
 			// オーディオの再生
 			sourceVoiceEat = Audio::GetInstance()->SoundPlayAudio(soundDataEat, false);
+			AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceEat, kSE);
 			if (kMaxGrassGauge_ > grassGauge_ && createGrassTimer_ <= 0)
 			{
 				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.1f)
@@ -317,9 +320,11 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 				{
 						// 唾を吐く
 						sourceVoiceYodare = Audio::GetInstance()->SoundPlayAudio(soundDataYodare, false);
+						AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceYodare, kSE);
 						//emitter_->EmitFromTo(worldTransform_.translation_, other->GetWorldTransform().translation_);
 						// オーディオの再生
 						sourceVoiceGrow = Audio::GetInstance()->SoundPlayAudio(soundDataGrow, false);
+						AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceGrow, kSE);
 				}
 			}
 		}
@@ -746,6 +751,7 @@ void Player::TakeDamage()
 
 			// オーディオの再生
 			sourceVoiceDamage = Audio::GetInstance()->SoundPlayAudio(soundDataDamage, false);
+			AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceDamage, kSE);
 			if (HP_ <= 0)
 			{
 				extendTimer_ = 0;
@@ -963,6 +969,7 @@ void Player::BehaviorBoostInit()
 	boostTimer_ = kBoostTime_;
 	invincibleTimer_ = kBoostTime_; // ブースト中無敵に
 	sourceVoiceBoost = Audio::GetInstance()->SoundPlayAudio(soundDataBoost, false);
+	AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceBoost, kSE);
 }
 
 void Player::BehaviorBoostUpdate()

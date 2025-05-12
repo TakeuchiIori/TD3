@@ -11,6 +11,9 @@
 #include "Collision/Core/CollisionManager.h"
 #include "../Graphics/Culling/OcclusionCullingManager.h"
 
+// App
+#include "../Application/SystemsApp/AppAudio/AudioVolumeManager.h"
+
 // C++
 #include <cstdlib>
 #include <ctime>
@@ -79,6 +82,8 @@ void GameScene::Initialize()
 	// 音量の設定（0.0f ～ 1.0f）
 	Audio::GetInstance()->SetVolume(sourceVoice, 0.1f); // 80%の音量に設定
 
+	AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoice, kBGM);
+
 
 	gameScreen_ = std::make_unique<GameScreen>();
 	gameScreen_->SetCamera(sceneCamera_.get());
@@ -136,7 +141,7 @@ void GameScene::Update()
 	UpdateCameraMode();
 	UpdateCamera();
 
-
+	TestVolumeChange();
 
 
 	ShowImGui();
@@ -201,6 +206,27 @@ void GameScene::DrawOffScreen()
 
 
 }
+
+#ifdef _DEBUG
+void GameScene::TestVolumeChange()
+{
+	static float masterVolume = 1.0f;
+	static float bgmVolume = 1.0f;
+	static float seVolume = 1.0f;
+	static float uiVolume = 1.0f;
+	ImGui::Begin("VolumeChange");
+	ImGui::SliderFloat("masterVolume", &masterVolume, 0.0f, 1.0f);
+	ImGui::SliderFloat("bgmVolume", &bgmVolume, 0.0f, 1.0f);
+	ImGui::SliderFloat("seVolume", &seVolume, 0.0f, 1.0f);
+	ImGui::SliderFloat("uiVolume", &uiVolume, 0.0f, 1.0f);
+	ImGui::End();
+	AudioVolumeManager::GetInstance()->SetVolume(kMaster, masterVolume);
+	AudioVolumeManager::GetInstance()->SetVolume(kBGM, bgmVolume);
+	AudioVolumeManager::GetInstance()->SetVolume(kSE, seVolume);
+	AudioVolumeManager::GetInstance()->SetVolume(kUISound, uiVolume);
+}
+#endif // _DEBUG
+
 
 void GameScene::DrawObject()
 {

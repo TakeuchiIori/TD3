@@ -190,8 +190,6 @@ void Audio::StopAudio(IXAudio2SourceVoice* pSourceVoice)
 {
 	if (pSourceVoice) {
 		pSourceVoice->Stop();
-		pSourceVoice->DestroyVoice();
-		pSourceVoice = nullptr;
 	}
 }
 
