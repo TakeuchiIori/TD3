@@ -108,8 +108,10 @@ void Player::InitCollision()
 
 void Player::InitJson()
 {
-	jsonManager_ = std::make_unique<JsonManager>("playerObj", "Resources/JSON/");
+	jsonManager_ = std::make_unique<JsonManager>("Obj", "Resources/JSON/");
 	jsonManager_->SetCategory("Objects");
+	jsonManager_->SetSubCategory("Player");
+	jsonManager_->Register("位置", &worldTransform_.translation_);
 	jsonManager_->Register("通常時の移動速度",&defaultSpeed_);
 	jsonManager_->Register("ブースト時の速度", &boostSpeed_);
 	jsonManager_->Register("帰還時の速度", &returnSpeed_);
