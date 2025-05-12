@@ -130,6 +130,8 @@ void Player::InitJson()
 	jsonManager_->Register("通常の草の回復量(sec)", &grassTime_);
 	jsonManager_->Register("大きい草の回復量(sec)", &largeGrassTime_);
 
+	jsonManager_->Register("方向転換できるまでの距離", &moveInterval_);
+
 	jsonCollider_ = std::make_unique<JsonManager>("playerCollider", "Resources/JSON/");
 	//aabbCollider_->InitJson(jsonCollider_.get());
 }
@@ -284,13 +286,6 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 			}
 		}
 
-
-		/*if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
-		{
-			TakeDamage();
-		}*/
-
-
 		if (behavior_ != BehaviorPlayer::Boost)
 		{
 			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kBranch))
@@ -305,14 +300,6 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 {
 	if (behavior_ == BehaviorPlayer::Moving || behavior_ == BehaviorPlayer::Boost)
 	{
-		if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kNextFramePlayer))
-		{
-			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody)) // 体に当たったら
-			{
-				isCollisionBody = true;
-				TakeDamage();
-			}
-		}
 		if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
 		{
 			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrowthArea)) // 草の成長エリア
@@ -383,6 +370,23 @@ void Player::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDi
 			}
 		}
 	}
+
+	if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kNextFramePlayer))
+	{
+		if (behavior_ == BehaviorPlayer::Moving || behavior_ == BehaviorPlayer::Boost)
+		{
+			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody))
+			{
+				HitDirection hitDir = Collision::GetSelfLocalHitDirection(self, other);
+				if (hitDir == HitDirection::Top)
+				{
+					isCollisionBody = true;
+					TakeDamage();
+				}
+			}
+
+		}
+	}
 }
 
 #pragma endregion
@@ -420,7 +424,47 @@ void Player::Move()
 		stick = {};
 	}
 
+	if(Length(moveHistory_.back() - worldTransform_.translation_) >= moveInterval_ || isCollisionBody) ChangeDir();
+	
 
+	moveDirection_ = Normalize(moveDirection_);
+
+	if(beforeDirection_ == moveDirection_)
+	{
+		velocity_ += moveDirection_ * speed_;
+	}
+
+
+	Vector3 newPos = worldTransform_.translation_;
+	newPos = worldTransform_.translation_ + velocity_;
+
+	mpCollision_.DetectAndResolveCollision(
+		colliderRect_,  // 衝突判定用矩形
+		newPos,    // 更新される位置（衝突解決後）
+		velocity_,      // 更新される速度
+		MapChipCollision::CollisionFlag::All,  // すべての方向をチェック
+		[this](const CollisionInfo& info) {
+			// 衝突時の処理（例：特殊ブロック対応）
+			MapChipOnCollision(info);
+		}
+	);
+
+	if (isCollisionBody && beforeDirection_ == moveDirection_)
+	{
+		newPos = worldTransform_.translation_;
+		velocity_ = { 0,0,0 };
+		isCollisionBody = false;
+	}
+
+	worldTransform_.translation_ = newPos;
+	nextWorldTransform_.translation_ = newPos + velocity_;
+
+	ExtendBody();
+
+}
+
+void Player::ChangeDir()
+{
 	if ((input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP)) &&
 		moveDirection_ != Vector3{ 0,1,0 } &&
 		moveDirection_ != Vector3{ 0,-1,0 })
@@ -453,13 +497,13 @@ void Player::Move()
 		{
 			RightBody();
 		}
-		else if(moveDirection_ != Vector3{ -1,0,0 } &&
-				moveDirection_ != Vector3{ 1,0,0 })
+		else if (moveDirection_ != Vector3{ -1,0,0 } &&
+			moveDirection_ != Vector3{ 1,0,0 })
 		{
 			LeftBody();
 		}
 	}
-	else if(stick.x != 0 || stick.y != 0)
+	else if (stick.x != 0 || stick.y != 0)
 	{
 		if (stick.y > 0 &&
 			moveDirection_ != Vector3{ 0,1,0 } &&
@@ -467,51 +511,12 @@ void Player::Move()
 		{
 			UpBody();
 		}
-		else if(moveDirection_ != Vector3{ 0,-1,0 } &&
-				moveDirection_ != Vector3{ 0,1,0 })
+		else if (moveDirection_ != Vector3{ 0,-1,0 } &&
+			moveDirection_ != Vector3{ 0,1,0 })
 		{
 			DownBody();
 		}
 	}
-
-	moveDirection_ = Normalize(moveDirection_);
-
-	if(beforeDirection_ == moveDirection_)
-	{
-		velocity_ += moveDirection_ * speed_;
-	}
-
-
-	Vector3 newPos = worldTransform_.translation_;
-	newPos = worldTransform_.translation_ + velocity_;
-
-	if (isCollisionBody && beforeDirection_ == moveDirection_)
-	{
-		newPos = worldTransform_.translation_;
-		velocity_ = { 0,0,0 };
-		TakeDamage();
-	}
-	else
-	{
-		isCollisionBody = false;
-	}
-
-	mpCollision_.DetectAndResolveCollision(
-		colliderRect_,  // 衝突判定用矩形
-		newPos,    // 更新される位置（衝突解決後）
-		velocity_,      // 更新される速度
-		MapChipCollision::CollisionFlag::All,  // すべての方向をチェック
-		[this](const CollisionInfo& info) {
-			// 衝突時の処理（例：特殊ブロック対応）
-			MapChipOnCollision(info);
-		}
-	);
-
-	worldTransform_.translation_ = newPos;
-	nextWorldTransform_.translation_ = newPos + velocity_;
-
-	ExtendBody();
-
 }
 
 #pragma region // 体が伸びる向き決定
