@@ -63,6 +63,11 @@ private:
 	void CreateMaterialResource();
 
 private:
+
+
+
+
+
 	struct KernelForGPU {
 		int kernelSize;
 	};

@@ -40,7 +40,7 @@ void Grass::Initialize(Camera* camera)
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("grass.obj");
+	obj_->SetModel("leafRed.obj");
 	obj_->SetMaterialColor(defaultColor_);
 
 	// 枝の初期化
