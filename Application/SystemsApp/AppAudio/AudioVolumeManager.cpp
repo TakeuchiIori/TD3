@@ -17,7 +17,7 @@ void AudioVolumeManager::Finalize()
 {
 	for (IXAudio2SourceVoice*& voice : pSourceVoices_) {
 		if (voice) {
-			Audio::GetInstance()->StopAudio(voice);
+			Audio::GetInstance()->PauseAudio(voice);
 			voice->DestroyVoice();
 			voice = nullptr;
 		}
