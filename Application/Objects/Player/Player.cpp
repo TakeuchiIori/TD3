@@ -19,11 +19,11 @@ Player::~Player()
 	//aabbCollider_->~AABBCollider();
 	obbCollider_->~OBBCollider();
 	nextAabbCollider_->~AABBCollider();
-	Audio::GetInstance()->StopAudio(sourceVoiceGrow);
-	Audio::GetInstance()->StopAudio(sourceVoiceBoost);
-	Audio::GetInstance()->StopAudio(sourceVoiceDamage);
-	Audio::GetInstance()->StopAudio(sourceVoiceEat);
-	Audio::GetInstance()->StopAudio(sourceVoiceYodare);
+	Audio::GetInstance()->PauseAudio(sourceVoiceGrow);
+	Audio::GetInstance()->PauseAudio(sourceVoiceBoost);
+	Audio::GetInstance()->PauseAudio(sourceVoiceDamage);
+	Audio::GetInstance()->PauseAudio(sourceVoiceEat);
+	Audio::GetInstance()->PauseAudio(sourceVoiceYodare);
 }
 
 void Player::Initialize(Camera* camera)

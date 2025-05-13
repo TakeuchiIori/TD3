@@ -262,7 +262,7 @@ void GameScene::DrawLine()
 void GameScene::Finalize()
 {
 	cameraManager_.RemoveCamera(sceneCamera_);
-	Audio::GetInstance()->StopAudio(sourceVoice);
+	Audio::GetInstance()->PauseAudio(sourceVoice);
 }
 
 
