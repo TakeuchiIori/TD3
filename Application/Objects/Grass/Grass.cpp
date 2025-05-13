@@ -40,7 +40,7 @@ void Grass::Initialize(Camera* camera)
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("leafRed.obj");
+	obj_->SetModel("grass.obj");
 	obj_->SetMaterialColor(defaultColor_);
 
 	// 枝の初期化
@@ -190,6 +190,8 @@ void Grass::OnCollision(BaseCollider* self, BaseCollider* other)
 				{
 					if (player_->behavior_ != BehaviorPlayer::Return)
 					{
+
+						obj_->SetModel("leafRed.obj");
 						if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
 						{
 							if (worldTransform_.scale_.x != 0.0f) {
@@ -207,6 +209,7 @@ void Grass::OnCollision(BaseCollider* self, BaseCollider* other)
 
 void Grass::OnExitCollision(BaseCollider* self, BaseCollider* other)
 {
+	obj_->SetModel("grass.obj");
 }
 
 void Grass::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
