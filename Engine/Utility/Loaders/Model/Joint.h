@@ -43,6 +43,10 @@ public:
 	int32_t& GetIndex() { return index_; }
 	std::optional<int32_t>& GetParent() { return parent_; }
 
+
+	const QuaternionTransform& GetTransform() const { return transform_; }
+
+
 private:
 
 	QuaternionTransform transform_; 

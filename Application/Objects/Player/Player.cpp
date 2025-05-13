@@ -53,6 +53,7 @@ void Player::Initialize(Camera* camera)
 	obj_->Initialize();
 	obj_->SetModel("kirin_yodare.gltf",true);
 	obj_->SetMaterialColor(defaultColorV4_);
+	//obj_->SetLoopAnimation(true);  無限ループ再生
 
 	for (size_t i = 0; i < kMaxHP_; ++i)
 	{
@@ -137,6 +138,10 @@ void Player::InitJson()
 void Player::Update()
 {
 	beforebehavior_ = behavior_;
+
+	if (input_->IsPadTriggered(0, GamePadButton::B)) {
+		obj_->GetModel()->PlayAnimation();
+	}
 
 	// 各行動の初期化
 	BehaviorInitialize();
