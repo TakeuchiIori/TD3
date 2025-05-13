@@ -225,10 +225,13 @@ void AnimationSystem::BlendAndApplyAnimation(const Animation& from, const Animat
 
 
 void AnimationSystem::RequestPlay() {
+	if (!isPlayRequested_) {
+		CacheInitialPose();
+	}
+
 	isPlayRequested_ = true;
 	isPlayFinished_ = false;
 	animationTime_ = 0.0f;
-	CacheInitialPose();
 }
 
 bool AnimationSystem::IsPlayFinished() const {
