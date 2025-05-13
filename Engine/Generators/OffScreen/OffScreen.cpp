@@ -107,3 +107,47 @@ void OffScreen::CreateRadialBlurResource()
 	radialBlurResource_->Unmap(0, nullptr);
 }
 
+
+/*=================================================================
+
+					 　	実際にゲームで扱う関数
+
+=================================================================*/
+
+void OffScreen::UpdateBlur(float deltaTime)
+{
+	if (isBlurMotion_) {
+		blurTime_ += deltaTime;
+		float t = std::clamp(blurTime_ / blurDuration_, 0.0f, 1.0f);
+		float easeT = 1.0f - t; // 最初1.0 → 最後0.0
+
+		// 幅とサンプル数を減衰させる
+		radialBlurData_->width = initialWidth_ * easeT;
+		radialBlurData_->sampleCount = (std::max)(1, static_cast<int>(initialSampleCount_ * easeT));
+
+		if (t >= 1.0f) {
+			isBlurMotion_ = false;
+			SetEffectType(OffScreenEffectType::Copy); // 通常状態に戻す
+		}
+	}
+}
+
+void OffScreen::StartBlurMotion(RadialBlurPrams radialBlurPrams)
+{
+	radialBlurPrams_ = radialBlurPrams;
+
+	// 初期値を設定
+	blurDuration_ = 1.0f;
+	blurTime_ = 0.0f;
+	isBlurMotion_ = true;
+	
+	// GPUに値を転送
+	radialBlurData_->direction = radialBlurPrams_.direction;
+	radialBlurData_->center = radialBlurPrams_.center;
+	radialBlurData_->width = radialBlurPrams_.width;
+	radialBlurData_->sampleCount = radialBlurPrams_.sampleCount;
+	radialBlurData_->isRadial = radialBlurPrams_.isRadial;
+
+	SetEffectType(OffScreenEffectType::RadialBlur);
+}
+

@@ -5,6 +5,7 @@
 
 #include "Collision/Core/CollisionManager.h"
 #include "../Generators/OffScreen/OffScreen.h"
+#include "Systems/GameTime/GameTIme.h"
 
 #ifdef _DEBUG
 #include "imgui.h"
@@ -966,14 +967,21 @@ void Player::BehaviorBoostInit()
 	boostTimer_ = kBoostTime_;
 	invincibleTimer_ = kBoostTime_; // ブースト中無敵に
 	sourceVoiceBoost = Audio::GetInstance()->SoundPlayAudio(soundDataBoost, false);
-	OffScreen::GetInstance()->SetEffectType(OffScreen::OffScreenEffectType::RadialBlur);
+	OffScreen::RadialBlurPrams blurPrams;
+	blurPrams.center = { 0.0f,0.0f };
+	blurPrams.direction = { 0.0f,1.0f };
+	blurPrams.isRadial = false;
+	blurPrams.sampleCount = 10;
+	blurPrams.width = 0.01f;
+
+	OffScreen::GetInstance()->StartBlurMotion(blurPrams);
 }
 
 void Player::BehaviorBoostUpdate()
 {
 	Move();
 
-	
+	OffScreen::GetInstance()->UpdateBlur(GameTime::GetDeltaTime());
 
 	if (0 >= boostTimer_)
 	{

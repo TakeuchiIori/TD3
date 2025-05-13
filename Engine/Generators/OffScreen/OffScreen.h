@@ -134,6 +134,50 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> radialBlurResource_;
 	RadialBlurForGPU* radialBlurData_ = nullptr;
 
-	OffScreenEffectType effectType_ = OffScreenEffectType::DepthOutline;
+	OffScreenEffectType effectType_ = OffScreenEffectType::Copy;
+
+
+public:
+
+	/*=================================================================
+
+						 　	実際にゲームで扱うもの
+
+	=================================================================*/	
+
+	struct RadialBlurPrams
+	{
+		Vector2 direction;
+		Vector2 center;
+		float width;
+		int sampleCount;
+		bool isRadial;
+	};
+
+
+	/// <summary>
+	/// ブラーの更新
+	/// </summary>
+	/// <param name="deltaTime"></param>
+	void UpdateBlur(float deltaTime);
+
+
+	// --- 追加メソッド ---
+	/// <summary>
+	/// ブラー演出を開始する（最初強→最後弱）
+	/// </summary>
+	void StartBlurMotion(RadialBlurPrams radialBlurPrams);
+
+
+private:
+
+	RadialBlurPrams radialBlurPrams_;
+	bool isBlurMotion_ = false;
+	float blurTime_ = 0.0f;
+	float blurDuration_ = 1.0f;		// ブラー時間（秒）
+	float initialWidth_ = 0.01f;	// ブラー初期幅
+	int initialSampleCount_ = 16;
+
+
 };
 

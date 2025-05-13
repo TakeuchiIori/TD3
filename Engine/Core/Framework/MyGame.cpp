@@ -15,7 +15,7 @@ void MyGame::Initialize()
 	SceneManager::GetInstance()->Initialize();
 	offScreen_ = OffScreen::GetInstance();
 	offScreen_->Initialize();
-	offScreen_->SetEffectType(OffScreen::OffScreenEffectType::RadialBlur);
+	//offScreen_->SetEffectType(OffScreen::OffScreenEffectType::RadialBlur);
 #ifdef _DEBUG
 	SceneManager::GetInstance()->ChangeScene("Game");
 #else
