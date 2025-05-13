@@ -1025,6 +1025,7 @@ void Player::BehaviorReturnInit()
 	moveDirection_ = { 0,0,0 };
 	isCollisionBody = false;
 	TimerZero();
+	OffScreen::GetInstance()->SetEffectType(OffScreen::OffScreenEffectType::Copy);
 }
 
 void Player::BehaviorReturnUpdate()
