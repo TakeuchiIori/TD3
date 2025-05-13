@@ -69,6 +69,11 @@ void Stage::Draw()
 #endif // _DEBUG
 }
 
+void Stage::DrawAnimation()
+{
+	player_->DrawAnimation();
+}
+
 void Stage::DrawCollision()
 {
 	player_->DrawCollision();

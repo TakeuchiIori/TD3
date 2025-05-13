@@ -1,11 +1,15 @@
 #pragma once
-#include "wrl.h"
+
+// C++
+#include <wrl.h>
 #include <d3d12.h>
+#include <unordered_map>
 
 #include "Matrix4x4.h"
 
 
 // Math
+#include "Vector2.h"
 #include "Vector4.h"
 
 /// <summary>
@@ -24,8 +28,17 @@ public:
 		DepthOutline,
 		Sepia,
 		Grayscale,
-		Vignette
+		Vignette,
+		RadialBlur
 	};
+
+	/// <summary>
+	/// シングルトンインスタンス取得
+	/// </summary>
+	static OffScreen* GetInstance() {
+		static OffScreen instance;
+		return &instance;
+	}
 
 	/// <summary>
 	/// 初期化
@@ -47,7 +60,7 @@ public:
 	/// エフェクトの種類を設定する
 	/// </summary>
 	/// <param name="type">エフェクトの種類</param>
-	void SetEffectType(OffScreenEffectType type) { effectType_ = type; }
+	void SetEffectType(OffScreenEffectType type) {effectType_ = type;}
 
 	/// <summary>
 	/// 現在のエフェクトタイプを取得
@@ -57,12 +70,24 @@ public:
 
 
 private:
+	OffScreen() = default;
+	~OffScreen() = default;
+	OffScreen(const OffScreen&) = delete;
+	OffScreen& operator=(const OffScreen&) = delete;
 
 	void CreateBoxFilterResource();
 	void CreateGaussFilterResource();
 	void CreateMaterialResource();
+	void CreateRadialBlurResource();
 
 private:
+
+	/*=================================================================
+
+							 　リソース管理
+
+	=================================================================*/
+
 	struct KernelForGPU {
 		int kernelSize;
 	};
@@ -76,20 +101,83 @@ private:
 		int padding[3];
 		Vector4 outlineColor;
 	};
+	struct RadialBlurForGPU {
+		Vector2 direction;
+		Vector2 center;
+		float width;
+		int sampleCount;
+		bool isRadial;
+		float padding[1];
+	};
 
 	DirectXCommon* dxCommon_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState_ = nullptr;
 
+	struct OffScreenPipeline {
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;
+	};
+	std::unordered_map<OffScreenEffectType, OffScreenPipeline> pipelineMap_;
+
+
+	// ぼかし用
 	Microsoft::WRL::ComPtr<ID3D12Resource> boxResource_;
 	KernelForGPU* boxData_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> gaussResource_;
 	GaussKernelForGPU* gaussData_ = nullptr;
 
+	// デプスアウトライン用
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	Material* materialData_ = nullptr;
 	Matrix4x4 projectionInverse_;
 
-	OffScreenEffectType effectType_ = OffScreenEffectType::DepthOutline;
+	// ラジアルブラー用
+	Microsoft::WRL::ComPtr<ID3D12Resource> radialBlurResource_;
+	RadialBlurForGPU* radialBlurData_ = nullptr;
+
+	OffScreenEffectType effectType_ = OffScreenEffectType::Copy;
+
+
+public:
+
+	/*=================================================================
+
+						 　	実際にゲームで扱うもの
+
+	=================================================================*/	
+
+	struct RadialBlurPrams
+	{
+		Vector2 direction;
+		Vector2 center;
+		float width;
+		int sampleCount;
+		bool isRadial;
+	};
+
+
+	/// <summary>
+	/// ブラーの更新
+	/// </summary>
+	/// <param name="deltaTime"></param>
+	void UpdateBlur(float deltaTime);
+
+
+	// --- 追加メソッド ---
+	/// <summary>
+	/// ブラー演出を開始する（最初強→最後弱）
+	/// </summary>
+	void StartBlurMotion(RadialBlurPrams radialBlurPrams);
+
+
+private:
+
+	RadialBlurPrams radialBlurPrams_;
+	bool isBlurMotion_ = false;
+	float blurTime_ = 0.0f;
+	float blurDuration_ = 1.0f;		// ブラー時間（秒）
+	float initialWidth_ = 0.01f;	// ブラー初期幅
+	int initialSampleCount_ = 16;
+
+
 };
 

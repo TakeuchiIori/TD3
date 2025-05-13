@@ -30,6 +30,6 @@ public: // メンバ関数
 	void Draw() override;
 
 private: // メンバ変数
-	std::unique_ptr<OffScreen> offScreen_;
+	OffScreen* offScreen_;
 };
 

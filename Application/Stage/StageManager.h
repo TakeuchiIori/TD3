@@ -26,6 +26,8 @@ public:
 	/// </summary>
 	void Draw();
 
+	void DrawAnimation();
+
 	void DrawCollision();
 
 	void DrawTransition();

@@ -93,6 +93,7 @@ public: // アクセッサ
 	void SetMaterialColor(const Vector3& color) { materialColor_->SetColor(color); }
 	void SetAlpha(float alpha) { materialColor_->SetAlpha(alpha); }
 	void SetUvTransform(const Matrix4x4& uvTransform) { materialUV_->SetUVTransform(uvTransform); }
+	void SetLoopAnimation(bool loop) { model_->SetLoop(loop); }
 
 private:
 

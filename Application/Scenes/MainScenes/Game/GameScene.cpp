@@ -244,7 +244,7 @@ void GameScene::DrawSprite()
 
 void GameScene::DrawAnimation()
 {
-
+	stageManager_->DrawAnimation();
 }
 
 void GameScene::DrawLine()

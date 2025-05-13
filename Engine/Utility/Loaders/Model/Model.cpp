@@ -57,11 +57,35 @@ void Model::Initialize(ModelCommon* modelCommon, const std::string& directorypat
 
 void Model::UpdateAnimation()
 {
-	if (animationSystem_) {
-		animationSystem_->Update(1.0f / 60.0f);
-		animationSystem_->Apply();             
+	if (!animationSystem_) return;
+
+	animationSystem_->Update(1.0f / 60.0f);
+
+	// Apply は「再生中だけ」に呼ぶ
+	if (!animationSystem_->IsPlayFinished()) {
+		animationSystem_->Apply();
 	}
 }
+
+void Model::PlayAnimation() {
+	if (animationSystem_) {
+		animationSystem_->RequestPlay();
+	}
+}
+
+bool Model::IsAnimationPlayFinished() const {
+	if (animationSystem_) {
+		return animationSystem_->IsPlayFinished();
+	}
+	return true;
+}
+
+void Model::ResetAnimationPlay() {
+	if (animationSystem_) {
+		animationSystem_->ResetPlay();
+	}
+}
+
 
 void Model::Draw()
 {

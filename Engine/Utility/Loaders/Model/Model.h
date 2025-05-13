@@ -47,6 +47,7 @@ public: // メンバ関数
 	/// 更新処理
 	/// </summary>
 	void UpdateAnimation();
+	void PlayAnimation();
 
 	/// <summary>
 	/// 描画
@@ -80,6 +81,16 @@ public:
 
 	bool GetHasBones() { return hasBones_; }
 	Node GetRootNode() { return *rootNode_; }
+	bool IsAnimationPlayedOnceFinished() const { return animationSystem_->IsPlayOnceFinished(); }
+	// Model.h に追加
+	bool IsAnimationPlayFinished() const;
+	void ResetAnimationPlay();
+
+	void SetLoop(bool loop) {
+		if (animationSystem_) {
+			animationSystem_->SetLoop(loop);
+		}
+	}
 
 
 	/// <summary>

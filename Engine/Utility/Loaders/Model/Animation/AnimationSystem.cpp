@@ -29,33 +29,43 @@ void AnimationSystem::Initialize(Animation& animation, Node* rootNode)
 
 void AnimationSystem::Update(float deltaTime)
 {
-	if (!animation_) return;
+	if (!animation_ || !isPlayRequested_) return;
 
-	if (animationBlendState_.isBlending) {
-		animationBlendState_.currentTime += deltaTime;
-		animationTime_ += deltaTime;
-		if (animationBlendState_.currentTime >= animationBlendState_.blendTime) {
-			animationBlendState_.isBlending = false;
-			animationTime_ = 0.0f;
-		}
-	} else {
-		animationTime_ += deltaTime;
-		float duration = animation_->GetDuration();
-		if (animationTime_ > duration) {
-			animationTime_ = 0.0f;
+	animationTime_ += deltaTime;
+	float duration = animation_->GetDuration();
+
+	if (animationTime_ >= duration) {
+		if (isLoop_) {
+			animationTime_ = 0.0f; // ループ
+		} else {
+			animationTime_ = duration;
+			isPlayRequested_ = false;
+			isPlayFinished_ = true;
+			RestoreInitialPose();
+
+			skeleton_->Update();
+			if (skinCluster_) {
+				skinCluster_->Update(skeleton_->GetJoints());
+			}
+			return;
 		}
 	}
 
-
 }
+
+
 
 /// <summary>
 ///  アニメーション適用（ブレンド対応）
 /// </summary>
 void AnimationSystem::Apply()
 {
-	if (!animation_) { return; }
+	if (!animation_) return;
 
+	// 再生が終わっていれば何も適用しない（戻し済み）
+	if (isPlayOnce_ && isPlayFinished_) {
+		return;
+	}
 	// ブレンド中
 	// ・ブレンドしていない通常再生
 	// 　・ボーン無しモデル
@@ -123,6 +133,41 @@ bool AnimationSystem::IsIgnoredJoint(const std::string& name) {
 	return ignored.count(name) > 0;
 }
 
+
+
+
+void AnimationSystem::CacheInitialPose() {
+	if (!skeleton_ || !animation_) return;
+
+	initialPoseMap_.clear();
+
+	for ( Joint& joint : skeleton_->GetJoints()) {
+		initialPoseMap_[joint.GetName()] = joint.GetTransform();
+	}
+
+	hasCachedInitialPose_ = true;
+}
+
+
+void AnimationSystem::RestoreInitialPose() {
+	if (!skeleton_ || !hasCachedInitialPose_) return;
+
+	for (Joint& joint : skeleton_->GetJoints()) {
+		const std::string& name = joint.GetName();
+		if (initialPoseMap_.count(name)) {
+			joint.SetTransform(initialPoseMap_[name]); // キャッシュからそのまま適用
+		}
+	}
+
+	skeleton_->Update();
+
+	if (skinCluster_) {
+		skinCluster_->Update(skeleton_->GetJoints());
+	}
+}
+
+
+
 std::string AnimationSystem::GetNormalizedName(const std::string& name) {
 	auto it = normalizedNameCache_.find(name);
 	if (it != normalizedNameCache_.end()) return it->second;
@@ -178,4 +223,22 @@ void AnimationSystem::BlendAndApplyAnimation(const Animation& from, const Animat
 	}
 }
 
+
+void AnimationSystem::RequestPlay() {
+	isPlayRequested_ = true;
+	isPlayFinished_ = false;
+	animationTime_ = 0.0f;
+	CacheInitialPose();
+}
+
+bool AnimationSystem::IsPlayFinished() const {
+	return isPlayFinished_;
+}
+
+void AnimationSystem::ResetPlay() {
+	isPlayRequested_ = false;
+	isPlayFinished_ = false;
+	isPlayOnce_ = false;
+	animationTime_ = 0.0f;
+}
 

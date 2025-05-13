@@ -6,76 +6,66 @@ void OffScreen::Initialize()
 {
 	dxCommon_ = DirectXCommon::GetInstance();
 
-	switch (effectType_) {
-	case OffScreenEffectType::Copy:
-		rootSignature_ = PipelineManager::GetInstance()->GetRootSignature("OffScreen");
-		pipelineState_ = PipelineManager::GetInstance()->GetPipeLineStateObject("OffScreen");
-		break;
-	case OffScreenEffectType::GaussSmoothing:
-		rootSignature_ = PipelineManager::GetInstance()->GetRootSignature("OffScreen_GaussSmoothing");
-		pipelineState_ = PipelineManager::GetInstance()->GetPipeLineStateObject("OffScreen_GaussSmoothing");
-		break;
-	case OffScreenEffectType::DepthOutline:
-		rootSignature_ = PipelineManager::GetInstance()->GetRootSignature("OffScreen_DepthOutLine");
-		pipelineState_ = PipelineManager::GetInstance()->GetPipeLineStateObject("OffScreen_DepthOutLine");
-		break;
-	case OffScreenEffectType::Sepia:
-		rootSignature_ = PipelineManager::GetInstance()->GetRootSignature("OffScreen_Sepia");
-		pipelineState_ = PipelineManager::GetInstance()->GetPipeLineStateObject("OffScreen_Sepia");
-		break;
-	case OffScreenEffectType::Grayscale:
-		rootSignature_ = PipelineManager::GetInstance()->GetRootSignature("OffScreen_Grayscale");
-		pipelineState_ = PipelineManager::GetInstance()->GetPipeLineStateObject("OffScreen_Grayscale");
-		break;
-	case OffScreenEffectType::Vignette:
-		rootSignature_ = PipelineManager::GetInstance()->GetRootSignature("OffScreen_Vignette");
-		pipelineState_ = PipelineManager::GetInstance()->GetPipeLineStateObject("OffScreen_Vignette");
-		break;
-	}
+	// 全種類のエフェクト用PSO/RSを一括で登録
+	auto pipelineManager = PipelineManager::GetInstance();
+
+	auto Register = [&](OffScreenEffectType type, const std::string& name) {
+		OffScreenPipeline p;
+		p.rootSignature = pipelineManager->GetRootSignature(name);
+		p.pipelineState = pipelineManager->GetPipeLineStateObject(name);
+		pipelineMap_[type] = p;
+		};
+
+	Register(OffScreenEffectType::Copy, "OffScreen");
+	Register(OffScreenEffectType::GaussSmoothing, "GaussSmoothing");
+	Register(OffScreenEffectType::DepthOutline, "DepthOutLine");
+	Register(OffScreenEffectType::Sepia, "Sepia");
+	Register(OffScreenEffectType::Grayscale, "Grayscale");
+	Register(OffScreenEffectType::Vignette, "Vignette");
+	Register(OffScreenEffectType::RadialBlur, "RadialBlur");
 
 	CreateMaterialResource();
+	CreateRadialBlurResource();
 }
-
-
 
 
 void OffScreen::Draw()
 {
-	// 共通設定
-	materialData_->Inverse = Inverse(projectionInverse_);
-	dxCommon_->GetCommandList()->SetPipelineState(pipelineState_.Get());
-	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
+	auto& pipeline = pipelineMap_[effectType_];
+	dxCommon_->GetCommandList()->SetPipelineState(pipeline.pipelineState.Get());
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(pipeline.rootSignature.Get());
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
+	materialData_->Inverse = Inverse(projectionInverse_);
+
+	// 各種 RootParameter 設定（省略せず維持）
 	switch (effectType_) {
 	case OffScreenEffectType::Copy:
-		// RootParameter = 1つ: テクスチャのみ
 		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, dxCommon_->GetOffScreenGPUHandle());
 		break;
-
 	case OffScreenEffectType::GaussSmoothing:
-		// RootParameter = 2つ: テクスチャ + ガウスパラメータ
 		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, dxCommon_->GetOffScreenGPUHandle());
 		dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, gaussResource_->GetGPUVirtualAddress());
 		break;
-
 	case OffScreenEffectType::DepthOutline:
-		// RootParameter = 3つ: テクスチャ + Depth + Material
 		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, dxCommon_->GetOffScreenGPUHandle());
 		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, dxCommon_->GetDepthGPUHandle());
 		dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(2, materialResource_->GetGPUVirtualAddress());
 		break;
-
 	case OffScreenEffectType::Sepia:
 	case OffScreenEffectType::Grayscale:
 	case OffScreenEffectType::Vignette:
-		// BaseOffScreen系: RootParameter = 1つのみ（テクスチャ）
 		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, dxCommon_->GetOffScreenGPUHandle());
+		break;
+	case OffScreenEffectType::RadialBlur:
+		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(0, dxCommon_->GetOffScreenGPUHandle());
+		dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, radialBlurResource_->GetGPUVirtualAddress());
 		break;
 	}
 
 	dxCommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 }
+
 
 
 void OffScreen::CreateBoxFilterResource()
@@ -103,5 +93,61 @@ void OffScreen::CreateMaterialResource()
 	materialData_->Inverse = MakeIdentity4x4();
 	materialData_->kernelSize = 5;
 	materialData_->outlineColor = { 1.0f, 0.0f, 1.0f, 1.0f };
+}
+
+void OffScreen::CreateRadialBlurResource()
+{
+	radialBlurResource_ = dxCommon_->CreateBufferResource(sizeof(RadialBlurForGPU));
+	radialBlurResource_->Map(0, nullptr, reinterpret_cast<void**>(&radialBlurData_));
+	radialBlurData_->direction = { 0.0f, 0.0f };
+	radialBlurData_->center = { 0.5f, 0.5f };
+	radialBlurData_->width = 0.001f;
+	radialBlurData_->sampleCount = 10;
+	radialBlurData_->isRadial = true;
+	radialBlurResource_->Unmap(0, nullptr);
+}
+
+
+/*=================================================================
+
+					 　	実際にゲームで扱う関数
+
+=================================================================*/
+
+void OffScreen::UpdateBlur(float deltaTime)
+{
+	if (isBlurMotion_) {
+		blurTime_ += deltaTime;
+		float t = std::clamp(blurTime_ / blurDuration_, 0.0f, 1.0f);
+		float easeT = 1.0f - t;
+
+		// 幅とサンプル数を減衰させる
+		radialBlurData_->width = initialWidth_ * easeT;
+		radialBlurData_->sampleCount = (std::max)(1, static_cast<int>(initialSampleCount_ * easeT));
+
+		if (t >= 1.0f) {
+			isBlurMotion_ = false;
+			SetEffectType(OffScreenEffectType::Copy); // 通常状態に戻す
+		}
+	}
+}
+
+void OffScreen::StartBlurMotion(RadialBlurPrams radialBlurPrams)
+{
+	radialBlurPrams_ = radialBlurPrams;
+
+	// 初期値を設定
+	blurDuration_ = 1.0f;
+	blurTime_ = 0.0f;
+	isBlurMotion_ = true;
+	
+	// GPUに値を転送
+	radialBlurData_->direction = radialBlurPrams_.direction;
+	radialBlurData_->center = radialBlurPrams_.center;
+	radialBlurData_->width = radialBlurPrams_.width;
+	radialBlurData_->sampleCount = radialBlurPrams_.sampleCount;
+	radialBlurData_->isRadial = radialBlurPrams_.isRadial;
+
+	SetEffectType(OffScreenEffectType::RadialBlur);
 }
 
