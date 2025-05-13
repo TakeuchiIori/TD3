@@ -77,6 +77,11 @@ void StageManager::Draw()
 	stageList_[currentStageNum_]->Draw();
 }
 
+void StageManager::DrawAnimation()
+{
+	stageList_[currentStageNum_]->DrawAnimation();
+}
+
 void StageManager::DrawCollision()
 {
 	stageList_[currentStageNum_]->DrawCollision();

@@ -67,6 +67,7 @@ public:
 	/// 描画
 	/// </summary>
 	void Draw() override;
+	void DrawAnimation();
 
 	void DrawCollision();
 

@@ -51,7 +51,7 @@ void Player::Initialize(Camera* camera)
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("head.obj");
+	obj_->SetModel("kirin_yodare.gltf",true);
 	obj_->SetMaterialColor(defaultColorV4_);
 
 	for (size_t i = 0; i < kMaxHP_; ++i)
@@ -162,6 +162,7 @@ void Player::Update()
 	UpdateMatrices();
 	
 	//aabbCollider_->Update();
+	obj_->UpdateAnimation();
 	obbCollider_->Update();
 	nextAabbCollider_->Update();
 	
@@ -172,7 +173,7 @@ void Player::Update()
 
 void Player::Draw()
 {
-	obj_->Draw(camera_, modelWT_);
+	
 
 	for (const auto& body : playerBodys_) 
 	{
@@ -188,6 +189,11 @@ void Player::Draw()
 	{
 		haerts_[i]->Draw();
 	}
+}
+
+void Player::DrawAnimation()
+{
+	obj_->Draw(camera_, modelWT_);
 }
 
 void Player::DrawCollision()
@@ -971,7 +977,7 @@ void Player::BehaviorBoostInit()
 	blurPrams.center = { 0.0f,0.0f };
 	blurPrams.direction = { 0.0f,1.0f };
 	blurPrams.isRadial = false;
-	blurPrams.sampleCount = 10;
+	blurPrams.sampleCount = 5;
 	blurPrams.width = 0.01f;
 
 	OffScreen::GetInstance()->StartBlurMotion(blurPrams);

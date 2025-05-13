@@ -119,7 +119,7 @@ void OffScreen::UpdateBlur(float deltaTime)
 	if (isBlurMotion_) {
 		blurTime_ += deltaTime;
 		float t = std::clamp(blurTime_ / blurDuration_, 0.0f, 1.0f);
-		float easeT = 1.0f - t; // 最初1.0 → 最後0.0
+		float easeT = 1.0f - t;
 
 		// 幅とサンプル数を減衰させる
 		radialBlurData_->width = initialWidth_ * easeT;
