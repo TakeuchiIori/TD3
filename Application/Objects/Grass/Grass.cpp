@@ -209,7 +209,13 @@ void Grass::OnCollision(BaseCollider* self, BaseCollider* other)
 
 void Grass::OnExitCollision(BaseCollider* self, BaseCollider* other)
 {
-	obj_->SetModel("grass.obj");
+	if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrowthArea))
+	{
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
+		{
+			obj_->SetModel("grass.obj");
+		}
+	}
 }
 
 void Grass::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
@@ -328,6 +334,7 @@ void Grass::BehaviorGrowthInit()
 	growthTimer_ = kGrowthTime_;
 	aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
 	aabbGrowthCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
+	obj_->SetModel("grass.obj");
 }
 
 void Grass::BehaviorGrowthUpdate()
