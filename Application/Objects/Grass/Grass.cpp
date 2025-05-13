@@ -161,15 +161,18 @@ void Grass::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
 	if(self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrass))
 	{
-		if (player_->behavior_ != BehaviorPlayer::Return)
+		if (behavior_ == BehaviorGrass::Root)
 		{
-			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
+			if (player_->behavior_ != BehaviorPlayer::Return)
 			{
-				DropLeaves(10);
-				//worldTransform_.scale_ = { 0.0f,0.0f,0.0f };
-				aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
-				enter++;
-				behaviortRquest_ = BehaviorGrass::Eaten;
+				if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
+				{
+					DropLeaves(10);
+					//worldTransform_.scale_ = { 0.0f,0.0f,0.0f };
+					aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
+					enter++;
+					behaviortRquest_ = BehaviorGrass::Eaten;
+				}
 			}
 		}
 	}
@@ -181,11 +184,11 @@ void Grass::OnCollision(BaseCollider* self, BaseCollider* other)
 	{
 		if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrowthArea))
 		{
-			if (behavior_ != BehaviorGrass::Eaten)
+			if (behavior_ != BehaviorGrass::Eaten && behavior_ != BehaviorGrass::Growth)
 			{
-				if (player_->behavior_ != BehaviorPlayer::Return)
+				if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
 				{
-					if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
+					if (player_->behavior_ != BehaviorPlayer::Return)
 					{
 						if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
 						{
@@ -297,6 +300,8 @@ void Grass::BehaviorEatenInit()
 {
 	eatenTimer_ = kEatenTime_;
 	eatenStartScale_ = worldTransform_.scale_;
+	aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
+	aabbGrowthCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
 }
 
 void Grass::BehaviorEatenUpdate()
@@ -316,8 +321,10 @@ void Grass::BehaviorEatenUpdate()
 
 void Grass::BehaviorGrowthInit()
 {
-	growthWait_ = true;
+	growthWait_ = false;
 	growthTimer_ = kGrowthTime_;
+	aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
+	aabbGrowthCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
 }
 
 void Grass::BehaviorGrowthUpdate()
@@ -334,7 +341,7 @@ void Grass::BehaviorGrowthUpdate()
 		else
 		{
 			isLarge_ = true;
-			behaviortRquest_ = BehaviorGrass::Root;
+			if(player_->behavior_ == BehaviorPlayer::Return) behaviortRquest_ = BehaviorGrass::Root;
 		}
 	}
 }
@@ -344,6 +351,7 @@ void Grass::BehaviorRepopInit()
 	worldTransform_.scale_ = { 0.0f, 0.0f, 0.0f }; // ここもスケール初期化しといた方が無難
 	repopWait_ = false;
 	repopTimer_ = kRepopTime_;
+	aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
 }
 
 void Grass::BehaviorRepopUpdate()

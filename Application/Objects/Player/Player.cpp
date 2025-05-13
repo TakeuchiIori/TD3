@@ -138,6 +138,7 @@ void Player::InitJson()
 
 void Player::Update()
 {
+	canSpitting_ = false;
 	beforebehavior_ = behavior_;
 
 	// 各行動の初期化
