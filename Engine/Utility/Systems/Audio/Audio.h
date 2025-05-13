@@ -54,7 +54,7 @@ public:
 
 	SoundData LoadWave(const char* filename);
 	SoundData LoadAudio(const wchar_t* filename); // .mp3, .mp4 用
-	void StopAudio(IXAudio2SourceVoice* pSourceVoice);
+	void PauseAudio(IXAudio2SourceVoice* pSourceVoice);
 	void FadeOutAndStop(IXAudio2SourceVoice* pSourceVoice, float durationSeconds);
 
 	void SoundUnload(SoundData* soundData);
@@ -64,6 +64,11 @@ public:
 
 	// 音量設定
 	void SetVolume(IXAudio2SourceVoice* pSourceVoice, float volume);
+	// マスターボリューム
+	void SetMasterVolume(float volume) { masterVoice_->SetVolume(volume); }
+
+public:
+	IXAudio2* GetXAudio2() { return xAudio2_; }
 
 private:
 	// シングルトンパターン

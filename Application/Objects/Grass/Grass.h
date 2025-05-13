@@ -69,10 +69,10 @@ public:
 				isLarge_ = false;
 				behaviortRquest_ = BehaviorGrass::Repop;
 			}
-		}
-		else
-		{
-			growthWait_ = false;
+			if (!isLarge_)
+			{
+				aabbGrowthCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kGrowthArea));
+			}
 		}
 	}
 

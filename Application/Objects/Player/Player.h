@@ -105,6 +105,8 @@ private:
 	// 移動
 	void Move();
 
+	void ChangeDir();
+
 	void UpBody();
 	void DownBody();
 	void LeftBody();
@@ -146,6 +148,7 @@ private:
 			Vector3 dir = Normalize(worldTransform_.translation_ - moveHistory_.back()); // 方向ベクトル（単位ベクトル）
 			float angle = std::atan2(dir.y, dir.x);  // XY平面での角度
 			worldTransform_.rotation_.z = angle + 3.0f * std::numbers::pi_v<float> / 2.0f;
+			nextWorldTransform_.rotation_ = worldTransform_.rotation_;
 		}
 	}
 
@@ -255,6 +258,8 @@ private:
 	float boostSpeed_ = 0.2f;						// ブースト時の速度
 	float returnSpeed_ = 1.0f;						// 帰還時の速度
 	float speed_ = defaultSpeed_;					// 動く速度
+
+	float moveInterval_ = 2.1f;
 
 	bool isMove_ = false;
 
