@@ -992,7 +992,7 @@ void Player::BehaviorBoostInit()
 	sourceVoiceBoost = Audio::GetInstance()->SoundPlayAudio(soundDataBoost, false);
 	OffScreen::RadialBlurPrams blurPrams;
 	blurPrams.center = { 0.0f,0.0f };
-	blurPrams.direction = { 0.0f,1.0f };
+	blurPrams.direction = { 0.0f,-1.0f };
 	blurPrams.isRadial = false;
 	blurPrams.sampleCount = 5;
 	blurPrams.width = 0.01f;
