@@ -215,6 +215,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Objects\Player\PlayerHaert.cpp" />
     <ClCompile Include="Application\Objects\Player\TitlePlayer.cpp" />
     <ClCompile Include="Application\SpriteApp\ScreenApp\TitleScreen.cpp" />
+    <ClCompile Include="Application\SpriteApp\ScreenApp\MenuOverlay.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -328,6 +329,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Objects\Player\PlayerMapCollision.h" />
     <ClInclude Include="Application\Objects\Player\PlayerBody.h" />
     <ClInclude Include="Application\Objects\Player\PlayerHaert.h" />
+    <ClInclude Include="Application\SpriteApp\ScreenApp\MenuOverlay.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Application\Objects\EnemyManager\SideEnemy.h" />
     <ClInclude Include="Application\SystemsApp\Picture\Picture.h" />

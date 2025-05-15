@@ -8,6 +8,7 @@ enum AudioType
 	kBGM,
 	kSE,
 	kUISound,
+	kAudioTypeNum,
 };
 
 class AudioVolumeManager
