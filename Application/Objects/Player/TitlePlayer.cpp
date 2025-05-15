@@ -18,7 +18,7 @@ void TitlePlayer::Initialize(Camera* camera)
 
 	neck_ = std::make_unique<Object3d>();
 	neck_->Initialize();
-	neck_->SetModel("neck.obj");
+	neck_->SetModel("neck2.obj");
 
 	body_ = std::make_unique<Object3d>();
 	body_->Initialize();
@@ -126,6 +126,8 @@ void TitlePlayer::Update()
 
 
 	obbCollider_->Update();
+	neck_->uvScale = { neckTransform_.scale_.x, neckTransform_.scale_.y };
+	neck_->uvTranslate.y = -(neckTransform_.scale_.y - 1.0f) * 0.6855f;
 
 	UpdateSprite();
 }
