@@ -16,7 +16,6 @@ void Book::Initialize(Camera* camera)
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
 	obj_->SetModel("book.obj");
-	obj_->SetMaterialColor(Vector3{ 0.0,1.0f,0.0f });
 	worldTransform_.Initialize();
 
 	worldTransform_.translation_ = { 25.0f,2.0f,0.0f };
@@ -275,7 +274,6 @@ void Book::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
 	{
 		uiScaleTarget_ = 1.0f;
-		//obj_->SetMaterialColor(Vector3{ 1.0,1.0f,0.0f });
 		isColliding_ = true;
 	}
 }
@@ -303,7 +301,6 @@ void Book::OnExitCollision(BaseCollider* self, BaseCollider* other)
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
 	{
 		uiScaleTarget_ = 0.0f;
-		//obj_->SetMaterialColor(Vector3{ 0.0,1.0f,0.0f });
 		isColliding_ = false;
 
 	}
