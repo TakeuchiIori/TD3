@@ -335,6 +335,7 @@ void Grass::BehaviorGrowthInit()
 	aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
 	aabbGrowthCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
 	obj_->SetModel("grass.obj");
+	GrowthLeaves(20);
 }
 
 void Grass::BehaviorGrowthUpdate()
@@ -346,7 +347,7 @@ void Grass::BehaviorGrowthUpdate()
 			growthTimer_ -= deltaTime_;
 			float t = 1.0f - growthTimer_ / kGrowthTime_;
 
-			worldTransform_.scale_ = LerpGrass(defaultScale_, growthScale_, t, Easing::Function::EaseInOutBack);
+			worldTransform_.scale_ = LerpGrass(defaultScale_, growthScale_, t, Easing::Function::EaseOutGrowBounce);
 		}
 		else
 		{
@@ -362,6 +363,7 @@ void Grass::BehaviorRepopInit()
 	repopWait_ = false;
 	repopTimer_ = kRepopTime_;
 	aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
+	DropLeaves(20);
 }
 
 void Grass::BehaviorRepopUpdate()
@@ -374,7 +376,7 @@ void Grass::BehaviorRepopUpdate()
 	{
 		repopTimer_ -= deltaTime_;
 		float t = 1.0f - repopTimer_ / kRepopTime_;
-		worldTransform_.scale_ = LerpGrass(Vector3{ 0,0,0 }, defaultScale_, t, Easing::Function::EaseInOutBack);
+		worldTransform_.scale_ = LerpGrass(Vector3{ 0,0,0 }, defaultScale_, t, Easing::Function::EaseOutBack);
 	} else
 	{
 		behaviortRquest_ = BehaviorGrass::Root;
@@ -440,6 +442,39 @@ void Grass::DropLeaves(int count) {
 		leaf.wt = std::make_unique<WorldTransform>();
 		leaf.wt->Initialize();
 		leaf.wt->translation_ = worldTransform_.translation_ + Vector3{ 0.0f, 1.0f, 0.0f };
+		leaf.wt->scale_ = { 1.5f, 1.5f, 1.5f };
+
+		// 初期落下速度はほぼ0（ふわふわ）
+		leaf.velocity = {
+			((rand() % 100) / 100.0f - 0.5f) * 0.005f,
+			-((rand() % 10) / 100.0f + 0.005f),
+			((rand() % 100) / 100.0f - 0.5f) * 0.005f
+		};
+
+		leaf.angularVelocity = {
+			((rand() % 100) / 100.0f - 0.5f) * 0.02f,
+			((rand() % 100) / 100.0f - 0.5f) * 0.02f,
+			((rand() % 100) / 100.0f - 0.5f) * 0.02f
+		};
+
+		leaf.swingPhase = ((rand() % 100) / 100.0f) * 6.28f;
+		leaf.floatPhase = ((rand() % 100) / 100.0f) * 6.28f;
+
+		fallingLeaves_.emplace_back(std::move(leaf));
+	}
+}
+
+void Grass::GrowthLeaves(int count)
+{
+	for (int i = 0; i < count; ++i) {
+		FallingLeaf leaf;
+		leaf.obj = std::make_unique<Object3d>();
+		leaf.obj->Initialize();
+		leaf.obj->SetModel("leaf.obj");
+
+		leaf.wt = std::make_unique<WorldTransform>();
+		leaf.wt->Initialize();
+		leaf.wt->translation_ = worldTransform_.translation_ + Vector3{ ((rand() % 100) / 100.0f - 0.5f) * 4.0f, 1.0f, 0.0f };
 		leaf.wt->scale_ = { 1.5f, 1.5f, 1.5f };
 
 		// 初期落下速度はほぼ0（ふわふわ）

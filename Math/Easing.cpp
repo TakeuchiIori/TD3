@@ -45,6 +45,8 @@ float Easing::ease(Function func, float x) {
     case Function::EaseOutBounce: return easeOutBounce(x);
     case Function::EaseInOutBounce: return easeInOutBounce(x);
 
+    case Function::EaseOutGrowBounce: return easeOutGrowBounce(x);
+
     default: return x; // デフォルトは線形
     }
 }
@@ -92,7 +94,11 @@ Easing::Function Easing::functionFromString(const std::string& name) {
 
         {"easeInBounce", Function::EaseInBounce},
         {"easeOutBounce", Function::EaseOutBounce},
-        {"easeInOutBounce", Function::EaseInOutBounce}
+        {"easeInOutBounce", Function::EaseInOutBounce},
+
+	    {"easeOutGrowBounce", Function::EaseOutGrowBounce}
+
+
     };
 
     auto it = functionMap.find(name);
@@ -251,4 +257,23 @@ float Easing::easeInOutBounce(float x) {
     return x < 0.5f
         ? (1.0f - easeOutBounce(1.0f - 2.0f * x)) / 2.0f
         : (1.0f + easeOutBounce(2.0f * x - 1.0f)) / 2.0f;
+}
+
+float Easing::easeOutGrowBounce(float t)
+{
+    // クランプして安全に（念のため）
+    t = std::clamp(t, 0.0f, 1.0f);
+
+    if (t < 0.2f) {
+        // 前半：急激に成長（1.6倍まで）
+        float f = t / 0.2f;
+        float grow = (1.0f - powf(1.0f - f, 2.0f)) * 0.6f; // 0〜0.6の範囲で増加
+        return 1.0f + grow;
+    } else {
+        // 後半：バウンドしながら1.0に収束
+        float f = (t - 0.2f) / 0.8f; // 0〜1
+        float damping = powf(1.0f - f, 2.0f); // 減衰（指数は安定的な2.0）
+        float bounce = sinf(f * 8.0f * PI) * damping * 0.3f; // 周期と振幅を調整
+        return 1.0f + bounce;
+    }
 }
