@@ -11,6 +11,10 @@
 #include "Collision/Core/CollisionManager.h"
 #include "../Graphics/Culling/OcclusionCullingManager.h"
 
+// App
+#include "../Application/SystemsApp/AppAudio/AudioVolumeManager.h"
+#include "../Application/SpriteApp/ScreenApp/MenuOverlay.h"
+
 // C++
 #include <cstdlib>
 #include <ctime>
@@ -37,7 +41,7 @@ void GameScene::Initialize()
 
 	CollisionManager::GetInstance()->Initialize();
 
-
+	MenuOverlay::GetInstance()->Initialize();
 
 	followCamera_.Initialize();
 	debugCamera_.Initialize();
@@ -79,6 +83,8 @@ void GameScene::Initialize()
 	// 音量の設定（0.0f ～ 1.0f）
 	Audio::GetInstance()->SetVolume(sourceVoice, 0.1f); // 80%の音量に設定
 
+	AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoice, kBGM);
+
 
 	gameScreen_ = std::make_unique<GameScreen>();
 	gameScreen_->SetCamera(sceneCamera_.get());
@@ -101,29 +107,41 @@ void GameScene::Update()
 	GameTime::ImGui();
 	gameScreen_->SetCheckPoint(stageManager_->GetCheckPoint());
 #ifdef _DEBUG
-	if ((Input::GetInstance()->TriggerKey(DIK_LCONTROL)) || Input::GetInstance()->IsPadTriggered(0, GamePadButton::RT)) {
+	if ((Input::GetInstance()->TriggerKey(DIK_LCONTROL)) || Input::GetInstance()->IsPadTriggered(0, GamePadButton::RT)) 
+	{
 		isDebugCamera_ = !isDebugCamera_;
 	}
 	stageEditor_->DrawEditorUI();
 #endif // _DEBUG
 
 	// クリアしたとき
-	if (stageManager_->IsClear()) {
+	if (stageManager_->IsClear()) 
+	{
 		sceneManager_->ChangeScene("Clear");
 	}
 	// プレイ中
 	else
 	{
-		mpInfo_->Update();
 
-
-
-		if(!stageManager_->CheckPointTransition())
+		MenuOverlay::GetInstance()->ShowHide();
+		if (MenuOverlay::GetInstance()->IsVisible())
 		{
-			if (!isDebugCamera_) {
-				stageManager_->NotDebugCameraUpdate();
+			MenuOverlay::GetInstance()->Update();
+		}
+		else
+		{
+			mpInfo_->Update();
+
+
+
+			if (!stageManager_->CheckPointTransition())
+			{
+				if (!isDebugCamera_)
+				{
+					stageManager_->NotDebugCameraUpdate();
+				}
+				stageManager_->Update();
 			}
-			stageManager_->Update();
 		}
 
 	}
@@ -136,7 +154,7 @@ void GameScene::Update()
 	UpdateCameraMode();
 	UpdateCamera();
 
-
+	TestVolumeChange();
 
 
 	ShowImGui();
@@ -202,6 +220,27 @@ void GameScene::DrawOffScreen()
 
 }
 
+#ifdef _DEBUG
+void GameScene::TestVolumeChange()
+{
+	/*static float masterVolume = 1.0f;
+	static float bgmVolume = 1.0f;
+	static float seVolume = 1.0f;
+	static float uiVolume = 1.0f;
+	ImGui::Begin("VolumeChange");
+	ImGui::SliderFloat("masterVolume", &masterVolume, 0.0f, 1.0f);
+	ImGui::SliderFloat("bgmVolume", &bgmVolume, 0.0f, 1.0f);
+	ImGui::SliderFloat("seVolume", &seVolume, 0.0f, 1.0f);
+	ImGui::SliderFloat("uiVolume", &uiVolume, 0.0f, 1.0f);
+	ImGui::End();
+	AudioVolumeManager::GetInstance()->SetVolume(kMaster, masterVolume);
+	AudioVolumeManager::GetInstance()->SetVolume(kBGM, bgmVolume);
+	AudioVolumeManager::GetInstance()->SetVolume(kSE, seVolume);
+	AudioVolumeManager::GetInstance()->SetVolume(kUISound, uiVolume);*/
+}
+#endif // _DEBUG
+
+
 void GameScene::DrawObject()
 {
 	giraffe_->Draw();
@@ -214,11 +253,14 @@ void GameScene::DrawSprite()
 {
 	gameScreen_->Draw();
 	stageManager_->DrawTransition();
+	if (MenuOverlay::GetInstance()->IsVisible()) {
+		MenuOverlay::GetInstance()->Draw();
+	}
 }
 
 void GameScene::DrawAnimation()
 {
-
+	stageManager_->DrawAnimation();
 }
 
 void GameScene::DrawLine()
@@ -236,7 +278,7 @@ void GameScene::DrawLine()
 void GameScene::Finalize()
 {
 	cameraManager_.RemoveCamera(sceneCamera_);
-	Audio::GetInstance()->StopAudio(sourceVoice);
+	Audio::GetInstance()->PauseAudio(sourceVoice);
 }
 
 

@@ -121,6 +121,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Objects\Book\Book.cpp" />
     <ClCompile Include="Application\SystemsApp\Cameras\BookEventCamera\BookEventCamera.cpp" />
     <ClCompile Include="Application\SystemsApp\Cameras\DefaultCamera\DefaultCamera.cpp" />
+    <ClCompile Include="Application\SystemsApp\AppAudio\AudioVolumeManager.cpp" />
     <ClCompile Include="Engine\Generators\OffScreen\OffScreen.cpp" />
     <ClCompile Include="Engine\Graphics\Culling\OcclusionCullingManager.cpp" />
     <ClCompile Include="Engine\Utility\Collision\AABB\AABBCollider.cpp" />
@@ -214,6 +215,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Objects\Player\PlayerHaert.cpp" />
     <ClCompile Include="Application\Objects\Player\TitlePlayer.cpp" />
     <ClCompile Include="Application\SpriteApp\ScreenApp\TitleScreen.cpp" />
+    <ClCompile Include="Application\SpriteApp\ScreenApp\MenuOverlay.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -228,6 +230,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Objects\Book\Book.h" />
     <ClInclude Include="Application\SystemsApp\Cameras\BookEventCamera\BookEventCamera.h" />
     <ClInclude Include="Application\SystemsApp\Cameras\DefaultCamera\DefaultCamera.h" />
+    <ClInclude Include="Application\SystemsApp\AppAudio\AudioVolumeManager.h" />
     <ClInclude Include="Engine\Generators\OffScreen\OffScreen.h" />
     <ClInclude Include="Engine\Graphics\Culling\OcclusionCullingManager.h" />
     <ClInclude Include="Engine\Utility\Collision\AABB\AABBCollider.h" />
@@ -326,6 +329,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Objects\Player\PlayerMapCollision.h" />
     <ClInclude Include="Application\Objects\Player\PlayerBody.h" />
     <ClInclude Include="Application\Objects\Player\PlayerHaert.h" />
+    <ClInclude Include="Application\SpriteApp\ScreenApp\MenuOverlay.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Application\Objects\EnemyManager\SideEnemy.h" />
     <ClInclude Include="Application\SystemsApp\Picture\Picture.h" />
@@ -384,6 +388,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Resources\shaders\Particle.VS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect\Blur\RadialBlur.PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>

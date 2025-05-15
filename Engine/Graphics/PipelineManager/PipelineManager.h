@@ -78,8 +78,6 @@ private:
 	/// <summary>
 	/// オフスクリーン用のパイプライン
 	/// </summary>
-	//void CreatePSO_OffScreen();
-
 	void CreatePSO_BaseOffScreen(
 		const std::wstring& pixelShaderPath = L"",
 		const std::string& pipelineKey = ""
@@ -96,7 +94,10 @@ private:
 		const std::wstring& pixelShaderPath = L"",
 		const std::string& pipelineKey = ""
 	);
-
+	void CreatePSO_RadialBlur(
+		const std::wstring& pixelShaderPath = L"",
+		const std::string& pipelineKey = ""
+	);
 
 public:
 

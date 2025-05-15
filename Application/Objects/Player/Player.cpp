@@ -4,6 +4,10 @@
 #include <algorithm>
 
 #include "Collision/Core/CollisionManager.h"
+#include "../Generators/OffScreen/OffScreen.h"
+#include "Systems/GameTime/GameTIme.h"
+
+#include "../Application/SystemsApp/AppAudio/AudioVolumeManager.h"
 
 #ifdef _DEBUG
 #include "imgui.h"
@@ -17,11 +21,11 @@ Player::~Player()
 	//aabbCollider_->~AABBCollider();
 	obbCollider_->~OBBCollider();
 	nextAabbCollider_->~AABBCollider();
-	Audio::GetInstance()->StopAudio(sourceVoiceGrow);
-	Audio::GetInstance()->StopAudio(sourceVoiceBoost);
-	Audio::GetInstance()->StopAudio(sourceVoiceDamage);
-	Audio::GetInstance()->StopAudio(sourceVoiceEat);
-	Audio::GetInstance()->StopAudio(sourceVoiceYodare);
+	Audio::GetInstance()->PauseAudio(sourceVoiceGrow);
+	Audio::GetInstance()->PauseAudio(sourceVoiceBoost);
+	Audio::GetInstance()->PauseAudio(sourceVoiceDamage);
+	Audio::GetInstance()->PauseAudio(sourceVoiceEat);
+	Audio::GetInstance()->PauseAudio(sourceVoiceYodare);
 }
 
 void Player::Initialize(Camera* camera)
@@ -49,8 +53,9 @@ void Player::Initialize(Camera* camera)
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("head.obj");
+	obj_->SetModel("kirin_yodare.gltf",true);
 	obj_->SetMaterialColor(defaultColorV4_);
+	//obj_->SetLoopAnimation(true);  無限ループ再生
 
 	for (size_t i = 0; i < kMaxHP_; ++i)
 	{
@@ -108,8 +113,10 @@ void Player::InitCollision()
 
 void Player::InitJson()
 {
-	jsonManager_ = std::make_unique<JsonManager>("playerObj", "Resources/JSON/");
+	jsonManager_ = std::make_unique<JsonManager>("Obj", "Resources/JSON/");
 	jsonManager_->SetCategory("Objects");
+	jsonManager_->SetSubCategory("Player");
+	jsonManager_->Register("位置", &worldTransform_.translation_);
 	jsonManager_->Register("通常時の移動速度",&defaultSpeed_);
 	jsonManager_->Register("ブースト時の速度", &boostSpeed_);
 	jsonManager_->Register("帰還時の速度", &returnSpeed_);
@@ -126,13 +133,20 @@ void Player::InitJson()
 	jsonManager_->Register("通常の草の回復量(sec)", &grassTime_);
 	jsonManager_->Register("大きい草の回復量(sec)", &largeGrassTime_);
 
+	jsonManager_->Register("方向転換できるまでの距離", &moveInterval_);
+
 	jsonCollider_ = std::make_unique<JsonManager>("playerCollider", "Resources/JSON/");
 	//aabbCollider_->InitJson(jsonCollider_.get());
 }
 
 void Player::Update()
 {
+	canSpitting_ = false;
 	beforebehavior_ = behavior_;
+
+	if (input_->IsPadTriggered(0, GamePadButton::B)) {
+		obj_->GetModel()->PlayAnimation();
+	}
 
 	// 各行動の初期化
 	BehaviorInitialize();
@@ -158,6 +172,7 @@ void Player::Update()
 	UpdateMatrices();
 	
 	//aabbCollider_->Update();
+	obj_->UpdateAnimation();
 	obbCollider_->Update();
 	nextAabbCollider_->Update();
 	
@@ -168,7 +183,7 @@ void Player::Update()
 
 void Player::Draw()
 {
-	obj_->Draw(camera_, modelWT_);
+	
 
 	for (const auto& body : playerBodys_) 
 	{
@@ -184,6 +199,11 @@ void Player::Draw()
 	{
 		haerts_[i]->Draw();
 	}
+}
+
+void Player::DrawAnimation()
+{
+	obj_->Draw(camera_, modelWT_);
 }
 
 void Player::DrawCollision()
@@ -249,6 +269,7 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 		{
 			// オーディオの再生
 			sourceVoiceEat = Audio::GetInstance()->SoundPlayAudio(soundDataEat, false);
+			AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceEat, kSE);
 			if (kMaxGrassGauge_ > grassGauge_ && createGrassTimer_ <= 0)
 			{
 				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.1f)
@@ -279,13 +300,6 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 			}
 		}
 
-
-		/*if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
-		{
-			TakeDamage();
-		}*/
-
-
 		if (behavior_ != BehaviorPlayer::Boost)
 		{
 			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kBranch))
@@ -300,14 +314,6 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 {
 	if (behavior_ == BehaviorPlayer::Moving || behavior_ == BehaviorPlayer::Boost)
 	{
-		if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kNextFramePlayer))
-		{
-			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody)) // 体に当たったら
-			{
-				isCollisionBody = true;
-				TakeDamage();
-			}
-		}
 		if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
 		{
 			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrowthArea)) // 草の成長エリア
@@ -317,9 +323,11 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 				{
 						// 唾を吐く
 						sourceVoiceYodare = Audio::GetInstance()->SoundPlayAudio(soundDataYodare, false);
+						AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceYodare, kSE);
 						//emitter_->EmitFromTo(worldTransform_.translation_, other->GetWorldTransform().translation_);
 						// オーディオの再生
 						sourceVoiceGrow = Audio::GetInstance()->SoundPlayAudio(soundDataGrow, false);
+						AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceGrow, kSE);
 				}
 			}
 		}
@@ -376,6 +384,23 @@ void Player::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDi
 			}
 		}
 	}
+
+	if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kNextFramePlayer))
+	{
+		if (behavior_ == BehaviorPlayer::Moving || behavior_ == BehaviorPlayer::Boost)
+		{
+			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody))
+			{
+				HitDirection hitDir = Collision::GetSelfLocalHitDirection(self, other);
+				if (hitDir == HitDirection::Top)
+				{
+					isCollisionBody = true;
+					TakeDamage();
+				}
+			}
+
+		}
+	}
 }
 
 #pragma endregion
@@ -413,7 +438,47 @@ void Player::Move()
 		stick = {};
 	}
 
+	if(Length(moveHistory_.back() - worldTransform_.translation_) >= moveInterval_ || isCollisionBody) ChangeDir();
+	
 
+	moveDirection_ = Normalize(moveDirection_);
+
+	if(beforeDirection_ == moveDirection_)
+	{
+		velocity_ += moveDirection_ * speed_;
+	}
+
+
+	Vector3 newPos = worldTransform_.translation_;
+	newPos = worldTransform_.translation_ + velocity_;
+
+	mpCollision_.DetectAndResolveCollision(
+		colliderRect_,  // 衝突判定用矩形
+		newPos,    // 更新される位置（衝突解決後）
+		velocity_,      // 更新される速度
+		MapChipCollision::CollisionFlag::All,  // すべての方向をチェック
+		[this](const CollisionInfo& info) {
+			// 衝突時の処理（例：特殊ブロック対応）
+			MapChipOnCollision(info);
+		}
+	);
+
+	if (isCollisionBody && beforeDirection_ == moveDirection_)
+	{
+		newPos = worldTransform_.translation_;
+		velocity_ = { 0,0,0 };
+		isCollisionBody = false;
+	}
+
+	worldTransform_.translation_ = newPos;
+	nextWorldTransform_.translation_ = newPos + velocity_;
+
+	ExtendBody();
+
+}
+
+void Player::ChangeDir()
+{
 	if ((input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP)) &&
 		moveDirection_ != Vector3{ 0,1,0 } &&
 		moveDirection_ != Vector3{ 0,-1,0 })
@@ -446,13 +511,13 @@ void Player::Move()
 		{
 			RightBody();
 		}
-		else if(moveDirection_ != Vector3{ -1,0,0 } &&
-				moveDirection_ != Vector3{ 1,0,0 })
+		else if (moveDirection_ != Vector3{ -1,0,0 } &&
+			moveDirection_ != Vector3{ 1,0,0 })
 		{
 			LeftBody();
 		}
 	}
-	else if(stick.x != 0 || stick.y != 0)
+	else if (stick.x != 0 || stick.y != 0)
 	{
 		if (stick.y > 0 &&
 			moveDirection_ != Vector3{ 0,1,0 } &&
@@ -460,51 +525,12 @@ void Player::Move()
 		{
 			UpBody();
 		}
-		else if(moveDirection_ != Vector3{ 0,-1,0 } &&
-				moveDirection_ != Vector3{ 0,1,0 })
+		else if (moveDirection_ != Vector3{ 0,-1,0 } &&
+			moveDirection_ != Vector3{ 0,1,0 })
 		{
 			DownBody();
 		}
 	}
-
-	moveDirection_ = Normalize(moveDirection_);
-
-	if(beforeDirection_ == moveDirection_)
-	{
-		velocity_ += moveDirection_ * speed_;
-	}
-
-
-	Vector3 newPos = worldTransform_.translation_;
-	newPos = worldTransform_.translation_ + velocity_;
-
-	if (isCollisionBody && beforeDirection_ == moveDirection_)
-	{
-		newPos = worldTransform_.translation_;
-		velocity_ = { 0,0,0 };
-		TakeDamage();
-	}
-	else
-	{
-		isCollisionBody = false;
-	}
-
-	mpCollision_.DetectAndResolveCollision(
-		colliderRect_,  // 衝突判定用矩形
-		newPos,    // 更新される位置（衝突解決後）
-		velocity_,      // 更新される速度
-		MapChipCollision::CollisionFlag::All,  // すべての方向をチェック
-		[this](const CollisionInfo& info) {
-			// 衝突時の処理（例：特殊ブロック対応）
-			MapChipOnCollision(info);
-		}
-	);
-
-	worldTransform_.translation_ = newPos;
-	nextWorldTransform_.translation_ = newPos + velocity_;
-
-	ExtendBody();
-
 }
 
 #pragma region // 体が伸びる向き決定
@@ -746,6 +772,7 @@ void Player::TakeDamage()
 
 			// オーディオの再生
 			sourceVoiceDamage = Audio::GetInstance()->SoundPlayAudio(soundDataDamage, false);
+			AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceDamage, kSE);
 			if (HP_ <= 0)
 			{
 				extendTimer_ = 0;
@@ -963,13 +990,22 @@ void Player::BehaviorBoostInit()
 	boostTimer_ = kBoostTime_;
 	invincibleTimer_ = kBoostTime_; // ブースト中無敵に
 	sourceVoiceBoost = Audio::GetInstance()->SoundPlayAudio(soundDataBoost, false);
+	OffScreen::RadialBlurPrams blurPrams;
+	blurPrams.center = { 0.0f,0.0f };
+	blurPrams.direction = { 0.0f,-1.0f };
+	blurPrams.isRadial = false;
+	blurPrams.sampleCount = 5;
+	blurPrams.width = 0.01f;
+
+	OffScreen::GetInstance()->StartBlurMotion(blurPrams);
+	AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceBoost, kSE);
 }
 
 void Player::BehaviorBoostUpdate()
 {
 	Move();
 
-	
+	OffScreen::GetInstance()->UpdateBlur(GameTime::GetDeltaTime());
 
 	if (0 >= boostTimer_)
 	{
@@ -989,6 +1025,7 @@ void Player::BehaviorReturnInit()
 	moveDirection_ = { 0,0,0 };
 	isCollisionBody = false;
 	TimerZero();
+	OffScreen::GetInstance()->SetEffectType(OffScreen::OffScreenEffectType::Copy);
 }
 
 void Player::BehaviorReturnUpdate()

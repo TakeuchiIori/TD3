@@ -186,12 +186,10 @@ Audio::SoundData Audio::LoadAudio(const wchar_t* filename)
     return soundData;
 }
 
-void Audio::StopAudio(IXAudio2SourceVoice* pSourceVoice)
+void Audio::PauseAudio(IXAudio2SourceVoice* pSourceVoice)
 {
 	if (pSourceVoice) {
 		pSourceVoice->Stop();
-		pSourceVoice->DestroyVoice();
-		pSourceVoice = nullptr;
 	}
 }
 

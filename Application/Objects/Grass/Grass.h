@@ -6,6 +6,7 @@
 #include "Collision/Sphere/SphereCollider.h"
 #include "Collision/AABB/AABBCollider.h"
 #include "Loaders/Json/JsonManager.h"
+#include "Easing.h"
 
 // Collision
 #include "Collision/Sphere/SphereCollider.h"
@@ -69,10 +70,10 @@ public:
 				isLarge_ = false;
 				behaviortRquest_ = BehaviorGrass::Repop;
 			}
-		}
-		else
-		{
-			growthWait_ = false;
+			if (!isLarge_)
+			{
+				aabbGrowthCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kGrowthArea));
+			}
 		}
 	}
 
@@ -171,7 +172,8 @@ private: // ふるまい
 
 	
 	void DropLeaves(int count);
-
+	void GrowthLeaves(int count);
+	Vector3 LerpGrass(const Vector3& start, const Vector3& end, float t, Easing::Function easingFunc);
 
 public: // getter & setter
 	void SetPos(Vector3 pos);
@@ -192,6 +194,8 @@ public: // getter & setter
 
 	void StartFalling() { behaviortRquest_ = BehaviorGrass::Falling; }
 
+	void SetBehaviorrequest(BehaviorGrass behavior){behaviortRquest_ = behavior;}
+
 private:
 	Player* player_ = nullptr;
 	Input* input_ = nullptr;
@@ -209,13 +213,13 @@ private:
 	// 枝
 	std::unique_ptr<Branch> branch_;
 
-	Vector3 defaultColor_ = { 0.3f,1.0f,0.3f };
+	Vector3 defaultColor_ = { 1.0f,1.0f,1.0f };
 	Vector3 growthColor_ = { 0.3f,0.3f,1.0f };
 
 	const float deltaTime_ = 1.0f / 60.0f; // 仮対応
 
-	Vector3 defaultScale_ = { 0.8f,0.8f,0.8f };
-	Vector3 growthScale_ = { 1.2f,1.2f,1.2f };
+	Vector3 defaultScale_ = { 2.0f,2.0f,2.0f };
+	Vector3 growthScale_ = { 3.0f,3.0f,3.0f };
 	float growthAreaScaleF_ = 4.5f;
 
 	// 食べる処理

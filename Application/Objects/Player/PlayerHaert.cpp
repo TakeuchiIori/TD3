@@ -6,7 +6,7 @@ void PlayerHaert::Initialize(Camera* camera)
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
-	worldTransform_.scale_ = { 1.8f,1.8f,1.8f };
+	worldTransform_.scale_ = { 2.5f,2.5f,2.5f };
 
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();

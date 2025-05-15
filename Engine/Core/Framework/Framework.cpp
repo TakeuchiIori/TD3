@@ -1,5 +1,8 @@
 #include "Framework.h"
 
+// App
+#include "../Application/SystemsApp/AppAudio/AudioVolumeManager.h"
+
 void Framework::Initialize()
 {
 	// ウィンドウ生成
@@ -17,6 +20,9 @@ void Framework::Initialize()
 	// サウンド生成
 	audio_ = Audio::GetInstance();
 	audio_->Initialize();
+
+	// サウンドボリューム管理クラス
+	AudioVolumeManager::GetInstance()->Initialize();
 
 	// ImGui生成
 	imguiManager_ = ImGuiManager::GetInstance();
@@ -74,6 +80,7 @@ void Framework::Finalize()
 	SceneManager::GetInstance()->Finalize();
 	textureManager_->Finalize();
 	srvManager_->Finalize();
+	AudioVolumeManager::GetInstance()->Finalize();
 	audio_->Finalize();
 	input_->Finalize();
 	winApp_->Finalize();

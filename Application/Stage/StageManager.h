@@ -26,6 +26,8 @@ public:
 	/// </summary>
 	void Draw();
 
+	void DrawAnimation();
+
 	void DrawCollision();
 
 	void DrawTransition();
@@ -74,7 +76,7 @@ private:
 
 	float cameraScrollStart_ = 16.0f;
 	float cameraScrollEnd_ = 22.0f;
-	float offsetY_ = 2.0f;
+	float offsetY_ = -0.5f;
 
 	bool isTransition_ = false; // ポイント遷移中か
 

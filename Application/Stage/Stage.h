@@ -47,7 +47,7 @@ public:
 	/// 描画
 	/// </summary>
 	void Draw();
-
+	void DrawAnimation();
 	void DrawCollision();
 
 	// チェックポイントにたどり着いたときの処理

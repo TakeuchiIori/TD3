@@ -13,11 +13,11 @@ void MyGame::Initialize()
 	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());
 	SceneManager::GetInstance()->SetTransitionFactory(std::make_unique<FadeTransitionFactory>());
 	SceneManager::GetInstance()->Initialize();
-	offScreen_ = std::make_unique<OffScreen>();
-	offScreen_->SetEffectType(OffScreen::OffScreenEffectType::Copy);
+	offScreen_ = OffScreen::GetInstance();
 	offScreen_->Initialize();
+	//offScreen_->SetEffectType(OffScreen::OffScreenEffectType::RadialBlur);
 #ifdef _DEBUG
-	SceneManager::GetInstance()->ChangeScene("Title");
+	SceneManager::GetInstance()->ChangeScene("Game");
 #else
 	SceneManager::GetInstance()->ChangeScene("Title");
 #endif

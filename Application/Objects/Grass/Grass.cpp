@@ -1,6 +1,7 @@
 #include "Grass.h"
 
-//
+// Enging
+
 
 
 
@@ -161,15 +162,18 @@ void Grass::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
 	if(self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrass))
 	{
-		if (player_->behavior_ != BehaviorPlayer::Return)
+		if (behavior_ == BehaviorGrass::Root)
 		{
-			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
+			if (player_->behavior_ != BehaviorPlayer::Return)
 			{
-				DropLeaves(10);
-				//worldTransform_.scale_ = { 0.0f,0.0f,0.0f };
-				aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
-				enter++;
-				behaviortRquest_ = BehaviorGrass::Eaten;
+				if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
+				{
+					DropLeaves(10);
+					//worldTransform_.scale_ = { 0.0f,0.0f,0.0f };
+					aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
+					enter++;
+					behaviortRquest_ = BehaviorGrass::Eaten;
+				}
 			}
 		}
 	}
@@ -181,12 +185,14 @@ void Grass::OnCollision(BaseCollider* self, BaseCollider* other)
 	{
 		if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrowthArea))
 		{
-			if (behavior_ != BehaviorGrass::Eaten)
+			if (behavior_ != BehaviorGrass::Eaten && behavior_ != BehaviorGrass::Growth)
 			{
-				if (player_->behavior_ != BehaviorPlayer::Return)
+				if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
 				{
-					if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
+					if (player_->behavior_ != BehaviorPlayer::Return)
 					{
+
+						obj_->SetModel("leafRed.obj");
 						if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
 						{
 							if (worldTransform_.scale_.x != 0.0f) {
@@ -204,6 +210,13 @@ void Grass::OnCollision(BaseCollider* self, BaseCollider* other)
 
 void Grass::OnExitCollision(BaseCollider* self, BaseCollider* other)
 {
+	if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrowthArea))
+	{
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
+		{
+			obj_->SetModel("grass.obj");
+		}
+	}
 }
 
 void Grass::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
@@ -297,6 +310,8 @@ void Grass::BehaviorEatenInit()
 {
 	eatenTimer_ = kEatenTime_;
 	eatenStartScale_ = worldTransform_.scale_;
+	aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
+	aabbGrowthCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
 }
 
 void Grass::BehaviorEatenUpdate()
@@ -306,18 +321,21 @@ void Grass::BehaviorEatenUpdate()
 		float t = 1.0f - eatenTimer_ / kEatenTime_;
 
 		// スケールを0に向かって補間
-		worldTransform_.scale_ = Lerp(eatenStartScale_, { 0.0f, 0.0f, 0.0f }, t);
+		worldTransform_.scale_ = LerpGrass(eatenStartScale_, { 0.0f, 0.0f, 0.0f }, t,Easing::Function::Linear);
 	} else {
 		// 補間完了後はRootに戻す（またはそのまま消えるならDeleteでもOK）
 		worldTransform_.scale_ = { 0.0f, 0.0f, 0.0f };
-		//behaviortRquest_ = BehaviorGrass::Root;
 	}
 }
 
 void Grass::BehaviorGrowthInit()
 {
-	growthWait_ = true;
+	growthWait_ = false;
 	growthTimer_ = kGrowthTime_;
+	aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
+	aabbGrowthCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
+	obj_->SetModel("grass.obj");
+	GrowthLeaves(20);
 }
 
 void Grass::BehaviorGrowthUpdate()
@@ -329,12 +347,12 @@ void Grass::BehaviorGrowthUpdate()
 			growthTimer_ -= deltaTime_;
 			float t = 1.0f - growthTimer_ / kGrowthTime_;
 
-			worldTransform_.scale_ = Lerp(defaultScale_, growthScale_, t);
+			worldTransform_.scale_ = LerpGrass(defaultScale_, growthScale_, t, Easing::Function::EaseOutGrowBounce);
 		}
 		else
 		{
 			isLarge_ = true;
-			behaviortRquest_ = BehaviorGrass::Root;
+			if(player_->behavior_ == BehaviorPlayer::Return) behaviortRquest_ = BehaviorGrass::Root;
 		}
 	}
 }
@@ -344,6 +362,8 @@ void Grass::BehaviorRepopInit()
 	worldTransform_.scale_ = { 0.0f, 0.0f, 0.0f }; // ここもスケール初期化しといた方が無難
 	repopWait_ = false;
 	repopTimer_ = kRepopTime_;
+	aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
+	DropLeaves(20);
 }
 
 void Grass::BehaviorRepopUpdate()
@@ -356,7 +376,7 @@ void Grass::BehaviorRepopUpdate()
 	{
 		repopTimer_ -= deltaTime_;
 		float t = 1.0f - repopTimer_ / kRepopTime_;
-		worldTransform_.scale_ = Lerp(Vector3{ 0,0,0 }, defaultScale_, t);
+		worldTransform_.scale_ = LerpGrass(Vector3{ 0,0,0 }, defaultScale_, t, Easing::Function::EaseOutBack);
 	} else
 	{
 		behaviortRquest_ = BehaviorGrass::Root;
@@ -442,6 +462,49 @@ void Grass::DropLeaves(int count) {
 
 		fallingLeaves_.emplace_back(std::move(leaf));
 	}
+}
+
+void Grass::GrowthLeaves(int count)
+{
+	for (int i = 0; i < count; ++i) {
+		FallingLeaf leaf;
+		leaf.obj = std::make_unique<Object3d>();
+		leaf.obj->Initialize();
+		leaf.obj->SetModel("leaf.obj");
+
+		leaf.wt = std::make_unique<WorldTransform>();
+		leaf.wt->Initialize();
+		leaf.wt->translation_ = worldTransform_.translation_ + Vector3{ ((rand() % 100) / 100.0f - 0.5f) * 4.0f, 1.0f, 0.0f };
+		leaf.wt->scale_ = { 1.5f, 1.5f, 1.5f };
+
+		// 初期落下速度はほぼ0（ふわふわ）
+		leaf.velocity = {
+			((rand() % 100) / 100.0f - 0.5f) * 0.005f,
+			-((rand() % 10) / 100.0f + 0.005f),
+			((rand() % 100) / 100.0f - 0.5f) * 0.005f
+		};
+
+		leaf.angularVelocity = {
+			((rand() % 100) / 100.0f - 0.5f) * 0.02f,
+			((rand() % 100) / 100.0f - 0.5f) * 0.02f,
+			((rand() % 100) / 100.0f - 0.5f) * 0.02f
+		};
+
+		leaf.swingPhase = ((rand() % 100) / 100.0f) * 6.28f;
+		leaf.floatPhase = ((rand() % 100) / 100.0f) * 6.28f;
+
+		fallingLeaves_.emplace_back(std::move(leaf));
+	}
+}
+
+Vector3 Grass::LerpGrass(const Vector3& start, const Vector3& end, float t, Easing::Function easingFunc)
+{
+	float easedT = Easing::ease(easingFunc, t);
+	return {
+		start.x + (end.x - start.x) * easedT,
+		start.y + (end.y - start.y) * easedT,
+		start.z + (end.z - start.z) * easedT
+	};
 }
 
 
