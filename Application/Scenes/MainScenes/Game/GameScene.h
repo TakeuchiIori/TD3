@@ -80,10 +80,6 @@ public:
 
     Matrix4x4 GetViewProjection() override { return sceneCamera_->viewProjectionMatrix_; }
 
-#ifdef _DEBUG
-    void TestVolumeChange();
-#endif // _DEBUG
-
 
 private:
 
