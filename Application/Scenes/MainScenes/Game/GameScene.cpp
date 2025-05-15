@@ -13,6 +13,7 @@
 
 // App
 #include "../Application/SystemsApp/AppAudio/AudioVolumeManager.h"
+#include "../Application/SpriteApp/ScreenApp/MenuOverlay.h"
 
 // C++
 #include <cstdlib>
@@ -40,7 +41,7 @@ void GameScene::Initialize()
 
 	CollisionManager::GetInstance()->Initialize();
 
-
+	MenuOverlay::GetInstance()->Initialize();
 
 	followCamera_.Initialize();
 	debugCamera_.Initialize();
@@ -106,29 +107,41 @@ void GameScene::Update()
 	GameTime::ImGui();
 	gameScreen_->SetCheckPoint(stageManager_->GetCheckPoint());
 #ifdef _DEBUG
-	if ((Input::GetInstance()->TriggerKey(DIK_LCONTROL)) || Input::GetInstance()->IsPadTriggered(0, GamePadButton::RT)) {
+	if ((Input::GetInstance()->TriggerKey(DIK_LCONTROL)) || Input::GetInstance()->IsPadTriggered(0, GamePadButton::RT)) 
+	{
 		isDebugCamera_ = !isDebugCamera_;
 	}
 	stageEditor_->DrawEditorUI();
 #endif // _DEBUG
 
 	// クリアしたとき
-	if (stageManager_->IsClear()) {
+	if (stageManager_->IsClear()) 
+	{
 		sceneManager_->ChangeScene("Clear");
 	}
 	// プレイ中
 	else
 	{
-		mpInfo_->Update();
 
-
-
-		if(!stageManager_->CheckPointTransition())
+		MenuOverlay::GetInstance()->ShowHide();
+		if (MenuOverlay::GetInstance()->IsVisible())
 		{
-			if (!isDebugCamera_) {
-				stageManager_->NotDebugCameraUpdate();
+			MenuOverlay::GetInstance()->Update();
+		}
+		else
+		{
+			mpInfo_->Update();
+
+
+
+			if (!stageManager_->CheckPointTransition())
+			{
+				if (!isDebugCamera_)
+				{
+					stageManager_->NotDebugCameraUpdate();
+				}
+				stageManager_->Update();
 			}
-			stageManager_->Update();
 		}
 
 	}
@@ -210,7 +223,7 @@ void GameScene::DrawOffScreen()
 #ifdef _DEBUG
 void GameScene::TestVolumeChange()
 {
-	static float masterVolume = 1.0f;
+	/*static float masterVolume = 1.0f;
 	static float bgmVolume = 1.0f;
 	static float seVolume = 1.0f;
 	static float uiVolume = 1.0f;
@@ -223,7 +236,7 @@ void GameScene::TestVolumeChange()
 	AudioVolumeManager::GetInstance()->SetVolume(kMaster, masterVolume);
 	AudioVolumeManager::GetInstance()->SetVolume(kBGM, bgmVolume);
 	AudioVolumeManager::GetInstance()->SetVolume(kSE, seVolume);
-	AudioVolumeManager::GetInstance()->SetVolume(kUISound, uiVolume);
+	AudioVolumeManager::GetInstance()->SetVolume(kUISound, uiVolume);*/
 }
 #endif // _DEBUG
 
@@ -240,6 +253,9 @@ void GameScene::DrawSprite()
 {
 	gameScreen_->Draw();
 	stageManager_->DrawTransition();
+	if (MenuOverlay::GetInstance()->IsVisible()) {
+		MenuOverlay::GetInstance()->Draw();
+	}
 }
 
 void GameScene::DrawAnimation()
