@@ -36,6 +36,7 @@ public:
 	{
 		std::unique_ptr<Grass> grass = std::make_unique<Grass>();
 		grass->Initialize(camera_);
+		grass->SetBehaviorrequest(BehaviorGrass::Repop);
 		grass->SetPos(pos);
 		grass->SetPlayer(player_);
 		grass->SetMadeByPlayer(madeByPlayer);

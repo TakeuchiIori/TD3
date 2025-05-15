@@ -20,7 +20,8 @@ public:
         EaseInCirc,     EaseOutCirc,     EaseInOutCirc,
         EaseInBack,     EaseOutBack,     EaseInOutBack,
         EaseInElastic,  EaseOutElastic,  EaseInOutElastic,
-        EaseInBounce,   EaseOutBounce,   EaseInOutBounce
+        EaseInBounce,   EaseOutBounce,   EaseInOutBounce,
+        EaseOutGrowBounce
     };
 
     // 指定されたイージング関数で値を計算
@@ -71,6 +72,10 @@ public:
     static float easeInBounce(float x);
     static float easeOutBounce(float x);
     static float easeInOutBounce(float x);
+
+
+    //  徐々に大きくなり、最後にバウンドするイージング
+    static float easeOutGrowBounce(float t);
 
 private:
 	static constexpr float PI = std::numbers::pi_v<float>;
