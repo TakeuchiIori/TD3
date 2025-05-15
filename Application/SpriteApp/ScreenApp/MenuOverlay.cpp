@@ -1,11 +1,10 @@
 #include "MenuOverlay.h"
-
+#include "Systems/GameTime/GameTime.h"
 #include "MathFunc.h"
 
 #ifdef _DEBUG
 #include <imgui.h>
 #endif // _DEBUG
-
 
 void MenuOverlay::Initialize()
 {
@@ -86,10 +85,12 @@ void MenuOverlay::ShowHide()
 	if (isVisible_)
 	{
 		Hide();
+		GameTime::Pause();
 	}
 	else
 	{
 		Show();
+		GameTime::Resume();
 	}
 }
 
