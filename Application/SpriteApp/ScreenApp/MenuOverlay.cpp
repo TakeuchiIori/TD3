@@ -96,7 +96,7 @@ void MenuOverlay::ShowHide()
 
 void MenuOverlay::Show()
 {
-	if (input_->TriggerKey(DIK_TAB))
+	if (input_->TriggerKey(DIK_TAB) || input_->IsPadTriggered(0, GamePadButton::Start))
 	{
 		isVisible_ = true;
 	}
@@ -104,7 +104,7 @@ void MenuOverlay::Show()
 
 void MenuOverlay::Hide()
 {
-	if (input_->TriggerKey(DIK_TAB))
+	if (input_->TriggerKey(DIK_TAB) || input_->IsPadTriggered(0, GamePadButton::Start))
 	{
 		isVisible_ = false;
 	}
