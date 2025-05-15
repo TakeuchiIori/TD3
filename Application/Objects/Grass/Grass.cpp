@@ -1,6 +1,7 @@
 #include "Grass.h"
 
-//
+// Enging
+
 
 
 
@@ -320,11 +321,10 @@ void Grass::BehaviorEatenUpdate()
 		float t = 1.0f - eatenTimer_ / kEatenTime_;
 
 		// スケールを0に向かって補間
-		worldTransform_.scale_ = Lerp(eatenStartScale_, { 0.0f, 0.0f, 0.0f }, t);
+		worldTransform_.scale_ = LerpGrass(eatenStartScale_, { 0.0f, 0.0f, 0.0f }, t,Easing::Function::Linear);
 	} else {
 		// 補間完了後はRootに戻す（またはそのまま消えるならDeleteでもOK）
 		worldTransform_.scale_ = { 0.0f, 0.0f, 0.0f };
-		//behaviortRquest_ = BehaviorGrass::Root;
 	}
 }
 
@@ -346,7 +346,7 @@ void Grass::BehaviorGrowthUpdate()
 			growthTimer_ -= deltaTime_;
 			float t = 1.0f - growthTimer_ / kGrowthTime_;
 
-			worldTransform_.scale_ = Lerp(defaultScale_, growthScale_, t);
+			worldTransform_.scale_ = LerpGrass(defaultScale_, growthScale_, t, Easing::Function::EaseInOutBack);
 		}
 		else
 		{
@@ -374,7 +374,7 @@ void Grass::BehaviorRepopUpdate()
 	{
 		repopTimer_ -= deltaTime_;
 		float t = 1.0f - repopTimer_ / kRepopTime_;
-		worldTransform_.scale_ = Lerp(Vector3{ 0,0,0 }, defaultScale_, t);
+		worldTransform_.scale_ = LerpGrass(Vector3{ 0,0,0 }, defaultScale_, t, Easing::Function::EaseInOutBack);
 	} else
 	{
 		behaviortRquest_ = BehaviorGrass::Root;
@@ -460,6 +460,16 @@ void Grass::DropLeaves(int count) {
 
 		fallingLeaves_.emplace_back(std::move(leaf));
 	}
+}
+
+Vector3 Grass::LerpGrass(const Vector3& start, const Vector3& end, float t, Easing::Function easingFunc)
+{
+	float easedT = Easing::ease(easingFunc, t);
+	return {
+		start.x + (end.x - start.x) * easedT,
+		start.y + (end.y - start.y) * easedT,
+		start.z + (end.z - start.z) * easedT
+	};
 }
 
 

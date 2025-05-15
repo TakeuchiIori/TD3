@@ -6,6 +6,7 @@
 #include "Collision/Sphere/SphereCollider.h"
 #include "Collision/AABB/AABBCollider.h"
 #include "Loaders/Json/JsonManager.h"
+#include "Easing.h"
 
 // Collision
 #include "Collision/Sphere/SphereCollider.h"
@@ -171,7 +172,7 @@ private: // ふるまい
 
 	
 	void DropLeaves(int count);
-
+	Vector3 LerpGrass(const Vector3& start, const Vector3& end, float t, Easing::Function easingFunc);
 
 public: // getter & setter
 	void SetPos(Vector3 pos);
@@ -191,6 +192,8 @@ public: // getter & setter
 	bool IsDelete() { return behavior_ == BehaviorGrass::Delete; }
 
 	void StartFalling() { behaviortRquest_ = BehaviorGrass::Falling; }
+
+	void SetBehaviorrequest(BehaviorGrass behavior){behaviortRquest_ = behavior;}
 
 private:
 	Player* player_ = nullptr;
