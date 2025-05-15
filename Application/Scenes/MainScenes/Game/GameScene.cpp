@@ -154,8 +154,6 @@ void GameScene::Update()
 	UpdateCameraMode();
 	UpdateCamera();
 
-	TestVolumeChange();
-
 
 	ShowImGui();
 
