@@ -13,8 +13,6 @@
 #include "WorldTransform./WorldTransform.h"
 #include "Debugger/Logger.h"
 
-#include "Matrix4x4.h"
-
 #ifdef _DEBUG
 #include "imgui.h"
 #endif // _DEBUG
@@ -69,26 +67,24 @@ void Object3d::Draw(Camera* camera, WorldTransform& worldTransform)
 		Matrix4x4 worldViewProjectionMatrix;
 		Matrix4x4 worldMatrix;
 		if (model_) {
-			if (model_) {
-				if (camera) {
-					const Matrix4x4& viewProjectionMatrix = camera->GetViewProjectionMatrix();
+			if (camera) {
+				const Matrix4x4& viewProjectionMatrix = camera->GetViewProjectionMatrix();
 
-					const Matrix4x4& localRoot = model_->GetRootNode().GetLocalMatrix();
-					if (IsIdentityMatrix(localRoot)) {
-						// 単位行列なら何もしない（今まで通り）
-						worldViewProjectionMatrix = worldTransform.GetMatWorld() * viewProjectionMatrix;
-						worldMatrix = worldTransform.GetMatWorld();
-					} else {
-						// 回転が含まれていれば適用
-						worldViewProjectionMatrix = worldTransform.GetMatWorld() * localRoot * viewProjectionMatrix;
-						worldMatrix = worldTransform.GetMatWorld() * localRoot;
-					}
+				// 
+				if (!model_->GetHasBones()) {
+					worldViewProjectionMatrix = worldTransform.GetMatWorld() * model_->GetRootNode().GetLocalMatrix() * viewProjectionMatrix;
+					worldMatrix = worldTransform.GetMatWorld() * model_->GetRootNode().GetLocalMatrix();
 				} else {
-					worldViewProjectionMatrix = worldTransform.GetMatWorld();
+					worldViewProjectionMatrix = worldTransform.GetMatWorld() * viewProjectionMatrix;
 					worldMatrix = worldTransform.GetMatWorld();
 				}
+			} else {
+
+				worldViewProjectionMatrix = worldTransform.GetMatWorld();
+				worldMatrix = worldTransform.GetMatWorld(); // 初期化が必要
 			}
 		}
+
 		worldTransform.SetMapWVP(worldViewProjectionMatrix);
 		worldTransform.SetMapWorld(worldMatrix);
 
