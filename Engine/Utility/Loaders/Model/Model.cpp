@@ -60,6 +60,7 @@ void Model::ChangeModel(const std::string& directoryPath, const std::string& fil
 	rootNode_.reset();
 	skinCluster_.reset();
 	skeleton_.reset();
+	animation_.Reset();
 
 	isAnimation_ = isAnimation;
 
@@ -82,7 +83,7 @@ void Model::ChangeModel(const std::string& directoryPath, const std::string& fil
 	// ★ アニメーション再生を自動で行うようにする
 	animationSystem_->ResetPlay();
 	animationSystem_->RequestPlay();
-
+	animationSystem_->ResetPoseCache();
 }
 
 

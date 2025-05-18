@@ -246,3 +246,7 @@ void AnimationSystem::ResetPlay() {
 	animationTime_ = 0.0f;
 }
 
+void AnimationSystem::ResetPoseCache() {
+	initialPoseMap_.clear();
+	hasCachedInitialPose_ = false;
+}

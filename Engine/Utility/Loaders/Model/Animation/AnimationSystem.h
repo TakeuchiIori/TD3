@@ -40,6 +40,8 @@ public:
 	void RequestPlay();
 	void ResetPlay();
 
+	void ResetPoseCache();
+
 
 	// Jointの名前を除く
 	bool IsIgnoredJoint(const std::string& name);

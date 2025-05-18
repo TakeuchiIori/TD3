@@ -146,7 +146,7 @@ void Player::Update()
 
 	// Bボタンで一回だけ「食べるアニメーション」再生
 	if (!isEating_ && input_->IsPadTriggered(0, GamePadButton::B)) {
-		obj_->ChangeModel("eat_1.gltf", true);
+		obj_->ChangeModel("kirin_yodare.gltf", true);
 		isEating_ = true;
 	} else if (isEating_ && obj_->GetModel()->IsAnimationPlayFinished()) {
 		obj_->ChangeModel("kirin.gltf", true);
