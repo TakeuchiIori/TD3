@@ -135,6 +135,10 @@ void Player::InitJson()
 
 	jsonManager_->Register("方向転換できるまでの距離", &moveInterval_);
 
+	jsonManager_->Register("コンボタイマー持続秒数", &kComboTimeLimit_);
+	jsonManager_->Register("最大コンボ数", &kMaxCombo_);
+
+
 	jsonCollider_ = std::make_unique<JsonManager>("playerCollider", "Resources/JSON/");
 	//aabbCollider_->InitJson(jsonCollider_.get());
 }
@@ -167,6 +171,8 @@ void Player::Update()
 	IsPopGrass();
 
 	DamageProcessBodys();
+
+	UpdateCombo();
 
 	TimerManager();
 
@@ -286,6 +292,11 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + largeGrassTime_);
 				}
 				grassGauge_++;
+
+				// コンボ処理
+				comboCount_ = std::min(comboCount_ + 1, kMaxCombo_);
+				comboTimer_ = kComboTimeLimit_;
+
 				if (kMaxGrassGauge_ <= grassGauge_)
 				{
 					createGrassTimer_ = kCreateGrassTime_;
@@ -705,6 +716,14 @@ void Player::TimerManager()
 			body->SetColor(changeColor_);
 		}
 	}
+
+	if (comboTimer_ > 0.0f) {
+		comboTimer_ -= deltaTime_;
+		if (comboTimer_ <= 0.0f) {
+			comboCount_ = 0; // タイマー切れでリセット
+		}
+	}
+
 }
 
 void Player::TimerZero()
@@ -883,6 +902,24 @@ void Player::HeartPos()
 }
 
 #ifdef _DEBUG
+void Player::UpdateCombo()
+{
+	// コンボ数に応じた演出や処理
+	switch (comboCount_) {
+	case 1:
+
+		break;
+	case 2:
+
+		break;
+	case 3:
+
+		break;
+	default:
+		break;
+	}
+}
+}
 void Player::DebugPlayer()
 {
 	int a = static_cast<int>(moveHistory_.size());
@@ -900,12 +937,19 @@ void Player::DebugPlayer()
 	int c = HP_;
 	ImGui::Text("HP : %d", c);
 	ImGui::Text("Inv : %.2f", invincibleTimer_);
+
+
+	ImGui::Text("コンボ数：%d / %d", comboCount_, kMaxCombo_);
+	ImGui::Text("コンボタイマー：%.2f 秒", comboTimer_);
 	ImGui::End();
 
 	if (input_->TriggerKey(DIK_N))
 	{
 		EntryReturn();
 	}
+
+
+
 }
 #endif // _DEBUG
 
