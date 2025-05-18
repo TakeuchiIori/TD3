@@ -605,3 +605,17 @@ Matrix4x4 MakeLookAtMatrix(const Vector3& eye, const Vector3& target, const Vect
 
 	return result;
 }
+
+bool IsIdentityMatrix(const Matrix4x4& mat) {
+	static const Matrix4x4 identity = MakeIdentity4x4();
+	const float epsilon = 0.0001f;
+
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			if (std::abs(mat.m[i][j] - identity.m[i][j]) > epsilon) {
+				return false;
+			}
+		}
+	}
+	return true;
+}

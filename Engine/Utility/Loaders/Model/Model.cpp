@@ -35,25 +35,56 @@ void Model::Initialize(ModelCommon* modelCommon, const std::string& directorypat
 
 	animationSystem_ = std::make_unique<AnimationSystem>();
 
-	// アニメーションをするならtrue
-	if (isAnimation_) {
-		LoadAnimationFile(directorypath, filename);
-		
+	LoadAnimationFile(directorypath, filename);
 
-		if (hasBones_) {
-			// 骨の作成
-			skeleton_ = std::make_unique<Skeleton>();
-			skeleton_->Create(*rootNode_);
-			skinCluster_->CreateResource(skeleton_->GetJoints().size(), meshes_[0]->GetVertexCount(), skeleton_->GetJointMap());
-			animationSystem_->Initialize(animation_, *skeleton_, *skinCluster_, rootNode_.get());
 
-		} else {
-			animationSystem_->Initialize(animation_,rootNode_.get());
-		}
+	if (hasBones_) {
+		// 骨の作成
+		skeleton_ = std::make_unique<Skeleton>();
+		skeleton_->Create(*rootNode_);
+		skinCluster_->CreateResource(skeleton_->GetJoints().size(), meshes_[0]->GetVertexCount(), skeleton_->GetJointMap());
+		animationSystem_->Initialize(animation_, *skeleton_, *skinCluster_, rootNode_.get());
 
+	} else {
+		animationSystem_->Initialize(animation_, rootNode_.get());
 	}
 
+
+
 }
+
+void Model::ChangeModel(const std::string& directoryPath, const std::string& filename, bool isAnimation)
+{
+	meshes_.clear();
+	materials_.clear();
+	rootNode_.reset();
+	skinCluster_.reset();
+	skeleton_.reset();
+
+	isAnimation_ = isAnimation;
+
+	LoadModelIndexFile(directoryPath, filename);
+
+	animationSystem_ = std::make_unique<AnimationSystem>();
+
+
+	LoadAnimationFile(directoryPath, filename);
+
+	if (hasBones_) {
+		skeleton_ = std::make_unique<Skeleton>();
+		skeleton_->Create(*rootNode_);
+		skinCluster_->CreateResource(skeleton_->GetJoints().size(), meshes_[0]->GetVertexCount(), skeleton_->GetJointMap());
+		animationSystem_->Initialize(animation_, *skeleton_, *skinCluster_, rootNode_.get());
+	} else {
+		animationSystem_->Initialize(animation_, rootNode_.get());
+	}
+
+	// ★ アニメーション再生を自動で行うようにする
+	animationSystem_->ResetPlay();
+	animationSystem_->RequestPlay();
+
+}
+
 
 void Model::UpdateAnimation()
 {
@@ -171,7 +202,8 @@ void Model::LoadAnimationFile(const std::string& directoryPath, const std::strin
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(fullPath.c_str(), 0);
 	if (!scene || scene->mNumAnimations == 0) {
-		throw std::runtime_error("Not AnimationFile: " + fullPath);
+		isAnimation_ = false;
+		return;
 	}
 
 	// アニメーションの読み込み
@@ -180,6 +212,7 @@ void Model::LoadAnimationFile(const std::string& directoryPath, const std::strin
 	// バイナリファイルに保存・ファイル作成
 	animation_.SaveToBinary(cachePath);
 	animationCache_[fullPath] = animation_;
+	isAnimation_ = true;
 }
 
 

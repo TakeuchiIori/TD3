@@ -53,7 +53,7 @@ void Player::Initialize(Camera* camera)
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("kirin_yodare.gltf",true);
+	obj_->SetModel("kirin.gltf",true);
 	obj_->SetMaterialColor(defaultColorV4_);
 	//obj_->SetLoopAnimation(true);  無限ループ再生
 
@@ -144,8 +144,13 @@ void Player::Update()
 	canSpitting_ = false;
 	beforebehavior_ = behavior_;
 
-	if (input_->IsPadTriggered(0, GamePadButton::B)) {
-		obj_->GetModel()->PlayAnimation();
+	// Bボタンで一回だけ「食べるアニメーション」再生
+	if (!isEating_ && input_->IsPadTriggered(0, GamePadButton::B)) {
+		obj_->ChangeModel("kirin_yodare.gltf", true);
+		isEating_ = true;
+	} else if (isEating_ && obj_->GetModel()->IsAnimationPlayFinished()) {
+		obj_->ChangeModel("kirin.gltf", true);
+		isEating_ = false;
 	}
 
 	// 各行動の初期化

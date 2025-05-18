@@ -243,6 +243,7 @@ private:
 	bool isCollisionBody = false;
 
 	bool isRed_ = false;
+	bool isEating_ = false;
 
 
 	const Vector4 defaultColorV4_ = { 0.90625f,0.87109f,0.125f,1.0f };

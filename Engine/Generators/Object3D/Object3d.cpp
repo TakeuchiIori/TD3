@@ -13,6 +13,8 @@
 #include "WorldTransform./WorldTransform.h"
 #include "Debugger/Logger.h"
 
+#include "Matrix4x4.h"
+
 #ifdef _DEBUG
 #include "imgui.h"
 #endif // _DEBUG
@@ -67,24 +69,26 @@ void Object3d::Draw(Camera* camera, WorldTransform& worldTransform)
 		Matrix4x4 worldViewProjectionMatrix;
 		Matrix4x4 worldMatrix;
 		if (model_) {
-			if (camera) {
-				const Matrix4x4& viewProjectionMatrix = camera->GetViewProjectionMatrix();
+			if (model_) {
+				if (camera) {
+					const Matrix4x4& viewProjectionMatrix = camera->GetViewProjectionMatrix();
 
-				// 
-				if (!model_->GetHasBones()) {
-					worldViewProjectionMatrix = worldTransform.GetMatWorld() * model_->GetRootNode().GetLocalMatrix() * viewProjectionMatrix;
-					worldMatrix = worldTransform.GetMatWorld() * model_->GetRootNode().GetLocalMatrix();
+					const Matrix4x4& localRoot = model_->GetRootNode().GetLocalMatrix();
+					if (IsIdentityMatrix(localRoot)) {
+						// 単位行列なら何もしない（今まで通り）
+						worldViewProjectionMatrix = worldTransform.GetMatWorld() * viewProjectionMatrix;
+						worldMatrix = worldTransform.GetMatWorld();
+					} else {
+						// 回転が含まれていれば適用
+						worldViewProjectionMatrix = worldTransform.GetMatWorld() * localRoot * viewProjectionMatrix;
+						worldMatrix = worldTransform.GetMatWorld() * localRoot;
+					}
 				} else {
-					worldViewProjectionMatrix = worldTransform.GetMatWorld() * viewProjectionMatrix;
+					worldViewProjectionMatrix = worldTransform.GetMatWorld();
 					worldMatrix = worldTransform.GetMatWorld();
 				}
-			} else {
-
-				worldViewProjectionMatrix = worldTransform.GetMatWorld();
-				worldMatrix = worldTransform.GetMatWorld(); // 初期化が必要
 			}
 		}
-
 		worldTransform.SetMapWVP(worldViewProjectionMatrix);
 		worldTransform.SetMapWorld(worldMatrix);
 
@@ -209,4 +213,29 @@ Object3d* Object3d::Create(Model* model)
 	newObj->Initialize();
 	newObj->model_ = model;
 	return newObj;
+}
+
+void Object3d::ChangeModel(const std::string& filePath, bool isAnimation)
+{
+	// 拡張子を取り除く処理
+	std::string basePath = filePath;
+	std::string fileName;
+	if (basePath.size() > 4) {
+		// .obj または .gltf の場合に削除
+		if (basePath.substr(basePath.size() - 4) == ".obj") {
+			basePath = basePath.substr(0, basePath.size() - 4);
+			fileName = basePath + ".obj";
+		} else if (basePath.size() > 5 && basePath.substr(basePath.size() - 5) == ".gltf") {
+			basePath = basePath.substr(0, basePath.size() - 5);
+			fileName = basePath + ".gltf";
+		}
+	}
+
+	// .obj 読み込み (第一引数には拡張子なしのパス)
+	ModelManager::GetInstance()->LoadModel(defaultModelPath_ + basePath, fileName, isAnimation);
+
+	// モデルを検索してセットする
+	model_ = ModelManager::GetInstance()->FindModel(fileName);
+
+	model_->ChangeModel(defaultModelPath_ + basePath, fileName, isAnimation);
 }
