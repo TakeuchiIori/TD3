@@ -150,7 +150,7 @@ void Player::Update()
 
 	// Bボタンで一回だけ「食べるアニメーション」再生
 	if (!isEating_ && input_->IsPadTriggered(0, GamePadButton::B)) {
-		obj_->ChangeModel("kirin_yodare.gltf", true);
+		obj_->ChangeModelAnimation("eat_2.gltf", 5);
 		isEating_ = true;
 	} else if (isEating_ && obj_->GetModel()->IsAnimationPlayFinished()) {
 		obj_->ChangeModel("kirin.gltf", true);
@@ -198,7 +198,7 @@ void Player::Draw()
 
 	for (const auto& body : playerBodys_) 
 	{
-		body->Draw();
+		//body->Draw();
 	}
 
 	for (const auto& body : stuckGrassList_) 
@@ -919,7 +919,8 @@ void Player::UpdateCombo()
 		break;
 	}
 }
-}
+
+
 void Player::DebugPlayer()
 {
 	int a = static_cast<int>(moveHistory_.size());

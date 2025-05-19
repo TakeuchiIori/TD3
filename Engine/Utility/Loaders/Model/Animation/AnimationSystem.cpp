@@ -36,8 +36,10 @@ void AnimationSystem::Update(float deltaTime)
 	float duration = animation_->GetDuration();
 
 	if (animationTime_ >= duration) {
-		if (isLoop_) {
-			animationTime_ = 0.0f; // ループ
+		++loopCounter_;
+
+		if (isLoop_ && (loopCount_ == -1 || loopCounter_ < loopCount_)) {
+			animationTime_ = 0.0f; // 次のループへ
 		} else {
 			animationTime_ = duration;
 			isPlayRequested_ = false;
@@ -51,8 +53,8 @@ void AnimationSystem::Update(float deltaTime)
 			return;
 		}
 	}
-
 }
+
 
 
 

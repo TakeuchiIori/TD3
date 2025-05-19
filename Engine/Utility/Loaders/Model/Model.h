@@ -44,6 +44,7 @@ public: // メンバ関数
 	void Initialize(ModelCommon* modelCommon, const std::string& directorypath, const std::string& filename ,bool isAnimation = false);
 
 	void ChangeModel(const std::string& directoryPath, const std::string& filename, bool isAnimation);
+	void ChangeModelAnimation(const std::string& directoryPath, const std::string& filename,int count);
 
 	/// <summary>
 	/// 更新処理

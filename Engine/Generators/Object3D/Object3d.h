@@ -73,6 +73,7 @@ public:
 	static Object3d* Create(const std::string& fileName, bool isAnimation = false);
 	static Object3d* Create(Model* model);
 	void ChangeModel(const std::string& filePath, bool isAnimation = false);
+	void ChangeModelAnimation(const std::string& filePath, int count);
 
 private:
 

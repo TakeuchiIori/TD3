@@ -51,6 +51,16 @@ public:
 	void SetLoop(bool flag) { isLoop_ = flag; }
 	bool IsLoop() const { return isLoop_; }
 
+	void SetLoopCount(int count) {
+		loopCount_ = count;
+		loopCounter_ = 0;
+		isLoop_ = true;
+	}
+
+	int GetLoopCount() const { return loopCount_; }
+	int GetCurrentLoop() const { return loopCounter_; }
+
+
 private:
 	QuaternionTransform GetTransformAnimation(const Animation& anim, const std::string& nodeName,float time);
 	void BlendAndApplyAnimation(const Animation& from, const Animation& to, float t);
@@ -73,6 +83,9 @@ private:
 	bool isPlayFinished_ = false;						
 
 	bool isLoop_ = false;								// 無限ループ
+	int loopCount_ = -1;
+	int loopCounter_ = 0;
+
 
 
 	// 初期ポーズの保存

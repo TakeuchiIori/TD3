@@ -86,6 +86,37 @@ void Model::ChangeModel(const std::string& directoryPath, const std::string& fil
 	animationSystem_->ResetPoseCache();
 }
 
+void Model::ChangeModelAnimation(const std::string& directoryPath, const std::string& filename, int count)
+{
+	meshes_.clear();
+	materials_.clear();
+	rootNode_.reset();
+	skinCluster_.reset();
+	skeleton_.reset();
+	animation_.Reset();
+
+	LoadModelIndexFile(directoryPath, filename);
+
+	animationSystem_ = std::make_unique<AnimationSystem>();
+
+
+	LoadAnimationFile(directoryPath, filename);
+
+	if (hasBones_) {
+		skeleton_ = std::make_unique<Skeleton>();
+		skeleton_->Create(*rootNode_);
+		skinCluster_->CreateResource(skeleton_->GetJoints().size(), meshes_[0]->GetVertexCount(), skeleton_->GetJointMap());
+		animationSystem_->Initialize(animation_, *skeleton_, *skinCluster_, rootNode_.get());
+	} else {
+		animationSystem_->Initialize(animation_, rootNode_.get());
+	}
+
+	// ★ アニメーション再生を自動で行うようにする
+	animationSystem_->SetLoopCount(count);
+	animationSystem_->RequestPlay();
+	animationSystem_->ResetPoseCache();
+}
+
 
 void Model::UpdateAnimation()
 {
