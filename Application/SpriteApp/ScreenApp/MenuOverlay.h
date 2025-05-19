@@ -48,6 +48,8 @@ private:
     float maxX = 100.0f;
     float intervalY_ = 30.0f;
 
+    float changeVolume_ = 2.0f;
+
     bool isView = false;
     bool isPush = false;
     struct VolumeControl
