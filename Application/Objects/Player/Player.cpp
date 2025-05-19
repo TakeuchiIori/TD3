@@ -332,13 +332,44 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 				canSpitting_ = true;
 				if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
 				{
-						// 唾を吐く
-						sourceVoiceYodare = Audio::GetInstance()->SoundPlayAudio(soundDataYodare, false);
-						AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceYodare, kSE);
-						//emitter_->EmitFromTo(worldTransform_.translation_, other->GetWorldTransform().translation_);
-						// オーディオの再生
-						sourceVoiceGrow = Audio::GetInstance()->SoundPlayAudio(soundDataGrow, false);
-						AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceGrow, kSE);
+					// 唾を吐く
+					sourceVoiceYodare = Audio::GetInstance()->SoundPlayAudio(soundDataYodare, false);
+					AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceYodare, kSE);
+					//emitter_->EmitFromTo(worldTransform_.translation_, other->GetWorldTransform().translation_);
+					// オーディオの再生
+					sourceVoiceGrow = Audio::GetInstance()->SoundPlayAudio(soundDataGrow, false);
+					AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceGrow, kSE);
+
+					if (moveDirection_ == Vector3{ 0, 1, 0 })
+					{
+						if (worldTransform_.translation_.x - other->GetCenterPosition().x >= 0)
+						{
+							worldTransform_.rotation_.y = 0;
+						}
+						else
+						{
+							worldTransform_.rotation_.y = std::numbers::pi_v<float>;
+						}
+					}
+					else if (moveDirection_ == Vector3{ 0, -1, 0 })
+					{
+						if (worldTransform_.translation_.x - other->GetCenterPosition().x >= 0)
+						{
+							worldTransform_.rotation_.y = std::numbers::pi_v<float>;
+						}
+						else
+						{
+							worldTransform_.rotation_.y = 0;
+						}
+					}
+					else if (moveDirection_ == Vector3{ 1, 0, 0 })
+					{
+
+					}
+					else if (moveDirection_ == Vector3{ -1, 0, 0 })
+					{
+
+					}
 				}
 			}
 		}
