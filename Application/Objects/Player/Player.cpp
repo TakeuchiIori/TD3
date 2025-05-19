@@ -900,14 +900,15 @@ void Player::HeartPos()
 
 void Player::UpdateCombo()
 {
+	// アニメーション再生が終わっていれば戻す処理
 	if (isEating_ && obj_->GetModel()->IsAnimationPlayFinished()) {
 		obj_->ChangeModel("kirin.gltf", true);
 		isEating_ = false;
 	}
 
-
 	// 再生中や、前回と同じコンボ数なら何もしない
 	if (isEating_ || comboCount_ == lastPlayedComboCount_) {
+		UpdateCombo1Effect(); // 再生中なら演出継続
 		return;
 	}
 
@@ -917,21 +918,76 @@ void Player::UpdateCombo()
 		obj_->ChangeModelAnimation("eat_1.gltf", 1);
 		isEating_ = true;
 		lastPlayedComboCount_ = comboCount_;
+		PlayCombo1Animation();
 		break;
 	case 2:
 		obj_->ChangeModelAnimation("eat_2.gltf", 3);
 		isEating_ = true;
 		lastPlayedComboCount_ = comboCount_;
+		ResetCombo1Effect();
 		break;
 	case 3:
 		obj_->ChangeModelAnimation("eat_3.gltf", 5);
 		isEating_ = true;
 		lastPlayedComboCount_ = comboCount_;
+		ResetCombo1Effect();
 		break;
 	default:
+		ResetCombo1Effect();
 		break;
 	}
+
+	// コンボ1演出中の処理を別関数に分離
+	UpdateCombo1Effect();
+
+	// コンボタイマー処理
+	if (comboTimer_ > 0.0f) {
+		comboTimer_ -= deltaTime_;
+		if (comboTimer_ <= 0.0f) {
+			comboCount_ = 0;
+			lastPlayedComboCount_ = 0;
+			ResetCombo1Effect();
+		}
+	}
 }
+
+void Player::PlayCombo1Animation()
+{
+	comboInfo_.isCombo1Rotating_ = true;
+	comboInfo_.comboSinTime_ = 0.0f;
+	comboInfo_.comboSpinCount_ = 3; // 回転数（1回転 = 2π）
+	comboInfo_.comboTotalRotation_ = 0.0f;
+	worldTransform_.anchorPoint_ = { 0.5f, 0.0f, 0.0f };
+}
+
+void Player::UpdateCombo1Effect()
+{
+	if (!comboInfo_.isCombo1Rotating_ && comboCount_ != 1) return;
+
+	comboInfo_.comboSinTime_ += deltaTime_;
+	float sinOffset = std::sin(comboInfo_.comboSinTime_ * 6.0f) * 0.7f; // 上下にびよびよ
+	worldTransform_.scale_.y = 1.0f + sinOffset;
+
+	float rotationAmount = comboInfo_.comboRotationSpeed_ * deltaTime_;
+	worldTransform_.rotation_.y += rotationAmount;
+	comboInfo_.comboTotalRotation_ += rotationAmount;
+
+	if (comboInfo_.comboTotalRotation_ >= comboInfo_.comboSpinCount_ * 2.0f * std::numbers::pi_v<float>) {
+		comboInfo_.isCombo1Rotating_ = false;
+		comboInfo_.comboTotalRotation_ = 0.0f;
+		worldTransform_.rotation_.y = -std::numbers::pi_v<float>; // 正面に戻す
+		worldTransform_.scale_.y = 1.0f; // スケール戻す
+	}
+}
+
+void Player::ResetCombo1Effect()
+{
+	comboInfo_.isCombo1Rotating_ = false;
+	comboInfo_.comboTotalRotation_ = 0.0f;
+	worldTransform_.scale_.y = 1.0f;
+	worldTransform_.rotation_.y = -std::numbers::pi_v<float>;
+}
+
 
 
 #ifdef _DEBUG
