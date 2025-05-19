@@ -224,6 +224,8 @@ public: // getter&setter
 		return 1.0f - boostCoolTimer_ / kBoostCT_;
 	}
 
+	void SetTimeLimit(float time) { kTimeLimit_ = time; }
+
 private:
 	Input* input_ = nullptr;
 	
