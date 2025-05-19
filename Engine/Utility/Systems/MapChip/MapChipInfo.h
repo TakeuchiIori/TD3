@@ -43,12 +43,12 @@ public:
 	void SetCamera(Camera* camera) { camera_ = camera; }
 
 
-private:
-
 	/// <summary>
 	/// ブロック生成
 	/// </summary>
 	void GenerateBlocks();
+private:
+
 
 
 public:

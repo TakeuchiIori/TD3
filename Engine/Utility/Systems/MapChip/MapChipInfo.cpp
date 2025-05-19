@@ -108,27 +108,26 @@ void MapChipInfo::Update()
 void MapChipInfo::Draw() {
 	for (uint32_t i = 0; i < wt_.size(); ++i) {
 		for (uint32_t j = 0; j < wt_[i].size(); ++j) {
-			if (wt_[i][j] && objects_[i][j]) {
-				objects_[i][j]->Draw(camera_, *wt_[i][j]);
+			MapChipType type = mpField_->GetMapChipTypeByIndex(j, i);
+
+			if (type == MapChipType::kBlank) {
+				continue; // 空白なら何も描画しない！
+			}
+
+			if (wt_[i][j]) {
+				if (objects_[i][j] && type == MapChipType::kBlock) {
+					objects_[i][j]->Draw(camera_, *wt_[i][j]);
+				}
+				if (floors_[i][j] && type == MapChipType::kFloor) {
+					floors_[i][j]->Draw(camera_, *wt_[i][j]);
+				}
+				if (ceilings_[i][j] && type == MapChipType::kCeiling) {
+					ceilings_[i][j]->Draw(camera_, *wt_[i][j]);
+				}
 			}
 		}
 	}
 
-	for (uint32_t i = 0; i < wt_.size(); ++i) {
-		for (uint32_t j = 0; j < wt_[i].size(); ++j) {
-			if (floors_[i][j]) {
-				floors_[i][j]->Draw(camera_, *wt_[i][j]);
-			}
-		}
-	}
-
-	for (uint32_t i = 0; i < wt_.size(); ++i) {
-		for (uint32_t j = 0; j < wt_[i].size(); ++j) {
-			if (ceilings_[i][j]) {
-				ceilings_[i][j]->Draw(camera_, *wt_[i][j]);
-			}
-		}
-	}
 }
 
 

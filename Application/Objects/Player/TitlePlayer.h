@@ -106,11 +106,12 @@ public:
 
 	void SetIsFinishedReadBook(bool isFinishedReadBook) { isFinishedReadBook_ = isFinishedReadBook; }
 	void SetShowUI(bool showUI) { showUI_ = showUI; }
+	void SetMapChipInfo(MapChipInfo* info) { mpInfo_ = info; }
 private:
 
 	// ポインタ
 	Input* input_ = nullptr;
-
+	MapChipInfo* mpInfo_ = nullptr;
 	std::unique_ptr<Object3d> neck_;
 	std::unique_ptr<Object3d> body_;
 

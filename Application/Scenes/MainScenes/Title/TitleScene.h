@@ -104,6 +104,8 @@ private:
 	/// </summary>
 	void UpdateCamera();
 
+public:
+	
 
 
 private:

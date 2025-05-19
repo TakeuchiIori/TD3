@@ -54,6 +54,7 @@ void TitleScene::Initialize()
 	player_ = std::make_unique<TitlePlayer>(mpInfo_->GetMapChipField());
 	player_->Initialize(sceneCamera_.get());
 	bookEventCamera_.SetTarget(player_->GetWorldTransform());
+	player_->SetMapChipInfo(mpInfo_.get());
 
 	book_ = std::make_unique<Book>(mpInfo_->GetMapChipField());
 	book_->Initialize(sceneCamera_.get());
@@ -128,9 +129,9 @@ void TitleScene::Update()
 		}
 	}
 
-	if (player_->GetWorldTransform().translation_.y > 20.0f) {
-		SceneManager::GetInstance()->ChangeScene("Game");
-	}
+	//if (player_->GetWorldTransform().translation_.y > 20.0f) {
+	//	SceneManager::GetInstance()->ChangeScene("Game");
+	//}
 
 
 

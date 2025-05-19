@@ -1,6 +1,7 @@
 #include "TitlePlayer.h"
 #include "Collision/OBB/OBBCollider.h"
 #include "Collision/Core/ColliderFactory.h"
+#include <Debugger/Logger.h>
 
 
 TitlePlayer::~TitlePlayer()
@@ -105,6 +106,9 @@ void TitlePlayer::Update()
 		neckMat.m[3][2]
 	};
 
+	if (input_->IsPadPressed(0, GamePadButton::B)) {
+		neckTransform_.scale_.y += 0.1f;
+	}
 
 
 	if (isFinishedReadBook_) {
@@ -123,6 +127,13 @@ void TitlePlayer::Update()
 	worldTransform_.UpdateMatrix();
 	// スケールによる伸びを考慮して頭を移動
 
+	auto result = mpCollision_.CheckHitAtPosition(worldTransform_.translation_);
+	if (result && result->blockType == MapChipType::kCeiling) {
+		auto& info = *result;
+
+		mpCollision_.GetMapChipField()->SetMapChipTypeByIndex(info.xIndex, info.yIndex, MapChipType::kBlank);
+
+	}
 
 
 	obbCollider_->Update();
@@ -186,24 +197,6 @@ void TitlePlayer::DrawSprite()
 
 void TitlePlayer::MapChipOnCollision(const CollisionInfo& info)
 {
-	switch (info.blockType) {
-	case MapChipType::kBlock:
-		// 通常ブロックの処理
-		break;
-
-	case MapChipType::kCeiling:
-		MapChipField* field = mpCollision_.GetMapChipField(); // MapChipField取得
-		if (field) {
-			field->SetMapChipTypeByIndex(info.xIndex, info.yIndex, MapChipType::kBlank);
-		}
-
-		break;
-	}
-
-	// 衝突方向に応じた処理
-	if (info.direction == 4) {  // 下方向の衝突 = 着地
-		//isGrounded_ = true;
-	}
 }
 
 void TitlePlayer::Reset()

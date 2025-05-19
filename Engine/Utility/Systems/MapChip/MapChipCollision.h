@@ -78,6 +78,8 @@ public:
         int checkFlags = CollisionFlag::All,
         std::function<void(const CollisionInfo&)> collisionCallback = nullptr);
 
+    std::optional<CollisionInfo> CheckHitAtPosition(const Vector3& position) const;
+
 
 protected:
     MapChipField* mapChipField_;
