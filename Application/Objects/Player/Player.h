@@ -139,7 +139,8 @@ private:
 
 	void HeartPos();
 
-	void HeadDir() {
+	void HeadDir() 
+	{
 		worldTransform_.rotation_.z = 0;
 		if (moveHistory_.size() > 1)
 		{
