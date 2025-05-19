@@ -194,7 +194,7 @@ void Player::Draw()
 
 	for (const auto& body : playerBodys_) 
 	{
-		//body->Draw();
+		body->Draw();
 	}
 
 	for (const auto& body : stuckGrassList_) 
