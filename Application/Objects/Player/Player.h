@@ -37,14 +37,6 @@ struct PointWithDirection {
 	float radian; // XY平面での向き（進行方向ベクトルの角度）
 };
 
-struct ComboInfo {
-	float comboSinTime_ = 0.0f;
-	float comboRotationSpeed_ = 4.0f * std::numbers::pi_v<float>; // 1秒で1回転
-	int comboSpinCount_ = 0;
-	bool isCombo1Rotating_ = false;
-	float comboTotalRotation_ = 0.0f;
-};
-
 class Player 
 	: public BaseObject
 {
@@ -162,9 +154,6 @@ private:
 
 	void UpdateCombo();
 
-	void PlayCombo1Animation();
-	void UpdateCombo1Effect();
-	void ResetCombo1Effect();
 
 #ifdef _DEBUG
 	// デバッグ用 (ImGuiとか)
@@ -328,8 +317,6 @@ private:
 	float comboTimer_ = 0.0f;              // コンボ残り時間
 	float kComboTimeLimit_ = 1.5f;         // コンボ持続時間（秒）
 	int lastPlayedComboCount_ = 0;
-
-	ComboInfo comboInfo_;
 
 
 	// ヒットポイント
