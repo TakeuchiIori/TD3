@@ -1,6 +1,6 @@
 {
 	"asset":{
-		"generator":"Khronos glTF Blender I/O v4.1.63",
+		"generator":"Khronos glTF Blender I/O v4.4.55",
 		"version":"2.0"
 	},
 	"scene":0,
@@ -8,59 +8,41 @@
 		{
 			"name":"Scene",
 			"nodes":[
-				0
+				3
 			]
 		}
 	],
 	"nodes":[
 		{
-			"mesh":0,
-			"name":"head.001"
-		}
-	],
-	"animations":[
-		{
-			"channels":[
-				{
-					"sampler":0,
-					"target":{
-						"node":0,
-						"path":"translation"
-					}
-				},
-				{
-					"sampler":1,
-					"target":{
-						"node":0,
-						"path":"rotation"
-					}
-				},
-				{
-					"sampler":2,
-					"target":{
-						"node":0,
-						"path":"scale"
-					}
-				}
-			],
-			"name":"head.001Action",
-			"samplers":[
-				{
-					"input":5,
-					"interpolation":"STEP",
-					"output":6
-				},
-				{
-					"input":5,
-					"interpolation":"STEP",
-					"output":7
-				},
-				{
-					"input":5,
-					"interpolation":"STEP",
-					"output":8
-				}
+			"name":"Bone",
+			"rotation":[
+				-8.557136332854043e-09,
+				1.7114272665708086e-08,
+				-2.928983286277023e-16,
+				1
 			]
+		},
+		{
+			"name":"neutral_bone",
+			"rotation":[
+				-0.7071067690849304,
+				0,
+				0,
+				0.7071067690849304
+			]
+		},
+		{
+			"mesh":0,
+			"name":"head.001",
+			"skin":0
+		},
+		{
+			"children":[
+				2,
+				0,
+				1
+			],
+			"name":"Armature"
 		}
 	],
 	"materials":[
@@ -85,9 +67,11 @@
 						"POSITION":0,
 						"NORMAL":1,
 						"TEXCOORD_0":2,
-						"TEXCOORD_1":3
+						"TEXCOORD_1":3,
+						"JOINTS_0":4,
+						"WEIGHTS_0":5
 					},
-					"indices":4,
+					"indices":6,
 					"material":0
 				}
 			]
@@ -106,128 +90,123 @@
 			"uri":"head.png"
 		}
 	],
+	"skins":[
+		{
+			"inverseBindMatrices":7,
+			"joints":[
+				0,
+				1
+			],
+			"name":"Armature"
+		}
+	],
 	"accessors":[
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":6892,
+			"count":8668,
 			"max":[
 				1.4203684329986572,
 				1.711991786956787,
-				1.0093482732772827
+				1.0093481540679932
 			],
 			"min":[
 				-2.0576624870300293,
 				-1,
-				-1.0346152782440186
+				-1.034615159034729
 			],
 			"type":"VEC3"
 		},
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":6892,
+			"count":8668,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":6892,
+			"count":8668,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5126,
-			"count":6892,
+			"count":8668,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":4,
-			"componentType":5123,
-			"count":15744,
-			"type":"SCALAR"
+			"componentType":5121,
+			"count":8668,
+			"type":"VEC4"
 		},
 		{
 			"bufferView":5,
 			"componentType":5126,
-			"count":2,
-			"max":[
-				0.08333333333333333
-			],
-			"min":[
-				0
-			],
-			"type":"SCALAR"
+			"count":8668,
+			"type":"VEC4"
 		},
 		{
 			"bufferView":6,
-			"componentType":5126,
-			"count":2,
-			"type":"VEC3"
+			"componentType":5123,
+			"count":15738,
+			"type":"SCALAR"
 		},
 		{
 			"bufferView":7,
 			"componentType":5126,
 			"count":2,
-			"type":"VEC4"
-		},
-		{
-			"bufferView":8,
-			"componentType":5126,
-			"count":2,
-			"type":"VEC3"
+			"type":"MAT4"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":82704,
+			"byteLength":104016,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":82704,
-			"byteOffset":82704,
+			"byteLength":104016,
+			"byteOffset":104016,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":55136,
-			"byteOffset":165408,
+			"byteLength":69344,
+			"byteOffset":208032,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":55136,
-			"byteOffset":220544,
+			"byteLength":69344,
+			"byteOffset":277376,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":31488,
-			"byteOffset":275680,
+			"byteLength":34672,
+			"byteOffset":346720,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":138688,
+			"byteOffset":381392,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":31476,
+			"byteOffset":520080,
 			"target":34963
 		},
 		{
 			"buffer":0,
-			"byteLength":8,
-			"byteOffset":307168
-		},
-		{
-			"buffer":0,
-			"byteLength":24,
-			"byteOffset":307176
-		},
-		{
-			"buffer":0,
-			"byteLength":32,
-			"byteOffset":307200
-		},
-		{
-			"buffer":0,
-			"byteLength":24,
-			"byteOffset":307232
+			"byteLength":128,
+			"byteOffset":551556
 		}
 	],
 	"samplers":[
@@ -238,7 +217,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":307256,
+			"byteLength":551684,
 			"uri":"kirin.bin"
 		}
 	]

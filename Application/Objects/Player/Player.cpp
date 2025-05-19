@@ -53,7 +53,7 @@ void Player::Initialize(Camera* camera)
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("kirin_yodare.gltf",true);
+	obj_->SetModel("kirin.gltf",true);
 	obj_->SetMaterialColor(defaultColorV4_);
 	//obj_->SetLoopAnimation(true);  無限ループ再生
 
@@ -134,6 +134,10 @@ void Player::InitJson()
 
 	jsonManager_->Register("方向転換できるまでの距離", &moveInterval_);
 
+	jsonManager_->Register("コンボタイマー持続秒数", &kComboTimeLimit_);
+	jsonManager_->Register("最大コンボ数", &kMaxCombo_);
+
+
 	jsonCollider_ = std::make_unique<JsonManager>("playerCollider", "Resources/JSON/");
 	//aabbCollider_->InitJson(jsonCollider_.get());
 }
@@ -143,10 +147,11 @@ void Player::Update()
 	canSpitting_ = false;
 	beforebehavior_ = behavior_;
 
-	if (input_->IsPadTriggered(0, GamePadButton::B)) {
-		obj_->GetModel()->PlayAnimation();
-	}
-
+	// Bボタンで一回だけ「食べるアニメーション」再生
+	//if (!isEating_ && input_->IsPadTriggered(0, GamePadButton::B)) {
+	//	obj_->ChangeModelAnimation("eat_2.gltf", 5);
+	//	isEating_ = true;
+	//}
 	// 各行動の初期化
 	BehaviorInitialize();
 
@@ -161,6 +166,8 @@ void Player::Update()
 	IsPopGrass();
 
 	DamageProcessBodys();
+
+	UpdateCombo();
 
 	TimerManager();
 
@@ -280,6 +287,11 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + largeGrassTime_);
 				}
 				grassGauge_++;
+
+				// コンボ処理
+				comboCount_ = std::min(comboCount_ + 1, kMaxCombo_);
+				comboTimer_ = kComboTimeLimit_;
+
 				if (kMaxGrassGauge_ <= grassGauge_)
 				{
 					createGrassTimer_ = kCreateGrassTime_;
@@ -699,6 +711,16 @@ void Player::TimerManager()
 			body->SetColor(changeColor_);
 		}
 	}
+
+	if (comboTimer_ > 0.0f) {
+		comboTimer_ -= deltaTime_;
+		if (comboTimer_ <= 0.0f) {
+			comboCount_ = 0;
+			lastPlayedComboCount_ = 0; // 🔴 ←ここ追加！
+		}
+	}
+
+
 }
 
 void Player::TimerZero()
@@ -876,7 +898,45 @@ void Player::HeartPos()
 	// resultに3つの配置場所が入っている（足りなければ少ない場合もある）
 }
 
+void Player::UpdateCombo()
+{
+	if (isEating_ && obj_->GetModel()->IsAnimationPlayFinished()) {
+		obj_->ChangeModel("kirin.gltf", true);
+		isEating_ = false;
+	}
+
+
+	// 再生中や、前回と同じコンボ数なら何もしない
+	if (isEating_ || comboCount_ == lastPlayedComboCount_) {
+		return;
+	}
+
+	// comboCount_ に応じて一度だけアニメ再生
+	switch (comboCount_) {
+	case 1:
+		obj_->ChangeModelAnimation("eat_1.gltf", 1);
+		isEating_ = true;
+		lastPlayedComboCount_ = comboCount_;
+		break;
+	case 2:
+		obj_->ChangeModelAnimation("eat_2.gltf", 3);
+		isEating_ = true;
+		lastPlayedComboCount_ = comboCount_;
+		break;
+	case 3:
+		obj_->ChangeModelAnimation("eat_3.gltf", 5);
+		isEating_ = true;
+		lastPlayedComboCount_ = comboCount_;
+		break;
+	default:
+		break;
+	}
+}
+
+
 #ifdef _DEBUG
+
+
 void Player::DebugPlayer()
 {
 	int a = static_cast<int>(moveHistory_.size());
@@ -894,12 +954,19 @@ void Player::DebugPlayer()
 	int c = HP_;
 	ImGui::Text("HP : %d", c);
 	ImGui::Text("Inv : %.2f", invincibleTimer_);
+
+
+	ImGui::Text("コンボ数：%d / %d", comboCount_, kMaxCombo_);
+	ImGui::Text("コンボタイマー：%.2f 秒", comboTimer_);
 	ImGui::End();
 
 	if (input_->TriggerKey(DIK_N))
 	{
 		EntryReturn();
 	}
+
+
+
 }
 #endif // _DEBUG
 

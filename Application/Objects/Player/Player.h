@@ -152,6 +152,8 @@ private:
 		}
 	}
 
+	void UpdateCombo();
+
 
 #ifdef _DEBUG
 	// デバッグ用 (ImGuiとか)
@@ -245,6 +247,7 @@ private:
 	bool isCollisionBody = false;
 
 	bool isRed_ = false;
+	bool isEating_ = false;
 
 
 	const Vector4 defaultColorV4_ = { 0.90625f,0.87109f,0.125f,1.0f };
@@ -306,6 +309,15 @@ private:
 
 
 	const float deltaTime_ = 1.0f / 60.0f;	// 仮対応
+
+
+	// コンボ用
+	int comboCount_ = 0;                   // 現在のコンボ数
+	int kMaxCombo_ = 3;                    // 最大コンボ数
+	float comboTimer_ = 0.0f;              // コンボ残り時間
+	float kComboTimeLimit_ = 1.5f;         // コンボ持続時間（秒）
+	int lastPlayedComboCount_ = 0;
+
 
 	// ヒットポイント
 	int32_t kMaxHP_ = 3;

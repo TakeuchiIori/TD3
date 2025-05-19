@@ -210,3 +210,53 @@ Object3d* Object3d::Create(Model* model)
 	newObj->model_ = model;
 	return newObj;
 }
+
+void Object3d::ChangeModel(const std::string& filePath, bool isAnimation)
+{
+	// 拡張子を取り除く処理
+	std::string basePath = filePath;
+	std::string fileName;
+	if (basePath.size() > 4) {
+		// .obj または .gltf の場合に削除
+		if (basePath.substr(basePath.size() - 4) == ".obj") {
+			basePath = basePath.substr(0, basePath.size() - 4);
+			fileName = basePath + ".obj";
+		} else if (basePath.size() > 5 && basePath.substr(basePath.size() - 5) == ".gltf") {
+			basePath = basePath.substr(0, basePath.size() - 5);
+			fileName = basePath + ".gltf";
+		}
+	}
+
+	// .obj 読み込み (第一引数には拡張子なしのパス)
+	ModelManager::GetInstance()->LoadModel(defaultModelPath_ + basePath, fileName, isAnimation);
+
+	// モデルを検索してセットする
+	model_ = ModelManager::GetInstance()->FindModel(fileName);
+
+	model_->ChangeModel(defaultModelPath_ + basePath, fileName, isAnimation);
+}
+
+void Object3d::ChangeModelAnimation(const std::string& filePath, int count)
+{	// 拡張子を取り除く処理
+	std::string basePath = filePath;
+	std::string fileName;
+	if (basePath.size() > 4) {
+		// .obj または .gltf の場合に削除
+		if (basePath.substr(basePath.size() - 4) == ".obj") {
+			basePath = basePath.substr(0, basePath.size() - 4);
+			fileName = basePath + ".obj";
+		} else if (basePath.size() > 5 && basePath.substr(basePath.size() - 5) == ".gltf") {
+			basePath = basePath.substr(0, basePath.size() - 5);
+			fileName = basePath + ".gltf";
+		}
+	}
+
+	bool  isAnimation = true;
+	// .obj 読み込み (第一引数には拡張子なしのパス)
+	ModelManager::GetInstance()->LoadModel(defaultModelPath_ + basePath, fileName, isAnimation);
+
+	// モデルを検索してセットする
+	model_ = ModelManager::GetInstance()->FindModel(fileName);
+
+	model_->ChangeModelAnimation(defaultModelPath_ + basePath, fileName, count);
+}

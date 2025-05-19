@@ -77,6 +77,8 @@ public:
 	Vector3 CalculateValueNew(const std::vector<KeyframeVector3>& keyframes, float time, InterpolationType interpolationType);
 	Quaternion CalculateValueNew(const std::vector<KeyframeQuaternion>& keyframes, float time, InterpolationType interpolationType);
 
+	void Reset();
+
 
 	
 public:

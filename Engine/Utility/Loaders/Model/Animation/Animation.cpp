@@ -328,3 +328,8 @@ Quaternion Animation::CalculateValueNew(const std::vector<KeyframeQuaternion>& k
 
 	return (*keyframes.rbegin()).value;
 }
+
+void Animation::Reset() {
+	animationTime_ = 0.0f;
+	localMatrix_ = MakeIdentity4x4();
+}

@@ -72,6 +72,8 @@ public:
 
 	static Object3d* Create(const std::string& fileName, bool isAnimation = false);
 	static Object3d* Create(Model* model);
+	void ChangeModel(const std::string& filePath, bool isAnimation = false);
+	void ChangeModelAnimation(const std::string& filePath, int count);
 
 private:
 
@@ -94,6 +96,11 @@ public: // アクセッサ
 	void SetAlpha(float alpha) { materialColor_->SetAlpha(alpha); }
 	void SetUvTransform(const Matrix4x4& uvTransform) { materialUV_->SetUVTransform(uvTransform); }
 	void SetLoopAnimation(bool loop) { model_->SetLoop(loop); }
+
+	bool IsAnimationPlayFinished() const {
+		return model_ ? model_->IsAnimationPlayFinished() : true;
+	}
+
 
 private:
 
