@@ -393,7 +393,6 @@ void GameScreen::UpdateLimit()
 {
 	// 時間をfloatで取得（例：9.83）
 	float time = player_->GetTimeLimit();
-	if (time > 10.0f) time = 10.0f;  // 最大10秒
 
 	int seconds = static_cast<int>(time);          // 整数部（9）
 	int fraction = static_cast<int>(time * 100) % 100; // 小数部2桁（83）
