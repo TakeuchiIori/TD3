@@ -198,6 +198,11 @@
 //	}
 //}
 
+MapChipField* MapChipCollision::GetMapChipField() const {
+	return mapChipField_;
+}
+
+
 /// Y値を考慮
 void MapChipCollision::DetectAndResolveCollision(
 	const ColliderRect& colliderRect,

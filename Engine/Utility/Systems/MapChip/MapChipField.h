@@ -21,6 +21,7 @@ enum class MapChipType {
     kSideEnemy = 3,
     kBody = 4,
     kFloor = 5,
+    kCeiling = 6,
 };
 
 

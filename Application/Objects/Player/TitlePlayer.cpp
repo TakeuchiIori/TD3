@@ -110,13 +110,13 @@ void TitlePlayer::Update()
 	if (isFinishedReadBook_) {
 		if (Input::GetInstance()->PushKey(DIK_SPACE) || Input::GetInstance()->IsPadPressed(0, GamePadButton::A) || Input::GetInstance()->TriggerKey(DIK_E)) {
 			isScaling_ = true;
-			
+
 		}
 
 		if (isScaling_) {
 			neckTransform_.scale_.y += 0.1f;
 		}
-	
+
 	}
 	float stretchY = neckTransform_.scale_.y;
 	worldTransform_.translation_ = neckPos + Vector3(0.0f, stretchY + 1.0f, 0.0f);
@@ -186,6 +186,24 @@ void TitlePlayer::DrawSprite()
 
 void TitlePlayer::MapChipOnCollision(const CollisionInfo& info)
 {
+	switch (info.blockType) {
+	case MapChipType::kBlock:
+		// 通常ブロックの処理
+		break;
+
+	case MapChipType::kCeiling:
+		MapChipField* field = mpCollision_.GetMapChipField(); // MapChipField取得
+		if (field) {
+			field->SetMapChipTypeByIndex(info.xIndex, info.yIndex, MapChipType::kBlank);
+		}
+
+		break;
+	}
+
+	// 衝突方向に応じた処理
+	if (info.direction == 4) {  // 下方向の衝突 = 着地
+		//isGrounded_ = true;
+	}
 }
 
 void TitlePlayer::Reset()

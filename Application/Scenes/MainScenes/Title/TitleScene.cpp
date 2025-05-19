@@ -48,7 +48,7 @@ void TitleScene::Initialize()
 	mpInfo_ = std::make_unique<MapChipInfo>();
 	mpInfo_->Initialize();
 	mpInfo_->SetCamera(sceneCamera_.get());
-
+	mpInfo_->SetMapChip("Resources/images/MapChip_Title.csv");
 
 
 	player_ = std::make_unique<TitlePlayer>(mpInfo_->GetMapChipField());

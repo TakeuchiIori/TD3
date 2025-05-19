@@ -53,6 +53,7 @@ private:
 
 public:
 
+	void SetMapChip(std::string path);
 	void SetMapChipField(MapChipField* mpField) { mpField_ = mpField; }
 	void SetWorldTransform(std::vector<std::vector<WorldTransform*>> wt) { wt_ = wt; }
 	MapChipField* GetMapChipField() { return mpField_; }
@@ -65,14 +66,16 @@ private:
 	========================================================================*/
 	Camera* camera_ = nullptr;
 	MapChipField* mpField_ = nullptr;
-	std::vector<std::vector<WorldTransform*>> wt_;
-	std::vector<std::vector<std::unique_ptr<Object3d>>> objects_;
 	std::unique_ptr<JsonManager> jsonManager_;
+
+	std::vector<std::vector<WorldTransform*>> wt_;
+	
+	std::vector<std::vector<std::unique_ptr<Object3d>>> objects_;
 	std::vector<std::vector<std::unique_ptr<Object3d>>> floors_;
+	std::vector<std::vector<std::unique_ptr<Object3d>>> ceilings_;
 
 
-
-	Vector3 color_[2]{};
-	float alpha_[2];
+	Vector3 color_[3]{};
+	float alpha_[3];
 };
 

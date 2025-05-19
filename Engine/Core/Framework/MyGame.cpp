@@ -17,9 +17,9 @@ void MyGame::Initialize()
 	offScreen_->Initialize();
 	//offScreen_->SetEffectType(OffScreen::OffScreenEffectType::RadialBlur);
 #ifdef _DEBUG
-	SceneManager::GetInstance()->ChangeScene("Game");
+	SceneManager::GetInstance()->ChangeScene("Title");
 #else//Title
-	SceneManager::GetInstance()->ChangeScene("Game");
+	SceneManager::GetInstance()->ChangeScene("Title");
 #endif
 	// パーティクルマネージャ生成
 
