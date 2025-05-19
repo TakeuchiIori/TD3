@@ -314,6 +314,7 @@ private:
 	int kMaxCombo_ = 3;                    // 最大コンボ数
 	float comboTimer_ = 0.0f;              // コンボ残り時間
 	float kComboTimeLimit_ = 1.5f;         // コンボ持続時間（秒）
+	int lastPlayedComboCount_ = 0;
 
 
 	// ヒットポイント

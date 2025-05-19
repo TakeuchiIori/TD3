@@ -149,14 +149,10 @@ void Player::Update()
 	beforebehavior_ = behavior_;
 
 	// Bボタンで一回だけ「食べるアニメーション」再生
-	if (!isEating_ && input_->IsPadTriggered(0, GamePadButton::B)) {
-		obj_->ChangeModelAnimation("eat_2.gltf", 5);
-		isEating_ = true;
-	} else if (isEating_ && obj_->GetModel()->IsAnimationPlayFinished()) {
-		obj_->ChangeModel("kirin.gltf", true);
-		isEating_ = false;
-	}
-
+	//if (!isEating_ && input_->IsPadTriggered(0, GamePadButton::B)) {
+	//	obj_->ChangeModelAnimation("eat_2.gltf", 5);
+	//	isEating_ = true;
+	//}
 	// 各行動の初期化
 	BehaviorInitialize();
 
@@ -720,9 +716,11 @@ void Player::TimerManager()
 	if (comboTimer_ > 0.0f) {
 		comboTimer_ -= deltaTime_;
 		if (comboTimer_ <= 0.0f) {
-			comboCount_ = 0; // タイマー切れでリセット
+			comboCount_ = 0;
+			lastPlayedComboCount_ = 0; // 🔴 ←ここ追加！
 		}
 	}
+
 
 }
 
@@ -901,24 +899,43 @@ void Player::HeartPos()
 	// resultに3つの配置場所が入っている（足りなければ少ない場合もある）
 }
 
-#ifdef _DEBUG
 void Player::UpdateCombo()
 {
-	// コンボ数に応じた演出や処理
+	if (isEating_ && obj_->GetModel()->IsAnimationPlayFinished()) {
+		obj_->ChangeModel("kirin.gltf", true);
+		isEating_ = false;
+	}
+
+
+	// 再生中や、前回と同じコンボ数なら何もしない
+	if (isEating_ || comboCount_ == lastPlayedComboCount_) {
+		return;
+	}
+
+	// comboCount_ に応じて一度だけアニメ再生
 	switch (comboCount_) {
 	case 1:
-
+		obj_->ChangeModelAnimation("eat_1.gltf", 1);
+		isEating_ = true;
+		lastPlayedComboCount_ = comboCount_;
 		break;
 	case 2:
-
+		obj_->ChangeModelAnimation("eat_2.gltf", 3);
+		isEating_ = true;
+		lastPlayedComboCount_ = comboCount_;
 		break;
 	case 3:
-
+		obj_->ChangeModelAnimation("eat_3.gltf", 5);
+		isEating_ = true;
+		lastPlayedComboCount_ = comboCount_;
 		break;
 	default:
 		break;
 	}
 }
+
+
+#ifdef _DEBUG
 
 
 void Player::DebugPlayer()
