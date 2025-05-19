@@ -51,6 +51,19 @@ void GameScreen::Initialize()
 		option_[i]->isDrawImGui_ = false;
 	}
 
+	// CurrentMap
+	uiMap_ = std::make_unique<Sprite>();
+	uiMap_->Initialize("Resources/Textures/In_Game/map.png");
+	uiMap_->SetPosition(offsetMapPos_);
+	uiMap_->SetSize(uiMap_->GetTextureSize() * offsetMapScale_);
+
+	uiMapCurrent_ = std::make_unique<Sprite>();
+	uiMapCurrent_->Initialize("Resources/Textures/In_Game/here.png");
+	uiMapCurrent_->SetAnchorPoint({0.5f,0.5f});
+	Vector2 size = uiMapCurrent_->GetTextureSize();;
+	uiMapCurrent_->SetSize({ size.x * offsetMapCurrentScale_.x, size.y * offsetMapCurrentScale_.y });
+	uiMapCurrent_->SetPosition(offsetMapCurrentPos_);
+
 	///////////////////////////////////////////////////////////////////////////
 	// 
 	// 草の初期化
@@ -189,6 +202,8 @@ void GameScreen::Update()
 	{
 		option_[i]->Update();
 	}
+
+	UpdateMapView();
 
 	///////////////////////////////////////////////////////////////////////////
 	// 
@@ -356,6 +371,9 @@ void GameScreen::Draw()
 		}
 	}
 
+	uiMap_->Draw();
+	uiMapCurrent_->Draw();
+
 	for (uint32_t i = 0; i < numGrass_; i++)
 	{
 		grass_[i]->Draw();
@@ -393,7 +411,6 @@ void GameScreen::UpdateLimit()
 {
 	// 時間をfloatで取得（例：9.83）
 	float time = player_->GetTimeLimit();
-	if (time > 10.0f) time = 10.0f;  // 最大10秒
 
 	int seconds = static_cast<int>(time);          // 整数部（9）
 	int fraction = static_cast<int>(time * 100) % 100; // 小数部2桁（83）
@@ -454,4 +471,49 @@ void GameScreen::Updatedistance()
 		ditSprites_[i]->Update();
 	}
 
+}
+
+void GameScreen::UpdateMapView()
+{
+#ifdef _DEBUG
+	ImGui::Begin("MapView");
+	ImGui::DragFloat2("pos", &offsetMapCurrentPos_.x, 0.1f);
+	ImGui::DragFloat2("scale", &offsetMapCurrentScale_.x, 0.1f);
+	ImGui::End();
+	Vector2 size = uiMapCurrent_->GetTextureSize();;
+	uiMapCurrent_->SetSize({ size.x * offsetMapCurrentScale_.x, size.y * offsetMapCurrentScale_.y });
+	uiMapCurrent_->SetPosition(offsetMapCurrentPos_);
+#endif // _DEBUG
+	if (currentMapNum_ == 0)
+	{
+		uiMapCurrent_->SetSize({ size.x * 1.4f, size.y * 1.1f });
+		uiMapCurrent_->SetPosition(Vector3(173.0f, 535.9f, 0.0f));
+	}
+	if (currentMapNum_ == 1)
+	{
+		uiMapCurrent_->SetSize({ size.x * 1.4f, size.y * 1.3f });
+		uiMapCurrent_->SetPosition(Vector3(173.0f, 477.6f, 0.0f));
+	}
+	if (currentMapNum_ == 2)
+	{
+		uiMapCurrent_->SetSize({ size.x * 1.4f, size.y * 1.7f });
+		uiMapCurrent_->SetPosition(Vector3(173.0f, 406.9f, 0.0f));
+	}
+	if (currentMapNum_ == 3)
+	{
+		uiMapCurrent_->SetSize({ size.x * 1.4f, size.y * 1.7f });
+		uiMapCurrent_->SetPosition(Vector3(173.0f, 328.2f, 0.0f));
+	}
+	if (currentMapNum_ == 4)
+	{
+		uiMapCurrent_->SetSize({ size.x * 1.4f, size.y * 1.8f });
+		uiMapCurrent_->SetPosition(Vector3(173.0f, 246.0f, 0.0f));
+	}
+	if (currentMapNum_ == 5)
+	{
+		uiMapCurrent_->SetSize({ size.x * 1.4f, size.y * 1.8f });
+		uiMapCurrent_->SetPosition(Vector3(173.0f, 164.0f, 0.0f));
+	}
+	uiMap_->Update();
+	uiMapCurrent_->Update();
 }

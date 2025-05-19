@@ -57,6 +57,7 @@ public:
 	bool IsClear() { return stageList_[currentStageNum_]->IsClear() || input_->TriggerKey(DIK_L); }
 	void SetFollowCamera(FollowCamera* camera) { followCamera_ = camera; }
 
+	int GetCheckPointID() { return stageList_[currentStageNum_]->GetCheckPointID(); }
 
 private:
 	Input* input_ = nullptr;

@@ -141,6 +141,7 @@ void GameScene::Update()
 					stageManager_->NotDebugCameraUpdate();
 				}
 				stageManager_->Update();
+				gameScreen_->SetCurrentMap(stageManager_->GetCheckPointID());
 			}
 		}
 

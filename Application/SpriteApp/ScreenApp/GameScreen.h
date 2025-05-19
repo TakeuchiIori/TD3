@@ -52,12 +52,19 @@ public:
 	/// </summary>
 	void Updatedistance();
 
+
+	/// <summary>
+	/// マップ表示の更新
+	/// </summary>
+	void UpdateMapView();
+
 public:
 
 	void SetPlayer(Player* player) { player_ = player; }
 	void SetCamera(Camera* camera) { camera_ = camera; }
 	void SetCheckPoint(float checkPoint) { checkPointPos_ = checkPoint; }
 	void SetCheckPointPos(Vector3 checkPointv) { checkPointPosv_ = checkPointv; }
+	void SetCurrentMap(int num) { currentMapNum_ = num; }
 
 private:
 
@@ -110,6 +117,16 @@ private:
 
 	std::unique_ptr<Sprite> uiYodareop_;
 	Vector3 offsetYodareop_ = Vector3(0.0f, 0.0f, 0.0f);
+
+
+	std::unique_ptr<Sprite> uiMap_;
+	Vector3 offsetMapPos_ = Vector3(20.0f, 80.0f, 0.0f);
+	float offsetMapScale_ = 1.5f;
+
+	std::unique_ptr<Sprite> uiMapCurrent_;
+	Vector3 offsetMapCurrentPos_ = Vector3(20.0f, 80.0f, 0.0f);
+	Vector3 offsetMapCurrentScale_ = Vector3(offsetMapScale_, 1.0f, 1.0f);
+	int currentMapNum_ = -1;
 
 
 	std::unique_ptr<JsonManager> jsonManager_;
