@@ -75,6 +75,8 @@ public:
 
 	void TransitionEnd() { transitionType_ = TransitionType::kNone; }
 
+	int GetCheckPointID();
+
 private:
 	int currentStageNum_ = 0;
 

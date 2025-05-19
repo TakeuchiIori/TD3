@@ -182,3 +182,14 @@ Vector3 Stage::GetCheckPointPos()
 {
 	return checkPoint_.GetCheckPointPos();
 }
+
+int Stage::GetCheckPointID()
+{
+	int id = 0;
+	int prevStageNum = currentStageNum_ - 1;
+	if (prevStageNum >= 0)
+	{
+		return id = StageEditor::Instance()->GetMaxCheckPointNumber(prevStageNum) + currentCheckPoint_;
+	}
+	return id = currentCheckPoint_;
+}
