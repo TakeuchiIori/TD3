@@ -150,6 +150,7 @@ private:
 			worldTransform_.rotation_.z = angle + 3.0f * std::numbers::pi_v<float> / 2.0f;
 			nextWorldTransform_.rotation_ = worldTransform_.rotation_;
 		}
+
 	}
 
 	void UpdateCombo();
