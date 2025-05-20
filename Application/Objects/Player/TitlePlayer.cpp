@@ -86,6 +86,8 @@ void TitlePlayer::InitJson()
 	jsonManager_->Register("体の位置", &bodyTransform_.translation_);
 	jsonManager_->Register("体の回転", &bodyTransform_.rotation_);
 
+	jsonManager_->Register("上がる力", &UpPower_);
+
 	jsonCollider_ = std::make_unique<JsonManager>("TitlePlayerCollider", "Resources/JSON/");
 	obbCollider_->InitJson(jsonCollider_.get());
 
@@ -126,15 +128,28 @@ void TitlePlayer::Update()
 	worldTransform_.translation_ = neckPos + Vector3(0.0f, stretchY + 1.0f, 0.0f);
 	worldTransform_.UpdateMatrix();
 	// スケールによる伸びを考慮して頭を移動
+// 横に判定を広げる幅
+	float checkWidth = 2.5f;
 
-	auto result = mpCollision_.CheckHitAtPosition(worldTransform_.translation_);
-	if (result && result->blockType == MapChipType::kCeiling) {
-		auto& info = *result;
+	// 中心と左右で3点チェック
+	std::vector<Vector3> checkPositions = {
+		worldTransform_.translation_,
+		worldTransform_.translation_ + Vector3(checkWidth, 0.0f, 0.0f),
+		worldTransform_.translation_ + Vector3(-checkWidth, 0.0f, 0.0f)
+	};
 
-		mpCollision_.GetMapChipField()->SetMapChipTypeByIndex(info.xIndex, info.yIndex, MapChipType::kBlank);
-		GenerateCeilingBreakParticle(worldTransform_.translation_);
+	for (const auto& pos : checkPositions) {
+		auto result = mpCollision_.CheckHitAtPosition(pos);
+		if (result && result->blockType == MapChipType::kCeiling) {
+			const auto& info = *result;
+			mpCollision_.GetMapChipField()->SetMapChipTypeByIndex(info.xIndex, info.yIndex, MapChipType::kBlank);
+			GenerateCeilingBreakParticle(pos); // 当たった位置で生成
+		}
 	}
-	for (auto it = breakParticles_.begin(); it != breakParticles_.end(); ) {
+
+
+
+	for (auto it = breakParticles_.begin(); it != breakParticles_.end();) {
 		auto& p = *it;
 		float dt = GameTime::GetDeltaTime();
 		p.lifetime -= dt;
@@ -144,19 +159,19 @@ void TitlePlayer::Update()
 			continue;
 		}
 
-		Vector3 gravity = { 0.0f, -9.8f, 0.0f };
+		// ▼ 緩やかな重力で最初から減速 → 後から通常重力に切り替え
+		Vector3 lightGravity = { 0.0f, -80.0f, 0.0f };  // 弱めの重力
+		Vector3 fullGravity = { 0.0f, -9.8f, 0.0f };  // 通常重力
 
 		if (!p.hasSwitched) {
-			// 打ち上げ中（重力なし）
+			p.velocity += lightGravity * dt;
 			p.wt->translation_ += p.velocity * dt;
 
 			if (p.lifetime <= (3.0f - p.switchTime)) {
-				p.velocity = MakeExplosionVelocity(0.3f, 1.6f); // 放射切替
 				p.hasSwitched = true;
 			}
 		} else {
-			// 放射中（重力あり）
-			p.velocity += gravity * dt;
+			p.velocity += fullGravity * dt;
 			p.wt->translation_ += p.velocity * dt;
 		}
 
@@ -332,19 +347,23 @@ void TitlePlayer::GenerateCeilingBreakParticle(const Vector3& position)
 		auto obj = std::make_unique<Object3d>();
 		obj->Initialize();
 		obj->SetModel("cube.obj");
+		obj->SetMaterialColor(Vector3{ 0.0f, 0.0f, 0.0f });
 
 		auto wt = std::make_unique<WorldTransform>();
 		wt->Initialize();
+		float randomX = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
 		wt->translation_ = position;
-		wt->scale_ = { 0.7f, 0.7f, 0.7f };
+		wt->translation_.x += randomX;
 
-		// 少しばらつきのある初期打ち上げ方向
+		float scale = 0.1f + ((rand() % 100) / 100.0f) * 0.4f;
+		wt->scale_ = { scale, scale, scale };
+
 		Vector3 offset = {
-			((rand() % 100) / 100.0f - 0.5f) * 0.5f,  // X方向に±0.25
-			1.0f,  // Y方向固定
-			((rand() % 100) / 100.0f - 0.5f) * 0.5f   // Z方向に±0.25
+			((rand() % 100) / 100.0f - 0.5f) * 0.5f,
+			((rand() % 100) / 100.0f) * 0.5f + 0.8f,
+			((rand() % 100) / 100.0f - 0.5f) * 0.5f
 		};
-		Vector3 initialVelocity = Normalize(offset) * 8.0f + Vector3{ 0, 8.0f, 0 }; // 少し中心寄せつつ打ち上げ
+		Vector3 initialVelocity = Normalize(offset) * UpPower_;
 
 		// ランダムな回転速度
 		Vector3 rotationVel = {

@@ -176,7 +176,7 @@ private:
 	float blurTime_ = 0.0f;
 	float blurDuration_ = 1.0f;		// ブラー時間（秒）
 	float initialWidth_ = 0.01f;	// ブラー初期幅
-	int initialSampleCount_ = 16;
+	int initialSampleCount_ = 10;
 
 
 };
