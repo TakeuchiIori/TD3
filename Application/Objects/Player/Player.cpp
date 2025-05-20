@@ -919,12 +919,12 @@ void Player::UpdateCombo()
 		lastPlayedComboCount_ = comboCount_;
 		break;
 	case 2:
-		obj_->ChangeModelAnimation("eat_2.gltf", 3);
+		obj_->ChangeModelAnimation("eat_2.gltf", 1);
 		isEating_ = true;
 		lastPlayedComboCount_ = comboCount_;
 		break;
 	case 3:
-		obj_->ChangeModelAnimation("eat_3.gltf", 5);
+		obj_->ChangeModelAnimation("eat_3.gltf", 2);
 		isEating_ = true;
 		lastPlayedComboCount_ = comboCount_;
 		break;
