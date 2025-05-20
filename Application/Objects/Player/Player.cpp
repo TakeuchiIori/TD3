@@ -36,19 +36,24 @@ void Player::Initialize(Camera* camera)
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
-	worldTransform_.translation_ = { 2.0f,6.0f,0.0f };
+	worldTransform_.translation_ = { 4.0f,6.0f,0.0f };
 	worldTransform_.scale_ = { 0.99f,0.99f,0.99f };
 	modelWT_.Initialize();
 	modelWT_.parent_ = &worldTransform_;
-	modelWT_.rotation_.y = std::numbers::pi_v<float>;
+	//modelWT_.rotation_.y = std::numbers::pi_v<float>;
 	//worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
 	nextWorldTransform_.Initialize();
 	nextWorldTransform_.translation_ = worldTransform_.translation_;
 	nextWorldTransform_.scale_ = worldTransform_.scale_;
 
+	legWT_.Initialize();
+	legWT_.translation_ = worldTransform_.translation_;
+	legWT_.translation_.y = 2.3f;
+
 	worldTransform_.UpdateMatrix();
 	modelWT_.UpdateMatrix();
 	nextWorldTransform_.UpdateMatrix();
+	legWT_.UpdateMatrix();
 
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
@@ -56,6 +61,11 @@ void Player::Initialize(Camera* camera)
 	obj_->SetModel("kirin.gltf",true);
 	obj_->SetMaterialColor(defaultColorV4_);
 	//obj_->SetLoopAnimation(true);  無限ループ再生
+
+	legObj_ = std::make_unique<Object3d>();
+	legObj_->Initialize();
+	legObj_->SetModel("body.obj");
+	legObj_->SetMaterialColor(defaultColorV4_);
 
 	for (size_t i = 0; i < kMaxHP_; ++i)
 	{
@@ -210,6 +220,7 @@ void Player::Draw()
 void Player::DrawAnimation()
 {
 	obj_->Draw(camera_, modelWT_);
+	legObj_->Draw(camera_, legWT_);
 }
 
 void Player::DrawCollision()
@@ -344,31 +355,45 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 					{
 						if (worldTransform_.translation_.x - other->GetCenterPosition().x >= 0)
 						{
-							worldTransform_.rotation_.y = 0;
+							worldTransform_.rotation_.y = std::numbers::pi_v<float>;
 						}
 						else
 						{
-							worldTransform_.rotation_.y = std::numbers::pi_v<float>;
+							worldTransform_.rotation_.y = 0;
 						}
 					}
 					else if (moveDirection_ == Vector3{ 0, -1, 0 })
 					{
 						if (worldTransform_.translation_.x - other->GetCenterPosition().x >= 0)
 						{
+							worldTransform_.rotation_.y = 0;
+						}
+						else
+						{
+							worldTransform_.rotation_.y = std::numbers::pi_v<float>;
+						}
+					}
+					else if (moveDirection_ == Vector3{ 1, 0, 0 })
+					{
+						if (worldTransform_.translation_.y - other->GetCenterPosition().y >= 0)
+						{
+							worldTransform_.rotation_.y = 0;
+						}
+						else
+						{
+							worldTransform_.rotation_.y = std::numbers::pi_v<float>;
+						}
+					}
+					else if (moveDirection_ == Vector3{ -1, 0, 0 })
+					{
+						if (worldTransform_.translation_.y - other->GetCenterPosition().y >= 0)
+						{
 							worldTransform_.rotation_.y = std::numbers::pi_v<float>;
 						}
 						else
 						{
 							worldTransform_.rotation_.y = 0;
 						}
-					}
-					else if (moveDirection_ == Vector3{ 1, 0, 0 })
-					{
-
-					}
-					else if (moveDirection_ == Vector3{ -1, 0, 0 })
-					{
-
 					}
 				}
 			}
@@ -453,6 +478,7 @@ void Player::UpdateMatrices()
 	worldTransform_.UpdateMatrix();
 	modelWT_.UpdateMatrix();
 	nextWorldTransform_.UpdateMatrix();
+	legWT_.UpdateMatrix();
 	for (const auto& body : playerBodys_) 
 	{
 		body->Update();
@@ -575,6 +601,34 @@ void Player::ChangeDir()
 	}
 }
 
+void Player::ChangeDirRoot()
+{
+	if ((input_->PushKey(DIK_A) || input_->PushKey(DIK_LEFT)))
+	{
+		moveDirection_ = { -1,0,0 };
+		worldTransform_.rotation_.y = std::numbers::pi_v<float>;
+	}
+	else if ((input_->PushKey(DIK_D) || input_->PushKey(DIK_RIGHT)))
+	{
+		moveDirection_ = { 1,0,0 };
+		worldTransform_.rotation_.y = 0;
+	}
+	else  if (std::abs(stick.x) > std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
+	{
+		if (stick.x > 0)
+		{
+			moveDirection_ = { 1,0,0 };
+			worldTransform_.rotation_.y = 0;
+		}
+		else
+		{
+			moveDirection_ = { -1,0,0 };
+			worldTransform_.rotation_.y = std::numbers::pi_v<float>;
+		}
+	}
+	legWT_.rotation_.y = worldTransform_.rotation_.y;
+}
+
 #pragma region // 体が伸びる向き決定
 void Player::UpBody()
 {
@@ -633,6 +687,9 @@ void Player::RightBody()
 void Player::EntryMove()
 {
 
+	velocity_ = { 0.0f,0.0f,0.0f };
+	moveDirection_ = { 0.0f,0.0f,0.0f };
+
 	if (input_->IsControllerConnected())
 	{
 	}
@@ -640,6 +697,28 @@ void Player::EntryMove()
 	if (std::abs(stick.x) < threshold && std::abs(stick.y) < threshold) {
 		stick = {};
 	}
+
+	ChangeDirRoot();
+
+	velocity_ += moveDirection_ * speed_;
+
+
+	Vector3 newPos = worldTransform_.translation_;
+	newPos = worldTransform_.translation_ + velocity_;
+
+	mpCollision_.DetectAndResolveCollision(
+		colliderRect_,  // 衝突判定用矩形
+		newPos,    // 更新される位置（衝突解決後）
+		velocity_,      // 更新される速度
+		MapChipCollision::CollisionFlag::All,  // すべての方向をチェック
+		[this](const CollisionInfo& info) {
+			// 衝突時の処理（例：特殊ブロック対応）
+			MapChipOnCollision(info);
+		}
+	);
+
+	worldTransform_.translation_ = newPos;
+	nextWorldTransform_.translation_ = newPos + velocity_;
 
 	if ((input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP)))
 	{
@@ -1052,7 +1131,7 @@ void Player::BehaviorUpdate()
 
 void Player::BehaviorRootInit()
 {
-	speed_ = 0;
+	speed_ = defaultSpeed_;
 	grassGauge_ = 0;
 	playerBodys_.clear();
 	isCollisionBody = false;
@@ -1061,6 +1140,7 @@ void Player::BehaviorRootInit()
 
 void Player::BehaviorRootUpdate()
 {
+	legWT_.translation_.x = worldTransform_.translation_.x;
 	EntryMove();
 }
 
