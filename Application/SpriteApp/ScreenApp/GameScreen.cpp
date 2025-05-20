@@ -475,6 +475,7 @@ void GameScreen::Updatedistance()
 
 void GameScreen::UpdateMapView()
 {
+	Vector2 size = uiMapCurrent_->GetTextureSize();
 #ifdef _DEBUG
 	ImGui::Begin("MapView");
 	ImGui::DragFloat2("pos", &offsetMapCurrentPos_.x, 0.1f);

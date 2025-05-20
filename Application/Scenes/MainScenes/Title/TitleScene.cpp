@@ -64,6 +64,8 @@ void TitleScene::Initialize()
 	titleScreen_->Initialize();
 	titleScreen_->SetCamera(sceneCamera_.get());
 
+	defaultCamera_.translate_.y = 18;
+
 
 	// 本を読み始めたら
 	book_->OnBookTrigger_ = [this]() {
@@ -120,7 +122,7 @@ void TitleScene::Update()
 #endif // _DEBUG
 
 	if (isAlreadyRead_) {
-		if (Input::GetInstance()->IsPadTriggered(0, GamePadButton::A)) {
+		if (Input::GetInstance()->PushKey(DIK_SPACE) || Input::GetInstance()->IsPadPressed(0, GamePadButton::A) || Input::GetInstance()->TriggerKey(DIK_E)) {
 			// 本に当たっていないときだけ、首を伸ばすフラグをONにする
 			if (!book_->IsColliding()) {
 				// 読書が終わっている前提で
