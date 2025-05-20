@@ -482,7 +482,6 @@ void GameScreen::UpdateMapView()
 	ImGui::DragFloat2("scale", &offsetMapCurrentScale_.x, 0.1f);
 	ImGui::End();
 #endif // _DEBUG
-	Vector2 size = uiMapCurrent_->GetTextureSize();;
 	uiMapCurrent_->SetSize({ size.x * offsetMapCurrentScale_.x, size.y * offsetMapCurrentScale_.y });
 	uiMapCurrent_->SetPosition(offsetMapCurrentPos_);
 	if (currentMapNum_ == 0)
