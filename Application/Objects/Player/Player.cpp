@@ -434,19 +434,10 @@ void Player::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDi
 		{
 			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
 			{
-				HitDirection hitDir = Collision::GetSelfLocalHitDirection(self, other);
-				HitDirection otherDir = Collision::GetSelfLocalHitDirection(other, self);
-				if (otherDir != HitDirection::None && !isHit)
+				if (!isHit)
 				{
 					isHit = true;
-					if (otherDir == HitDirection::Back)
-					{
-						TakeDamage();
-					}
-					else
-					{
-						Eliminate();
-					}
+					TakeDamage();
 				}
 			}
 		}

@@ -143,9 +143,9 @@ void SideEnemy::OnDirectionCollision(BaseCollider* self, BaseCollider* other, Hi
 		HitDirection selfDir = Collision::GetSelfLocalHitDirection(self, other);
 		HitDirection otherDir = Collision::GetSelfLocalHitDirection(other, self);
 
-		if (player_->behavior_ == BehaviorPlayer::Moving)
+		/*if (player_->behavior_ == BehaviorPlayer::Moving)
 		{
-			if (selfDir != HitDirection::None && !isHit)
+			if (!isHit)
 			{
 				isHit = true;
 				if (selfDir != HitDirection::Back)
@@ -155,7 +155,7 @@ void SideEnemy::OnDirectionCollision(BaseCollider* self, BaseCollider* other, Hi
 					sourceVoice_ = Audio::GetInstance()->SoundPlayAudio(soundData_, false);
 				}
 			}
-		}
+		}*/
 	}
 }
 
