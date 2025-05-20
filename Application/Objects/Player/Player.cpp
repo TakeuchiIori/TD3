@@ -24,7 +24,9 @@ Player::~Player()
 	Audio::GetInstance()->PauseAudio(sourceVoiceGrow);
 	Audio::GetInstance()->PauseAudio(sourceVoiceBoost);
 	Audio::GetInstance()->PauseAudio(sourceVoiceDamage);
-	Audio::GetInstance()->PauseAudio(sourceVoiceEat);
+	Audio::GetInstance()->PauseAudio(sourceVoiceEat[0]);
+	Audio::GetInstance()->PauseAudio(sourceVoiceEat[1]);
+	Audio::GetInstance()->PauseAudio(sourceVoiceEat[2]);
 	Audio::GetInstance()->PauseAudio(sourceVoiceYodare);
 }
 
@@ -58,7 +60,7 @@ void Player::Initialize(Camera* camera)
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("kirin.gltf",true);
+	obj_->SetModel("kirin.gltf", true);
 	obj_->SetMaterialColor(defaultColorV4_);
 	//obj_->SetLoopAnimation(true);  無限ループ再生
 
@@ -73,7 +75,7 @@ void Player::Initialize(Camera* camera)
 		haert->Initialize(camera_);
 		haerts_.push_back(std::move(haert));
 	}
-	
+
 
 	/*SphereCollider::SetCamera(BaseObject::camera_);
 	SphereCollider::Initialize();*/
@@ -87,13 +89,15 @@ void Player::Initialize(Camera* camera)
 	soundDataBoost = Audio::GetInstance()->LoadAudio(L"Resources/Audio/acceleration.mp3");
 
 	soundDataDamage = Audio::GetInstance()->LoadAudio(L"Resources/Audio/damage.mp3");
-	soundDataEat = Audio::GetInstance()->LoadAudio(L"Resources/Audio/eat.mp3");
+	soundDataEat[0] = Audio::GetInstance()->LoadAudio(L"Resources/Audio/eat.mp3");
+	soundDataEat[1] = Audio::GetInstance()->LoadAudio(L"Resources/Audio/eat2.mp3");
+	soundDataEat[2] = Audio::GetInstance()->LoadAudio(L"Resources/Audio/eat3.mp3");
 	soundDataYodare = Audio::GetInstance()->LoadAudio(L"Resources/Audio/yodare.mp3");
 	// 音量の設定（0.0f ～ 1.0f）
 	//Audio::GetInstance()->SetVolume(sourceVoice, 0.5f);
 
 
-	emitter_ = std::make_unique<ParticleEmitter>("YodareParticle",worldTransform_.translation_,3);
+	emitter_ = std::make_unique<ParticleEmitter>("YodareParticle", worldTransform_.translation_, 3);
 	emitter_->Initialize("Yodare");
 }
 
@@ -127,7 +131,7 @@ void Player::InitJson()
 	jsonManager_->SetCategory("Objects");
 	jsonManager_->SetSubCategory("Player");
 	jsonManager_->Register("位置", &worldTransform_.translation_);
-	jsonManager_->Register("通常時の移動速度",&defaultSpeed_);
+	jsonManager_->Register("通常時の移動速度", &defaultSpeed_);
 	jsonManager_->Register("ブースト時の速度", &boostSpeed_);
 	jsonManager_->Register("帰還時の速度", &returnSpeed_);
 
@@ -186,12 +190,12 @@ void Player::Update()
 	HeadDir();
 
 	UpdateMatrices();
-	
+
 	//aabbCollider_->Update();
 	obj_->UpdateAnimation();
 	obbCollider_->Update();
 	nextAabbCollider_->Update();
-	
+
 #ifdef _DEBUG
 	DebugPlayer();
 #endif // _DEBUG
@@ -199,14 +203,14 @@ void Player::Update()
 
 void Player::Draw()
 {
-	
 
-	for (const auto& body : playerBodys_) 
+
+	for (const auto& body : playerBodys_)
 	{
 		body->Draw();
 	}
 
-	for (const auto& body : stuckGrassList_) 
+	for (const auto& body : stuckGrassList_)
 	{
 		body->Draw();
 	}
@@ -284,38 +288,30 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 	{
 		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrass)) // 草を食べたら
 		{
-			// オーディオの再生
-			sourceVoiceEat = Audio::GetInstance()->SoundPlayAudio(soundDataEat, false);
-			AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceEat, kSE);
 			if (kMaxGrassGauge_ > grassGauge_ && createGrassTimer_ <= 0)
 			{
 				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.1f)
 				{
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
-				} 
-				else
+				} else
 				{
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + largeGrassTime_);
 				}
 				grassGauge_++;
 
-				// コンボ処理
-				comboCount_ = std::min(comboCount_ + 1, kMaxCombo_);
-				comboTimer_ = kComboTimeLimit_;
+				AddCombo(1);
 
 				if (kMaxGrassGauge_ <= grassGauge_)
 				{
 					createGrassTimer_ = kCreateGrassTime_;
 					isCreateGrass_ = true;
 				}
-			}
-			else
+			} else
 			{
 				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.1f)
 				{
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + (grassTime_ / 2.0f));
-				}
-				else
+				} else
 				{
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + (largeGrassTime_ / 2.0f));
 				}
@@ -356,41 +352,34 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 						if (worldTransform_.translation_.x - other->GetCenterPosition().x >= 0)
 						{
 							worldTransform_.rotation_.y = std::numbers::pi_v<float>;
-						}
-						else
+						} else
 						{
 							worldTransform_.rotation_.y = 0;
 						}
-					}
-					else if (moveDirection_ == Vector3{ 0, -1, 0 })
+					} else if (moveDirection_ == Vector3{ 0, -1, 0 })
 					{
 						if (worldTransform_.translation_.x - other->GetCenterPosition().x >= 0)
 						{
 							worldTransform_.rotation_.y = 0;
-						}
-						else
+						} else
 						{
 							worldTransform_.rotation_.y = std::numbers::pi_v<float>;
 						}
-					}
-					else if (moveDirection_ == Vector3{ 1, 0, 0 })
+					} else if (moveDirection_ == Vector3{ 1, 0, 0 })
 					{
 						if (worldTransform_.translation_.y - other->GetCenterPosition().y >= 0)
 						{
 							worldTransform_.rotation_.y = 0;
-						}
-						else
+						} else
 						{
 							worldTransform_.rotation_.y = std::numbers::pi_v<float>;
 						}
-					}
-					else if (moveDirection_ == Vector3{ -1, 0, 0 })
+					} else if (moveDirection_ == Vector3{ -1, 0, 0 })
 					{
 						if (worldTransform_.translation_.y - other->GetCenterPosition().y >= 0)
 						{
 							worldTransform_.rotation_.y = std::numbers::pi_v<float>;
-						}
-						else
+						} else
 						{
 							worldTransform_.rotation_.y = 0;
 						}
@@ -427,7 +416,7 @@ void Player::OnExitCollision(BaseCollider* self, BaseCollider* other)
 ///////////////////////////////////////////////////////////
 void Player::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
 {
-	if(self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+	if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
 	{
 		// 敵からダメージ受ける
 		if (behavior_ == BehaviorPlayer::Moving)
@@ -470,11 +459,11 @@ void Player::UpdateMatrices()
 	modelWT_.UpdateMatrix();
 	nextWorldTransform_.UpdateMatrix();
 	legWT_.UpdateMatrix();
-	for (const auto& body : playerBodys_) 
+	for (const auto& body : playerBodys_)
 	{
 		body->Update();
 	}
-	for (const auto& body : stuckGrassList_) 
+	for (const auto& body : stuckGrassList_)
 	{
 		body->Update();
 	}
@@ -497,12 +486,12 @@ void Player::Move()
 		stick = {};
 	}
 
-	if(Length(moveHistory_.back() - worldTransform_.translation_) >= moveInterval_ || isCollisionBody) ChangeDir();
-	
+	if (Length(moveHistory_.back() - worldTransform_.translation_) >= moveInterval_ || isCollisionBody) ChangeDir();
+
 
 	moveDirection_ = Normalize(moveDirection_);
 
-	if(beforeDirection_ == moveDirection_)
+	if (beforeDirection_ == moveDirection_)
 	{
 		velocity_ += moveDirection_ * speed_;
 	}
@@ -543,48 +532,41 @@ void Player::ChangeDir()
 		moveDirection_ != Vector3{ 0,-1,0 })
 	{
 		UpBody();
-	}
-	else if ((input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN)) &&
+	} else if ((input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN)) &&
 		moveDirection_ != Vector3{ 0,-1,0 } &&
 		moveDirection_ != Vector3{ 0,1,0 })
 	{
 		DownBody();
-	}
-	else if ((input_->TriggerKey(DIK_A) || input_->TriggerKey(DIK_LEFT)) &&
+	} else if ((input_->TriggerKey(DIK_A) || input_->TriggerKey(DIK_LEFT)) &&
 		moveDirection_ != Vector3{ -1,0,0 } &&
 		moveDirection_ != Vector3{ 1,0,0 })
 	{
 		LeftBody();
-	}
-	else if ((input_->TriggerKey(DIK_D) || input_->TriggerKey(DIK_RIGHT)) &&
+	} else if ((input_->TriggerKey(DIK_D) || input_->TriggerKey(DIK_RIGHT)) &&
 		moveDirection_ != Vector3{ 1,0,0 } &&
 		moveDirection_ != Vector3{ -1,0,0 })
 	{
 		RightBody();
-	}
-	else  if (std::abs(stick.x) > std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
+	} else  if (std::abs(stick.x) > std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
 	{
 		if (stick.x > 0 &&
 			moveDirection_ != Vector3{ 1,0,0 } &&
 			moveDirection_ != Vector3{ -1,0,0 })
 		{
 			RightBody();
-		}
-		else if (moveDirection_ != Vector3{ -1,0,0 } &&
+		} else if (moveDirection_ != Vector3{ -1,0,0 } &&
 			moveDirection_ != Vector3{ 1,0,0 })
 		{
 			LeftBody();
 		}
-	}
-	else if (stick.x != 0 || stick.y != 0)
+	} else if (stick.x != 0 || stick.y != 0)
 	{
 		if (stick.y > 0 &&
 			moveDirection_ != Vector3{ 0,1,0 } &&
 			moveDirection_ != Vector3{ 0,-1,0 })
 		{
 			UpBody();
-		}
-		else if (moveDirection_ != Vector3{ 0,-1,0 } &&
+		} else if (moveDirection_ != Vector3{ 0,-1,0 } &&
 			moveDirection_ != Vector3{ 0,1,0 })
 		{
 			DownBody();
@@ -598,20 +580,17 @@ void Player::ChangeDirRoot()
 	{
 		moveDirection_ = { -1,0,0 };
 		worldTransform_.rotation_.y = std::numbers::pi_v<float>;
-	}
-	else if ((input_->PushKey(DIK_D) || input_->PushKey(DIK_RIGHT)))
+	} else if ((input_->PushKey(DIK_D) || input_->PushKey(DIK_RIGHT)))
 	{
 		moveDirection_ = { 1,0,0 };
 		worldTransform_.rotation_.y = 0;
-	}
-	else  if (std::abs(stick.x) > std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
+	} else  if (std::abs(stick.x) > std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
 	{
 		if (stick.x > 0)
 		{
 			moveDirection_ = { 1,0,0 };
 			worldTransform_.rotation_.y = 0;
-		}
-		else
+		} else
 		{
 			moveDirection_ = { -1,0,0 };
 			worldTransform_.rotation_.y = std::numbers::pi_v<float>;
@@ -717,8 +696,7 @@ void Player::EntryMove()
 		moveDirection_ = { 0,1,0 };
 		extendTimer_ = kTimeLimit_;
 		moveHistory_.push_back(worldTransform_.translation_);
-	}
-	else if (std::abs(stick.x) < std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
+	} else if (std::abs(stick.x) < std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
 	{
 		if (stick.y > 0)
 		{
@@ -734,7 +712,7 @@ void Player::EntryMove()
 
 void Player::EntryBoost()
 {
-	if(0 >= boostCoolTimer_)
+	if (0 >= boostCoolTimer_)
 	{
 		if (input_->TriggerKey(DIK_E) || input_->IsPadTriggered(0, GamePadButton::A))
 		{
@@ -752,7 +730,7 @@ void Player::EntryReturn()
 
 void Player::TimerManager()
 {
-	if (0 < extendTimer_) 
+	if (0 < extendTimer_)
 	{
 		extendTimer_ -= deltaTime_;
 	}
@@ -780,16 +758,14 @@ void Player::TimerManager()
 		if (isRed_)
 		{
 			changeColor_ = { 1,0,0 };
-		}
-		else
+		} else
 		{
 			if (time == 0)
 			{
-				if(changeColor_ == defaultColorV3_)
+				if (changeColor_ == defaultColorV3_)
 				{
 					changeColor_ = { 1,1,1 };
-				}
-				else
+				} else
 				{
 					changeColor_ = defaultColorV3_;
 				}
@@ -807,20 +783,21 @@ void Player::TimerManager()
 
 		obj_->SetMaterialColor(changeColor_);
 
-		for (const auto& body : playerBodys_) 
+		for (const auto& body : playerBodys_)
 		{
 			body->SetColor(changeColor_);
 		}
 	}
 
+	// コンボの処理
+
 	if (comboTimer_ > 0.0f) {
 		comboTimer_ -= deltaTime_;
 		if (comboTimer_ <= 0.0f) {
 			comboCount_ = 0;
-			lastPlayedComboCount_ = 0; // 🔴 ←ここ追加！
+			lastPlayedComboCount_ = 0;
 		}
 	}
-
 
 }
 
@@ -884,7 +861,7 @@ void Player::ShrinkBody()
 
 void Player::TakeDamage()
 {
-	if(behavior_ != BehaviorPlayer::Return)
+	if (behavior_ != BehaviorPlayer::Return)
 	{
 		if (HP_ > 0 && invincibleTimer_ <= 0)
 		{
@@ -898,8 +875,7 @@ void Player::TakeDamage()
 			if (HP_ <= 0)
 			{
 				extendTimer_ = 0;
-			}
-			else
+			} else
 			{
 				invincibleTimer_ = kInvincibleTime_;
 			}
@@ -914,8 +890,7 @@ void Player::DamageProcessBodys()
 		if (0 < boostTimer_)
 		{
 			body->SetIsInvincible(true);
-		}
-		else
+		} else
 		{
 			body->SetIsInvincible(false);
 		}
@@ -933,8 +908,7 @@ void Player::GrassGaugeUpdate()
 	if (grassGauge_ < kMaxGrassGauge_)
 	{
 		UIGauge_ = std::clamp(static_cast<float>(grassGauge_) / static_cast<float>(kMaxGrassGauge_), 0.0f, 1.0f);
-	}
-	else
+	} else
 	{
 		UIGauge_ = std::clamp(1.0f * (createGrassTimer_ / kCreateGrassTime_), 0.0f, 1.0f);
 	}
@@ -981,8 +955,7 @@ void Player::HeartPos()
 				result.push_back({ position, angle });
 
 				targetDistance += length;
-			}
-			else {
+			} else {
 				accumulated += segLen;
 				prev = curr;
 				++it;
@@ -999,6 +972,15 @@ void Player::HeartPos()
 	// resultに3つの配置場所が入っている（足りなければ少ない場合もある）
 }
 
+void Player::AddCombo(int amount)
+{
+	if (comboCount_ < kMaxCombo_ + 1) {
+		comboCount_ = std::min(comboCount_ + amount, kMaxCombo_);
+		comboTimer_ = kComboTimeLimit_;
+	}
+}
+
+
 void Player::UpdateCombo()
 {
 	if (isEating_ && obj_->GetModel()->IsAnimationPlayFinished()) {
@@ -1006,28 +988,32 @@ void Player::UpdateCombo()
 		isEating_ = false;
 	}
 
-
 	// 再生中や、前回と同じコンボ数なら何もしない
 	if (isEating_ || comboCount_ == lastPlayedComboCount_) {
 		return;
 	}
 
-	// comboCount_ に応じて一度だけアニメ再生
 	switch (comboCount_) {
 	case 1:
 		obj_->ChangeModelAnimation("eat_1.gltf", 1);
 		isEating_ = true;
 		lastPlayedComboCount_ = comboCount_;
+		sourceVoiceEat[0] = Audio::GetInstance()->SoundPlayAudio(soundDataEat[0], false);
+		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceEat[0], kSE);
 		break;
 	case 2:
 		obj_->ChangeModelAnimation("eat_2.gltf", 1);
 		isEating_ = true;
 		lastPlayedComboCount_ = comboCount_;
+		sourceVoiceEat[1] = Audio::GetInstance()->SoundPlayAudio(soundDataEat[1], false);
+		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceEat[1], kSE);
 		break;
 	case 3:
 		obj_->ChangeModelAnimation("eat_3.gltf", 2);
 		isEating_ = true;
 		lastPlayedComboCount_ = comboCount_;
+		sourceVoiceEat[2] = Audio::GetInstance()->SoundPlayAudio(soundDataEat[2], false);
+		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceEat[2], kSE);
 		break;
 	default:
 		break;
@@ -1204,8 +1190,7 @@ void Player::BehaviorReturnUpdate()
 		{
 			Vector3 direction = Normalize(moveHistory_.back() - worldTransform_.translation_);
 			worldTransform_.translation_ += speed_ * direction;
-		}
-		else
+		} else
 		{
 			worldTransform_.translation_ = moveHistory_.back();
 			moveHistory_.pop_back();
@@ -1215,8 +1200,7 @@ void Player::BehaviorReturnUpdate()
 			{
 				return s->IsDelete();
 			});
-	}
-	else
+	} else
 	{
 		stuckGrassList_.clear();
 		behaviortRquest_ = BehaviorPlayer::Root;

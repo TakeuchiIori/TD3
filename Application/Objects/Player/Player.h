@@ -141,6 +141,8 @@ private:
 
 	void HeartPos();
 
+	void AddCombo(int amount);
+
 	void HeadDir() 
 	{
 		worldTransform_.rotation_.z = 0;
@@ -349,8 +351,8 @@ private:
 	Audio::SoundData soundDataDamage = {};
 	IXAudio2SourceVoice* sourceVoiceDamage = nullptr;
 
-	Audio::SoundData soundDataEat = {};
-	IXAudio2SourceVoice* sourceVoiceEat = nullptr;
+	Audio::SoundData soundDataEat[3] = {};
+	IXAudio2SourceVoice* sourceVoiceEat[3];
 
 	Audio::SoundData soundDataYodare = {};
 	IXAudio2SourceVoice* sourceVoiceYodare = nullptr;
