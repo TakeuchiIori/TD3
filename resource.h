@@ -2,8 +2,7 @@
 // Microsoft Visual C++ で生成されたインクルード ファイル。
 // DirectXGame.rc で使用
 //
-#define IDI_ICON1                       101
-#define IDI_ICON2						102
+#define IDI_ICON1						101
 
 
 // Next default values for new objects
