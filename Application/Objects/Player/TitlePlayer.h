@@ -163,6 +163,8 @@ private:
 	bool isScaling_ = false;
 
 	float targetRotationY_;
+
+	float UpPower_ = 0.0f;
 };
 
 Vector3 MakeExplosionVelocity(float minSpeed, float maxSpeed);
