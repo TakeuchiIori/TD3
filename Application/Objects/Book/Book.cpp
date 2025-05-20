@@ -196,7 +196,7 @@ void Book::UpdateReadBook()
 	// 読書UIが出てからの3秒タイマー
 	if (hasReadBookShown_ && !isCloseIconVisible_) {
 		readBookDelayTimer_ += GameTime::GetUnscaledDeltaTime();
-		if (readBookDelayTimer_ >= 3.0f) {
+		if (readBookDelayTimer_ >= 1.0f) {
 			isCloseIconVisible_ = true;
 		}
 	}
