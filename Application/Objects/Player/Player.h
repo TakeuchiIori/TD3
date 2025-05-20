@@ -107,6 +107,8 @@ private:
 
 	void ChangeDir();
 
+	void ChangeDirRoot();
+
 	void UpBody();
 	void DownBody();
 	void LeftBody();
@@ -245,6 +247,9 @@ private:
 	
 	MapChipCollision mpCollision_;
 	MapChipCollision::ColliderRect colliderRect_;
+
+	WorldTransform legWT_;
+	std::shared_ptr<Object3d> legObj_;
 
 	bool isCollisionBody = false;
 

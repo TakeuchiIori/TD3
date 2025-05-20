@@ -32,7 +32,7 @@ void Stage::InitCheckPoint()
 	player_->Reset();
 	pos.x = StageEditor::Instance()->GetInitX(currentStageNum_, currentCheckPoint_);
 	player_->SetTimeLimit(StageEditor::Instance()->GetTimeLimit(currentStageNum_, currentCheckPoint_));
-	player_->SetPos({ pos.x, 2.0f, pos.z });
+	player_->SetPos({ pos.x, 4.0f, pos.z });
 	ReloadObject();
 }
 
