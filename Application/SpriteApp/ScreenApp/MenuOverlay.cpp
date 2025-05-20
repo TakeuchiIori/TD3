@@ -174,58 +174,57 @@ void MenuOverlay::VolumeSlider()
 		volume[static_cast<AudioType>(index)] = t;
 		volumeManager_->SetVolume(static_cast<AudioType>(index), t);
 		volumeSprites_[index]->SetColor(Vector4(0.9f, 0.7f, 0.2f, 1.0f));
-		if(RStick.x != 0) jsonManager_->Save();
+		if (RStick.x != 0) jsonManager_->Save();
 	}
-	/*else
+
+
+	if (input_->IsTriggerMouse(0))
 	{
-		if (input_->IsTriggerMouse(0))
-		{
-			if (!isPush)
-			{
-				for (VolumeControl& vol : volumeControl_)
-				{
-					if (Length(vol.pos - input_->GetMousePosition()) <= vol.radius)
-					{
-						vol.isPush = true;
-						isPush = true;
-						break;
-					}
-				}
-			}
-		}
-		int i = 0;
-		if (input_->IsPressMouse(0) && isPush)
+		if (!isPush)
 		{
 			for (VolumeControl& vol : volumeControl_)
 			{
-				if (vol.isPush)
+				if (Length(vol.pos - input_->GetMousePosition()) <= vol.radius)
 				{
-					vol.pos.x = std::clamp(input_->GetMousePosition().x, minX, maxX);
-					float liner = maxX - minX;
-					float current = maxX - vol.pos.x;
-					float t = 1.0f - (current / liner);
-					volume[static_cast<AudioType>(i)] = t;
-					volumeManager_->SetVolume(static_cast<AudioType>(i), t);
-					volumeSprites_[i]->SetColor(Vector4(0.9f, 0.7f, 0.2f, 1.0f));
-					jsonManager_->Save();
+					vol.isPush = true;
+					isPush = true;
 					break;
 				}
-				++i;
 			}
 		}
-		else
+	}
+	int i = 0;
+	if (input_->IsPressMouse(0) && isPush)
+	{
+		for (VolumeControl& vol : volumeControl_)
 		{
-			for (VolumeControl& vol : volumeControl_)
+			if (vol.isPush)
 			{
-				vol.isPush = false;
+				vol.pos.x = std::clamp(input_->GetMousePosition().x, minX, maxX);
+				float liner = maxX - minX;
+				float current = maxX - vol.pos.x;
+				float t = 1.0f - (current / liner);
+				volume[static_cast<AudioType>(i)] = t;
+				volumeManager_->SetVolume(static_cast<AudioType>(i), t);
+				volumeSprites_[i]->SetColor(Vector4(0.9f, 0.7f, 0.2f, 1.0f));
+				jsonManager_->Save();
+				break;
 			}
-			for (auto&& volTex : volumeSprites_)
-			{
-				volTex->SetColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-			}
-			isPush = false;
+			++i;
 		}
-	}*/
+	}
+	else if (isPush)
+	{
+		for (VolumeControl& vol : volumeControl_)
+		{
+			vol.isPush = false;
+		}
+		for (auto&& volTex : volumeSprites_)
+		{
+			volTex->SetColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+		}
+		isPush = false;
+	}
 }
 
 float MenuOverlay::Length(const Vector2& v)
