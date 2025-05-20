@@ -19,7 +19,7 @@ void MyGame::Initialize()
 #ifdef _DEBUG
 	SceneManager::GetInstance()->ChangeScene("Game");
 #else//Title
-	SceneManager::GetInstance()->ChangeScene("Game");
+	SceneManager::GetInstance()->ChangeScene("Title");
 #endif
 	// パーティクルマネージャ生成
 

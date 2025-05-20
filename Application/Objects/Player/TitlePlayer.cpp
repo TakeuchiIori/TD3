@@ -1,6 +1,7 @@
 #include "TitlePlayer.h"
 #include "Collision/OBB/OBBCollider.h"
 #include "Collision/Core/ColliderFactory.h"
+#include <Debugger/Logger.h>
 
 
 TitlePlayer::~TitlePlayer()
@@ -105,23 +106,68 @@ void TitlePlayer::Update()
 		neckMat.m[3][2]
 	};
 
+	if (input_->IsPadPressed(0, GamePadButton::B)) {
+		neckTransform_.scale_.y += 0.1f;
+	}
 
 
 	if (isFinishedReadBook_) {
 		if (Input::GetInstance()->PushKey(DIK_SPACE) || Input::GetInstance()->IsPadPressed(0, GamePadButton::A) || Input::GetInstance()->TriggerKey(DIK_E)) {
 			isScaling_ = true;
-			
+
 		}
 
 		if (isScaling_) {
 			neckTransform_.scale_.y += 0.1f;
 		}
-	
+
 	}
 	float stretchY = neckTransform_.scale_.y;
 	worldTransform_.translation_ = neckPos + Vector3(0.0f, stretchY + 1.0f, 0.0f);
 	worldTransform_.UpdateMatrix();
 	// スケールによる伸びを考慮して頭を移動
+
+	auto result = mpCollision_.CheckHitAtPosition(worldTransform_.translation_);
+	if (result && result->blockType == MapChipType::kCeiling) {
+		auto& info = *result;
+
+		mpCollision_.GetMapChipField()->SetMapChipTypeByIndex(info.xIndex, info.yIndex, MapChipType::kBlank);
+		GenerateCeilingBreakParticle(worldTransform_.translation_);
+	}
+	for (auto it = breakParticles_.begin(); it != breakParticles_.end(); ) {
+		auto& p = *it;
+		float dt = GameTime::GetDeltaTime();
+		p.lifetime -= dt;
+
+		if (p.lifetime <= 0.0f) {
+			it = breakParticles_.erase(it);
+			continue;
+		}
+
+		Vector3 gravity = { 0.0f, -9.8f, 0.0f };
+
+		if (!p.hasSwitched) {
+			// 打ち上げ中（重力なし）
+			p.wt->translation_ += p.velocity * dt;
+
+			if (p.lifetime <= (3.0f - p.switchTime)) {
+				p.velocity = MakeExplosionVelocity(0.3f, 1.6f); // 放射切替
+				p.hasSwitched = true;
+			}
+		} else {
+			// 放射中（重力あり）
+			p.velocity += gravity * dt;
+			p.wt->translation_ += p.velocity * dt;
+		}
+
+		p.wt->rotation_ += p.rotationVelocity * dt;
+		p.wt->UpdateMatrix();
+
+		++it;
+	}
+
+
+
 
 
 
@@ -166,9 +212,15 @@ void TitlePlayer::UpdateSprite()
 
 void TitlePlayer::Draw()
 {
+	for (auto& p : breakParticles_) {
+		p.obj->Draw(BaseObject::camera_, *p.wt);
+	}
+
 	obj_->Draw(BaseObject::camera_, worldTransform_);
 	neck_->Draw(BaseObject::camera_, neckTransform_);
 	body_->Draw(BaseObject::camera_, bodyTransform_);
+
+
 
 }
 
@@ -260,4 +312,67 @@ void TitlePlayer::OnExitCollision(BaseCollider* self, BaseCollider* other)
 
 void TitlePlayer::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
 {
+}
+
+/// <summary>
+///  天井破壊モデルパーティクルを生成する
+/// </summary>
+void TitlePlayer::GenerateCeilingBreakParticle(const Vector3& position)
+{
+	const int kParticleCount = 15;
+	for (int i = 0; i < kParticleCount; ++i) {
+		auto obj = std::make_unique<Object3d>();
+		obj->Initialize();
+		obj->SetModel("cube.obj");
+
+		auto wt = std::make_unique<WorldTransform>();
+		wt->Initialize();
+		wt->translation_ = position;
+		wt->scale_ = { 0.7f, 0.7f, 0.7f };
+
+		// 少しばらつきのある初期打ち上げ方向
+		Vector3 offset = {
+			((rand() % 100) / 100.0f - 0.5f) * 0.5f,  // X方向に±0.25
+			1.0f,  // Y方向固定
+			((rand() % 100) / 100.0f - 0.5f) * 0.5f   // Z方向に±0.25
+		};
+		Vector3 initialVelocity = Normalize(offset) * 8.0f + Vector3{ 0, 8.0f, 0 }; // 少し中心寄せつつ打ち上げ
+
+		// ランダムな回転速度
+		Vector3 rotationVel = {
+			((rand() % 100) / 100.0f - 0.5f) * 1.5f,
+			((rand() % 100) / 100.0f - 0.5f) * 1.5f,
+			((rand() % 100) / 100.0f - 0.5f) * 1.5f,
+		};
+
+		breakParticles_.push_back({
+			std::move(obj),
+			std::move(wt),
+			initialVelocity,
+			3.0f,
+			0.15f,
+			false,
+			rotationVel
+			});
+	}
+}
+
+
+Vector3 MakeExplosionVelocity(float minSpeed, float maxSpeed) {
+	// 水平方向のランダム角度 [0, 2π]
+	float theta = static_cast<float>(rand()) / RAND_MAX * 2.0f * 3.1415926f;
+
+	// 垂直方向の角度 [0, π/2]（上方向だけ）
+	float phi = static_cast<float>(rand()) / RAND_MAX * (3.1415926f / 2.0f);
+
+	// 球面座標 → XYZ（XとZがしっかり出る）
+	Vector3 dir = {
+		std::sin(phi) * std::cos(theta), // X
+		std::sin(phi),                   // Y（上方向）
+		std::sin(phi) * std::sin(theta)  // Z
+	};
+
+	float speed = minSpeed + ((rand() % 100) / 100.0f) * (maxSpeed - minSpeed);
+
+	return dir * speed;
 }

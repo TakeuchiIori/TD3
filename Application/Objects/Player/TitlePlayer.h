@@ -104,18 +104,34 @@ public:
 	void OnExitCollision(BaseCollider* self, BaseCollider* other);
 	void OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir);
 
+	void GenerateCeilingBreakParticle(const Vector3& position);
+
 	void SetIsFinishedReadBook(bool isFinishedReadBook) { isFinishedReadBook_ = isFinishedReadBook; }
 	void SetShowUI(bool showUI) { showUI_ = showUI; }
+	void SetMapChipInfo(MapChipInfo* info) { mpInfo_ = info; }
 private:
 
 	// ポインタ
 	Input* input_ = nullptr;
-
+	MapChipInfo* mpInfo_ = nullptr;
 	std::unique_ptr<Object3d> neck_;
 	std::unique_ptr<Object3d> body_;
 
 	std::unique_ptr<Sprite> uiA_;
 	Vector3 offsetUI_ = {};
+
+
+	struct ExplosionParticle {
+		std::unique_ptr<Object3d> obj;
+		std::unique_ptr<WorldTransform> wt;
+		Vector3 velocity;
+		float lifetime;
+		float switchTime; // 噴火から放射に切り替えるタイミング
+		bool hasSwitched = false;
+		Vector3 rotationVelocity;
+	};
+
+	std::vector<ExplosionParticle> breakParticles_;
 
 
 	std::unique_ptr<JsonManager> jsonManager_;
@@ -149,3 +165,4 @@ private:
 	float targetRotationY_;
 };
 
+Vector3 MakeExplosionVelocity(float minSpeed, float maxSpeed);

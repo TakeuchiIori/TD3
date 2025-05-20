@@ -198,6 +198,11 @@
 //	}
 //}
 
+MapChipField* MapChipCollision::GetMapChipField() const {
+	return mapChipField_;
+}
+
+
 /// Y値を考慮
 void MapChipCollision::DetectAndResolveCollision(
 	const ColliderRect& colliderRect,
@@ -393,3 +398,28 @@ void MapChipCollision::DetectAndResolveCollision(
 		velocity = originalVelocity;
 	}
 }
+
+std::optional<CollisionInfo> MapChipCollision::CheckHitAtPosition(const Vector3& position) const
+{
+	if (!mapChipField_) return std::nullopt;
+
+	auto index = mapChipField_->GetMapChipIndexSetByPosition(position);
+	MapChipType type = mapChipField_->GetMapChipTypeByIndex(index.xIndex, index.yIndex);
+
+	if (type == MapChipType::kBlank) {
+		return std::nullopt;
+	}
+
+	CollisionInfo info;
+	info.xIndex = index.xIndex;
+	info.yIndex = index.yIndex;
+	info.blockType = type;
+	info.blockRect = mapChipField_->GetRectByIndex(index.xIndex, index.yIndex);
+	info.direction = CollisionDirection::NoneDir;
+	info.penetrationDepth = 0.0f;
+	info.penetrationDepth = 0.0f;
+
+	return info;
+
+}
+
