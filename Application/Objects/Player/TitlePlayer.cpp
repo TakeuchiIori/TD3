@@ -249,11 +249,19 @@ void TitlePlayer::Move()
 {
 	Vector3 oldDirection = moveDirection_;
 
-	if (input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A)) {
-		moveDirection_ = { -1.0f, 0.0f, 0.0f };
-	} else if (input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D)) {
-		moveDirection_ = { 1.0f, 0.0f, 0.0f };
-	} else {
+
+	if (!isScaling_) {
+		if (input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A)) {
+			moveDirection_ = { -1.0f, 0.0f, 0.0f };
+		}
+		else if (input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D)) {
+			moveDirection_ = { 1.0f, 0.0f, 0.0f };
+		}
+		else {
+			moveDirection_ = { 0.0f, 0.0f, 0.0f };
+		}
+	}
+	else {
 		moveDirection_ = { 0.0f, 0.0f, 0.0f };
 	}
 
