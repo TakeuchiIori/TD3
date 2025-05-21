@@ -141,6 +141,8 @@ private:
 
 	void HeartPos();
 
+	void AddCombo(int amount);
+
 	void HeadDir() 
 	{
 		worldTransform_.rotation_.z = 0;
@@ -254,7 +256,7 @@ private:
 	bool isCollisionBody = false;
 
 	bool isRed_ = false;
-	bool isEating_ = false;
+	bool isAnimation_ = false;
 
 
 	const Vector4 defaultColorV4_ = { 0.90625f,0.87109f,0.125f,1.0f };
@@ -324,6 +326,7 @@ private:
 	float comboTimer_ = 0.0f;              // コンボ残り時間
 	float kComboTimeLimit_ = 1.5f;         // コンボ持続時間（秒）
 	int lastPlayedComboCount_ = 0;
+	uint32_t eatingComboId_ = 0;
 
 
 	// ヒットポイント
@@ -349,8 +352,8 @@ private:
 	Audio::SoundData soundDataDamage = {};
 	IXAudio2SourceVoice* sourceVoiceDamage = nullptr;
 
-	Audio::SoundData soundDataEat = {};
-	IXAudio2SourceVoice* sourceVoiceEat = nullptr;
+	Audio::SoundData soundDataEat[3] = {};
+	IXAudio2SourceVoice* sourceVoiceEat[3];
 
 	Audio::SoundData soundDataYodare = {};
 	IXAudio2SourceVoice* sourceVoiceYodare = nullptr;

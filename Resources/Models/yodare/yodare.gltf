@@ -432,107 +432,107 @@
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":13
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":14
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":15
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":16
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":17
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":18
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":19
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":20
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":21
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":22
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":23
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":24
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":25
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":26
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":27
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":28
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":29
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":30
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":31
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":32
 				},
 				{
 					"input":11,
-					"interpolation":"LINEAR",
+					"interpolation":"STEP",
 					"output":33
 				},
 				{
@@ -685,9 +685,9 @@
 		{
 			"bufferView":8,
 			"componentType":5126,
-			"count":24,
+			"count":29,
 			"max":[
-				0.9583333333333334
+				1.1666666666666667
 			],
 			"min":[
 				0
@@ -697,13 +697,13 @@
 		{
 			"bufferView":9,
 			"componentType":5126,
-			"count":24,
+			"count":29,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":10,
 			"componentType":5126,
-			"count":24,
+			"count":29,
 			"type":"VEC4"
 		},
 		{
@@ -711,7 +711,7 @@
 			"componentType":5126,
 			"count":2,
 			"max":[
-				0.9583333333333334
+				1.1666666666666667
 			],
 			"min":[
 				0
@@ -925,53 +925,23 @@
 		},
 		{
 			"buffer":0,
-			"byteLength":96,
+			"byteLength":116,
 			"byteOffset":586092
 		},
 		{
 			"buffer":0,
-			"byteLength":288,
-			"byteOffset":586188
+			"byteLength":348,
+			"byteOffset":586208
 		},
 		{
 			"buffer":0,
-			"byteLength":384,
-			"byteOffset":586476
+			"byteLength":464,
+			"byteOffset":586556
 		},
 		{
 			"buffer":0,
 			"byteLength":8,
-			"byteOffset":586860
-		},
-		{
-			"buffer":0,
-			"byteLength":24,
-			"byteOffset":586868
-		},
-		{
-			"buffer":0,
-			"byteLength":24,
-			"byteOffset":586892
-		},
-		{
-			"buffer":0,
-			"byteLength":32,
-			"byteOffset":586916
-		},
-		{
-			"buffer":0,
-			"byteLength":24,
-			"byteOffset":586948
-		},
-		{
-			"buffer":0,
-			"byteLength":24,
-			"byteOffset":586972
-		},
-		{
-			"buffer":0,
-			"byteLength":32,
-			"byteOffset":586996
+			"byteOffset":587020
 		},
 		{
 			"buffer":0,
@@ -1070,8 +1040,38 @@
 		},
 		{
 			"buffer":0,
-			"byteLength":128,
+			"byteLength":24,
 			"byteOffset":587532
+		},
+		{
+			"buffer":0,
+			"byteLength":32,
+			"byteOffset":587556
+		},
+		{
+			"buffer":0,
+			"byteLength":24,
+			"byteOffset":587588
+		},
+		{
+			"buffer":0,
+			"byteLength":24,
+			"byteOffset":587612
+		},
+		{
+			"buffer":0,
+			"byteLength":32,
+			"byteOffset":587636
+		},
+		{
+			"buffer":0,
+			"byteLength":24,
+			"byteOffset":587668
+		},
+		{
+			"buffer":0,
+			"byteLength":128,
+			"byteOffset":587692
 		}
 	],
 	"samplers":[
@@ -1082,8 +1082,8 @@
 	],
 	"buffers":[
 		{
-			"byteLength":587660,
-			"uri":"yodare.bin"
+			"byteLength":587820,
+			"uri":"Yodare.bin"
 		}
 	]
 }
