@@ -256,7 +256,7 @@ private:
 	bool isCollisionBody = false;
 
 	bool isRed_ = false;
-	bool isEating_ = false;
+	bool isAnimation_ = false;
 
 
 	const Vector4 defaultColorV4_ = { 0.90625f,0.87109f,0.125f,1.0f };
@@ -326,6 +326,7 @@ private:
 	float comboTimer_ = 0.0f;              // コンボ残り時間
 	float kComboTimeLimit_ = 1.5f;         // コンボ持続時間（秒）
 	int lastPlayedComboCount_ = 0;
+	uint32_t eatingComboId_ = 0;
 
 
 	// ヒットポイント

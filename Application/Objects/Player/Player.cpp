@@ -162,10 +162,10 @@ void Player::Update()
 	beforebehavior_ = behavior_;
 
 	// Bボタンで一回だけ「食べるアニメーション」再生
-	//if (!isEating_ && input_->IsPadTriggered(0, GamePadButton::B)) {
-	//	obj_->ChangeModelAnimation("eat_2.gltf", 5);
-	//	isEating_ = true;
-	//}
+	if (!isAnimation_ && input_->IsPadTriggered(0, GamePadButton::B)) {
+		obj_->ChangeModelAnimation("Yodare.gltf", 1);
+		isAnimation_ = true;
+	}
 	// 各行動の初期化
 	BehaviorInitialize();
 
@@ -288,6 +288,8 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 	{
 		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrass)) // 草を食べたら
 		{
+			AddCombo(1);
+
 			if (kMaxGrassGauge_ > grassGauge_ && createGrassTimer_ <= 0)
 			{
 				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.1f)
@@ -298,8 +300,6 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + largeGrassTime_);
 				}
 				grassGauge_++;
-
-				AddCombo(1);
 
 				if (kMaxGrassGauge_ <= grassGauge_)
 				{
@@ -808,6 +808,10 @@ void Player::TimerZero()
 	boostTimer_ = 0;
 	createGrassTimer_ = 0;
 	invincibleTimer_ = 0;
+
+	comboCount_ = 0;
+	lastPlayedComboCount_ = 0;
+	comboTimer_ = 0.0f;
 }
 
 bool Player::IsPopGrass()
@@ -983,34 +987,40 @@ void Player::AddCombo(int amount)
 
 void Player::UpdateCombo()
 {
-	if (isEating_ && obj_->GetModel()->IsAnimationPlayFinished()) {
+	if (isAnimation_ && obj_->GetModel()->IsAnimationPlayFinished()) {
 		obj_->ChangeModel("kirin.gltf", true);
-		isEating_ = false;
+		isAnimation_ = false;
+
+		// ★ ここで3コンボ目が終わったらリセットする
+		if (comboCount_ == kMaxCombo_) {
+			comboCount_ = 0;
+			lastPlayedComboCount_ = 0;
+			comboTimer_ = 0.0f;
+		}
 	}
 
-	// 再生中や、前回と同じコンボ数なら何もしない
-	if (isEating_ || comboCount_ == lastPlayedComboCount_) {
+	if (comboCount_ == lastPlayedComboCount_) {
 		return;
 	}
 
 	switch (comboCount_) {
 	case 1:
 		obj_->ChangeModelAnimation("eat_1.gltf", 1);
-		isEating_ = true;
+		isAnimation_ = true;
 		lastPlayedComboCount_ = comboCount_;
 		sourceVoiceEat[0] = Audio::GetInstance()->SoundPlayAudio(soundDataEat[0], false);
 		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceEat[0], kSE);
 		break;
 	case 2:
 		obj_->ChangeModelAnimation("eat_2.gltf", 1);
-		isEating_ = true;
+		isAnimation_ = true;
 		lastPlayedComboCount_ = comboCount_;
 		sourceVoiceEat[1] = Audio::GetInstance()->SoundPlayAudio(soundDataEat[1], false);
 		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceEat[1], kSE);
 		break;
 	case 3:
 		obj_->ChangeModelAnimation("eat_3.gltf", 2);
-		isEating_ = true;
+		isAnimation_ = true;
 		lastPlayedComboCount_ = comboCount_;
 		sourceVoiceEat[2] = Audio::GetInstance()->SoundPlayAudio(soundDataEat[2], false);
 		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceEat[2], kSE);
