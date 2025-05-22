@@ -71,6 +71,7 @@ void Book::InitJson()
 	jsonManager_ = std::make_unique<JsonManager>("Book", "Resources/JSON/");
 	jsonManager_->SetCategory("Objects");
 	jsonManager_->SetSubCategory("Book");
+	jsonManager_->Register("Translate", &worldTransform_.translation_);
 	jsonManager_->Register("Rotate", &worldTransform_.rotation_);
 	jsonManager_->Register("Offset", &offset_);
 	jsonManager_->Register("OffsetReadUI", &offsetReadUI_);
