@@ -305,7 +305,7 @@ void TitlePlayer::UpdateParticle()
 		}
 
 		// ▼ 緩やかな重力で最初から減速 → 後から通常重力に切り替え
-		Vector3 lightGravity = { 0.0f, -80.0f, 0.0f };  // 弱めの重力
+		Vector3 lightGravity = { 0.0f, -120.0f, 0.0f };  // 弱めの重力
 		Vector3 fullGravity = { 0.0f, -9.8f, 0.0f };  // 通常重力
 
 		if (!p.hasSwitched) {
@@ -353,7 +353,7 @@ void TitlePlayer::OnDirectionCollision(BaseCollider* self, BaseCollider* other, 
 /// </summary>
 void TitlePlayer::GenerateCeilingBreakParticle(const Vector3& position)
 {
-	const int kParticleCount = 15;
+	const int kParticleCount = 40;
 	for (int i = 0; i < kParticleCount; ++i) {
 		auto obj = std::make_unique<Object3d>();
 		obj->Initialize();
@@ -378,9 +378,9 @@ void TitlePlayer::GenerateCeilingBreakParticle(const Vector3& position)
 
 		// ランダムな回転速度
 		Vector3 rotationVel = {
-			((rand() % 100) / 100.0f - 0.5f) * 1.5f,
-			((rand() % 100) / 100.0f - 0.5f) * 1.5f,
-			((rand() % 100) / 100.0f - 0.5f) * 1.5f,
+			((rand() % 100) / 100.0f - 0.5f) * 6.0f,
+			((rand() % 100) / 100.0f - 0.5f) * 6.0f,
+			((rand() % 100) / 100.0f - 0.5f) * 6.0f,
 		};
 
 		breakParticles_.push_back({
