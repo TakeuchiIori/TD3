@@ -24,7 +24,7 @@ void TitleScreen::Initialize()
 	// 
 	///////////////////////////////////////////////////////////////////////////
 
-// キーボード用UI
+	// キーボード用UI
 	option_[0] = std::make_unique<UIBase>("KeyBoard_0");
 	option_[0]->Initialize("Resources/JSON/UI/KeyBoard_0.json");
 	option_[1] = std::make_unique<UIBase>("KeyBoard_1");

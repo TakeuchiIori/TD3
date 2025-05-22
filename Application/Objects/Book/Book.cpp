@@ -120,6 +120,7 @@ void Book::UpdateSprite()
 
 	// スケールが小さくなりすぎたら描画停止
 	if (uiScaleCurrent_ < 0.01f) {
+
 		return;
 	}
 
@@ -151,6 +152,7 @@ void Book::UpdateReadBook()
 		if (isScaling_) {
 			uiReadScaleState_ = UIReadScaleState::Shrinking;
 			isDrawBack_ = false;
+			
 		}
 	}
 
@@ -166,6 +168,9 @@ void Book::UpdateReadBook()
 		break;
 	}
 	case UIReadScaleState::Shrinking: {
+		if (isCloseIconVisible_) {
+			isCloseIconVisible_ = false;
+		}
 		uiReadScaleCurrent_ += (0.0f - uiReadScaleCurrent_) * (1.0f - std::exp(-speed * delta));
 		if (uiReadScaleCurrent_ < 0.01f) {
 			uiReadScaleCurrent_ = 0.0f;
@@ -175,12 +180,15 @@ void Book::UpdateReadBook()
 
 			hasReadBookShown_ = false;
 			readBookDelayTimer_ = 0.0f;
-			isCloseIconVisible_ = false;
 
 			if (OffBookTrigger_) {
 				OffBookTrigger_();
 			}
 		}
+		break;
+	}
+	case UIReadScaleState::None: {
+		
 		break;
 	}
 	default:
@@ -194,13 +202,14 @@ void Book::UpdateReadBook()
 	};
 	uiReadBook_[0]->SetSize(scaledSize);
 
-	// 読書UIが出てからの3秒タイマー
-	if (hasReadBookShown_ && !isCloseIconVisible_) {
+	// 読書UIが出てからの1秒タイマー
+	if (hasReadBookShown_ && !isCloseIconVisible_ && uiReadScaleState_ != UIReadScaleState::Shrinking) {
 		readBookDelayTimer_ += GameTime::GetUnscaledDeltaTime();
 		if (readBookDelayTimer_ >= 1.0f) {
 			isCloseIconVisible_ = true;
 		}
 	}
+
 
 
 	// 表示中のみ位置更新
