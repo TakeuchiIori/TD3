@@ -131,9 +131,9 @@ void TitleScene::Update()
 		}
 	}
 
-	//if (player_->GetWorldTransform().translation_.y > 20.0f) {
-	//	SceneManager::GetInstance()->ChangeScene("Game");
-	//}
+	if (player_->GetWorldTransform().translation_.y > 35.0f) {
+		SceneManager::GetInstance()->ChangeScene("Game");
+	}
 
 
 

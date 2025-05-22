@@ -398,7 +398,7 @@ void TitlePlayer::GenerateCeilingBreakParticle(const Vector3& position)
 void TitlePlayer::Shake()
 {
 	if (isShake) {
-		camera_->Shake(0.5f, Vector2{ -0.1f, -0.1f }, Vector2{ 0.1f,0.1f });
+		camera_->Shake(2.5f, Vector2{ -0.1f, -0.1f }, Vector2{ 0.1f,0.1f });
 		isShake = false;
 	}
 }
