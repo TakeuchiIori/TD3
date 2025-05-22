@@ -54,6 +54,8 @@ void TitlePlayer::Initialize(Camera* camera)
 	uiA_->SetSize({ 50.0f, 50.0f });
 	uiA_->SetAnchorPoint({ 0.5f, 0.5f });
 
+	isScaling_ = false;
+
 }
 
 void TitlePlayer::InitCollision()
@@ -240,19 +242,25 @@ void TitlePlayer::Move()
 {
 	Vector3 oldDirection = moveDirection_;
 
+	deltaTime_ = GameTime::GetDeltaTime();
 
-	if (!isScaling_) {
-		if (input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A)) {
-			moveDirection_ = { -1.0f, 0.0f, 0.0f };
-		} else if (input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D)) {
-			moveDirection_ = { 1.0f, 0.0f, 0.0f };
-		} else {
-			moveDirection_ = { 0.0f, 0.0f, 0.0f };
-		}
+	// isScaling_中は完全に移動不可（キーボードもパッドも）
+	if (isScaling_) {
+		moveDirection_ = { 0.0f, 0.0f, 0.0f };
+		velocity_ = { 0.0f, 0.0f, 0.0f };
+		return;
+	}
+
+	// キーボード入力
+	if (input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A)) {
+		moveDirection_ = { -1.0f, 0.0f, 0.0f };
+	} else if (input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D)) {
+		moveDirection_ = { 1.0f, 0.0f, 0.0f };
 	} else {
 		moveDirection_ = { 0.0f, 0.0f, 0.0f };
 	}
 
+	// パッド入力
 	Vector2 padInput = input_->GetLeftStickInput(0);
 	moveDirection_.x += padInput.x;
 
@@ -261,17 +269,17 @@ void TitlePlayer::Move()
 		moveDirection_ = Normalize(moveDirection_);
 	}
 
-	deltaTime_ = GameTime::GetDeltaTime();
 	velocity_ = moveDirection_ * defaultSpeed_ * deltaTime_;
 	Vector3 newPos = rootTransform_.translation_ + velocity_;
 
-	// ▼ X軸を前方とした向き計算と補間
+	// ▼ 向きの補間処理
 	if (LengthSquared(moveDirection_) > 0.0001f) {
 		float targetAngle = std::atan2(moveDirection_.z, moveDirection_.x);
 		targetRotationY_ = -targetAngle;
 		rootTransform_.rotation_.y += (targetRotationY_ - rootTransform_.rotation_.y) * (1.0f - std::exp(-10.0f * deltaTime_));
 		worldTransform_.rotation_.y = rootTransform_.rotation_.y;
 	}
+
 	mpCollision_.DetectAndResolveCollision(
 		colliderRect_,
 		newPos,
@@ -283,8 +291,8 @@ void TitlePlayer::Move()
 	);
 
 	rootTransform_.translation_ = newPos;
-
 }
+
 
 void TitlePlayer::UpdateParticle()
 {
