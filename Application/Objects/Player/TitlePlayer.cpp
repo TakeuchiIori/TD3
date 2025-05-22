@@ -88,6 +88,10 @@ void TitlePlayer::InitJson()
 
 	jsonManager_->Register("上がる力", &UpPower_);
 
+	jsonManager_->ClearTreePrefix();
+
+	jsonManager_->Register("up_", &up_);
+
 	jsonCollider_ = std::make_unique<JsonManager>("TitlePlayerCollider", "Resources/JSON/");
 	obbCollider_->InitJson(jsonCollider_.get());
 
@@ -109,7 +113,7 @@ void TitlePlayer::Update()
 	};
 
 	if (input_->IsPadPressed(0, GamePadButton::B)) {
-		neckTransform_.scale_.y += 0.1f;
+		neckTransform_.scale_.y += up_;
 	}
 
 
@@ -120,71 +124,18 @@ void TitlePlayer::Update()
 		}
 
 		if (isScaling_) {
-			neckTransform_.scale_.y += 0.1f;
+			neckTransform_.scale_.y += up_;
 		}
 
 	}
 	float stretchY = neckTransform_.scale_.y;
 	worldTransform_.translation_ = neckPos + Vector3(0.0f, stretchY + 1.0f, 0.0f);
 	worldTransform_.UpdateMatrix();
-	// スケールによる伸びを考慮して頭を移動
-// 横に判定を広げる幅
-	float checkWidth = 2.5f;
+	MapChipOnCollision();
 
-	// 中心と左右で3点チェック
-	std::vector<Vector3> checkPositions = {
-		worldTransform_.translation_,
-		worldTransform_.translation_ + Vector3(checkWidth, 0.0f, 0.0f),
-		worldTransform_.translation_ + Vector3(-checkWidth, 0.0f, 0.0f)
-	};
+	UpdateParticle();
 
-	for (const auto& pos : checkPositions) {
-		auto result = mpCollision_.CheckHitAtPosition(pos);
-		if (result && result->blockType == MapChipType::kCeiling) {
-			const auto& info = *result;
-			mpCollision_.GetMapChipField()->SetMapChipTypeByIndex(info.xIndex, info.yIndex, MapChipType::kBlank);
-			GenerateCeilingBreakParticle(pos); // 当たった位置で生成
-		}
-	}
-
-
-
-	for (auto it = breakParticles_.begin(); it != breakParticles_.end();) {
-		auto& p = *it;
-		float dt = GameTime::GetDeltaTime();
-		p.lifetime -= dt;
-
-		if (p.lifetime <= 0.0f) {
-			it = breakParticles_.erase(it);
-			continue;
-		}
-
-		// ▼ 緩やかな重力で最初から減速 → 後から通常重力に切り替え
-		Vector3 lightGravity = { 0.0f, -80.0f, 0.0f };  // 弱めの重力
-		Vector3 fullGravity = { 0.0f, -9.8f, 0.0f };  // 通常重力
-
-		if (!p.hasSwitched) {
-			p.velocity += lightGravity * dt;
-			p.wt->translation_ += p.velocity * dt;
-
-			if (p.lifetime <= (3.0f - p.switchTime)) {
-				p.hasSwitched = true;
-			}
-		} else {
-			p.velocity += fullGravity * dt;
-			p.wt->translation_ += p.velocity * dt;
-		}
-
-		p.wt->rotation_ += p.rotationVelocity * dt;
-		p.wt->UpdateMatrix();
-
-		++it;
-	}
-
-
-
-
-
+	Shake();
 
 	obbCollider_->Update();
 	neck_->uvScale = { neckTransform_.scale_.x, neckTransform_.scale_.y };
@@ -255,6 +206,30 @@ void TitlePlayer::MapChipOnCollision(const CollisionInfo& info)
 {
 }
 
+void TitlePlayer::MapChipOnCollision()
+{
+	float checkWidth = 2.0f;
+	float checkHeight = 0.0f;
+	// 中心と左右で3点チェック
+	std::vector<Vector3> checkPositions = {
+		worldTransform_.translation_,
+		worldTransform_.translation_ + Vector3(checkWidth, checkHeight, 0.0f),
+		worldTransform_.translation_ + Vector3(-checkWidth, -checkHeight, 0.0f)
+	};
+
+	for (const auto& pos : checkPositions) {
+		auto result = mpCollision_.CheckHitAtPosition(pos);
+		if (result && result->blockType == MapChipType::kCeiling) {
+			const auto& info = *result;
+			isShake = true;
+			mpCollision_.GetMapChipField()->SetMapChipTypeByIndex(info.xIndex, info.yIndex, MapChipType::kBlank);
+			GenerateCeilingBreakParticle(pos); // 当たった位置で生成
+		}
+	}
+
+
+}
+
 void TitlePlayer::Reset()
 {
 
@@ -317,6 +292,42 @@ void TitlePlayer::Move()
 
 }
 
+void TitlePlayer::UpdateParticle()
+{
+	for (auto it = breakParticles_.begin(); it != breakParticles_.end();) {
+		auto& p = *it;
+		float dt = GameTime::GetDeltaTime();
+		p.lifetime -= dt;
+
+		if (p.lifetime <= 0.0f) {
+			it = breakParticles_.erase(it);
+			continue;
+		}
+
+		// ▼ 緩やかな重力で最初から減速 → 後から通常重力に切り替え
+		Vector3 lightGravity = { 0.0f, -120.0f, 0.0f };  // 弱めの重力
+		Vector3 fullGravity = { 0.0f, -9.8f, 0.0f };  // 通常重力
+
+		if (!p.hasSwitched) {
+			p.velocity += lightGravity * dt;
+			p.wt->translation_ += p.velocity * dt;
+
+			if (p.lifetime <= (5.0f - p.switchTime)) {
+				p.hasSwitched = true;
+			}
+		} else {
+			p.velocity += fullGravity * dt;
+			p.wt->translation_ += p.velocity * dt;
+		}
+
+		p.wt->rotation_ += p.rotationVelocity * dt;
+		p.wt->UpdateMatrix();
+
+		++it;
+	}
+
+}
+
 void TitlePlayer::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
 }
@@ -342,7 +353,7 @@ void TitlePlayer::OnDirectionCollision(BaseCollider* self, BaseCollider* other, 
 /// </summary>
 void TitlePlayer::GenerateCeilingBreakParticle(const Vector3& position)
 {
-	const int kParticleCount = 15;
+	const int kParticleCount = 40;
 	for (int i = 0; i < kParticleCount; ++i) {
 		auto obj = std::make_unique<Object3d>();
 		obj->Initialize();
@@ -367,20 +378,28 @@ void TitlePlayer::GenerateCeilingBreakParticle(const Vector3& position)
 
 		// ランダムな回転速度
 		Vector3 rotationVel = {
-			((rand() % 100) / 100.0f - 0.5f) * 1.5f,
-			((rand() % 100) / 100.0f - 0.5f) * 1.5f,
-			((rand() % 100) / 100.0f - 0.5f) * 1.5f,
+			((rand() % 100) / 100.0f - 0.5f) * 6.0f,
+			((rand() % 100) / 100.0f - 0.5f) * 6.0f,
+			((rand() % 100) / 100.0f - 0.5f) * 6.0f,
 		};
 
 		breakParticles_.push_back({
 			std::move(obj),
 			std::move(wt),
 			initialVelocity,
-			3.0f,
+			5.0f,
 			0.15f,
 			false,
 			rotationVel
 			});
+	}
+}
+
+void TitlePlayer::Shake()
+{
+	if (isShake) {
+		camera_->Shake(0.5f, Vector2{ -0.1f, -0.1f }, Vector2{ 0.1f,0.1f });
+		isShake = false;
 	}
 }
 

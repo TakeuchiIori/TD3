@@ -65,6 +65,7 @@ public:
 	/// </summary>
 	/// <param name="info"></param>
 	void MapChipOnCollision(const CollisionInfo& info);
+	void MapChipOnCollision();
 	void Reset();
 
 private:
@@ -74,8 +75,10 @@ private:
 	/// </summary>
 	void Move();
 
-
-
+	/// <summary>
+	/// モデルパーティクルの更新
+	/// </summary>
+	void UpdateParticle();
 
 
 
@@ -109,6 +112,8 @@ public:
 	void SetIsFinishedReadBook(bool isFinishedReadBook) { isFinishedReadBook_ = isFinishedReadBook; }
 	void SetShowUI(bool showUI) { showUI_ = showUI; }
 	void SetMapChipInfo(MapChipInfo* info) { mpInfo_ = info; }
+
+	void Shake();
 private:
 
 	// ポインタ
@@ -157,14 +162,14 @@ private:
 	Vector3 velocity_ = {};
 	Vector3 moveDirection_ = {};
 	float defaultSpeed_ = 3.0f;
-
 	bool isFinishedReadBook_ = false;
 	bool showUI_ = false;
 	bool isScaling_ = false;
-
 	float targetRotationY_;
-
 	float UpPower_ = 0.0f;
+	bool isShake = false;
+
+	float up_ = 0.0f;
 };
 
 Vector3 MakeExplosionVelocity(float minSpeed, float maxSpeed);
