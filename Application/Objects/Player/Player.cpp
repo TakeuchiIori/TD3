@@ -1019,7 +1019,7 @@ void Player::UpdateCombo()
 		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceEat[1], kSE);
 		break;
 	case 3:
-		obj_->ChangeModelAnimation("eat_3.gltf", 2);
+		obj_->ChangeModelAnimation("eat_3.gltf", 1);
 		isAnimation_ = true;
 		lastPlayedComboCount_ = comboCount_;
 		sourceVoiceEat[2] = Audio::GetInstance()->SoundPlayAudio(soundDataEat[2], false);
