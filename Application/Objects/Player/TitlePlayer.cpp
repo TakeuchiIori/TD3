@@ -32,7 +32,7 @@ void TitlePlayer::Initialize(Camera* camera)
 	bodyTransform_.Initialize();
 
 	neckTransform_.SetParent(&rootTransform_);
-	bodyTransform_.SetParent(&rootTransform_); // ← これを追加！
+	bodyTransform_.SetParent(&rootTransform_);
 
 
 	neckTransform_.useAnchorPoint_ = true;
@@ -148,8 +148,8 @@ void TitlePlayer::UpdateMatrix()
 {
 	rootTransform_.UpdateMatrix();
 	//worldTransform_.UpdateMatrix();
-	neckTransform_.UpdateMatrix();  // 首が先！
-	bodyTransform_.UpdateMatrix();  // 体もrootの子
+	neckTransform_.UpdateMatrix();
+	bodyTransform_.UpdateMatrix();
 
 
 
@@ -161,10 +161,10 @@ void TitlePlayer::UpdateSprite()
 	// ぷりぷり処理（sin波）
 	const float pulseSpeed = 6.0f; // 速度（数値が大きいほど速く変動）
 	const float pulseScale = 0.1f; // 変動幅
-	float time = GameTime::GetTotalTime(); // 時間取得（秒）
+	float time = GameTime::GetTotalTime();
 	float scale = 1.0f + std::sin(time * pulseSpeed) * pulseScale;
 
-	uiA_->SetSize({ 50.0f * scale, 50.0f * scale }); // ぷりぷりスケール反映
+	uiA_->SetSize({ 50.0f * scale, 50.0f * scale });
 
 
 	Vector3 playerPos = rootTransform_.translation_;
@@ -243,15 +243,12 @@ void TitlePlayer::Move()
 	if (!isScaling_) {
 		if (input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A)) {
 			moveDirection_ = { -1.0f, 0.0f, 0.0f };
-		}
-		else if (input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D)) {
+		} else if (input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D)) {
 			moveDirection_ = { 1.0f, 0.0f, 0.0f };
-		}
-		else {
+		} else {
 			moveDirection_ = { 0.0f, 0.0f, 0.0f };
 		}
-	}
-	else {
+	} else {
 		moveDirection_ = { 0.0f, 0.0f, 0.0f };
 	}
 
@@ -269,15 +266,11 @@ void TitlePlayer::Move()
 
 	// ▼ X軸を前方とした向き計算と補間
 	if (LengthSquared(moveDirection_) > 0.0001f) {
-		float targetAngle = std::atan2(moveDirection_.z, moveDirection_.x); // X軸前提
-		targetRotationY_ = -targetAngle; // 左手座標系ならマイナスをつける
-
-		// 滑らかに回転補間
+		float targetAngle = std::atan2(moveDirection_.z, moveDirection_.x);
+		targetRotationY_ = -targetAngle;
 		rootTransform_.rotation_.y += (targetRotationY_ - rootTransform_.rotation_.y) * (1.0f - std::exp(-10.0f * deltaTime_));
 		worldTransform_.rotation_.y = rootTransform_.rotation_.y;
 	}
-
-
 	mpCollision_.DetectAndResolveCollision(
 		colliderRect_,
 		newPos,
@@ -303,10 +296,9 @@ void TitlePlayer::UpdateParticle()
 			it = breakParticles_.erase(it);
 			continue;
 		}
-
-		// ▼ 緩やかな重力で最初から減速 → 後から通常重力に切り替え
-		Vector3 lightGravity = { 0.0f, -120.0f, 0.0f };  // 弱めの重力
-		Vector3 fullGravity = { 0.0f, -9.8f, 0.0f };  // 通常重力
+		/// 重力処理
+		Vector3 lightGravity = { 0.0f, -120.0f, 0.0f };
+		Vector3 fullGravity = { 0.0f, -9.8f, 0.0f };
 
 		if (!p.hasSwitched) {
 			p.velocity += lightGravity * dt;
@@ -398,7 +390,7 @@ void TitlePlayer::GenerateCeilingBreakParticle(const Vector3& position)
 void TitlePlayer::Shake()
 {
 	if (isShake) {
-		camera_->Shake(0.5f, Vector2{ -0.1f, -0.1f }, Vector2{ 0.1f,0.1f });
+		camera_->Shake(2.5f, Vector2{ -0.1f, -0.1f }, Vector2{ 0.1f,0.1f });
 		isShake = false;
 	}
 }

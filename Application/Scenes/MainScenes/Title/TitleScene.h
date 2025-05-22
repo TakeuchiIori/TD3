@@ -27,10 +27,12 @@
 #include "../../../SystemsApp/Cameras/TopDownCamera/TopDownCamera.h"
 #include "../../../SystemsApp/Cameras/BookEventCamera/BookEventCamera.h"
 #include "../../../SystemsApp/Cameras/DefaultCamera/DefaultCamera.h"
-// app
+
+// App
 #include "Player/TitlePlayer.h" 
 #include "Book/Book.h"
 #include "../SpriteApp/ScreenApp/TitleScreen.h"
+#include "Cloud/Cloud.h"
 
 class TitleScene : public BaseScene
 {
@@ -141,7 +143,7 @@ private:
 	=================================================================*/
 	std::unique_ptr<TitlePlayer> player_;
 	std::unique_ptr<Book> book_;
-
+	std::unique_ptr<Cloud> cloud_;
 
 	/*=================================================================
 

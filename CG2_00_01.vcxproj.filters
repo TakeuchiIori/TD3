@@ -117,6 +117,7 @@
     <ClCompile Include="Engine\Utility\Loaders\Model\Mesh\MeshPrimitive.cpp" />
     <ClCompile Include="Application\SystemsApp\AppAudio\AudioVolumeManager.cpp" />
     <ClCompile Include="Application\SpriteApp\ScreenApp\MenuOverlay.cpp" />
+    <ClCompile Include="Application\Objects\Cloud\Cloud.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -240,6 +241,7 @@
     <ClInclude Include="Engine\Utility\Loaders\Model\Mesh\MeshPrimitive.h" />
     <ClInclude Include="Application\SystemsApp\AppAudio\AudioVolumeManager.h" />
     <ClInclude Include="Application\SpriteApp\ScreenApp\MenuOverlay.h" />
+    <ClInclude Include="Application\Objects\Cloud\Cloud.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />
