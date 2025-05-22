@@ -53,6 +53,7 @@ void TitlePlayer::Initialize(Camera* camera)
 	uiA_->Initialize("Resources/Textures/Option/A.png");
 	uiA_->SetSize({ 50.0f, 50.0f });
 	uiA_->SetAnchorPoint({ 0.5f, 0.5f });
+
 }
 
 void TitlePlayer::InitCollision()
