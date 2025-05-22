@@ -64,7 +64,8 @@ void TitleScene::Initialize()
 	titleScreen_->Initialize();
 	titleScreen_->SetCamera(sceneCamera_.get());
 
-	defaultCamera_.translate_.y = 18;
+	cloud_ = std::make_unique<Cloud>();
+	cloud_->Initialize(sceneCamera_.get());
 
 
 	// 本を読み始めたら
@@ -145,6 +146,7 @@ void TitleScene::Update()
 		player_->Update();
 	}
 	book_->Update();
+	cloud_->Update();
 	titleScreen_->Update();
 
 
@@ -204,7 +206,7 @@ void TitleScene::DrawObject()
 	mpInfo_->Draw();
 	player_->Draw();
 	book_->Draw();
-
+	cloud_->Draw();
 	// 制御点描画
 	//bookEventCamera_.Draw(sceneCamera_.get());
 }

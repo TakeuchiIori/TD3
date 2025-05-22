@@ -122,6 +122,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\SystemsApp\Cameras\BookEventCamera\BookEventCamera.cpp" />
     <ClCompile Include="Application\SystemsApp\Cameras\DefaultCamera\DefaultCamera.cpp" />
     <ClCompile Include="Application\SystemsApp\AppAudio\AudioVolumeManager.cpp" />
+    <ClCompile Include="Application\Objects\Cloud\Cloud.cpp" />
     <ClCompile Include="Engine\Generators\OffScreen\OffScreen.cpp" />
     <ClCompile Include="Engine\Graphics\Culling\OcclusionCullingManager.cpp" />
     <ClCompile Include="Engine\Utility\Collision\AABB\AABBCollider.cpp" />
@@ -231,6 +232,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\SystemsApp\Cameras\BookEventCamera\BookEventCamera.h" />
     <ClInclude Include="Application\SystemsApp\Cameras\DefaultCamera\DefaultCamera.h" />
     <ClInclude Include="Application\SystemsApp\AppAudio\AudioVolumeManager.h" />
+    <ClInclude Include="Application\Objects\Cloud\Cloud.h" />
     <ClInclude Include="Engine\Generators\OffScreen\OffScreen.h" />
     <ClInclude Include="Engine\Graphics\Culling\OcclusionCullingManager.h" />
     <ClInclude Include="Engine\Utility\Collision\AABB\AABBCollider.h" />
