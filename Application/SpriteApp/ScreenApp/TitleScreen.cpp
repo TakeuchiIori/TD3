@@ -80,6 +80,10 @@ void TitleScreen::Update()
 	if (!isFadingTitle_ && (std::abs(stickInput.x) > 0.1f || std::abs(stickInput.y) > 0.1f)) {
 		isFadingTitle_ = true;
 	}
+	if (Input::GetInstance()->IsPadPressed(0, GamePadButton::A) || Input::GetInstance()->IsAnyKeyPressed()) {
+		isFadingTitle_ = true;
+	}		
+
 	if (isFadingTitle_) {
 		titleAlpha_ -= 0.02f; // 徐々に透明に（速度は調整OK）
 		titleAlpha_ = std::clamp(titleAlpha_, 0.0f, 1.0f);
