@@ -276,8 +276,8 @@ void TitlePlayer::Move()
 
 	velocity_ = moveDirection_ * defaultSpeed_ * deltaTime_;
 	Vector3 newPos = rootTransform_.translation_ + velocity_;
-
-	if (LengthSquared(moveDirection_) > 0.0001f) {
+	// 回転処理を「方向が変わったときだけ」行う
+	if (LengthSquared(moveDirection_) > 0.0001f && moveDirection_ != oldDirection) {
 		float targetAngle = std::atan2(moveDirection_.z, moveDirection_.x);
 		rootTransform_.rotation_.y = -targetAngle;
 		worldTransform_.rotation_.y = rootTransform_.rotation_.y;
