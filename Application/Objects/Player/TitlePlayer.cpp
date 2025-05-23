@@ -237,14 +237,19 @@ void TitlePlayer::Reset()
 {
 
 }
-
+/// <summary>
+/// Move関数（プレイヤーの移動と回転を処理）
+/// </summary>
+/// <summary>
+/// Move（プレイヤーの移動処理＋自然な回転補間）
+/// </summary>
 void TitlePlayer::Move()
 {
 	Vector3 oldDirection = moveDirection_;
 
 	deltaTime_ = GameTime::GetDeltaTime();
 
-	// isScaling_中は完全に移動不可（キーボードもパッドも）
+	// スケーリング中は移動無効
 	if (isScaling_) {
 		moveDirection_ = { 0.0f, 0.0f, 0.0f };
 		velocity_ = { 0.0f, 0.0f, 0.0f };
@@ -272,13 +277,12 @@ void TitlePlayer::Move()
 	velocity_ = moveDirection_ * defaultSpeed_ * deltaTime_;
 	Vector3 newPos = rootTransform_.translation_ + velocity_;
 
-	// ▼ 向きの補間処理
 	if (LengthSquared(moveDirection_) > 0.0001f) {
 		float targetAngle = std::atan2(moveDirection_.z, moveDirection_.x);
-		targetRotationY_ = -targetAngle;
-		rootTransform_.rotation_.y += (targetRotationY_ - rootTransform_.rotation_.y) * (1.0f - std::exp(-10.0f * deltaTime_));
+		rootTransform_.rotation_.y = -targetAngle;
 		worldTransform_.rotation_.y = rootTransform_.rotation_.y;
 	}
+
 
 	mpCollision_.DetectAndResolveCollision(
 		colliderRect_,
