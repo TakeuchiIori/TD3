@@ -121,16 +121,22 @@ void TitlePlayer::Update()
 
 
 	if (isFinishedReadBook_) {
-		if (Input::GetInstance()->PushKey(DIK_SPACE) || Input::GetInstance()->IsPadPressed(0, GamePadButton::A) || Input::GetInstance()->TriggerKey(DIK_E)) {
-			isScaling_ = true;
+		// 左スティックの入力を取得
+		Vector2 leftStick = Input::GetInstance()->GetLeftStickInput(0);
 
+		// 左スティックが上方向（Y軸正の方向）に倒されているかチェック
+		// 閾値は0.5f程度に設定（スティックの感度調整）
+		if (Input::GetInstance()->PushKey(DIK_SPACE) ||
+			Input::GetInstance()->TriggerKey(DIK_E) ||
+			leftStick.y > 0.5f) {
+			isScaling_ = true;
 		}
 
 		if (isScaling_) {
 			neckTransform_.scale_.y += up_;
 		}
-
 	}
+
 	float stretchY = neckTransform_.scale_.y;
 	worldTransform_.translation_ = neckPos + Vector3(0.0f, stretchY + 1.0f, 0.0f);
 	worldTransform_.UpdateMatrix();
