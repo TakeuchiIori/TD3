@@ -204,16 +204,16 @@ void Player::Update()
 void Player::Draw()
 {
 
+	for (const auto& body : stuckGrassList_)
+	{
+		body->Draw();
+	}
 
 	for (const auto& body : playerBodys_)
 	{
 		body->Draw();
 	}
 
-	for (const auto& body : stuckGrassList_)
-	{
-		body->Draw();
-	}
 
 	for (size_t i = 0; i < drawCount_; ++i)
 	{
@@ -822,7 +822,9 @@ bool Player::IsPopGrass()
 		std::unique_ptr<StuckGrass> stuck = std::make_unique<StuckGrass>();
 		stuck->Initialize(camera_);
 		stuck->SetPlayer(this);
-		stuck->SetPos(worldTransform_.translation_);
+		Vector3 newPos = worldTransform_.translation_;
+		newPos.z -= 0.5f;
+		stuck->SetPos(newPos);
 		stuckGrassList_.push_back(std::move(stuck));
 		isCreateGrass_ = false;
 		return true;
