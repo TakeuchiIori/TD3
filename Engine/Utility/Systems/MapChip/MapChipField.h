@@ -119,7 +119,9 @@ public:
     static inline float GetBlockWidth() { return kBlockWidth; }
     static inline float GetBlockHeight() { return kBlockHeight; }
 
+    // 縦
 	static inline void SetNumBlockVertical(uint32_t num) { kNumBlockVertical = num; }
+	// 横
 	static inline void SetNumBlockHorizontal(uint32_t num) { kNumBlockHorizontal = num; }
 
     // ブロックの個数
