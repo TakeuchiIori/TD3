@@ -217,6 +217,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Objects\Player\TitlePlayer.cpp" />
     <ClCompile Include="Application\SpriteApp\ScreenApp\TitleScreen.cpp" />
     <ClCompile Include="Application\SpriteApp\ScreenApp\MenuOverlay.cpp" />
+    <ClCompile Include="Math\Vector4.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />

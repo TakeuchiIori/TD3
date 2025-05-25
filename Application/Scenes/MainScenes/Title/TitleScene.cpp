@@ -94,7 +94,8 @@ void TitleScene::Initialize()
 		GameTime::Resume();
 		};
 
-
+	emitter_ = std::make_unique<ParticleEmitter>("TitleParticle", Vector3{0.0f,0.0f,0.0f}, 3);
+	emitter_->Initialize("Title");
 }
 
 /// <summary>
@@ -137,7 +138,7 @@ void TitleScene::Update()
 	}
 
 
-
+	emitter_->UpdateTime();
 
 
 	mpInfo_->Update();
@@ -156,6 +157,7 @@ void TitleScene::Update()
 	UpdateCamera();
 	cameraManager_.UpdateAllCameras();
 
+	ParticleManager::GetInstance()->Update();
 	LightManager::GetInstance()->ShowLightingEditor();
 	CollisionManager::GetInstance()->Update();
 	JsonManager::ImGuiManager();
@@ -192,7 +194,7 @@ void TitleScene::DrawOffScreen()
 {
 	// Particle
 	//----------
-	//ParticleManager::GetInstance()->Draw();
+	ParticleManager::GetInstance()->Draw();
 	//----------
 	// Sprite
 	//----------

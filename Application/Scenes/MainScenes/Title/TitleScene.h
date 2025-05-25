@@ -153,6 +153,7 @@ private:
 	
 	std::unique_ptr<MapChipInfo> mpInfo_;
 	std::unique_ptr<TitleScreen> titleScreen_;
+	std::unique_ptr<ParticleEmitter> emitter_;
 	bool isBookTrigger_ = false;
 	bool isStartEvent_ = false;
 	bool isAlreadyRead_ = false;  // 本を読んだことがあるか
