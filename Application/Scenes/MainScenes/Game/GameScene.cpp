@@ -209,7 +209,7 @@ void GameScene::DrawOffScreen()
 	//----------
 	ParticleManager::GetInstance()->Draw();
 	//----------
-	ParticleManager::GetInstance()->Draw();
+	
 	//----------
 	// Sprite
 	//----------

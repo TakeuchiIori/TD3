@@ -118,6 +118,7 @@
     <ClCompile Include="Application\SystemsApp\AppAudio\AudioVolumeManager.cpp" />
     <ClCompile Include="Application\SpriteApp\ScreenApp\MenuOverlay.cpp" />
     <ClCompile Include="Application\Objects\Cloud\Cloud.cpp" />
+    <ClCompile Include="Math\Vector4.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
