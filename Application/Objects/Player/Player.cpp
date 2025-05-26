@@ -294,15 +294,21 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 			{
 				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.1f)
 				{
-					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
+					isAddTime_ = true;
+					addTime_ = grassTime_;
+					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + addTime_);
+					addTime_ = grassTime_;
 				} else
 				{
-					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + largeGrassTime_);
+					addTime_ = largeGrassTime_;
+					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + addTime_);
+					addTime_ = largeGrassTime_;
 				}
 				grassGauge_++;
 
 				if (kMaxGrassGauge_ <= grassGauge_)
 				{
+					isAddTime_ = true;
 					createGrassTimer_ = kCreateGrassTime_;
 					isCreateGrass_ = true;
 				}
@@ -310,10 +316,16 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 			{
 				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.1f)
 				{
-					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + (grassTime_ / 2.0f));
+					isAddTime_ = true;
+					addTime_ = (grassTime_ / 2.0f);
+					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + addTime_);
+					addTime_ = (grassTime_ / 2.0f);
 				} else
 				{
-					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + (largeGrassTime_ / 2.0f));
+					isAddTime_ = true;
+					addTime_ = (largeGrassTime_ / 2.0f);
+					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + addTime_);
+					addTime_ = (largeGrassTime_ / 2.0f);
 				}
 			}
 		}
