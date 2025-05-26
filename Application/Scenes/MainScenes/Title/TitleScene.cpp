@@ -41,6 +41,7 @@ void TitleScene::Initialize()
 	soundData = Audio::GetInstance()->LoadAudio(L"Resources/Audio/title.mp3");
 	// オーディオの再生
 	sourceVoice = Audio::GetInstance()->SoundPlayAudio(soundData,true);
+	//Audio::GetInstance()->FadeInPlay(sourceVoice, 2.0f);
 	AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoice, kBGM);
 	// 音量の設定（0.0f ～ 1.0f）
 	//Audio::GetInstance()->SetVolume(sourceVoice, 1.0f); // 80%の音量に設定
@@ -137,7 +138,7 @@ void TitleScene::Update()
 
 	if (player_->GetWorldTransform().translation_.y > 35.0f) {
 		SceneManager::GetInstance()->ChangeScene("Game");
-		Audio::GetInstance()->FadeOutAndStop(sourceVoice, 2.0f);
+		Audio::GetInstance()->FadeOutStop(sourceVoice,1.0f, 2.0f);
 	}
 
 
