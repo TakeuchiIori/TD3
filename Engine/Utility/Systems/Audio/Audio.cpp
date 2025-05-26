@@ -193,6 +193,11 @@ void Audio::PauseAudio(IXAudio2SourceVoice* pSourceVoice)
 	}
 }
 
+void Audio::StopAudio(IXAudio2SourceVoice* pSourceVoice)
+{
+    pSourceVoice->Stop();
+}
+
 /// <summary>
 ///  指定時間をかけて音声をフェードアウトし、停止する
 /// </summary>
