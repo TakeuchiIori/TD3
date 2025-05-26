@@ -7,6 +7,7 @@
 #include <mfreadwrite.h>
 #include <mferror.h>
 #include <cassert>
+#include <thread>
 
 
 
@@ -207,17 +208,16 @@ void Audio::FadeOutAndStop(IXAudio2SourceVoice* pSourceVoice, float durationSeco
         return;
     }
 
-    const int steps = 30; // フェード段階の数（多いほど滑らか）
-    const float sleepMillis = (durationSeconds / steps) * 1000.0f;
-
-    for (int i = 0; i <= steps; ++i) {
-        float volume = 1.0f - static_cast<float>(i) / steps;
-        pSourceVoice->SetVolume(volume);
-        Sleep(static_cast<DWORD>(sleepMillis));
-    }
-
-    pSourceVoice->Stop();
-    pSourceVoice->DestroyVoice();
+    std::thread([pSourceVoice, durationSeconds]() {
+        const int steps = 30;
+        const float sleepMillis = (durationSeconds / steps) * 1000.0f;
+        for (int i = 0; i <= steps; ++i) {
+            float volume = 1.0f - static_cast<float>(i) / steps;
+            pSourceVoice->SetVolume(volume);
+            Sleep(static_cast<DWORD>(sleepMillis));
+        }
+        pSourceVoice->Stop();
+        }).detach();
 }
 
 
