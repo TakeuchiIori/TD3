@@ -7,6 +7,7 @@
 #include <mfreadwrite.h>
 #include <mferror.h>
 #include <cassert>
+#include <thread>
 
 
 
@@ -193,28 +194,44 @@ void Audio::PauseAudio(IXAudio2SourceVoice* pSourceVoice)
 	}
 }
 
-/// <summary>
-///  指定時間をかけて音声をフェードアウトし、停止する
-/// </summary>
-void Audio::FadeOutAndStop(IXAudio2SourceVoice* pSourceVoice, float durationSeconds)
+void Audio::StopAudio(IXAudio2SourceVoice* pSourceVoice)
 {
-    if (!pSourceVoice || durationSeconds <= 0.0f) {
-        return;
-    }
-
-    const int steps = 30; // フェード段階の数（多いほど滑らか）
-    const float sleepMillis = (durationSeconds / steps) * 1000.0f;
-
-    for (int i = 0; i <= steps; ++i) {
-        float volume = 1.0f - static_cast<float>(i) / steps;
-        pSourceVoice->SetVolume(volume);
-        Sleep(static_cast<DWORD>(sleepMillis));
-    }
-
     pSourceVoice->Stop();
-    pSourceVoice->DestroyVoice();
 }
 
+void Audio::FadeInPlay(IXAudio2SourceVoice* pSourceVoice, float volume, float durationSeconds)
+{
+	if (!pSourceVoice || durationSeconds <= 0.0f) {
+		return;
+	}
+	std::thread([pSourceVoice, volume, durationSeconds]() {
+		const int steps = 30;
+		const float sleepMillis = (durationSeconds / steps) * 1000.0f;
+		for (int i = 0; i <= steps; ++i) {
+			float currentVolume = (static_cast<float>(i) / steps) * volume;
+			pSourceVoice->SetVolume(currentVolume);
+			Sleep(static_cast<DWORD>(sleepMillis));
+		}
+		pSourceVoice->Start();
+		}).detach();
+}
+
+void Audio::FadeOutStop(IXAudio2SourceVoice* pSourceVoice, float volume, float durationSeconds)
+{
+	if (!pSourceVoice || durationSeconds <= 0.0f) {
+		return;
+	}
+	std::thread([pSourceVoice, volume, durationSeconds]() {
+		const int steps = 30;
+		const float sleepMillis = (durationSeconds / steps) * 1000.0f;
+		for (int i = 0; i <= steps; ++i) {
+			float currentVolume = volume * (1.0f - static_cast<float>(i) / steps);
+			pSourceVoice->SetVolume(currentVolume);
+			Sleep(static_cast<DWORD>(sleepMillis));
+		}
+		pSourceVoice->Stop();
+		}).detach();
+}
 
 void Audio::SoundUnload(SoundData* soundData)
 {

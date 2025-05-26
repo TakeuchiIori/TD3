@@ -493,20 +493,20 @@ void CollisionManager::Initialize() {
 void CollisionManager::Update()
 {
 
-	///カメラ外だったら判定をしない(全て)
-	for (BaseCollider* collider : colliders_) {
-		if (!collider) continue;
-		if (!collider->GetIsActive()) continue;
+	/////カメラ外だったら判定をしない(全て)
+	//for (BaseCollider* collider : colliders_) {
+	//	if (!collider) continue;
+	//	if (!collider->GetIsActive()) continue;
 
-		const Camera* cam = collider->camera_;
-		if (!cam) continue;
+	//	const Camera* cam = collider->camera_;
+	//	if (!cam) continue;
 
-		Vector3 center = collider->GetCenterPosition();
-		bool isVisible = IsColliderInView(center, cam);
+	//	Vector3 center = collider->GetCenterPosition();
+	//	bool isVisible = IsColliderInView(center, cam);
 
-		// ここで無効化するのは当たり判定だけ！
-		collider->SetCollisionEnabled(isVisible);
-	}
+	//	// ここで無効化するのは当たり判定だけ！
+	//	collider->SetCollisionEnabled(isVisible);
+	//}
 
 
 	// 有効なものだけで衝突判定を実行
