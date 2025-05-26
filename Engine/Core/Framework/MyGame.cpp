@@ -17,7 +17,7 @@ void MyGame::Initialize()
 	offScreen_->Initialize();
 	//offScreen_->SetEffectType(OffScreen::OffScreenEffectType::RadialBlur);
 #ifdef _DEBUG
-	SceneManager::GetInstance()->ChangeScene("Title");
+	SceneManager::GetInstance()->ChangeScene("Game");
 #else//Title
 	SceneManager::GetInstance()->ChangeScene("Title");
 #endif
@@ -25,8 +25,6 @@ void MyGame::Initialize()
 
 	ParticleManager::GetInstance()->Initialize(srvManager_);
 	auto planeMesh = MeshPrimitive::Createplane(1.0f, 1.0f);
-
-	ParticleManager::GetInstance()->Initialize(srvManager_);
 
 	
 	

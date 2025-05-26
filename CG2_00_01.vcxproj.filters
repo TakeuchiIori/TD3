@@ -119,6 +119,7 @@
     <ClCompile Include="Application\SpriteApp\ScreenApp\MenuOverlay.cpp" />
     <ClCompile Include="Application\Objects\Cloud\Cloud.cpp" />
     <ClCompile Include="Math\Vector4.cpp" />
+    <ClCompile Include="Engine\Generators\Particle\ParticleEffectManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -243,6 +244,7 @@
     <ClInclude Include="Application\SystemsApp\AppAudio\AudioVolumeManager.h" />
     <ClInclude Include="Application\SpriteApp\ScreenApp\MenuOverlay.h" />
     <ClInclude Include="Application\Objects\Cloud\Cloud.h" />
+    <ClInclude Include="Engine\Generators\Particle\ParticleEffectManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />

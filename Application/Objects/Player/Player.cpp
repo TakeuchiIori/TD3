@@ -163,12 +163,11 @@ void Player::Update()
 
 	// Bボタンで一回だけ「食べるアニメーション」再生
 	if (!isAnimation_ && input_->IsPadTriggered(0, GamePadButton::B)) {
-		obj_->ChangeModelAnimation("Yodare.gltf", 1);
+		obj_->ChangeModelAnimation("kirin_yodare.gltf", 1);
 		isAnimation_ = true;
 	}
 	// 各行動の初期化
 	BehaviorInitialize();
-
 	// 各行動の更新
 	BehaviorUpdate();
 
