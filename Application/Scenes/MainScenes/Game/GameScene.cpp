@@ -50,6 +50,10 @@ void GameScene::Initialize()
 
 	// 各オブジェクトの初期化
 	mpInfo_ = std::make_unique<MapChipInfo>();
+	mpInfo_->GetMapChipField()->SetNumBlockVertical(154);
+	mpInfo_->GetMapChipField()->SetNumBlockHorizontal(18);
+
+
 	mpInfo_->Initialize();
 	mpInfo_->SetCamera(sceneCamera_.get());
 

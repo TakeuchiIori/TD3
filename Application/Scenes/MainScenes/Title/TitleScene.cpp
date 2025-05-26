@@ -95,7 +95,7 @@ void TitleScene::Initialize()
 		GameTime::Resume();
 		};
 
-	emitter_ = std::make_unique<ParticleEmitter>("TitleParticle", Vector3{0.0f,0.0f,0.0f}, 3);
+	emitter_ = std::make_unique<ParticleEmitter>("TitleParticle", Vector3{ 0.0f,0.0f,0.0f }, 3);
 	emitter_->Initialize("Title");
 }
 
@@ -125,14 +125,13 @@ void TitleScene::Update()
 #endif // _DEBUG
 
 	if (isAlreadyRead_) {
-		if (Input::GetInstance()->PushKey(DIK_SPACE) || Input::GetInstance()->IsPadPressed(0, GamePadButton::A) || Input::GetInstance()->TriggerKey(DIK_E)) {
-			// 本に当たっていないときだけ、首を伸ばすフラグをONにする
-			if (!book_->IsColliding()) {
-				// 読書が終わっている前提で
-				player_->SetIsFinishedReadBook(true);
-			}
+		// 本に当たっていないときだけ、首を伸ばすフラグをONにする
+		if (!book_->IsColliding()) {
+			// 読書が終わっている前提で
+			player_->SetIsFinishedReadBook(true);
 		}
 	}
+
 
 	if (player_->GetWorldTransform().translation_.y > 35.0f) {
 		SceneManager::GetInstance()->ChangeScene("Game");
