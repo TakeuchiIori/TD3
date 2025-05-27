@@ -26,6 +26,7 @@ void SideEnemy::Initialize(Camera* camera)
 
 	worldTransform_.Initialize();
 	startPos_ = worldTransform_.translation_;
+	kirisutegomennWT_.Initialize();
 
 	InitCollision();
 	//InitJson();
@@ -54,26 +55,20 @@ void SideEnemy::InitJson()
 
 void SideEnemy::KnockBackDir()
 {
-	// 敵 → プレイヤー のベクトル（XY平面のみ使用）
 	Vector3 diff = GetCenterPosition() - player_->GetCenterPosition();
-
-	// Z軸方向は使わず、XYのみに限定
 	Vector3 flatDir = { diff.x, diff.y, 0.0f };
 
-	// 入力がゼロベクトルに近い場合の保険
 	if (Length(flatDir) < 1e-5f) {
-		flatDir = { 1.0f, 1.0f, 0.0f }; // デフォルト方向（右上）にする
+		flatDir = { 1.0f, 1.0f, 0.0f };
 	}
 
-	// 右上・左上・右下・左下の4方向
 	static const Vector3 directions[4] = {
-		Normalize(Vector3{  1.0f,  1.0f, 0.0f }),  // 右上
-		Normalize(Vector3{ -1.0f,  1.0f, 0.0f }),  // 左上
-		Normalize(Vector3{  1.0f, -1.0f, 0.0f }),  // 右下
-		Normalize(Vector3{ -1.0f, -1.0f, 0.0f })   // 左下
+		Normalize(Vector3{  1.0f,  1.0f, 0.0f }),
+		Normalize(Vector3{ -1.0f,  1.0f, 0.0f }),
+		Normalize(Vector3{  1.0f, -1.0f, 0.0f }),
+		Normalize(Vector3{ -1.0f, -1.0f, 0.0f })
 	};
 
-	// 最も近い方向を選ぶ（内積が最大になる方向）
 	float maxDot = -FLT_MAX;
 	Vector3 bestDir = directions[0];
 
@@ -85,8 +80,13 @@ void SideEnemy::KnockBackDir()
 		}
 	}
 
-	// ノックバック適用（XY平面）
-	ApplyKnockback(bestDir, 0.9f);
+	// ノックバック
+	ApplyKnockback(bestDir, 2.5f);
+
+	// 吹っ飛び中の回転速度（ラジアン/秒）を設定
+	angularVelocityY_ = DirectX::XMConvertToRadians(360.0f * 1.0f);  // 1秒で1回転
+
+	isSpinning_ = true;  // 回転中フラグON
 }
 
 void SideEnemy::Update()
@@ -117,6 +117,7 @@ void SideEnemy::Update()
 	}
 
 	KnockBack();
+	kirisuteUpdate();
 	worldTransform_.UpdateMatrix();
 	//aabbCollider_->Update();
 	obbCollider_->Update();
@@ -126,7 +127,7 @@ void SideEnemy::Draw()
 {
 	if (!isFaint_) // 攻撃を食らったら次まで描画しない
 	{
-		obj_->Draw(camera_, worldTransform_);
+		obj_->Draw(camera_, kirisutegomennWT_);
 	}
 }
 
