@@ -7,6 +7,7 @@
 
 // Engine
 #include "Systems./Camera/Camera.h"
+#include "Loaders/Json/JsonManager.h"
 
 // Math
 #include "Vector4.h"
@@ -35,6 +36,7 @@ public:
 	/// 初期化
 	/// </summary>
 	void Initialize();
+
 
 	/// <summary>
 	/// コマンドリストを積む
@@ -66,6 +68,8 @@ private:
 	// コンストラクタとデストラクタ
 	LightManager() = default;
 	~LightManager() = default;
+
+	void InitJson();
 
 	// リソース作成関数
 	void CreateDirectionalLightResource();
@@ -193,5 +197,6 @@ private:
 
 	Object3dCommon* object3dCommon_ = nullptr;
 	Camera* camera_ = nullptr;
+	std::unique_ptr<JsonManager> jsonManager_ = nullptr;
 };
 

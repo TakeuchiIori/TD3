@@ -36,6 +36,7 @@ void DropEnemy::InitCollision()
 		camera_,
 		static_cast<uint32_t>(CollisionTypeIdDef::kEnemy)
 	);
+	obbCollider_->checkOutsideCamera = true;
 }
 
 void DropEnemy::InitJson()
