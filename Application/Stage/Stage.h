@@ -49,6 +49,7 @@ public:
 	void Draw();
 	void DrawAnimation();
 	void DrawCollision();
+	void DrawSprite();
 
 	// チェックポイントにたどり着いたときの処理
 	TransitionType ReachCheckPoint();
