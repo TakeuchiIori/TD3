@@ -35,7 +35,6 @@
     <ClCompile Include="Engine\Graphics\Drawer\LineManager\Line.cpp" />
     <ClCompile Include="Engine\Graphics\PipelineManager\PipelineManager.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Model\Joint.cpp" />
-    <ClCompile Include="Application\Objects\Ground\Ground.cpp" />
     <ClCompile Include="Application\Scenes\MainScenes\Transitions\Fade\Fade.cpp" />
     <ClCompile Include="Application\SystemsApp\Cameras\FollowCamera\FollowCamera.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Json\JsonManager.cpp" />
@@ -144,7 +143,6 @@
     <ClInclude Include="Engine\Utility\Debugger\LeakChecker.h" />
     <ClInclude Include="Engine\Utility\Systems\Input\Input.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\Joint.h" />
-    <ClInclude Include="Application\Objects\Ground\Ground.h" />
     <ClInclude Include="Application\Scenes\MainScenes\Transitions\Fade\Fade.h" />
     <ClInclude Include="Application\SystemsApp\Cameras\FollowCamera\FollowCamera.h" />
     <ClInclude Include="Engine\Utility\Loaders\Json\JsonManager.h" />

@@ -73,10 +73,6 @@ void GameScene::Initialize()
 	giraffe_ = std::make_unique<Giraffe>();
 	giraffe_->Initialize();
 	giraffe_->SetCamera(sceneCamera_.get());
-    
-    // 地面
-    ground_ = std::make_unique<Ground>();
-    ground_->Initialize(sceneCamera_.get());
 
 
 
@@ -152,7 +148,6 @@ void GameScene::Update()
 	}
 
 	giraffe_->Update();
-	ground_->Update();
 
 	ParticleManager::GetInstance()->Update();
 	// カメラ更新
@@ -228,7 +223,6 @@ void GameScene::DrawObject()
 {
 	giraffe_->Draw();
 	mpInfo_->Draw();
-	ground_->Draw();
 	stageManager_->Draw();
 }
 

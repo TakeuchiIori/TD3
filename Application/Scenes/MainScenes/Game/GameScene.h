@@ -14,7 +14,6 @@
 #include "Sprite/Sprite.h"
 #include "WorldTransform./WorldTransform.h"
 #include "Drawer/LineManager/Line.h"
-#include "Ground/Ground.h"
 #include "../Transitions/Fade/Fade.h"
 #include "Systems/MapChip/MapChipInfo.h"
 #include "Systems/UI/UIBase.h"
@@ -164,7 +163,6 @@ private:
                                オブジェクト関連
 
     =================================================================*/
-    std::unique_ptr<Ground> ground_;
     std::unique_ptr<Giraffe> giraffe_;
 
     // 3Dモデル
