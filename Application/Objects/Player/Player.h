@@ -234,6 +234,18 @@ public: // getter&setter
 
 	void SetTimeLimit(float time) { kTimeLimit_ = time; }
 
+	bool IsAddTime()
+	{
+		if (isAddTime_)
+		{
+			isAddTime_ = false;
+			return true;
+		}
+		return false;
+	}
+
+	float GetAddtime() { return addTime_; }
+
 private:
 	Input* input_ = nullptr;
 	
@@ -318,6 +330,9 @@ private:
 
 
 	const float deltaTime_ = 1.0f / 60.0f;	// 仮対応
+
+	float addTime_ = 0;
+	bool isAddTime_ = false;
 
 
 	// コンボ用
