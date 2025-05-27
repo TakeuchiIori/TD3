@@ -450,13 +450,19 @@ void GameScreen::UpdateLimit()
 	// 配置と更新
 	Vector2 basePos = { 560.0f, 680.0f };
 	float spacing = 40.0f;
-	for (int i = 0; i < 5; ++i) {
+	for (int i = 0; i < 5; ++i) 
+	{
 		timeSprites_[i]->SetPosition({ basePos.x + spacing * i, basePos.y, 0.0f });
 		timeSprites_[i]->Update();
 	}
 
 	if (player_->IsAddTime())
 	{
+		Vector3 playerPos = player_->GetWorldTransform().translation_;
+		Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
+		Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
+		playerPos = Transform(playerPos, matViewProjectionViewport);
+
 		time = player_->GetAddtime();
 
 		seconds = static_cast<int>(time);          // 整数部（9）
@@ -475,21 +481,42 @@ void GameScreen::UpdateLimit()
 
 		basePos = { 580.0f, 630.0f };
 		spacing = 15.0f;
-		for (int i = 0; i < 5; ++i) {
+		for (int i = 0; i < 5; ++i) 
+		{
 			if(i < 3)
 			{
-				plusTimeSprites_[i]->SetPosition({ basePos.x + spacing * i, basePos.y, 0.0f });
+				plusTimeSprites_[i]->SetPosition({ playerPos.x + spacing * i - 30, playerPos.y - 30, 0.0f });
 			}
 			else
 			{
-				plusTimeSprites_[i]->SetPosition({ basePos.x + spacing * (i - 1) + 5, basePos.y, 0.0f });
+				plusTimeSprites_[i]->SetPosition({ playerPos.x + spacing * (i - 1) -25, playerPos.y - 30, 0.0f });
 			}
+			plusTimeSprites_[i]->SetAlpha(1.0f);
 			plusTimeSprites_[i]->Update();
 		}
 	}
 	if (visibleTimer_ > 0)
 	{
 		visibleTimer_ -= deltaTime_;
+		if (visibleTimer_ >= kVisibleTime_ / 2.0f)
+		{
+			for (int i = 0; i < 5; ++i)
+			{
+				Vector3 pos = plusTimeSprites_[i]->GetPosition();
+				pos.y -= 30.0f * deltaTime_;
+				plusTimeSprites_[i]->SetPosition(pos);
+				plusTimeSprites_[i]->Update();
+			}
+		}
+		else 
+		{
+			for (int i = 0; i < 5; ++i)
+			{
+				float alpha = visibleTimer_ / (kVisibleTime_ / 2.0f);
+				plusTimeSprites_[i]->SetAlpha(alpha);
+				plusTimeSprites_[i]->Update();
+			}
+		}
 	}
 }
 

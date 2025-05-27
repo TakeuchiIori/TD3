@@ -107,7 +107,7 @@ private:
 	std::string plusTexturePath_ = "Resources/Textures/Each_Number/plus.png";
 	std::string dotTexturePath_ = "Resources/Textures/Each_Number/dot.png";
 	std::array<std::unique_ptr<Sprite>, 5> plusTimeSprites_;
-	const float kVisibleTime_ = 2.0f;
+	const float kVisibleTime_ = 1.3f;
 	float visibleTimer_ = 0;
 	float deltaTime_ = 1.0f / 60.0f;
 

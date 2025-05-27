@@ -300,6 +300,7 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 					addTime_ = grassTime_;
 				} else
 				{
+					isAddTime_ = true;
 					addTime_ = largeGrassTime_;
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + addTime_);
 					addTime_ = largeGrassTime_;
