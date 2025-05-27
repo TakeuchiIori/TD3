@@ -97,6 +97,8 @@ protected:
 		}
 	}
 
+	void kirisuteUpdate();
+
 public:
 
 	/// <summary>
@@ -131,5 +133,8 @@ protected:
 	float knockbackTimer_ = 0.0f;
 	const float kKnockbackDuration_ = 0.5f;
 
+	WorldTransform kirisutegomennWT_;
+	bool isSpinning_ = false;
+	float angularVelocityY_ = 0;
 };
 

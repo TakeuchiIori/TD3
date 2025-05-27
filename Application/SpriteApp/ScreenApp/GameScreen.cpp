@@ -127,6 +127,18 @@ void GameScreen::Initialize()
 		timeSprites_[i]->SetSize({ 60.0f, 80.0f });
 	}
 
+	for (int i = 0; i < 5; ++i) {
+		plusTimeSprites_[i] = std::make_unique<Sprite>();
+		// 初期は全部0.pngで初期化しておく（あとで切り替え）
+		plusTimeSprites_[i]->Initialize("Resources/Textures/Each_Number/0.png");
+		plusTimeSprites_[i]->SetAnchorPoint({ 0.5f, 0.5f });
+		plusTimeSprites_[i]->SetSize({ 20.0f, 30.0f });
+		plusTimeSprites_[i]->SetColor({ 0.0f, 0.0f, 0.0f, 1.0f });
+	}
+	plusTimeSprites_[0]->ChangeTexture(plusTexturePath_);
+	plusTimeSprites_[2]->ChangeTexture(dotTexturePath_);
+	
+
 
 	///////////////////////////////////////////////////////////////////////////
 	// 
@@ -399,6 +411,13 @@ void GameScreen::Draw()
 		sprite->Draw();
 	}
 
+	if (visibleTimer_ > 0)
+	{
+		for (const auto& sprite : plusTimeSprites_) {
+			sprite->Draw();
+		}
+	}
+
 	if (yodareState_ != YodareState::Hidden) {
 		uiYodare_->Draw();
 	}
@@ -431,11 +450,74 @@ void GameScreen::UpdateLimit()
 	// 配置と更新
 	Vector2 basePos = { 560.0f, 680.0f };
 	float spacing = 40.0f;
-	for (int i = 0; i < 5; ++i) {
+	for (int i = 0; i < 5; ++i) 
+	{
 		timeSprites_[i]->SetPosition({ basePos.x + spacing * i, basePos.y, 0.0f });
 		timeSprites_[i]->Update();
 	}
 
+	if (player_->IsAddTime())
+	{
+		Vector3 playerPos = player_->GetWorldTransform().translation_;
+		Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
+		Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
+		playerPos = Transform(playerPos, matViewProjectionViewport);
+
+		time = player_->GetAddtime();
+
+		seconds = static_cast<int>(time);          // 整数部（9）
+		fraction = static_cast<int>(time * 100) % 100; // 小数部2桁（83）
+
+		// 桁ごとに数字を分解
+		secOnes = seconds % 10;
+		fracTens = fraction / 10;
+		fracOnes = fraction % 10;
+
+		// テクスチャを変更
+		plusTimeSprites_[1]->ChangeTexture(disPaths_[secOnes]);
+		plusTimeSprites_[3]->ChangeTexture(disPaths_[fracTens]);
+		plusTimeSprites_[4]->ChangeTexture(disPaths_[fracOnes]);
+		visibleTimer_ = kVisibleTime_;
+
+		basePos = { 580.0f, 630.0f };
+		spacing = 15.0f;
+		for (int i = 0; i < 5; ++i) 
+		{
+			if(i < 3)
+			{
+				plusTimeSprites_[i]->SetPosition({ playerPos.x + spacing * i - 30, playerPos.y - 30, 0.0f });
+			}
+			else
+			{
+				plusTimeSprites_[i]->SetPosition({ playerPos.x + spacing * (i - 1) -25, playerPos.y - 30, 0.0f });
+			}
+			plusTimeSprites_[i]->SetAlpha(1.0f);
+			plusTimeSprites_[i]->Update();
+		}
+	}
+	if (visibleTimer_ > 0)
+	{
+		visibleTimer_ -= deltaTime_;
+		if (visibleTimer_ >= kVisibleTime_ / 2.0f)
+		{
+			for (int i = 0; i < 5; ++i)
+			{
+				Vector3 pos = plusTimeSprites_[i]->GetPosition();
+				pos.y -= 30.0f * deltaTime_;
+				plusTimeSprites_[i]->SetPosition(pos);
+				plusTimeSprites_[i]->Update();
+			}
+		}
+		else 
+		{
+			for (int i = 0; i < 5; ++i)
+			{
+				float alpha = visibleTimer_ / (kVisibleTime_ / 2.0f);
+				plusTimeSprites_[i]->SetAlpha(alpha);
+				plusTimeSprites_[i]->Update();
+			}
+		}
+	}
 }
 
 void GameScreen::Updatedistance()

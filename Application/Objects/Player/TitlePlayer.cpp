@@ -40,6 +40,7 @@ void TitlePlayer::Initialize(Camera* camera)
 
 	neckTransform_.useAnchorPoint_ = true;
 	neckTransform_.SetAnchorPoint({ 0.0, -1.0f,0.0f });
+	neckTransform_.scale_.y = 0;
 
 	rootTransform_.translation_ = { 2.0f,2.0f,0.0f };
 	worldTransform_.translation_ = { 2.0f,2.0f,0.0f };
@@ -124,8 +125,7 @@ void TitlePlayer::Update()
 
 		// 左スティックが上方向（Y軸正の方向）に倒されているかチェック
 		// 閾値は0.5f程度に設定（スティックの感度調整）
-		if (Input::GetInstance()->PushKey(DIK_SPACE) ||
-			Input::GetInstance()->TriggerKey(DIK_E) ||
+		if (Input::GetInstance()->TriggerKey(DIK_W) ||
 			leftStick.y > up_) {
 			isScaling_ = true;
 		}

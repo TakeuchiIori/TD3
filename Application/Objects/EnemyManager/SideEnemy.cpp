@@ -26,6 +26,7 @@ void SideEnemy::Initialize(Camera* camera)
 
 	worldTransform_.Initialize();
 	startPos_ = worldTransform_.translation_;
+	kirisutegomennWT_.Initialize();
 
 	InitCollision();
 	//InitJson();
@@ -55,9 +56,38 @@ void SideEnemy::InitJson()
 
 void SideEnemy::KnockBackDir()
 {
-	// 吹っ飛び方向の計算（プレイヤー中心 - 敵中心 → 正規化）
-	Vector3 direction = Normalize(GetCenterPosition() - player_->GetCenterPosition());
-	ApplyKnockback(direction, 0.6f); // ← 距離調整可能
+	Vector3 diff = GetCenterPosition() - player_->GetCenterPosition();
+	Vector3 flatDir = { diff.x, diff.y, 0.0f };
+
+	if (Length(flatDir) < 1e-5f) {
+		flatDir = { 1.0f, 1.0f, 0.0f };
+	}
+
+	static const Vector3 directions[4] = {
+		Normalize(Vector3{  1.0f,  1.0f, 0.0f }),
+		Normalize(Vector3{ -1.0f,  1.0f, 0.0f }),
+		Normalize(Vector3{  1.0f, -1.0f, 0.0f }),
+		Normalize(Vector3{ -1.0f, -1.0f, 0.0f })
+	};
+
+	float maxDot = -FLT_MAX;
+	Vector3 bestDir = directions[0];
+
+	for (const Vector3& dir : directions) {
+		float dot = Dot(Normalize(flatDir), dir);
+		if (dot > maxDot) {
+			maxDot = dot;
+			bestDir = dir;
+		}
+	}
+
+	// ノックバック
+	ApplyKnockback(bestDir, 2.5f);
+
+	// 吹っ飛び中の回転速度（ラジアン/秒）を設定
+	angularVelocityY_ = DirectX::XMConvertToRadians(360.0f * 1.0f);  // 1秒で1回転
+
+	isSpinning_ = true;  // 回転中フラグON
 }
 
 void SideEnemy::Update()
@@ -88,6 +118,7 @@ void SideEnemy::Update()
 	}
 
 	KnockBack();
+	kirisuteUpdate();
 	worldTransform_.UpdateMatrix();
 	//aabbCollider_->Update();
 	obbCollider_->Update();
@@ -97,7 +128,7 @@ void SideEnemy::Draw()
 {
 	if (!isFaint_) // 攻撃を食らったら次まで描画しない
 	{
-		obj_->Draw(camera_, worldTransform_);
+		obj_->Draw(camera_, kirisutegomennWT_);
 	}
 }
 

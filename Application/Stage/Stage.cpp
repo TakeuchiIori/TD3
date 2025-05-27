@@ -82,6 +82,11 @@ void Stage::DrawCollision()
 	enemyManager_->DrawCollisions();
 }
 
+void Stage::DrawSprite()
+{
+	player_->DrawSprite();
+}
+
 Stage::TransitionType Stage::ReachCheckPoint()
 {
 	if (player_->GetCenterPosition().y >= *checkPoint_.GetCheckPointHight() && transitionType_ == TransitionType::kNone)

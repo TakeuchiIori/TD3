@@ -99,6 +99,12 @@ void Player::Initialize(Camera* camera)
 
 	emitter_ = std::make_unique<ParticleEmitter>("YodareParticle", worldTransform_.translation_, 3);
 	emitter_->Initialize("Yodare");
+
+
+	uiA_ = std::make_unique<Sprite>();
+	uiA_->Initialize("Resources/Textures/Option/controller.png");
+	uiA_->SetSize({ 50.0f, 50.0f });
+	uiA_->SetAnchorPoint({ 0.5f, 0.5f });
 }
 
 void Player::InitCollision()
@@ -152,6 +158,11 @@ void Player::InitJson()
 	jsonManager_->Register("最大コンボ数", &kMaxCombo_);
 
 
+	jsonManager_->Register("スティックUIのオフセット", &offsetUI_);
+	jsonManager_->Register("説明のUIが表示されるまでの時間", &kShowRootTime_);
+	
+
+
 	jsonCollider_ = std::make_unique<JsonManager>("playerCollider", "Resources/JSON/");
 	//aabbCollider_->InitJson(jsonCollider_.get());
 }
@@ -183,6 +194,8 @@ void Player::Update()
 	DamageProcessBodys();
 
 	UpdateCombo();
+
+	UpdateSprite();
 
 	TimerManager();
 
@@ -242,6 +255,13 @@ void Player::DrawCollision()
 	}
 }
 
+void Player::DrawSprite()
+{
+	if (showUI_) {
+		uiA_->Draw();
+	}
+}
+
 void Player::MapChipOnCollision(const CollisionInfo& info)
 {// 衝突したブロックの種類に応じた処理
 	switch (info.blockType) {
@@ -296,15 +316,22 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 			{
 				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.1f)
 				{
-					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
+					isAddTime_ = true;
+					addTime_ = grassTime_;
+					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + addTime_);
+					addTime_ = grassTime_;
 				} else
 				{
-					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + largeGrassTime_);
+					isAddTime_ = true;
+					addTime_ = largeGrassTime_;
+					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + addTime_);
+					addTime_ = largeGrassTime_;
 				}
 				grassGauge_++;
 
 				if (kMaxGrassGauge_ <= grassGauge_)
 				{
+					isAddTime_ = true;
 					createGrassTimer_ = kCreateGrassTime_;
 					isCreateGrass_ = true;
 				}
@@ -312,10 +339,16 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 			{
 				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.1f)
 				{
-					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + (grassTime_ / 2.0f));
+					isAddTime_ = true;
+					addTime_ = (grassTime_ / 2.0f);
+					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + addTime_);
+					addTime_ = (grassTime_ / 2.0f);
 				} else
 				{
-					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + (largeGrassTime_ / 2.0f));
+					isAddTime_ = true;
+					addTime_ = (largeGrassTime_ / 2.0f);
+					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + addTime_);
+					addTime_ = (largeGrassTime_ / 2.0f);
 				}
 			}
 		}
@@ -655,7 +688,6 @@ void Player::RightBody()
 
 void Player::EntryMove()
 {
-
 	velocity_ = { 0.0f,0.0f,0.0f };
 	moveDirection_ = { 0.0f,0.0f,0.0f };
 
@@ -695,7 +727,9 @@ void Player::EntryMove()
 		moveDirection_ = { 0,1,0 };
 		extendTimer_ = kTimeLimit_;
 		moveHistory_.push_back(worldTransform_.translation_);
-	} else if (std::abs(stick.x) < std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
+		showUI_ = false;
+	} 
+	else if (std::abs(stick.x) < std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
 	{
 		if (stick.y > 0)
 		{
@@ -703,6 +737,7 @@ void Player::EntryMove()
 			moveDirection_ = { 0,1,0 };
 			extendTimer_ = kTimeLimit_;
 			moveHistory_.push_back(worldTransform_.translation_);
+			showUI_ = false;
 		}
 	}
 #ifdef _DEBUG
@@ -811,6 +846,42 @@ void Player::TimerZero()
 	comboCount_ = 0;
 	lastPlayedComboCount_ = 0;
 	comboTimer_ = 0.0f;
+}
+
+void Player::UpdateSprite()
+{
+
+	time_ += GameTime::GetDeltaTime();
+	if (time_ >= 1.0f) {
+		uiA_->ChangeTexture("Resources/Textures/Option/controller2.png");
+		uiA_->SetSize({ 50.0f, 50.0f });
+		uiA_->SetAnchorPoint({ 0.5f, 0.5f });
+	}
+
+	if (time_ >= 2.0f) {
+		time_ = 0.0f;
+		uiA_->ChangeTexture("Resources/Textures/Option/controller.png");
+		uiA_->SetSize({ 50.0f, 50.0f });
+		uiA_->SetAnchorPoint({ 0.5f, 0.5f });
+
+	}
+
+
+
+
+	Vector3 playerPos = worldTransform_.translation_;
+	Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
+	Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
+	playerPos = Transform(playerPos, matViewProjectionViewport);
+	playerPos += offsetUI_;
+	uiA_->SetPosition(playerPos);
+	uiA_->Update();
+
+#ifdef _DEBUG
+	ImGui::Begin("DebugPlayer");
+	ImGui::DragFloat3("UITransration", &playerPos.x);
+	ImGui::End();
+#endif // _DEBUG
 }
 
 bool Player::IsPopGrass()
@@ -992,11 +1063,10 @@ void Player::UpdateCombo()
 		obj_->ChangeModel("kirin.gltf", true);
 		isAnimation_ = false;
 
-		// ★ ここで3コンボ目が終わったらリセットする
+		// ★ ここで3コンボ目が終わったらもう一度3コンボ目が発動されるようにする
 		if (comboCount_ == kMaxCombo_) {
-			comboCount_ = 0;
-			lastPlayedComboCount_ = 0;
-			comboTimer_ = 0.0f;
+			comboCount_ = 2;
+			lastPlayedComboCount_ = 2;
 		}
 	}
 
@@ -1039,7 +1109,6 @@ void Player::DebugPlayer()
 {
 	int a = static_cast<int>(moveHistory_.size());
 	ImGui::Begin("DebugPlayer");
-	ImGui::Text("Start : SPACE  |  Boost : E or Pad:A  |  Return : N");
 	ImGui::Text("TimeLimit  : %.2f", extendTimer_);
 	ImGui::Text("BoostTimer : %.2f", boostTimer_);
 	ImGui::Text("BoostCT    : %.2f", boostCoolTimer_);
@@ -1124,10 +1193,16 @@ void Player::BehaviorRootInit()
 	playerBodys_.clear();
 	isCollisionBody = false;
 	HP_ = kMaxHP_;
+	rootTimer_ = 0;
 }
 
 void Player::BehaviorRootUpdate()
 {
+	rootTimer_ += GameTime::GetDeltaTime();
+	if (rootTimer_ >= kShowRootTime_)
+	{
+		showUI_ = true;
+	}
 	legWT_.translation_.x = worldTransform_.translation_.x;
 	EntryMove();
 }

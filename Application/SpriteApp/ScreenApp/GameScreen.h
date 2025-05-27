@@ -104,6 +104,13 @@ private:
 	std::array<std::unique_ptr<Sprite>, 5> timeSprites_;
 	std::array<std::string, 10> digitTexturePaths_;
 	std::string colonTexturePath_ = "Resources/Textures/Each_Number/a.png";
+	std::string plusTexturePath_ = "Resources/Textures/Each_Number/plus.png";
+	std::string dotTexturePath_ = "Resources/Textures/Each_Number/dot.png";
+	std::array<std::unique_ptr<Sprite>, 5> plusTimeSprites_;
+	const float kVisibleTime_ = 1.3f;
+	float visibleTimer_ = 0;
+	float deltaTime_ = 1.0f / 60.0f;
+
 
 	// 進んだ距離
 	std::unique_ptr<Sprite> mSprite_;
