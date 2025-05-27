@@ -54,9 +54,39 @@ void SideEnemy::InitJson()
 
 void SideEnemy::KnockBackDir()
 {
-	// 吹っ飛び方向の計算（プレイヤー中心 - 敵中心 → 正規化）
-	Vector3 direction = Normalize(GetCenterPosition() - player_->GetCenterPosition());
-	ApplyKnockback(direction, 0.6f); // ← 距離調整可能
+	// 敵 → プレイヤー のベクトル（XY平面のみ使用）
+	Vector3 diff = GetCenterPosition() - player_->GetCenterPosition();
+
+	// Z軸方向は使わず、XYのみに限定
+	Vector3 flatDir = { diff.x, diff.y, 0.0f };
+
+	// 入力がゼロベクトルに近い場合の保険
+	if (Length(flatDir) < 1e-5f) {
+		flatDir = { 1.0f, 1.0f, 0.0f }; // デフォルト方向（右上）にする
+	}
+
+	// 右上・左上・右下・左下の4方向
+	static const Vector3 directions[4] = {
+		Normalize(Vector3{  1.0f,  1.0f, 0.0f }),  // 右上
+		Normalize(Vector3{ -1.0f,  1.0f, 0.0f }),  // 左上
+		Normalize(Vector3{  1.0f, -1.0f, 0.0f }),  // 右下
+		Normalize(Vector3{ -1.0f, -1.0f, 0.0f })   // 左下
+	};
+
+	// 最も近い方向を選ぶ（内積が最大になる方向）
+	float maxDot = -FLT_MAX;
+	Vector3 bestDir = directions[0];
+
+	for (const Vector3& dir : directions) {
+		float dot = Dot(Normalize(flatDir), dir);
+		if (dot > maxDot) {
+			maxDot = dot;
+			bestDir = dir;
+		}
+	}
+
+	// ノックバック適用（XY平面）
+	ApplyKnockback(bestDir, 0.9f);
 }
 
 void SideEnemy::Update()
