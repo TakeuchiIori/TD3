@@ -76,6 +76,8 @@ private:
 	std::unique_ptr<JsonManager> jsonManager_;
 	std::unique_ptr<JsonManager> jsonCollider_;
 
+	float timer_ = 0;
+	float kScaleTime_ = 0.5f;
 
 	static int count_;    // 現在のインスタンス数
 	int id_;              // 各インスタンスのID
