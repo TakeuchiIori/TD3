@@ -16,14 +16,17 @@ void TitlePlayer::Initialize(Camera* camera)
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
 	obj_->SetModel("head.obj");
+	obj_->SetMaterialColor(defaultColorV4_);
 
 	neck_ = std::make_unique<Object3d>();
 	neck_->Initialize();
 	neck_->SetModel("neck2.obj");
+	neck_->SetMaterialColor(defaultColorV4_);
 
 	body_ = std::make_unique<Object3d>();
 	body_->Initialize();
 	body_->SetModel("body.obj");
+	body_->SetMaterialColor(defaultColorV4_);
 
 
 	rootTransform_.Initialize();

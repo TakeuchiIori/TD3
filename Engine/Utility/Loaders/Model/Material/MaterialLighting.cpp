@@ -5,7 +5,7 @@ void MaterialLighting::Initialize()
 {
 	resource_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(MaterialLight));
 	resource_->Map(0, nullptr, reinterpret_cast<void**>(&materialLight_));
-	materialLight_->enableLighting = true;
+	materialLight_->enableLighting = false;
 	materialLight_->shininess = 30.0f;
 	materialLight_->enableSpecular = false;
 	materialLight_->isHalfVector = false;

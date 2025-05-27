@@ -163,6 +163,8 @@ void Player::Update()
 
 	// Bボタンで一回だけ「食べるアニメーション」再生
 	if (!isAnimation_ && input_->IsPadTriggered(0, GamePadButton::B)) {
+		sourceVoiceYodare = Audio::GetInstance()->SoundPlayAudio(soundDataYodare, false);
+		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceYodare, kSE);
 		obj_->ChangeModelAnimation("Yodare.gltf", 1);
 		isAnimation_ = true;
 	}
@@ -340,8 +342,7 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 				if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
 				{
 					// 唾を吐く
-					sourceVoiceYodare = Audio::GetInstance()->SoundPlayAudio(soundDataYodare, false);
-					AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceYodare, kSE);
+
 					//emitter_->EmitFromTo(worldTransform_.translation_, other->GetWorldTransform().translation_);
 					// オーディオの再生
 					sourceVoiceGrow = Audio::GetInstance()->SoundPlayAudio(soundDataGrow, false);

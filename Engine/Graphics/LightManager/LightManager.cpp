@@ -31,6 +31,8 @@ void LightManager::Initialize()
     CreatePointLightResource();
     CreateSpecularReflectionResource();
     CreateSpotLightResource();
+
+    InitJson();
 }
 
 void LightManager::SetCommandList()
@@ -49,6 +51,40 @@ void LightManager::SetCommandList()
 }
 
 
+
+void LightManager::InitJson()
+{
+	jsonManager_ = std::make_unique<JsonManager>("LightManager", "Resources/JSON/");
+	jsonManager_->SetCategory("LightManager");
+    jsonManager_->SetTreePrefix("平行光源");
+	jsonManager_->Register("平行光源の色", &directionalLight_->color);
+	jsonManager_->Register("平行光源の方向", &directionalLight_->direction);
+	jsonManager_->Register("平行光源の輝度", &directionalLight_->intensity);
+	jsonManager_->Register("平行光源の有効フラグ", &directionalLight_->enableDirectionalLight);
+
+	jsonManager_->SetTreePrefix("ポイントライト");
+	jsonManager_->Register("ポイントライトの色", &pointLight_->color);
+	jsonManager_->Register("ポイントライトの位置", &pointLight_->position);
+	jsonManager_->Register("ポイントライトの輝度", &pointLight_->intensity);
+	jsonManager_->Register("ポイントライトの半径", &pointLight_->radius);
+	jsonManager_->Register("ポイントライトの減衰率", &pointLight_->decay);
+	jsonManager_->Register("ポイントライトの有効フラグ", &pointLight_->enablePointLight);
+
+	jsonManager_->SetTreePrefix("鏡面反射");
+	jsonManager_->Register("鏡面反射の有効フラグ", &cameraData_->enableSpecular);
+	jsonManager_->Register("鏡面反射の半ベクトルフラグ", &cameraData_->isHalfVector);
+
+	jsonManager_->SetTreePrefix("スポットライト");
+	jsonManager_->Register("スポットライトの色", &spotLight_->color);
+	jsonManager_->Register("スポットライトの位置", &spotLight_->position);
+	jsonManager_->Register("スポットライトの距離", &spotLight_->distance);
+	jsonManager_->Register("スポットライトの方向", &spotLight_->direction);
+	jsonManager_->Register("スポットライトの輝度", &spotLight_->intensity);
+	jsonManager_->Register("スポットライトの減衰率", &spotLight_->decay);
+	jsonManager_->Register("スポットライトの角度余弦値", &spotLight_->cosAngle);
+	jsonManager_->Register("スポットライトのフォールオフ開始角度余弦値", &spotLight_->cosFalloffStart);
+	jsonManager_->Register("スポットライトの有効フラグ", &spotLight_->enableSpotLight);
+}
 
 void LightManager::CreateDirectionalLightResource()
 {
