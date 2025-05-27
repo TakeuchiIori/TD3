@@ -122,8 +122,7 @@ void TitlePlayer::Update()
 
 		// 左スティックが上方向（Y軸正の方向）に倒されているかチェック
 		// 閾値は0.5f程度に設定（スティックの感度調整）
-		if (Input::GetInstance()->PushKey(DIK_SPACE) ||
-			Input::GetInstance()->TriggerKey(DIK_E) ||
+		if (Input::GetInstance()->TriggerKey(DIK_W) ||
 			leftStick.y > up_) {
 			isScaling_ = true;
 		}
