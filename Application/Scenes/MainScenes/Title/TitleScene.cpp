@@ -6,6 +6,7 @@
 #include "Particle./ParticleManager.h"
 #include "Object3D/Object3dCommon.h"
 #include "../Graphics/PipelineManager/SkinningManager.h"
+#include "../Application/SystemsApp/AppAudio/AudioVolumeManager.h"
 
 #ifdef _DEBUG
 #include "imgui.h"
@@ -37,11 +38,13 @@ void TitleScene::Initialize()
 	bookEventCamera_.Initialize();
 
 	// オーディオファイルのロード（例: MP3）
-	soundData = Audio::GetInstance()->LoadAudio(L"Resources./images./harpohikunezumi.mp3");
-	//// オーディオの再生
-	//sourceVoice = Audio::GetInstance()->SoundPlayAudio(soundData);
-	//// 音量の設定（0.0f ～ 1.0f）
-	//Audio::GetInstance()->SetVolume(sourceVoice, 0.05f); // 80%の音量に設定
+	soundData = Audio::GetInstance()->LoadAudio(L"Resources/Audio/title.mp3");
+	// オーディオの再生
+	sourceVoice = Audio::GetInstance()->SoundPlayAudio(soundData,true);
+	//Audio::GetInstance()->FadeInPlay(sourceVoice, 2.0f);
+	AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoice, kBGM);
+	// 音量の設定（0.0f ～ 1.0f）
+	//Audio::GetInstance()->SetVolume(sourceVoice, 1.0f); // 80%の音量に設定
 
 
 
@@ -95,7 +98,7 @@ void TitleScene::Initialize()
 		GameTime::Resume();
 		};
 
-	emitter_ = std::make_unique<ParticleEmitter>("TitleParticle", Vector3{0.0f,0.0f,0.0f}, 3);
+	emitter_ = std::make_unique<ParticleEmitter>("TitleParticle", Vector3{ 0.0f,0.0f,0.0f }, 3);
 	emitter_->Initialize("Title");
 }
 
@@ -125,17 +128,17 @@ void TitleScene::Update()
 #endif // _DEBUG
 
 	if (isAlreadyRead_) {
-		if (Input::GetInstance()->PushKey(DIK_SPACE) || Input::GetInstance()->IsPadPressed(0, GamePadButton::A) || Input::GetInstance()->TriggerKey(DIK_E)) {
-			// 本に当たっていないときだけ、首を伸ばすフラグをONにする
-			if (!book_->IsColliding()) {
-				// 読書が終わっている前提で
-				player_->SetIsFinishedReadBook(true);
-			}
+		// 本に当たっていないときだけ、首を伸ばすフラグをONにする
+		if (!book_->IsColliding()) {
+			// 読書が終わっている前提で
+			player_->SetIsFinishedReadBook(true);
 		}
 	}
 
+
 	if (player_->GetWorldTransform().translation_.y > 35.0f) {
 		SceneManager::GetInstance()->ChangeScene("Game");
+		Audio::GetInstance()->FadeOutStop(sourceVoice,1.0f, 2.0f);
 	}
 
 

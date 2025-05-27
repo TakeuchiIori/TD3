@@ -50,7 +50,7 @@ void TitlePlayer::Initialize(Camera* camera)
 
 
 	uiA_ = std::make_unique<Sprite>();
-	uiA_->Initialize("Resources/Textures/Option/A.png");
+	uiA_->Initialize("Resources/Textures/Option/controller.png");
 	uiA_->SetSize({ 50.0f, 50.0f });
 	uiA_->SetAnchorPoint({ 0.5f, 0.5f });
 
@@ -115,11 +115,6 @@ void TitlePlayer::Update()
 		neckMat.m[3][2]
 	};
 
-	if (input_->IsPadPressed(0, GamePadButton::B)) {
-		neckTransform_.scale_.y += up_;
-	}
-
-
 	if (isFinishedReadBook_) {
 		// 左スティックの入力を取得
 		Vector2 leftStick = Input::GetInstance()->GetLeftStickInput(0);
@@ -128,13 +123,14 @@ void TitlePlayer::Update()
 		// 閾値は0.5f程度に設定（スティックの感度調整）
 		if (Input::GetInstance()->PushKey(DIK_SPACE) ||
 			Input::GetInstance()->TriggerKey(DIK_E) ||
-			leftStick.y > 0.5f) {
+			leftStick.y > up_) {
 			isScaling_ = true;
 		}
 
 		if (isScaling_) {
 			neckTransform_.scale_.y += up_;
 		}
+
 	}
 
 	float stretchY = neckTransform_.scale_.y;
@@ -144,13 +140,15 @@ void TitlePlayer::Update()
 
 	UpdateParticle();
 
+	UpdateSprite();
+
 	Shake();
 
 	obbCollider_->Update();
 	neck_->uvScale = { neckTransform_.scale_.x, neckTransform_.scale_.y };
 	neck_->uvTranslate.y = -(neckTransform_.scale_.y - 1.0f) * 0.6855f;
 
-	UpdateSprite();
+
 }
 
 void TitlePlayer::UpdateMatrix()
@@ -167,13 +165,22 @@ void TitlePlayer::UpdateMatrix()
 void TitlePlayer::UpdateSprite()
 {
 
-	// ぷりぷり処理（sin波）
-	const float pulseSpeed = 6.0f; // 速度（数値が大きいほど速く変動）
-	const float pulseScale = 0.1f; // 変動幅
-	float time = GameTime::GetTotalTime();
-	float scale = 1.0f + std::sin(time * pulseSpeed) * pulseScale;
+	time_ += GameTime::GetDeltaTime();
+	if (time_ >= 1.0f) {
+		uiA_->ChangeTexture("Resources/Textures/Option/controller2.png");
+		uiA_->SetSize({ 50.0f, 50.0f });
+		uiA_->SetAnchorPoint({ 0.5f, 0.5f });
+	}
 
-	uiA_->SetSize({ 50.0f * scale, 50.0f * scale });
+	if (time_ >= 2.0f) {
+		time_ = 0.0f;
+		uiA_->ChangeTexture("Resources/Textures/Option/controller.png");
+		uiA_->SetSize({ 50.0f, 50.0f });
+		uiA_->SetAnchorPoint({ 0.5f, 0.5f });
+
+	}
+
+
 
 
 	Vector3 playerPos = rootTransform_.translation_;

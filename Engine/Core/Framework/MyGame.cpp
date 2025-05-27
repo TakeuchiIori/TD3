@@ -26,8 +26,6 @@ void MyGame::Initialize()
 	ParticleManager::GetInstance()->Initialize(srvManager_);
 	auto planeMesh = MeshPrimitive::Createplane(1.0f, 1.0f);
 
-	ParticleManager::GetInstance()->Initialize(srvManager_);
-
 	
 	
 	

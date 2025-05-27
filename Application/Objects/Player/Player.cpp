@@ -66,7 +66,7 @@ void Player::Initialize(Camera* camera)
 
 	legObj_ = std::make_unique<Object3d>();
 	legObj_->Initialize();
-	legObj_->SetModel("body.obj");
+	legObj_->SetModel("body.obj",false);
 	legObj_->SetMaterialColor(defaultColorV4_);
 
 	for (size_t i = 0; i < kMaxHP_; ++i)
@@ -168,7 +168,6 @@ void Player::Update()
 	}
 	// 各行動の初期化
 	BehaviorInitialize();
-
 	// 各行動の更新
 	BehaviorUpdate();
 
@@ -219,12 +218,13 @@ void Player::Draw()
 	{
 		haerts_[i]->Draw();
 	}
+
+	legObj_->Draw(camera_, legWT_);
 }
 
 void Player::DrawAnimation()
 {
 	obj_->Draw(camera_, modelWT_);
-	legObj_->Draw(camera_, legWT_);
 }
 
 void Player::DrawCollision()

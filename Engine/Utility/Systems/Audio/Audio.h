@@ -56,8 +56,8 @@ public:
 	SoundData LoadAudio(const wchar_t* filename); // .mp3, .mp4 用
 	void PauseAudio(IXAudio2SourceVoice* pSourceVoice);
 	void StopAudio(IXAudio2SourceVoice* pSourceVoice);
-	void FadeOutAndStop(IXAudio2SourceVoice* pSourceVoice, float durationSeconds);
-
+	void FadeInPlay(IXAudio2SourceVoice* pSourceVoice,float volume,float durationSeconds);
+	void FadeOutStop(IXAudio2SourceVoice* pSourceVoice,float volume,float durationSeconds);
 	void SoundUnload(SoundData* soundData);
 
 	IXAudio2SourceVoice* SoundPlayWave(const SoundData& soundData);

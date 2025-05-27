@@ -169,7 +169,7 @@ private:
 	float UpPower_ = 0.0f;
 	bool isShake = false;
 	float up_ = 0.0f;
-
+	float time_ = 0.0f;
 };
 
 Vector3 MakeExplosionVelocity(float minSpeed, float maxSpeed);
