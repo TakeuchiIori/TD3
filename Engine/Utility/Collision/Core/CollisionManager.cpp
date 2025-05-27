@@ -492,26 +492,25 @@ void CollisionManager::Initialize() {
 
 void CollisionManager::Update()
 {
-
-	/////カメラ外だったら判定をしない(全て)
-	//for (BaseCollider* collider : colliders_) {
-	//	if (!collider) continue;
-	//	if (!collider->GetIsActive()) continue;
-
-	//	const Camera* cam = collider->camera_;
-	//	if (!cam) continue;
-
-	//	Vector3 center = collider->GetCenterPosition();
-	//	bool isVisible = IsColliderInView(center, cam);
-
-	//	// ここで無効化するのは当たり判定だけ！
-	//	collider->SetCollisionEnabled(isVisible);
-	//}
-
-
-	// 有効なものだけで衝突判定を実行
+	for (BaseCollider* collider : colliders_) {
+		if (!collider) continue;
+		if (!collider->GetIsActive()) continue;
+		bool shouldEnable = true;  // デフォルトは有効
+		if (collider->checkOutsideCamera) {
+			// カメラ外チェックを行う
+			const Camera* cam = collider->camera_;
+			if (cam) {
+				Vector3 center = collider->GetCenterPosition();
+				bool isVisible = IsColliderInView(center, cam);
+				shouldEnable = isVisible;  // カメラ内なら有効、外なら無効
+			}
+		} else {
+			// カメラ外チェックしない = 常に有効
+			shouldEnable = true;
+		}
+		collider->SetCollisionEnabled(shouldEnable);
+	}
 	CheckAllCollisions();
-
 }
 
 

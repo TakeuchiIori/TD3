@@ -66,7 +66,7 @@ void Player::Initialize(Camera* camera)
 
 	legObj_ = std::make_unique<Object3d>();
 	legObj_->Initialize();
-	legObj_->SetModel("body.obj",false);
+	legObj_->SetModel("body.obj", false);
 	legObj_->SetMaterialColor(defaultColorV4_);
 
 	for (size_t i = 0; i < kMaxHP_; ++i)
@@ -440,11 +440,8 @@ void Player::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDi
 			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody))
 			{
 				HitDirection hitDir = Collision::GetSelfLocalHitDirection(self, other);
-				if (hitDir == HitDirection::Top)
-				{
-					isCollisionBody = true;
-					TakeDamage();
-				}
+				isCollisionBody = true;
+				TakeDamage();
 			}
 
 		}
@@ -515,13 +512,14 @@ void Player::Move()
 	if (isCollisionBody && beforeDirection_ == moveDirection_)
 	{
 		newPos = worldTransform_.translation_;
-		velocity_ = { 0,0,0 };
+		velocity_ = { 0.0f,0.0f,0.0f };
 		isCollisionBody = false;
+	} else {
+
+		worldTransform_.translation_ = newPos;
+		nextWorldTransform_.translation_ = newPos + velocity_;
+
 	}
-
-	worldTransform_.translation_ = newPos;
-	nextWorldTransform_.translation_ = newPos + velocity_;
-
 	ExtendBody();
 
 }
