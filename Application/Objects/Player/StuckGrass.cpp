@@ -3,6 +3,7 @@
 #include "Player.h"
 
 #include "Collision/Core/ColliderFactory.h"
+#include "Systems/GameTime/GameTIme.h"
 
 #ifdef _DEBUG
 #include "imgui.h"
@@ -50,6 +51,12 @@ void StuckGrass::InitJson()
 
 void StuckGrass::Update()
 {
+	timer_ += GameTime::GetDeltaTime();
+	if (timer_ <= kScaleTime_)
+	{
+		worldTransform_.scale_ = Lerp(Vector3(0, 0, 0), Vector3(1.2f, 1.2f, 1.2f), timer_ / kScaleTime_);
+	};
+
 	worldTransform_.UpdateMatrix();
 
 	aabbCollider_->Update();
