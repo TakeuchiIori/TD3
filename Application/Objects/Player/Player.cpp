@@ -1006,11 +1006,10 @@ void Player::UpdateCombo()
 		obj_->ChangeModel("kirin.gltf", true);
 		isAnimation_ = false;
 
-		// ★ ここで3コンボ目が終わったらリセットする
+		// ★ ここで3コンボ目が終わったらもう一度3コンボ目が発動されるようにする
 		if (comboCount_ == kMaxCombo_) {
-			comboCount_ = 0;
-			lastPlayedComboCount_ = 0;
-			comboTimer_ = 0.0f;
+			comboCount_ = 2;
+			lastPlayedComboCount_ = 2;
 		}
 	}
 
