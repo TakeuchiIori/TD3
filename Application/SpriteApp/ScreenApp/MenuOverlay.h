@@ -84,6 +84,8 @@ private:
     std::unique_ptr<Sprite> menuTex_;
     Vector3 menuStart_ = Vector3(400, 1920, 0);
     Vector3 menuGoal_ = Vector3(640, 360, 0);
+    std::string controllerPath_ = "Resources/Textures/Menu/menu.png";
+    std::string mousePath_ = "Resources/Textures/Menu/menuMouse.png";
 
     std::unique_ptr<Sprite> kirinL_;
     Vector3 kirinLStart_ = Vector3(-1000, 0, 0);

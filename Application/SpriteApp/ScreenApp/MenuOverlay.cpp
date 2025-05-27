@@ -20,7 +20,7 @@ void MenuOverlay::Initialize()
 		backGround_->SetColor({ 0.5f,0.5f,0.5f,1.0f });
 
 		menuTex_ = std::make_unique<Sprite>();
-		menuTex_->Initialize("Resources/Textures/Menu/menu.png");
+		menuTex_->Initialize(controllerPath_);
 		menuTex_->SetPosition(menuGoal_);
 		menuTex_->SetAnchorPoint({ 0.5f, 0.5f });
 		menuTex_->SetSize(menuTex_->GetTextureSize() * goalScale_);
@@ -165,6 +165,14 @@ void MenuOverlay::Show()
 		isVisible_ = true;
 		isAnimation_ = true;
 		menuTimer_ = kMenuTime_;
+		if (input_->IsControllerConnected())
+		{
+			menuTex_->ChangeTexture(controllerPath_);
+		}
+		else 
+		{
+			menuTex_->ChangeTexture(mousePath_);
+		}
 	}
 }
 
