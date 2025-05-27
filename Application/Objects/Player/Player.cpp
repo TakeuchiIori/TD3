@@ -1052,7 +1052,6 @@ void Player::DebugPlayer()
 {
 	int a = static_cast<int>(moveHistory_.size());
 	ImGui::Begin("DebugPlayer");
-	ImGui::Text("Start : SPACE  |  Boost : E or Pad:A  |  Return : N");
 	ImGui::Text("TimeLimit  : %.2f", extendTimer_);
 	ImGui::Text("BoostTimer : %.2f", boostTimer_);
 	ImGui::Text("BoostCT    : %.2f", boostCoolTimer_);

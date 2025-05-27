@@ -37,6 +37,7 @@ void TitlePlayer::Initialize(Camera* camera)
 
 	neckTransform_.useAnchorPoint_ = true;
 	neckTransform_.SetAnchorPoint({ 0.0, -1.0f,0.0f });
+	neckTransform_.scale_.y = 0;
 
 	rootTransform_.translation_ = { 2.0f,2.0f,0.0f };
 	worldTransform_.translation_ = { 2.0f,2.0f,0.0f };
