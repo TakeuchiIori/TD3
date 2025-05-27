@@ -235,6 +235,7 @@ void GameScene::DrawObject()
 void GameScene::DrawSprite()
 {
 	gameScreen_->Draw();
+	stageManager_->DrawSprite();
 	stageManager_->DrawTransition();
 	if (MenuOverlay::GetInstance()->IsVisible()) {
 		MenuOverlay::GetInstance()->Draw();

@@ -8,6 +8,7 @@
 #include "Collision/AABB/AABBCollider.h"
 #include "Loaders/Json/JsonManager.h"
 #include "Particle/ParticleEmitter.h"
+#include "Sprite/Sprite.h"
 
 // Collision
 #include "Collision/Sphere/SphereCollider.h"
@@ -71,6 +72,8 @@ public:
 
 	void DrawCollision();
 
+	void DrawSprite();
+
 	void MapChipOnCollision(const CollisionInfo& info);
 
 
@@ -126,6 +129,8 @@ private:
 
 	void TimerManager();
 	void TimerZero();
+
+	void UpdateSprite();
 
 	void ExtendBody();
 
@@ -372,6 +377,14 @@ private:
 
 	Audio::SoundData soundDataYodare = {};
 	IXAudio2SourceVoice* sourceVoiceYodare = nullptr;
+
+
+	float time_ = 0;
+	float rootTimer_ = 0;
+	float kShowRootTime_ = 10.0f;
+	std::unique_ptr<Sprite> uiA_;
+	Vector3 offsetUI_ = {};
+	bool showUI_ = true;
 
 public:
 	// 振る舞い

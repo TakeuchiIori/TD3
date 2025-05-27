@@ -87,6 +87,11 @@ void StageManager::DrawCollision()
 	stageList_[currentStageNum_]->DrawCollision();
 }
 
+void StageManager::DrawSprite()
+{
+	stageList_[currentStageNum_]->DrawSprite();
+}
+
 void StageManager::DrawTransition()
 {
 	transSprite_->Draw();

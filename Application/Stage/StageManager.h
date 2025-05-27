@@ -30,6 +30,8 @@ public:
 
 	void DrawCollision();
 
+	void DrawSprite();
+
 	void DrawTransition();
 
 	bool CheckPointTransition();
