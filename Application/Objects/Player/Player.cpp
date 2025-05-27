@@ -738,6 +738,7 @@ void Player::EntryMove()
 			moveDirection_ = { 0,1,0 };
 			extendTimer_ = kTimeLimit_;
 			moveHistory_.push_back(worldTransform_.translation_);
+			showUI_ = false;
 		}
 	}
 #ifdef _DEBUG
