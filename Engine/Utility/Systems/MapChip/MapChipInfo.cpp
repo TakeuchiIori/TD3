@@ -88,7 +88,7 @@ void MapChipInfo::Update()
 	for (auto& obj : floors_) {
 		for (auto& obj2 : obj) {
 			if (obj2) {
-				obj2->SetMaterialColor(color_[1]);
+				//obj2->SetMaterialColor(color_[1]);
 				//obj2->SetAlpha(alpha_[1]);
 			}
 		}
@@ -172,7 +172,7 @@ void MapChipInfo::GenerateBlocks()
 				wt_[i][j]->translation_ = mpField_->GetMapChipPositionByIndex(j, i);
 				auto obj = std::make_unique<Object3d>();
 				obj->Initialize();
-				obj->SetModel("cube.obj");
+				obj->SetModel("groundBlock.obj");
 				floors_[i][j] = std::move(obj);
 
 			} else if (mpField_->GetMapChipTypeByIndex(j, i) == MapChipType::kCeiling) {
