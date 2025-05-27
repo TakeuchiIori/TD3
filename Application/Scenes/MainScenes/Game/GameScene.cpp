@@ -198,22 +198,25 @@ void GameScene::Draw()
 	DrawLine();
 
 
-}
+	//----------
 
-void GameScene::DrawOffScreen()
-{
-
-	//----------
-	// Particle
-	//----------
-	ParticleManager::GetInstance()->Draw();
-	//----------
-	
 	//----------
 	// Sprite
 	//----------
 	SpriteCommon::GetInstance()->DrawPreference();
 	DrawSprite();
+
+
+	//----------
+	// Particle
+	//----------
+	ParticleManager::GetInstance()->Draw();
+}
+
+void GameScene::DrawOffScreen()
+{
+
+
 
 
 }

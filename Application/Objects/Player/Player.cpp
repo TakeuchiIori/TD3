@@ -174,10 +174,15 @@ void Player::Update()
 
 	// Bボタンで一回だけ「食べるアニメーション」再生
 	if (!isAnimation_ && input_->IsPadTriggered(0, GamePadButton::B)) {
+
 		sourceVoiceYodare = Audio::GetInstance()->SoundPlayAudio(soundDataYodare, false);
 		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceYodare, kSE);
 		obj_->ChangeModelAnimation("Yodare.gltf", 1);
 		isAnimation_ = true;
+	}
+
+	if (input_->IsPadPressed(0, GamePadButton::B)) {
+		emitter_->Emit();
 	}
 	// 各行動の初期化
 	BehaviorInitialize();
@@ -376,7 +381,7 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 				{
 					// 唾を吐く
 
-					//emitter_->EmitFromTo(worldTransform_.translation_, other->GetWorldTransform().translation_);
+					emitter_->EmitFromTo(worldTransform_.translation_, other->GetWorldTransform().translation_);
 					// オーディオの再生
 					sourceVoiceGrow = Audio::GetInstance()->SoundPlayAudio(soundDataGrow, false);
 					AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceGrow, kSE);
@@ -1194,6 +1199,7 @@ void Player::BehaviorRootInit()
 	isCollisionBody = false;
 	HP_ = kMaxHP_;
 	rootTimer_ = 0;
+	OffScreen::GetInstance()->SetEffectType(OffScreen::OffScreenEffectType::Copy);
 }
 
 void Player::BehaviorRootUpdate()
