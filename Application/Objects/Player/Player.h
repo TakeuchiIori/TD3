@@ -251,6 +251,8 @@ public: // getter&setter
 
 	float GetAddtime() { return addTime_; }
 
+	bool StuckGrassPop() { return stuckGrassList_.back()->IsPop(); }
+
 private:
 	Input* input_ = nullptr;
 	

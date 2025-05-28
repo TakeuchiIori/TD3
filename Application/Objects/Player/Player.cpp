@@ -18,7 +18,6 @@ bool::Player::isHit = false;
 
 Player::~Player()
 {
-	//aabbCollider_->~AABBCollider();
 	obbCollider_->~OBBCollider();
 	nextAabbCollider_->~AABBCollider();
 	Audio::GetInstance()->PauseAudio(sourceVoiceGrow);
@@ -42,8 +41,6 @@ void Player::Initialize(Camera* camera)
 	worldTransform_.scale_ = { 0.99f,0.99f,0.99f };
 	modelWT_.Initialize();
 	modelWT_.parent_ = &worldTransform_;
-	//modelWT_.rotation_.y = std::numbers::pi_v<float>;
-	//worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
 	nextWorldTransform_.Initialize();
 	nextWorldTransform_.translation_ = worldTransform_.translation_;
 	nextWorldTransform_.scale_ = worldTransform_.scale_;
@@ -76,14 +73,8 @@ void Player::Initialize(Camera* camera)
 		haerts_.push_back(std::move(haert));
 	}
 
-
-	/*SphereCollider::SetCamera(BaseObject::camera_);
-	SphereCollider::Initialize();*/
-
 	InitCollision();
 	InitJson();
-	//colliderRct_.height = 2.0f;
-	//colliderRct_.width = 2.0f;
 
 	soundDataGrow = Audio::GetInstance()->LoadAudio(L"Resources/Audio/Grow.mp3");
 	soundDataBoost = Audio::GetInstance()->LoadAudio(L"Resources/Audio/acceleration.mp3");
@@ -109,13 +100,6 @@ void Player::Initialize(Camera* camera)
 
 void Player::InitCollision()
 {
-	/*aabbCollider_ = ColliderFactory::Create<AABBCollider>(
-		this,
-		&worldTransform_,
-		camera_,
-		static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)
-	);*/
-
 	obbCollider_ = ColliderFactory::Create<OBBCollider>(
 		this,
 		&worldTransform_,
@@ -164,7 +148,6 @@ void Player::InitJson()
 
 
 	jsonCollider_ = std::make_unique<JsonManager>("playerCollider", "Resources/JSON/");
-	//aabbCollider_->InitJson(jsonCollider_.get());
 }
 
 void Player::Update()
@@ -319,7 +302,7 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 
 			if (kMaxGrassGauge_ > grassGauge_ && createGrassTimer_ <= 0)
 			{
-				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.1f)
+				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= 1.1f)
 				{
 					isAddTime_ = true;
 					addTime_ = grassTime_;
@@ -342,7 +325,7 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 				}
 			} else
 			{
-				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.1f)
+				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= 1.1f)
 				{
 					isAddTime_ = true;
 					addTime_ = (grassTime_ / 2.0f);
@@ -1136,9 +1119,6 @@ void Player::DebugPlayer()
 	{
 		EntryReturn();
 	}
-
-
-
 }
 #endif // _DEBUG
 

@@ -66,8 +66,17 @@ public:
 
 	bool IsDelete() { return isDelete_; }
 
+	bool IsPop() { 
+		if(isPop_) isDelete_ = true;
+		return isPop_;
+	}
+
 private:
 	Player* player_ = nullptr;
+
+	bool isVisible_ = true;
+
+	bool isPop_ = false;
 
 	bool isDelete_ = false;
 
