@@ -328,15 +328,16 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= 1.1f)
 				{
 					isAddTime_ = true;
-					addTime_ = (grassTime_ / 2.0f);
+					addTime_ = grassTime_;
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + addTime_);
-					addTime_ = (grassTime_ / 2.0f);
-				} else
+					addTime_ = grassTime_;
+				}
+				else
 				{
 					isAddTime_ = true;
-					addTime_ = (largeGrassTime_ / 2.0f);
+					addTime_ = largeGrassTime_;
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + addTime_);
-					addTime_ = (largeGrassTime_ / 2.0f);
+					addTime_ = largeGrassTime_;
 				}
 			}
 		}
