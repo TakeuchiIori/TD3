@@ -251,7 +251,13 @@ public: // getter&setter
 
 	float GetAddtime() { return addTime_; }
 
-	bool StuckGrassPop() { return stuckGrassList_.back()->IsPop(); }
+	bool StuckGrassPop() { 
+		if(stuckGrassList_.size() > 0)
+		{
+			return stuckGrassList_.back()->IsPop();
+		}
+		false;
+	}
 
 private:
 	Input* input_ = nullptr;
