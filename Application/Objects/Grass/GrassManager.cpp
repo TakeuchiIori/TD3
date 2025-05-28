@@ -48,11 +48,19 @@ void GrassManager::hakuGrass(bool pop, Vector3 pos)
 
 	if (player_->behavior_ == (BehaviorPlayer::Return) && isPop_)
 	{
-		for (Vector3 Pos : popPos_) 
+		if (popPos_.size() > 0 && player_->StuckGrassPop())
+		{
+			PopGrass(popPos_.back());
+			popPos_.pop_back();
+		}
+		/*for (Vector3 Pos : popPos_) 
 		{
 			PopGrass(Pos);
+		}*/
+		else if(popPos_.size() == 0)
+		{
+			popPos_.clear();
+			isPop_ = false;
 		}
-		popPos_.clear();
-		isPop_ = false;
 	}
 }

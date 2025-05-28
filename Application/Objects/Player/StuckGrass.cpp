@@ -64,7 +64,10 @@ void StuckGrass::Update()
 
 void StuckGrass::Draw()
 {
-	obj_->Draw(BaseObject::camera_, worldTransform_);
+	if(isVisible_)
+	{
+		obj_->Draw(camera_, worldTransform_);
+	}
 }
 
 void StuckGrass::DrawCollision()
@@ -82,13 +85,20 @@ void StuckGrass::OnCollision(BaseCollider* self, BaseCollider* other)
 	{
 		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
 		{
-			isDelete_ = true;
+			isVisible_ = false;
 		}
 	}
 }
 
 void StuckGrass::OnExitCollision(BaseCollider* self, BaseCollider* other)
 {
+	if (player_->behavior_ == BehaviorPlayer::Return)
+	{
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+		{
+			isPop_ = true;
+		}
+	}
 }
 
 void StuckGrass::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
