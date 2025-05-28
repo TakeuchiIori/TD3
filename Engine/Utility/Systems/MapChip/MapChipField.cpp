@@ -10,6 +10,7 @@ MapChipField::MapChipField() {
 
     RegisterMapChipType("5", MapChipType::kFloor);
 	RegisterMapChipType("6", MapChipType::kCeiling);
+    RegisterMapChipType("7", MapChipType::kSoil);
 
     // マップチップデータの初期化
     ResetMapChipData();
