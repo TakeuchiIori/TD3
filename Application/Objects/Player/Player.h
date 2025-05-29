@@ -261,6 +261,8 @@ public: // getter&setter
 
 	bool CanBoost() { return boostCoolTimer_ <= 0 ? true : false; }
 
+	Vector3 GetMoveDirection() { return moveDirection_; }
+
 private:
 	Input* input_ = nullptr;
 	
