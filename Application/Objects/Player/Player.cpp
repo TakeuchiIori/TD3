@@ -156,7 +156,7 @@ void Player::Update()
 	beforebehavior_ = behavior_;
 
 	// Bボタンで一回だけ「食べるアニメーション」再生
-	if (!isAnimation_ && input_->IsPadTriggered(0, GamePadButton::B)) {
+	if (!isAnimation_ && (input_->IsPadTriggered(0, GamePadButton::B) || input_->TriggerKey(DIK_Q))) {
 
 		sourceVoiceYodare = Audio::GetInstance()->SoundPlayAudio(soundDataYodare, false);
 		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceYodare, kSE);
