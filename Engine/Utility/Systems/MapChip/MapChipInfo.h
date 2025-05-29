@@ -73,6 +73,7 @@ private:
 	std::vector<std::vector<std::unique_ptr<Object3d>>> objects_;
 	std::vector<std::vector<std::unique_ptr<Object3d>>> floors_;
 	std::vector<std::vector<std::unique_ptr<Object3d>>> ceilings_;
+	std::vector<std::vector<std::unique_ptr<Object3d>>> soils_;
 
 
 	Vector3 color_[3]{};

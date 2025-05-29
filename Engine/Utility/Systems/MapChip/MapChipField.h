@@ -22,6 +22,7 @@ enum class MapChipType {
     kBody = 4,
     kFloor = 5,
     kCeiling = 6,
+    kSoil = 7,
 };
 
 

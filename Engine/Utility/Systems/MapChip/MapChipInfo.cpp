@@ -124,6 +124,9 @@ void MapChipInfo::Draw() {
 				if (ceilings_[i][j] && type == MapChipType::kCeiling) {
 					ceilings_[i][j]->Draw(camera_, *wt_[i][j]);
 				}
+				if (soils_[i][j] && type == MapChipType::kSoil) {
+					soils_[i][j]->Draw(camera_, *wt_[i][j]);
+				}
 			}
 		}
 	}
@@ -141,6 +144,7 @@ void MapChipInfo::GenerateBlocks()
 	objects_.resize(numBlockVirtical);
 	floors_.resize(numBlockVirtical);
 	ceilings_.resize(numBlockVirtical);
+	soils_.resize(numBlockVirtical);
 	// キューブの生成
 	for (uint32_t i = 0; i < numBlockVirtical; ++i) {
 		// 1列の要素数を設定 (横方向のブロック数)
@@ -148,6 +152,7 @@ void MapChipInfo::GenerateBlocks()
 		objects_[i].resize(numBlockHorizotal);
 		floors_[i].resize(numBlockHorizotal);
 		ceilings_[i].resize(numBlockHorizotal);
+		soils_[i].resize(numBlockHorizotal);
 	}
 	// ブロックの生成
 	for (uint32_t i = 0; i < numBlockVirtical; ++i) {
@@ -184,6 +189,15 @@ void MapChipInfo::GenerateBlocks()
 				obj->Initialize();
 				obj->SetModel("cube.obj");
 				ceilings_[i][j] = std::move(obj);
+			}else if(mpField_->GetMapChipTypeByIndex(j, i) == MapChipType::kSoil) {
+				WorldTransform* worldTransform = new WorldTransform();
+				worldTransform->Initialize();
+				wt_[i][j] = worldTransform;
+				wt_[i][j]->translation_ = mpField_->GetMapChipPositionByIndex(j, i);
+				auto obj = std::make_unique<Object3d>();
+				obj->Initialize();
+				obj->SetModel("soilBlock.obj");
+				soils_[i][j] = std::move(obj);
 			}
 		}
 	}

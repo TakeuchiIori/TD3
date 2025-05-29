@@ -21,10 +21,15 @@ void StageManager::Initialize(Camera* camera)
 	enemyManager_->SetPlayer(player_.get());
 	enemyManager_->Initialize(camera_, mpInfo_->GetMapChipField());
 
+	// 背景
+	background_ = std::make_unique<Background>();
+	background_->Initialzie();
+
 	stageList_.push_back(std::make_unique<Stage>());
 	stageList_[0]->SetPlayer(player_.get());
 	stageList_[0]->SetGrassManager(grassManager_.get());
 	stageList_[0]->SetEnemyManager(enemyManager_.get());
+	stageList_[0]->SetBackground(background_.get());
 	stageList_[0]->Initialize(camera_);
 
 
@@ -38,6 +43,8 @@ void StageManager::Initialize(Camera* camera)
 	transSpritePos_ = { 660,startY_,0 };
 	transSprite_->SetPosition(transSpritePos_);
 	transSprite_->SetSize(Vector2{ 616, 1024 });
+
+
 }
 
 void StageManager::InitJson()
@@ -70,6 +77,11 @@ void StageManager::Update()
 void StageManager::NotDebugCameraUpdate()
 {
 	stageList_[currentStageNum_]->NotDebugCameraUpdate();
+}
+
+void StageManager::DrawBackground()
+{
+	stageList_[currentStageNum_]->DrawBackground();
 }
 
 void StageManager::Draw()
