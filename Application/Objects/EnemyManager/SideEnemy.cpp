@@ -113,7 +113,7 @@ void SideEnemy::Update()
 
 	if (!IsStop()) // 攻撃を食らったら次まで動かない
 	{
-		//Move();
+		Move();
 
 		Vector3 newPos = worldTransform_.translation_ + velocity_;
 		mpCollision_.DetectAndResolveCollision(
