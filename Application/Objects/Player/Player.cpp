@@ -38,19 +38,17 @@ void Player::Initialize(Camera* camera)
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
-	worldTransform_.translation_ = { 4.0f,6.0f,0.0f };
+	worldTransform_.translation_ = { 4.0f,0.0f,0.0f };
 	worldTransform_.scale_ = { 0.99f,0.99f,0.99f };
 	modelWT_.Initialize();
 	modelWT_.parent_ = &worldTransform_;
-	//modelWT_.rotation_.y = std::numbers::pi_v<float>;
-	//worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
+
 	nextWorldTransform_.Initialize();
 	nextWorldTransform_.translation_ = worldTransform_.translation_;
 	nextWorldTransform_.scale_ = worldTransform_.scale_;
 
 	legWT_.Initialize();
 	legWT_.translation_ = worldTransform_.translation_;
-	legWT_.translation_.y = 2.3f;
 
 	worldTransform_.UpdateMatrix();
 	modelWT_.UpdateMatrix();
@@ -76,14 +74,8 @@ void Player::Initialize(Camera* camera)
 		haerts_.push_back(std::move(haert));
 	}
 
-
-	/*SphereCollider::SetCamera(BaseObject::camera_);
-	SphereCollider::Initialize();*/
-
 	InitCollision();
 	InitJson();
-	//colliderRct_.height = 2.0f;
-	//colliderRct_.width = 2.0f;
 
 	soundDataGrow = Audio::GetInstance()->LoadAudio(L"Resources/Audio/Grow.mp3");
 	soundDataBoost = Audio::GetInstance()->LoadAudio(L"Resources/Audio/acceleration.mp3");
@@ -109,12 +101,6 @@ void Player::Initialize(Camera* camera)
 
 void Player::InitCollision()
 {
-	/*aabbCollider_ = ColliderFactory::Create<AABBCollider>(
-		this,
-		&worldTransform_,
-		camera_,
-		static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)
-	);*/
 
 	obbCollider_ = ColliderFactory::Create<OBBCollider>(
 		this,
@@ -136,7 +122,8 @@ void Player::InitJson()
 	jsonManager_ = std::make_unique<JsonManager>("Obj", "Resources/JSON/");
 	jsonManager_->SetCategory("Objects");
 	jsonManager_->SetSubCategory("Player");
-	jsonManager_->Register("位置", &worldTransform_.translation_);
+	jsonManager_->Register("頭の位置", &worldTransform_.translation_);
+	jsonManager_->Register("体の位置", &legWT_.translation_);
 	jsonManager_->Register("通常時の移動速度", &defaultSpeed_);
 	jsonManager_->Register("ブースト時の速度", &boostSpeed_);
 	jsonManager_->Register("帰還時の速度", &returnSpeed_);

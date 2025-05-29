@@ -199,6 +199,11 @@ void GameScene::Draw()
 
 
 	//----------
+	// Particle
+	//----------
+	ParticleManager::GetInstance()->Draw();
+
+	//----------
 
 	//----------
 	// Sprite
@@ -206,11 +211,6 @@ void GameScene::Draw()
 	SpriteCommon::GetInstance()->DrawPreference();
 	DrawSprite();
 
-
-	//----------
-	// Particle
-	//----------
-	ParticleManager::GetInstance()->Draw();
 }
 
 void GameScene::DrawOffScreen()
