@@ -57,6 +57,8 @@ public:
 	/// </summary>
 	void DrawCollisions();
 
+	void DrawSprite();
+
 	void ClearAll();
 
 private:

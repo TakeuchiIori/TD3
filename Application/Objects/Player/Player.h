@@ -259,6 +259,8 @@ public: // getter&setter
 		false;
 	}
 
+	bool CanBoost() { return boostCoolTimer_ <= 0 ? true : false; }
+
 private:
 	Input* input_ = nullptr;
 	

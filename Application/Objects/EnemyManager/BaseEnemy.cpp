@@ -61,3 +61,40 @@ void BaseEnemy::kirisuteUpdate()
 	}
 	kirisutegomennWT_.UpdateMatrix();
 }
+
+void BaseEnemy::IconInit()
+{
+	dashIconSprite_ = std::make_unique<Sprite>();
+	dashIconSprite_->Initialize(dashIconPath_);
+	dashIconSprite_->SetSize(dashIconSprite_->GetTextureSize() * offsetScale_);
+}
+
+void BaseEnemy::IconUpdate()
+{
+	if (player_->CanBoost())
+	{
+		iconVisible_ = true;
+	}
+	else
+	{
+		iconVisible_ = false;
+	}
+	if (iconVisible_)
+	{
+		Vector3 pos = worldTransform_.translation_;
+		Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
+		Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
+		pos = Transform(pos, matViewProjectionViewport);
+		pos += offsetPos_;
+		dashIconSprite_->SetPosition(pos);
+		dashIconSprite_->Update();
+	}
+}
+
+void BaseEnemy::DrawSprite()
+{
+	if (iconVisible_ && !isFaint_ && !isTakeAttack_)
+	{
+		dashIconSprite_->Draw();
+	}
+}
