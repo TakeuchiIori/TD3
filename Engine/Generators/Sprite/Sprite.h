@@ -114,6 +114,11 @@ private: // メンバ関数
 
 public: // アクセッサ
 
+	// スプライト 緊急でPublicに移動
+	Vector3 position_ = { 0.0f,0.0f ,0.0f };
+	Vector3 rotation_ = { 0.0f,0.0f,0.0f };
+	Vector2 size_ = { 100.0f,100.0f };
+
 	const Vector3& GetPosition()const { return position_; }
 	void SetPosition(const Vector3& position) { position_ = position; }
 
@@ -235,10 +240,6 @@ private: // メンバ変数
 	// テクスチャ切り出しサイズ
 	Vector2 textureSize_ = { 100.0f,100.0f };
 
-	// スプライト
-	Vector3 position_ = { 0.0f,0.0f ,0.0f };
-	Vector3 rotation_ = { 0.0f,0.0f,0.0f };
-	Vector2 size_ = { 100.0f,100.0f };
 	const float numVertices_ = 6.0f;
 	// アンカーポイント
 	Vector2 anchorPoint_ = { 0.0f,0.0f };

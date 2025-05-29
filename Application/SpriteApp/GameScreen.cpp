@@ -362,6 +362,7 @@ void GameScreen::Update()
 
 void GameScreen::Draw()
 {
+
 	for (uint32_t i = 0; i < numBGs_; i++)
 	{
 		background_[i]->Draw();

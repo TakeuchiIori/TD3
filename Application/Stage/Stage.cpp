@@ -49,12 +49,19 @@ void Stage::Update()
 	}
 #endif // _DEBUG
 
+	background_->Update();
+
 }
 
 void Stage::NotDebugCameraUpdate()
 {
 	player_->Update();
 	grassManager_->hakuGrass(player_->IsPopGrass(), player_->GetCenterPosition());
+}
+
+void Stage::DrawBackground()
+{
+	background_->Draw();
 }
 
 void Stage::Draw()
