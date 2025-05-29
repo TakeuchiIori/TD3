@@ -83,7 +83,7 @@ private:
 
 	std::unique_ptr<UIBase> grass_[2];
 	uint32_t numGrass_ = 2;
-	Vector3 offset_ = Vector3(20.0f, -40.0f, 0.0f);
+	Vector3 offset_ = Vector3(25.0f, 0.0f, 0.0f);
 	Vector3 offsetGrass_ = Vector3(0.0f, 55.0f, 0.0f);
 
 	std::unique_ptr<UIBase> baseLimit_;

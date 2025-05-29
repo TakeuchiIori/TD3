@@ -4,6 +4,9 @@
 #include "Systems/MapChip/MapChipCollision.h"
 #include "Loaders/Json/JsonManager.h"
 #include "Systems/Audio/Audio.h"
+#include "Sprite/Sprite.h"
+
+#include "../Application/SystemsApp//AppAudio/AudioVolumeManager.h"
 
 // Collision
 #include "Collision/Sphere/SphereCollider.h"
@@ -40,6 +43,8 @@ public:
 	///	判定の描画
 	/// </summary>
 	virtual void DrawCollision() = 0;
+
+	void DrawSprite();
 
 	/// <summary>
 	///	判定の描画
@@ -84,6 +89,8 @@ protected:
 	// 攻撃を受けた時
 	void TakeAttack()
 	{ 
+		sourceVoiceFly = Audio::GetInstance()->SoundPlayAudio(soundDataFly);
+		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceFly, kSE);
 		obj_->SetMaterialColor(Vector3{ 0.3f,0.3f,0.3f });
 		obbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
 		if(isTakeAttack_)
@@ -98,6 +105,11 @@ protected:
 	}
 
 	void kirisuteUpdate();
+
+	void IconInit();
+	void IconUpdate();
+
+	void SoundInit();
 
 public:
 
@@ -136,5 +148,16 @@ protected:
 	WorldTransform kirisutegomennWT_;
 	bool isSpinning_ = false;
 	float angularVelocityY_ = 0;
+
+	std::string dashIconPath_ = "Resources/Textures/In_Game/dashIcon.png";
+	std::unique_ptr<Sprite> dashIconSprite_;
+	bool iconVisible_ = true;
+	Vector3 offsetPos_ = { 25,-40,0 };
+	float offsetScale_ = 0.15f;
+
+
+	// サウンド
+	Audio::SoundData soundDataFly = {};
+	IXAudio2SourceVoice* sourceVoiceFly = nullptr;
 };
 

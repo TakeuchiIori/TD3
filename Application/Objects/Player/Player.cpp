@@ -18,7 +18,6 @@ bool::Player::isHit = false;
 
 Player::~Player()
 {
-	//aabbCollider_->~AABBCollider();
 	obbCollider_->~OBBCollider();
 	nextAabbCollider_->~AABBCollider();
 	Audio::GetInstance()->PauseAudio(sourceVoiceGrow);
@@ -42,7 +41,6 @@ void Player::Initialize(Camera* camera)
 	worldTransform_.scale_ = { 0.99f,0.99f,0.99f };
 	modelWT_.Initialize();
 	modelWT_.parent_ = &worldTransform_;
-
 	nextWorldTransform_.Initialize();
 	nextWorldTransform_.translation_ = worldTransform_.translation_;
 	nextWorldTransform_.scale_ = worldTransform_.scale_;
@@ -85,6 +83,8 @@ void Player::Initialize(Camera* camera)
 	soundDataEat[1] = Audio::GetInstance()->LoadAudio(L"Resources/Audio/eat2.mp3");
 	soundDataEat[2] = Audio::GetInstance()->LoadAudio(L"Resources/Audio/eat3.mp3");
 	soundDataYodare = Audio::GetInstance()->LoadAudio(L"Resources/Audio/yodare.mp3");
+
+	soundDataTumari = Audio::GetInstance()->LoadAudio(L"Resources/Audio/tumaru.mp3");
 	// 音量の設定（0.0f ～ 1.0f）
 	//Audio::GetInstance()->SetVolume(sourceVoice, 0.5f);
 
@@ -101,7 +101,6 @@ void Player::Initialize(Camera* camera)
 
 void Player::InitCollision()
 {
-
 	obbCollider_ = ColliderFactory::Create<OBBCollider>(
 		this,
 		&worldTransform_,
@@ -151,7 +150,6 @@ void Player::InitJson()
 
 
 	jsonCollider_ = std::make_unique<JsonManager>("playerCollider", "Resources/JSON/");
-	//aabbCollider_->InitJson(jsonCollider_.get());
 }
 
 void Player::Update()
@@ -160,7 +158,7 @@ void Player::Update()
 	beforebehavior_ = behavior_;
 
 	// Bボタンで一回だけ「食べるアニメーション」再生
-	if (!isAnimation_ && input_->IsPadTriggered(0, GamePadButton::B)) {
+	if (!isAnimation_ && (input_->IsPadTriggered(0, GamePadButton::B) || input_->TriggerKey(DIK_Q))) {
 
 		sourceVoiceYodare = Audio::GetInstance()->SoundPlayAudio(soundDataYodare, false);
 		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceYodare, kSE);
@@ -281,6 +279,7 @@ void Player::MapChipOnCollision(const CollisionInfo& info)
 
 void Player::Reset()
 {
+	InitJson();
 	extendTimer_ = 0;
 	boostCoolTimer_ = 0;
 	boostTimer_ = 0;
@@ -306,7 +305,7 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 
 			if (kMaxGrassGauge_ > grassGauge_ && createGrassTimer_ <= 0)
 			{
-				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.1f)
+				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= 1.1f)
 				{
 					isAddTime_ = true;
 					addTime_ = grassTime_;
@@ -329,18 +328,19 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 				}
 			} else
 			{
-				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.1f)
+				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= 1.1f)
 				{
 					isAddTime_ = true;
-					addTime_ = (grassTime_ / 2.0f);
+					addTime_ = grassTime_;
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + addTime_);
-					addTime_ = (grassTime_ / 2.0f);
-				} else
+					addTime_ = grassTime_;
+				}
+				else
 				{
 					isAddTime_ = true;
-					addTime_ = (largeGrassTime_ / 2.0f);
+					addTime_ = largeGrassTime_;
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + addTime_);
-					addTime_ = (largeGrassTime_ / 2.0f);
+					addTime_ = largeGrassTime_;
 				}
 			}
 		}
@@ -880,6 +880,8 @@ bool Player::IsPopGrass()
 {
 	if (0 >= createGrassTimer_ && isCreateGrass_)
 	{
+		sourceVoiceTumari = Audio::GetInstance()->SoundPlayAudio(soundDataTumari);
+		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceTumari, kSE);
 		grassGauge_ = 0;
 		std::unique_ptr<StuckGrass> stuck = std::make_unique<StuckGrass>();
 		stuck->Initialize(camera_);
@@ -1123,9 +1125,6 @@ void Player::DebugPlayer()
 	{
 		EntryReturn();
 	}
-
-
-
 }
 #endif // _DEBUG
 

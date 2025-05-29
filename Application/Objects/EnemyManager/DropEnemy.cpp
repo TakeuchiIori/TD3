@@ -26,6 +26,9 @@ void DropEnemy::Initialize(Camera* camera)
 	InitCollision();
 	//InitJson();
 	soundData_ = Audio::GetInstance()->LoadAudio(L"Resources/Audio/fly.mp3");
+
+	IconInit();
+	SoundInit();
 }
 
 void DropEnemy::InitCollision()
@@ -115,6 +118,8 @@ void DropEnemy::Update()
 	kirisuteUpdate();
 	worldTransform_.UpdateMatrix();
 	obbCollider_->Update();
+
+	IconUpdate();
 }
 
 void DropEnemy::Draw()

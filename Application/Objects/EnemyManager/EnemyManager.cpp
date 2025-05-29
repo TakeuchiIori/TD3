@@ -52,6 +52,13 @@ void EnemyManager::DrawCollisions()
 	}
 }
 
+void EnemyManager::DrawSprite()
+{
+	for (auto& enemy : enemies_) {
+		enemy->DrawSprite();
+	}
+}
+
 void EnemyManager::ClearAll()
 {
 	spawnDataList_.clear();

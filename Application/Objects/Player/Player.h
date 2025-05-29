@@ -251,6 +251,18 @@ public: // getter&setter
 
 	float GetAddtime() { return addTime_; }
 
+	bool StuckGrassPop() { 
+		if(stuckGrassList_.size() > 0)
+		{
+			return stuckGrassList_.back()->IsPop();
+		}
+		false;
+	}
+
+	bool CanBoost() { return boostCoolTimer_ <= 0 ? true : false; }
+
+	Vector3 GetMoveDirection() { return moveDirection_; }
+
 private:
 	Input* input_ = nullptr;
 	
@@ -377,6 +389,9 @@ private:
 
 	Audio::SoundData soundDataYodare = {};
 	IXAudio2SourceVoice* sourceVoiceYodare = nullptr;
+
+	Audio::SoundData soundDataTumari = {};
+	IXAudio2SourceVoice* sourceVoiceTumari = nullptr;
 
 
 	float time_ = 0;

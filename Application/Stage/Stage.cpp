@@ -91,6 +91,7 @@ void Stage::DrawCollision()
 void Stage::DrawSprite()
 {
 	player_->DrawSprite();
+	enemyManager_->DrawSprite();
 }
 
 Stage::TransitionType Stage::ReachCheckPoint()

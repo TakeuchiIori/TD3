@@ -486,11 +486,11 @@ void GameScreen::UpdateLimit()
 		{
 			if(i < 3)
 			{
-				plusTimeSprites_[i]->SetPosition({ playerPos.x + spacing * i - 30, playerPos.y - 30, 0.0f });
+				plusTimeSprites_[i]->SetPosition({ playerPos.x + spacing * i - 80, playerPos.y - 0, 0.0f });
 			}
 			else
 			{
-				plusTimeSprites_[i]->SetPosition({ playerPos.x + spacing * (i - 1) -25, playerPos.y - 30, 0.0f });
+				plusTimeSprites_[i]->SetPosition({ playerPos.x + spacing * (i - 1) -75, playerPos.y - 0, 0.0f });
 			}
 			plusTimeSprites_[i]->SetAlpha(1.0f);
 			plusTimeSprites_[i]->Update();
@@ -549,9 +549,19 @@ void GameScreen::Updatedistance()
 	ditSprites_[3]->ChangeTexture(mTexturePath_);
 	// 配置と更新
 	float spacing = 20.0f;
-	for (int i = 0; i < 4; ++i) {
-		ditSprites_[i]->SetPosition({ playerPos.x - 10 + spacing * i, playerPos.y - 80, 0.0f });
-		ditSprites_[i]->Update();
+	if(player_->GetMoveDirection().y < 0)
+	{
+		for (int i = 0; i < 4; ++i) {
+			ditSprites_[i]->SetPosition({ playerPos.x - 30 + spacing * i, playerPos.y + 50, 0.0f });
+			ditSprites_[i]->Update();
+		}
+	}
+	else
+	{
+		for (int i = 0; i < 4; ++i) {
+			ditSprites_[i]->SetPosition({ playerPos.x - 30 + spacing * i, playerPos.y - 50, 0.0f });
+			ditSprites_[i]->Update();
+		}
 	}
 
 }

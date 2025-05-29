@@ -32,6 +32,9 @@ void SideEnemy::Initialize(Camera* camera)
 	//InitJson();
 
 	soundData_ = Audio::GetInstance()->LoadAudio(L"Resources/Audio/fly.mp3");
+
+	IconInit();
+	SoundInit();
 }
 
 void SideEnemy::InitCollision()
@@ -80,9 +83,21 @@ void SideEnemy::KnockBackDir()
 			bestDir = dir;
 		}
 	}
-
-	// ノックバック
-	ApplyKnockback(bestDir, 2.5f);
+	float min = 2.0f;
+	float max = 32.0f;
+	float len = max - min;
+	float t = 0;
+	if (bestDir.x > 0)
+	{
+		t = max - GetCenterPosition().x;
+	}
+	else
+	{
+		t = GetCenterPosition().x - min;
+	}
+	t = t / len;
+	// ノックバック max4.9 min0.7
+	ApplyKnockback(bestDir, Lerp(0.7f, 4.9f, t));
 
 	// 吹っ飛び中の回転速度（ラジアン/秒）を設定
 	angularVelocityY_ = DirectX::XMConvertToRadians(360.0f * 1.0f);  // 1秒で1回転
@@ -122,6 +137,8 @@ void SideEnemy::Update()
 	worldTransform_.UpdateMatrix();
 	//aabbCollider_->Update();
 	obbCollider_->Update();
+
+	IconUpdate();
 }
 
 void SideEnemy::Draw()
