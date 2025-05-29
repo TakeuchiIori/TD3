@@ -61,6 +61,7 @@ public:
 
 	int GetCheckPointID() { return stageList_[currentStageNum_]->GetCheckPointID(); }
 
+	bool PauseUpdate() { return player_->PauseUpdate(); }
 private:
 	Input* input_ = nullptr;
 

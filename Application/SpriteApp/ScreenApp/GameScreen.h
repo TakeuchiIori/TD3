@@ -137,5 +137,8 @@ private:
 
 
 	std::unique_ptr<JsonManager> jsonManager_;
+
+	float kTimeUpTime_ = 2.0f;
+	float timeUpTimer_ = 0.0f;
 };
 
