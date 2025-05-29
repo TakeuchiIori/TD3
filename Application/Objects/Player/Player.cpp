@@ -37,7 +37,7 @@ void Player::Initialize(Camera* camera)
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
-	worldTransform_.translation_ = { 4.0f,6.0f,0.0f };
+	worldTransform_.translation_ = { 4.0f,0.0f,0.0f };
 	worldTransform_.scale_ = { 0.99f,0.99f,0.99f };
 	modelWT_.Initialize();
 	modelWT_.parent_ = &worldTransform_;
@@ -47,7 +47,6 @@ void Player::Initialize(Camera* camera)
 
 	legWT_.Initialize();
 	legWT_.translation_ = worldTransform_.translation_;
-	legWT_.translation_.y = 2.3f;
 
 	worldTransform_.UpdateMatrix();
 	modelWT_.UpdateMatrix();
@@ -123,7 +122,8 @@ void Player::InitJson()
 	jsonManager_ = std::make_unique<JsonManager>("Obj", "Resources/JSON/");
 	jsonManager_->SetCategory("Objects");
 	jsonManager_->SetSubCategory("Player");
-	jsonManager_->Register("位置", &worldTransform_.translation_);
+	jsonManager_->Register("頭の位置", &worldTransform_.translation_);
+	jsonManager_->Register("体の位置", &legWT_.translation_);
 	jsonManager_->Register("通常時の移動速度", &defaultSpeed_);
 	jsonManager_->Register("ブースト時の速度", &boostSpeed_);
 	jsonManager_->Register("帰還時の速度", &returnSpeed_);
@@ -280,6 +280,7 @@ void Player::MapChipOnCollision(const CollisionInfo& info)
 
 void Player::Reset()
 {
+	InitJson();
 	extendTimer_ = 0;
 	boostCoolTimer_ = 0;
 	boostTimer_ = 0;

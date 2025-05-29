@@ -135,7 +135,6 @@ private:
 	Vector3 offsetMapCurrentScale_ = Vector3(offsetMapScale_, 1.0f, 1.0f);
 	int currentMapNum_ = -1;
 
-
 	std::unique_ptr<JsonManager> jsonManager_;
 
 	float kTimeUpTime_ = 2.0f;

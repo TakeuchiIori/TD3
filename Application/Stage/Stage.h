@@ -12,6 +12,7 @@
 #include "EnemyManager/EnemyManager.h"
 #include "Grass/GrassManager.h"
 #include "CheckPoint.h"
+#include "../SpriteApp/Background.h"
 
 
 class Stage
@@ -46,6 +47,7 @@ public:
 	/// <summary>
 	/// 描画
 	/// </summary>
+	void DrawBackground();
 	void Draw();
 	void DrawAnimation();
 	void DrawCollision();
@@ -65,6 +67,7 @@ public:
 	void SetPlayer(Player* player) { player_ = player; }
 	void SetEnemyManager(EnemyManager* enemyManager) { enemyManager_ = enemyManager; }
 	void SetGrassManager(GrassManager* grassManager) { grassManager_ = grassManager; }
+	void SetBackground(Background* background) { background_ = background; }
 
 	/// <summary>
 	/// チェックポイントの座標を取得
@@ -86,7 +89,7 @@ private:
 	//std::unique_ptr<JsonManager> jsonManager_;
 	
 	Camera* camera_ = nullptr;
-
+	Background* background_ = nullptr;
 	Player* player_ = nullptr;
 	EnemyManager* enemyManager_ = nullptr;
 	GrassManager* grassManager_ = nullptr;

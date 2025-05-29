@@ -12,8 +12,8 @@
 #include "../Graphics/Culling/OcclusionCullingManager.h"
 
 // App
-#include "../Application/SystemsApp/AppAudio/AudioVolumeManager.h"
-#include "../Application/SpriteApp/ScreenApp/MenuOverlay.h"
+#include "../SystemsApp/AppAudio/AudioVolumeManager.h"
+#include "../SpriteApp/MenuOverlay.h"
 
 // C++
 #include <cstdlib>
@@ -175,7 +175,7 @@ void GameScene::Update()
 	CollisionManager::GetInstance()->Update();
 
 	gameScreen_->Update();
-
+	
 }
 
 
@@ -184,6 +184,10 @@ void GameScene::Update()
 /// </summary>
 void GameScene::Draw()
 {
+
+	SpriteCommon::GetInstance()->DrawPreference();
+	stageManager_->DrawBackground();
+
 	//---------
 	// 3D
 	//---------
@@ -202,6 +206,11 @@ void GameScene::Draw()
 
 
 	//----------
+	// Particle
+	//----------
+	ParticleManager::GetInstance()->Draw();
+
+	//----------
 
 	//----------
 	// Sprite
@@ -209,11 +218,6 @@ void GameScene::Draw()
 	SpriteCommon::GetInstance()->DrawPreference();
 	DrawSprite();
 
-
-	//----------
-	// Particle
-	//----------
-	ParticleManager::GetInstance()->Draw();
 }
 
 void GameScene::DrawOffScreen()

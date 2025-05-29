@@ -89,7 +89,7 @@
     <ClCompile Include="Application\Objects\EnemyManager\SideEnemy.cpp" />
     <ClCompile Include="Application\Objects\EnemyManager\BaseEnemy.cpp" />
     <ClCompile Include="Application\Objects\EnemyManager\EnemyManager.cpp" />
-    <ClCompile Include="Application\SpriteApp\ScreenApp\GameScreen.cpp" />
+    <ClCompile Include="Application\SpriteApp\GameScreen.cpp" />
     <ClCompile Include="Application\Objects\Player\StuckGrass.cpp" />
     <ClCompile Include="Application\CheckPoint\CheckPoint.cpp" />
     <ClCompile Include="Application\Stage\Stage.cpp" />
@@ -112,13 +112,14 @@
     <ClCompile Include="Application\Objects\Book\Book.cpp" />
     <ClCompile Include="Application\SystemsApp\Cameras\BookEventCamera\BookEventCamera.cpp" />
     <ClCompile Include="Application\SystemsApp\Cameras\DefaultCamera\DefaultCamera.cpp" />
-    <ClCompile Include="Application\SpriteApp\ScreenApp\TitleScreen.cpp" />
+    <ClCompile Include="Application\SpriteApp\TitleScreen.cpp" />
     <ClCompile Include="Engine\Utility\Loaders\Model\Mesh\MeshPrimitive.cpp" />
     <ClCompile Include="Application\SystemsApp\AppAudio\AudioVolumeManager.cpp" />
-    <ClCompile Include="Application\SpriteApp\ScreenApp\MenuOverlay.cpp" />
+    <ClCompile Include="Application\SpriteApp\MenuOverlay.cpp" />
     <ClCompile Include="Application\Objects\Cloud\Cloud.cpp" />
     <ClCompile Include="Math\Vector4.cpp" />
     <ClCompile Include="Engine\Generators\Particle\ParticleEffectManager.cpp" />
+    <ClCompile Include="Application\SpriteApp\Background.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -210,7 +211,7 @@
     <ClInclude Include="Application\Objects\EnemyManager\SideEnemy.h" />
     <ClInclude Include="Application\Objects\EnemyManager\BaseEnemy.h" />
     <ClInclude Include="Application\Objects\EnemyManager\EnemyManager.h" />
-    <ClInclude Include="Application\SpriteApp\ScreenApp\GameScreen.h" />
+    <ClInclude Include="Application\SpriteApp\GameScreen.h" />
     <ClInclude Include="Application\Objects\Player\StuckGrass.h" />
     <ClInclude Include="Application\CheckPoint\CheckPoint.h" />
     <ClInclude Include="Application\Stage\Stage.h" />
@@ -236,13 +237,14 @@
     <ClInclude Include="Application\Objects\Book\Book.h" />
     <ClInclude Include="Application\SystemsApp\Cameras\BookEventCamera\BookEventCamera.h" />
     <ClInclude Include="Application\SystemsApp\Cameras\DefaultCamera\DefaultCamera.h" />
-    <ClInclude Include="Application\SpriteApp\ScreenApp\TitleScreen.h" />
+    <ClInclude Include="Application\SpriteApp\TitleScreen.h" />
     <ClInclude Include="Engine\Utility\Loaders\Json\EnumUtils.h" />
     <ClInclude Include="Engine\Utility\Loaders\Model\Mesh\MeshPrimitive.h" />
     <ClInclude Include="Application\SystemsApp\AppAudio\AudioVolumeManager.h" />
-    <ClInclude Include="Application\SpriteApp\ScreenApp\MenuOverlay.h" />
+    <ClInclude Include="Application\SpriteApp\MenuOverlay.h" />
     <ClInclude Include="Application\Objects\Cloud\Cloud.h" />
     <ClInclude Include="Engine\Generators\Particle\ParticleEffectManager.h" />
+    <ClInclude Include="Application\SpriteApp\Background.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />
