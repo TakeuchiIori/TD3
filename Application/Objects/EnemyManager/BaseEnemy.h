@@ -4,6 +4,7 @@
 #include "Systems/MapChip/MapChipCollision.h"
 #include "Loaders/Json/JsonManager.h"
 #include "Systems/Audio/Audio.h"
+#include "Sprite/Sprite.h"
 
 // Collision
 #include "Collision/Sphere/SphereCollider.h"
@@ -40,6 +41,8 @@ public:
 	///	判定の描画
 	/// </summary>
 	virtual void DrawCollision() = 0;
+
+	void DrawSprite();
 
 	/// <summary>
 	///	判定の描画
@@ -99,6 +102,9 @@ protected:
 
 	void kirisuteUpdate();
 
+	void IconInit();
+	void IconUpdate();
+
 public:
 
 	/// <summary>
@@ -136,5 +142,11 @@ protected:
 	WorldTransform kirisutegomennWT_;
 	bool isSpinning_ = false;
 	float angularVelocityY_ = 0;
+
+	std::string dashIconPath_ = "Resources/Textures/In_Game/dashIcon.png";
+	std::unique_ptr<Sprite> dashIconSprite_;
+	bool iconVisible_ = true;
+	Vector3 offsetPos_ = { 25,-40,0 };
+	float offsetScale_ = 0.15f;
 };
 

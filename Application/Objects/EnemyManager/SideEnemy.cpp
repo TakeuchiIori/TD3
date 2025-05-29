@@ -32,6 +32,8 @@ void SideEnemy::Initialize(Camera* camera)
 	//InitJson();
 
 	soundData_ = Audio::GetInstance()->LoadAudio(L"Resources/Audio/fly.mp3");
+
+	IconInit();
 }
 
 void SideEnemy::InitCollision()
@@ -134,6 +136,8 @@ void SideEnemy::Update()
 	worldTransform_.UpdateMatrix();
 	//aabbCollider_->Update();
 	obbCollider_->Update();
+
+	IconUpdate();
 }
 
 void SideEnemy::Draw()
