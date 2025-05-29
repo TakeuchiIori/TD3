@@ -142,7 +142,7 @@ void TitleScene::Update()
 	}
 
 
-	emitter_->UpdateTime();
+	//emitter_->UpdateTime();
 
 
 	mpInfo_->Update();

@@ -112,6 +112,11 @@ void GameScene::Update()
 		isDebugCamera_ = !isDebugCamera_;
 	}
 	stageEditor_->DrawEditorUI();
+
+	if (Input::GetInstance()->PushKey(DIK_LEFTARROW)) {
+		sceneManager_->ChangeScene("Clear");
+	}
+
 #endif // _DEBUG
 
 	// クリアしたとき
