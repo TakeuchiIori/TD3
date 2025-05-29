@@ -166,10 +166,13 @@ void Player::Update()
 		obj_->ChangeModelAnimation("Yodare.gltf", 1);
 		isAnimation_ = true;
 	}
+#ifdef _DEBUG
 
 	if (input_->IsPadPressed(0, GamePadButton::B)) {
 		emitter_->Emit();
 	}
+#endif // _DEBUG
+
 	// 各行動の初期化
 	BehaviorInitialize();
 	// 各行動の更新
@@ -280,6 +283,7 @@ void Player::MapChipOnCollision(const CollisionInfo& info)
 
 void Player::Reset()
 {
+	obj_->ChangeModel("kirin.gltf", true);
 	worldTransform_.translation_.y = 6.2f;
 	extendTimer_ = 0;
 	boostCoolTimer_ = 0;
