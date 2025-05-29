@@ -745,8 +745,6 @@ void Player::EntryBoost()
 		{
 			behaviortRquest_ = BehaviorPlayer::Boost;
 		}
-#ifdef _DEBUG
-#endif // _DEBUG
 	}
 }
 
