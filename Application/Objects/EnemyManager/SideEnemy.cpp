@@ -34,6 +34,7 @@ void SideEnemy::Initialize(Camera* camera)
 	soundData_ = Audio::GetInstance()->LoadAudio(L"Resources/Audio/fly.mp3");
 
 	IconInit();
+	SoundInit();
 }
 
 void SideEnemy::InitCollision()

@@ -28,6 +28,7 @@ void DropEnemy::Initialize(Camera* camera)
 	soundData_ = Audio::GetInstance()->LoadAudio(L"Resources/Audio/fly.mp3");
 
 	IconInit();
+	SoundInit();
 }
 
 void DropEnemy::InitCollision()

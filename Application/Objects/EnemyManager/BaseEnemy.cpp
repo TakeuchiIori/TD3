@@ -91,6 +91,11 @@ void BaseEnemy::IconUpdate()
 	}
 }
 
+void BaseEnemy::SoundInit()
+{
+	soundDataFly = Audio::GetInstance()->LoadAudio(L"Resources/Audio/fly.mp3");
+}
+
 void BaseEnemy::DrawSprite()
 {
 	if (iconVisible_ && !isFaint_ && !isTakeAttack_)
