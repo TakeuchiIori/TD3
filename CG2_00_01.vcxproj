@@ -123,6 +123,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\SystemsApp\Cameras\DefaultCamera\DefaultCamera.cpp" />
     <ClCompile Include="Application\SystemsApp\AppAudio\AudioVolumeManager.cpp" />
     <ClCompile Include="Application\Objects\Cloud\Cloud.cpp" />
+    <ClCompile Include="Application\SpriteApp\Background.cpp" />
     <ClCompile Include="Engine\Generators\OffScreen\OffScreen.cpp" />
     <ClCompile Include="Engine\Graphics\Culling\OcclusionCullingManager.cpp" />
     <ClCompile Include="Engine\Utility\Collision\AABB\AABBCollider.cpp" />
@@ -150,7 +151,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Utility\Systems\UI\UIButton.cpp" />
     <ClCompile Include="Application\Objects\Grass\Grass.cpp" />
     <ClCompile Include="Application\Objects\Grass\GrassManager.cpp" />
-    <ClCompile Include="Application\SpriteApp\ScreenApp\GameScreen.cpp" />
+    <ClCompile Include="Application\SpriteApp\GameScreen.cpp" />
     <ClCompile Include="Application\Objects\Giraffe\Giraffe.cpp" />
     <ClCompile Include="Math\Easing.cpp" />
     <ClCompile Include="Application\Scenes\MainScenes\Clear\ClearScene.cpp" />
@@ -214,8 +215,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Stage\StageEditor.cpp" />
     <ClCompile Include="Application\Objects\Player\PlayerHaert.cpp" />
     <ClCompile Include="Application\Objects\Player\TitlePlayer.cpp" />
-    <ClCompile Include="Application\SpriteApp\ScreenApp\TitleScreen.cpp" />
-    <ClCompile Include="Application\SpriteApp\ScreenApp\MenuOverlay.cpp" />
+    <ClCompile Include="Application\SpriteApp\TitleScreen.cpp" />
+    <ClCompile Include="Application\SpriteApp\MenuOverlay.cpp" />
     <ClCompile Include="Math\Vector4.cpp" />
     <ClCompile Include="Engine\Generators\Particle\ParticleEffectManager.cpp" />
   </ItemGroup>
@@ -234,6 +235,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\SystemsApp\Cameras\DefaultCamera\DefaultCamera.h" />
     <ClInclude Include="Application\SystemsApp\AppAudio\AudioVolumeManager.h" />
     <ClInclude Include="Application\Objects\Cloud\Cloud.h" />
+    <ClInclude Include="Application\SpriteApp\Background.h" />
     <ClInclude Include="Engine\Generators\OffScreen\OffScreen.h" />
     <ClInclude Include="Engine\Graphics\Culling\OcclusionCullingManager.h" />
     <ClInclude Include="Engine\Utility\Collision\AABB\AABBCollider.h" />
@@ -266,7 +268,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Utility\Systems\UI\UIButton.h" />
     <ClInclude Include="Application\Objects\Grass\Grass.h" />
     <ClInclude Include="Application\Objects\Grass\GrassManager.h" />
-    <ClInclude Include="Application\SpriteApp\ScreenApp\GameScreen.h" />
+    <ClInclude Include="Application\SpriteApp\GameScreen.h" />
     <ClInclude Include="Application\Objects\Giraffe\Giraffe.h" />
     <ClInclude Include="Math\Easing.h" />
     <ClInclude Include="Application\Scenes\MainScenes\Clear\ClearScene.h" />
@@ -331,7 +333,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Objects\Player\PlayerMapCollision.h" />
     <ClInclude Include="Application\Objects\Player\PlayerBody.h" />
     <ClInclude Include="Application\Objects\Player\PlayerHaert.h" />
-    <ClInclude Include="Application\SpriteApp\ScreenApp\MenuOverlay.h" />
+    <ClInclude Include="Application\SpriteApp\MenuOverlay.h" />
     <ClInclude Include="Engine\Generators\Particle\ParticleEffectManager.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Application\Objects\EnemyManager\SideEnemy.h" />
@@ -341,7 +343,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Stage\StageManager.h" />
     <ClInclude Include="Application\Stage\StageEditor.h" />
     <ClInclude Include="Application\Objects\Player\TitlePlayer.h" />
-    <ClInclude Include="Application\SpriteApp\ScreenApp\TitleScreen.h" />
+    <ClInclude Include="Application\SpriteApp\TitleScreen.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">

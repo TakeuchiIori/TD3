@@ -19,9 +19,10 @@ void GameScreen::Initialize()
 	///////////////////////////////////////////////////////////////////////////
 	background_[0] = std::make_unique<UIBase>("GameScreen");
 	background_[0]->Initialize("Resources/JSON/UI/GameScreen.json");
+	background_[0]->isDrawImGui_ = true;
 	background_[1] = std::make_unique<UIBase>("GameScreen_2");
 	background_[1]->Initialize("Resources/JSON/UI/GameScreen_2.json");
-
+	background_[1]->isDrawImGui_ = true;
 
 	///////////////////////////////////////////////////////////////////////////
 	// 
@@ -184,12 +185,13 @@ void GameScreen::Initialize()
 
 void GameScreen::InitJson()
 {
-	jsonManager_ = std::make_unique<JsonManager>("YodareUI", "Resources/JSON/UI");
+	jsonManager_ = std::make_unique<JsonManager>("UI", "Resources/JSON/UI");
 	jsonManager_->SetCategory("UI");
-	jsonManager_->Register("OffsetYodare", &offsetYodare_);
-	jsonManager_->Register("OffsetGrass", &offsetGrass_);
-	jsonManager_->Register("Offset", &offset_);
-	jsonManager_->Register("offsetYodareop_", &offsetYodareop_);
+	jsonManager_->Register("プレイヤー追従してるヨダレの位置", &offsetYodare_);
+	jsonManager_->Register("草の位置", &offset_);
+	jsonManager_->Register("ヨダレの位置", &offsetYodareop_);
+	jsonManager_->Register("HPの位置", &offsetH_);
+	jsonManager_->Register("ブーストの位置", &offsetB_);
 }
 
 void GameScreen::Update()
@@ -202,6 +204,7 @@ void GameScreen::Update()
 
 	for (uint32_t i = 0; i < numBGs_; i++)
 	{
+		//background_[i]->ImGUi();
 		background_[i]->Update();
 	}
 
@@ -251,9 +254,6 @@ void GameScreen::Update()
 		}
 		grass_[i]->Update();
 
-	}
-	for (uint32_t i = 0; i < 2; i++) {
-		grass_[i]->ImGUi();
 	}
 	///////////////////////////////////////////////////////////////////////////
 	// 
@@ -362,6 +362,7 @@ void GameScreen::Update()
 
 void GameScreen::Draw()
 {
+
 	for (uint32_t i = 0; i < numBGs_; i++)
 	{
 		background_[i]->Draw();

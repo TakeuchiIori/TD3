@@ -4,6 +4,7 @@
 #include "Stage.h"
 #include "Systems/MapChip/MapChipInfo.h"
 #include "../SystemsApp/Cameras/FollowCamera/FollowCamera.h"
+#include "../SpriteApp/Background.h"
 
 class StageManager
 {
@@ -24,6 +25,9 @@ public:
 	/// <summary>
 	/// 描画
 	/// </summary>
+	
+	void DrawBackground();
+
 	void Draw();
 
 	void DrawAnimation();
@@ -76,6 +80,7 @@ private:
 	std::unique_ptr<Player> player_;
 	std::unique_ptr<EnemyManager> enemyManager_;
 	std::unique_ptr<GrassManager> grassManager_;
+	std::unique_ptr<Background> background_;
 
 	float cameraScrollStart_ = 16.0f;
 	float cameraScrollEnd_ = 22.0f;
