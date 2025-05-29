@@ -306,7 +306,7 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 
 			if (kMaxGrassGauge_ > grassGauge_ && createGrassTimer_ <= 0)
 			{
-				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= 1.1f)
+				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= 2.1f)
 				{
 					isAddTime_ = true;
 					addTime_ = grassTime_;
@@ -329,7 +329,7 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 				}
 			} else
 			{
-				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= 1.1f)
+				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= 2.1f)
 				{
 					isAddTime_ = true;
 					addTime_ = grassTime_;
