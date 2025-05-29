@@ -280,7 +280,7 @@ void Player::MapChipOnCollision(const CollisionInfo& info)
 
 void Player::Reset()
 {
-	InitJson();
+	worldTransform_.translation_.y = 6.2f;
 	extendTimer_ = 0;
 	boostCoolTimer_ = 0;
 	boostTimer_ = 0;
