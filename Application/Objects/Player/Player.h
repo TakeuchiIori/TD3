@@ -388,6 +388,9 @@ private:
 	Audio::SoundData soundDataYodare = {};
 	IXAudio2SourceVoice* sourceVoiceYodare = nullptr;
 
+	Audio::SoundData soundDataTumari = {};
+	IXAudio2SourceVoice* sourceVoiceTumari = nullptr;
+
 
 	float time_ = 0;
 	float rootTimer_ = 0;

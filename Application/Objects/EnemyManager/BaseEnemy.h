@@ -6,6 +6,8 @@
 #include "Systems/Audio/Audio.h"
 #include "Sprite/Sprite.h"
 
+#include "../Application/SystemsApp//AppAudio/AudioVolumeManager.h"
+
 // Collision
 #include "Collision/Sphere/SphereCollider.h"
 #include "Collision/OBB/OBBCollider.h"
@@ -87,6 +89,8 @@ protected:
 	// 攻撃を受けた時
 	void TakeAttack()
 	{ 
+		sourceVoiceFly = Audio::GetInstance()->SoundPlayAudio(soundDataFly);
+		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceFly, kSE);
 		obj_->SetMaterialColor(Vector3{ 0.3f,0.3f,0.3f });
 		obbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
 		if(isTakeAttack_)
@@ -104,6 +108,8 @@ protected:
 
 	void IconInit();
 	void IconUpdate();
+
+	void SoundInit();
 
 public:
 
@@ -148,5 +154,10 @@ protected:
 	bool iconVisible_ = true;
 	Vector3 offsetPos_ = { 25,-40,0 };
 	float offsetScale_ = 0.15f;
+
+
+	// サウンド
+	Audio::SoundData soundDataFly = {};
+	IXAudio2SourceVoice* sourceVoiceFly = nullptr;
 };
 

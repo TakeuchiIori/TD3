@@ -84,6 +84,8 @@ void Player::Initialize(Camera* camera)
 	soundDataEat[1] = Audio::GetInstance()->LoadAudio(L"Resources/Audio/eat2.mp3");
 	soundDataEat[2] = Audio::GetInstance()->LoadAudio(L"Resources/Audio/eat3.mp3");
 	soundDataYodare = Audio::GetInstance()->LoadAudio(L"Resources/Audio/yodare.mp3");
+
+	soundDataTumari = Audio::GetInstance()->LoadAudio(L"Resources/Audio/tumaru.mp3");
 	// 音量の設定（0.0f ～ 1.0f）
 	//Audio::GetInstance()->SetVolume(sourceVoice, 0.5f);
 
@@ -877,6 +879,8 @@ bool Player::IsPopGrass()
 {
 	if (0 >= createGrassTimer_ && isCreateGrass_)
 	{
+		sourceVoiceTumari = Audio::GetInstance()->SoundPlayAudio(soundDataTumari);
+		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceTumari, kSE);
 		grassGauge_ = 0;
 		std::unique_ptr<StuckGrass> stuck = std::make_unique<StuckGrass>();
 		stuck->Initialize(camera_);

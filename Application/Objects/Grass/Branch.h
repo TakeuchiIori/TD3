@@ -99,6 +99,5 @@ private:
 
 	Audio::SoundData soundDataBranch_ = {};
 	IXAudio2SourceVoice* sourceVoiceBranch_ = nullptr;
-
 };
 

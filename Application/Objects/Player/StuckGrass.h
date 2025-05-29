@@ -8,6 +8,7 @@
 #include "Collision/Core/CollisionDirection.h"
 #include <MathFunc.h>
 #include <Vector3.h>
+#include "Systems/Audio/Audio.h"
 
 class Player;
 
@@ -91,5 +92,8 @@ private:
 	static int count_;    // 現在のインスタンス数
 	int id_;              // 各インスタンスのID
 
+
+	Audio::SoundData hakuSoundData_ = {};
+	IXAudio2SourceVoice* hakuSourceVoice_ = nullptr;
 };
 

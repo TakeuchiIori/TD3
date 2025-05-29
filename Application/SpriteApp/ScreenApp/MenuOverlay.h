@@ -100,5 +100,8 @@ private:
     bool isAnimation_ = false;
     bool isEndAnimation_ = false;
 
+    Audio::SoundData menuSoundData_ = {};
+    IXAudio2SourceVoice* menuSourceVoice_ = nullptr;
+
 };
 

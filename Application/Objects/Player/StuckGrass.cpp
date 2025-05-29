@@ -1,9 +1,11 @@
 #include "StuckGrass.h"
 
 #include "Player.h"
+#include "../Application/SystemsApp/AppAudio/AudioVolumeManager.h"
 
 #include "Collision/Core/ColliderFactory.h"
 #include "Systems/GameTime/GameTIme.h"
+
 
 #ifdef _DEBUG
 #include "imgui.h"
@@ -33,6 +35,8 @@ void StuckGrass::Initialize(Camera* camera)
 
 	InitCollision();
 	InitJson();
+
+	hakuSoundData_ = Audio::GetInstance()->LoadAudio(L"Resources/Audio/spitOut.mp3");
 }
 
 void StuckGrass::InitCollision()
@@ -77,6 +81,14 @@ void StuckGrass::DrawCollision()
 
 void StuckGrass::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
+	if (player_->behavior_ == BehaviorPlayer::Return)
+	{
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+		{
+			hakuSourceVoice_ = Audio::GetInstance()->SoundPlayAudio(hakuSoundData_);
+			AudioVolumeManager::GetInstance()->SetSourceToSubmix(hakuSourceVoice_, kSE);
+		}
+	}
 }
 
 void StuckGrass::OnCollision(BaseCollider* self, BaseCollider* other)
