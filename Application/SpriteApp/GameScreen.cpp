@@ -451,10 +451,25 @@ void GameScreen::UpdateLimit()
 	// 配置と更新
 	Vector2 basePos = { 560.0f, 680.0f };
 	float spacing = 40.0f;
-	for (int i = 0; i < 5; ++i) 
+	if(!player_->PauseUpdate())
 	{
-		timeSprites_[i]->SetPosition({ basePos.x + spacing * i, basePos.y, 0.0f });
-		timeSprites_[i]->Update();
+		for (int i = 0; i < 5; ++i)
+		{
+			timeSprites_[i]->SetPosition({ basePos.x + spacing * i, basePos.y, 0.0f });
+			timeSprites_[i]->Update();
+		}
+	}
+	else
+	{
+		if(timeUpTimer_ <= kTimeUpTime_)
+		{
+			timeUpTimer_ += GameTime::GetDeltaTime();
+		}
+		else
+		{
+			timeUpTimer_ = 0;
+			player_->ResumeUpdate();
+		}
 	}
 
 	if (player_->IsAddTime())

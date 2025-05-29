@@ -263,6 +263,10 @@ public: // getter&setter
 
 	Vector3 GetMoveDirection() { return moveDirection_; }
 
+	bool PauseUpdate() { return pauseUpdate_; }
+
+	void ResumeUpdate() { pauseUpdate_ = false; }
+
 private:
 	Input* input_ = nullptr;
 	
@@ -393,6 +397,9 @@ private:
 	Audio::SoundData soundDataTumari = {};
 	IXAudio2SourceVoice* sourceVoiceTumari = nullptr;
 
+	Audio::SoundData soundDataTimeUp = {};
+	IXAudio2SourceVoice* sourceVoiceTimeUp = nullptr;
+
 
 	float time_ = 0;
 	float rootTimer_ = 0;
@@ -400,6 +407,8 @@ private:
 	std::unique_ptr<Sprite> uiA_;
 	Vector3 offsetUI_ = {};
 	bool showUI_ = true;
+
+	bool pauseUpdate_ = false;
 
 public:
 	// 振る舞い

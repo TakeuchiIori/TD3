@@ -85,6 +85,7 @@ void Player::Initialize(Camera* camera)
 	soundDataYodare = Audio::GetInstance()->LoadAudio(L"Resources/Audio/yodare.mp3");
 
 	soundDataTumari = Audio::GetInstance()->LoadAudio(L"Resources/Audio/tumaru.mp3");
+	soundDataTimeUp = Audio::GetInstance()->LoadAudio(L"Resources/Audio/timeUp.mp3");
 	// 音量の設定（0.0f ～ 1.0f）
 	//Audio::GetInstance()->SetVolume(sourceVoice, 0.5f);
 
@@ -750,6 +751,13 @@ void Player::EntryBoost()
 void Player::EntryReturn()
 {
 	behaviortRquest_ = BehaviorPlayer::Return;
+	if(extendTimer_ <= 0)
+	{
+		sourceVoiceTimeUp = Audio::GetInstance()->SoundPlayAudio(soundDataTimeUp, false);
+		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceTimeUp, kSE);
+		pauseUpdate_ = true;
+	}
+	extendTimer_ = 0;
 }
 
 void Player::TimerManager()
@@ -942,8 +950,9 @@ void Player::TakeDamage()
 			AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceDamage, kSE);
 			if (HP_ <= 0)
 			{
-				extendTimer_ = 0;
-			} else
+				EntryReturn();
+			} 
+			else
 			{
 				invincibleTimer_ = kInvincibleTime_;
 			}
@@ -1117,6 +1126,7 @@ void Player::DebugPlayer()
 
 	ImGui::Text("コンボ数：%d / %d", comboCount_, kMaxCombo_);
 	ImGui::Text("コンボタイマー：%.2f 秒", comboTimer_);
+	ImGui::Text("po-zujoutai: %d", pauseUpdate_);
 	ImGui::End();
 
 	if (input_->TriggerKey(DIK_N))

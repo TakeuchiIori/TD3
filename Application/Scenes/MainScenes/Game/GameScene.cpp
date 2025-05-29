@@ -141,11 +141,14 @@ void GameScene::Update()
 
 			if (!stageManager_->CheckPointTransition())
 			{
-				if (!isDebugCamera_)
+				if(!stageManager_->PauseUpdate())
 				{
-					stageManager_->NotDebugCameraUpdate();
+					if (!isDebugCamera_)
+					{
+						stageManager_->NotDebugCameraUpdate();
+					}
+					stageManager_->Update();
 				}
-				stageManager_->Update();
 				gameScreen_->SetCurrentMap(stageManager_->GetCheckPointID());
 			}
 		}
