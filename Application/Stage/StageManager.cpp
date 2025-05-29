@@ -24,6 +24,7 @@ void StageManager::Initialize(Camera* camera)
 	// 背景
 	background_ = std::make_unique<Background>();
 	background_->Initialzie();
+	background_->SetColor({ 0.53f, 0.81f, 0.92f, 1.0f });
 
 	stageList_.push_back(std::make_unique<Stage>());
 	stageList_[0]->SetPlayer(player_.get());
