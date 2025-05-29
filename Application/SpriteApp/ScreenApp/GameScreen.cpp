@@ -548,9 +548,19 @@ void GameScreen::Updatedistance()
 	ditSprites_[3]->ChangeTexture(mTexturePath_);
 	// 配置と更新
 	float spacing = 20.0f;
-	for (int i = 0; i < 4; ++i) {
-		ditSprites_[i]->SetPosition({ playerPos.x - 30 + spacing * i, playerPos.y - 50, 0.0f });
-		ditSprites_[i]->Update();
+	if(player_->GetMoveDirection().y < 0)
+	{
+		for (int i = 0; i < 4; ++i) {
+			ditSprites_[i]->SetPosition({ playerPos.x - 30 + spacing * i, playerPos.y + 50, 0.0f });
+			ditSprites_[i]->Update();
+		}
+	}
+	else
+	{
+		for (int i = 0; i < 4; ++i) {
+			ditSprites_[i]->SetPosition({ playerPos.x - 30 + spacing * i, playerPos.y - 50, 0.0f });
+			ditSprites_[i]->Update();
+		}
 	}
 
 }
