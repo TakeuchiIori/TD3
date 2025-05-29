@@ -61,6 +61,9 @@ void TitleScreen::Update()
 	for (uint32_t i = 0; i < numBGs_; i++)
 	{
 		background_[i]->Update();
+		if (i != 2) {
+			//background_[i]->ImGUi();
+		}
 	}
 
 
