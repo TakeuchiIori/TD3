@@ -279,6 +279,7 @@ void Player::MapChipOnCollision(const CollisionInfo& info)
 
 void Player::Reset()
 {
+	InitJson();
 	extendTimer_ = 0;
 	boostCoolTimer_ = 0;
 	boostTimer_ = 0;
