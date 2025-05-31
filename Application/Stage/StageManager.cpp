@@ -26,11 +26,16 @@ void StageManager::Initialize(Camera* camera)
 	background_->Initialzie();
 	background_->SetColor({ 0.53f, 0.81f, 0.92f, 1.0f });
 
+	// 気球
+	balloon_ = std::make_unique<Balloon>();
+	balloon_->Initialize(camera_);
+
 	stageList_.push_back(std::make_unique<Stage>());
 	stageList_[0]->SetPlayer(player_.get());
 	stageList_[0]->SetGrassManager(grassManager_.get());
 	stageList_[0]->SetEnemyManager(enemyManager_.get());
 	stageList_[0]->SetBackground(background_.get());
+	stageList_[0]->SetBalloon(balloon_.get());
 	stageList_[0]->Initialize(camera_);
 
 
