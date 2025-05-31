@@ -1,6 +1,8 @@
 #include "ClearScreen.h"
+
 void ClearScreen::Initialize()
-{	///////////////////////////////////////////////////////////////////////////
+{
+	///////////////////////////////////////////////////////////////////////////
 	// 
 	// 背景の初期化
 	// 
@@ -11,10 +13,28 @@ void ClearScreen::Initialize()
 	background_[1] = std::make_unique<UIBase>("GameScreen_2");
 	background_[1]->Initialize("Resources/JSON/UI/ClearScreen_2.json");
 	background_[1]->isDrawImGui_ = true;
+	sprite_ = std::make_unique<Sprite>();
+	sprite_->Initialize("Resources/Textures/Option/clear_krin.png");
+	spriteA_ = std::make_unique<Sprite>();
+	spriteA_->Initialize("Resources/Textures/Option/title_go.png");
+	// スプライトスライド初期化
+	spriteSlideTimer_ = 0.0f;
+	isSliding_ = true;
+	// sin波のタイマー初期化
+	sinTimer_ = 0.0f;
+	InitJson();
 }
 
 void ClearScreen::InitJson()
 {
+	jsonManager_ = std::make_unique<JsonManager>("ClearUI", "Resources/JSON/UI");
+	jsonManager_->SetCategory("ClearUI");
+	jsonManager_->Register("スタート", &spriteStartX_);
+	jsonManager_->Register("ゴール", &spriteEndX_);
+	jsonManager_->Register("サイズ", &sprite_->size_);
+	jsonManager_->Register("Y", &sprite_->position_.y);
+	jsonManager_->Register("Aサイズ", &spriteA_->size_);
+	jsonManager_->Register("offset", &offset_);
 }
 
 void ClearScreen::Update()
@@ -24,12 +44,41 @@ void ClearScreen::Update()
 	// 背景の更新処理
 	// 
 	///////////////////////////////////////////////////////////////////////////
-
 	for (uint32_t i = 0; i < numBGs_; i++)
 	{
 		background_[i]->ImGUi();
 		background_[i]->Update();
 	}
+}
+
+void ClearScreen::UpdateKirin()
+{
+	// スプライトスライド処理
+	if (isSliding_) {
+		spriteSlideTimer_ += 1.0f / 60.0f; // 60FPS想定
+		if (spriteSlideTimer_ >= spriteSlideTime_) {
+			spriteSlideTimer_ = spriteSlideTime_;
+			isSliding_ = false;
+		}
+		// イージング計算（滑らかな動き）
+		float t = spriteSlideTimer_ / spriteSlideTime_;
+		float easedT = 1.0f - (1.0f - t) * (1.0f - t); // イーズアウト
+		sprite_->position_.x = spriteStartX_ + (spriteEndX_ - spriteStartX_) * easedT;
+	}
+
+	// Aボタンの基本位置を設定
+	spriteA_->position_ = sprite_->position_ + offset_;
+
+	// スライド完了後のみsin波を適用
+	if (!isSliding_) {
+		// sin波でAボタンをぷかぷか浮遊させる
+		sinTimer_ += 1.0f / 60.0f; // 60FPS想定
+		float sinWave = sin(sinTimer_ * floatSpeed_) * floatAmplitude_;
+		spriteA_->position_.y += sinWave; // Y座標にsin波を加算
+	}
+
+	sprite_->Update();
+	spriteA_->Update();
 }
 
 void ClearScreen::Draw()
@@ -38,4 +87,6 @@ void ClearScreen::Draw()
 	{
 		background_[i]->Draw();
 	}
+	sprite_->Draw();
+	spriteA_->Draw();
 }

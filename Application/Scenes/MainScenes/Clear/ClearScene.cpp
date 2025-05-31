@@ -51,9 +51,6 @@ void ClearScene::Update()
 	if ((Input::GetInstance()->TriggerKey(DIK_LCONTROL)) || Input::GetInstance()->IsPadTriggered(0, GamePadButton::RT)) {
 		isDebugCamera_ = !isDebugCamera_;
 	}
-	if (Input::GetInstance()->IsPadPressed(0, GamePadButton::A)) {
-		sceneManager_->ChangeScene("Title");
-	}
 #endif // _DEBUG
 
 	// プレイヤーの高度を取得
@@ -75,7 +72,10 @@ void ClearScene::Update()
 	if (player_->IsEventActive()) {
 		// イベント中は追従カメラの感度を下げる、または固定する
 		followCamera_.SetFollowEnabled(false);
-		// または特別なカメラ演出を追加
+		clearScreen_->UpdateKirin();
+		if (Input::GetInstance()->IsPadPressed(0, GamePadButton::A)) {
+			sceneManager_->ChangeScene("Title");
+		}
 	}
 
 	planet_->Update();
