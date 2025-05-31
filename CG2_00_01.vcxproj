@@ -124,6 +124,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\SystemsApp\AppAudio\AudioVolumeManager.cpp" />
     <ClCompile Include="Application\Objects\Cloud\Cloud.cpp" />
     <ClCompile Include="Application\SpriteApp\Background.cpp" />
+    <ClCompile Include="Application\Objects\Player\ClearPlayer.cpp" />
     <ClCompile Include="Engine\Generators\OffScreen\OffScreen.cpp" />
     <ClCompile Include="Engine\Graphics\Culling\OcclusionCullingManager.cpp" />
     <ClCompile Include="Engine\Utility\Collision\AABB\AABBCollider.cpp" />
@@ -236,6 +237,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\SystemsApp\AppAudio\AudioVolumeManager.h" />
     <ClInclude Include="Application\Objects\Cloud\Cloud.h" />
     <ClInclude Include="Application\SpriteApp\Background.h" />
+    <ClInclude Include="Application\Objects\Player\ClearPlayer.h" />
     <ClInclude Include="Engine\Generators\OffScreen\OffScreen.h" />
     <ClInclude Include="Engine\Graphics\Culling\OcclusionCullingManager.h" />
     <ClInclude Include="Engine\Utility\Collision\AABB\AABBCollider.h" />

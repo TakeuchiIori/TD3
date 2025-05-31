@@ -120,6 +120,7 @@
     <ClCompile Include="Math\Vector4.cpp" />
     <ClCompile Include="Engine\Generators\Particle\ParticleEffectManager.cpp" />
     <ClCompile Include="Application\SpriteApp\Background.cpp" />
+    <ClCompile Include="Application\Objects\Player\ClearPlayer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -245,6 +246,7 @@
     <ClInclude Include="Application\Objects\Cloud\Cloud.h" />
     <ClInclude Include="Engine\Generators\Particle\ParticleEffectManager.h" />
     <ClInclude Include="Application\SpriteApp\Background.h" />
+    <ClInclude Include="Application\Objects\Player\ClearPlayer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />

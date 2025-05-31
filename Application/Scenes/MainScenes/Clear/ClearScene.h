@@ -15,13 +15,30 @@
 #include "Drawer/LineManager/Line.h"
 #include "../Transitions/Fade/Fade.h"
 
+// Cameras
+#include "../../../SystemsApp/Cameras/DebugCamera/DebugCamera.h"
+#include "../../../SystemsApp/Cameras/FollowCamera/FollowCamera.h"
+#include "../../../SystemsApp/Cameras/TopDownCamera/TopDownCamera.h"
+#include "../../../SystemsApp/Cameras/BookEventCamera/BookEventCamera.h"
+#include "../../../SystemsApp/Cameras/DefaultCamera/DefaultCamera.h"
+
 // Math
 #include "Vector3.h"
 
+// App
+#include "../../../Objects/Player/ClearPlayer.h"
 
 
 class ClearScene : public BaseScene
 {
+	enum class CameraMode
+	{
+		DEFAULT,
+		FOLLOW,
+		DEBUG,
+		BOOK_EVENT
+	};
+
 public:
 	/// <summary>
 	/// 初期化
@@ -49,20 +66,42 @@ public:
 	void DrawOffScreen() override;
 
 
-	Matrix4x4 GetViewProjection() override { return currentCamera_->viewProjectionMatrix_; }
+	Matrix4x4 GetViewProjection() override { return sceneCamera_->viewProjectionMatrix_; }
 
 
 private:
-	// カメラ
-	std::shared_ptr<Camera> currentCamera_;
+
+	/// <summary>
+	/// カメラモードを更新する
+	/// </summary>
+	void UpdateCameraMode();
+
+	/// <summary>
+	/// カメラを更新する
+	/// </summary>
+	void UpdateCamera();
+private:
+	/*=================================================================
+
+								カメラ
+
+	=================================================================*/
+	CameraMode cameraMode_;
+	std::shared_ptr<Camera> sceneCamera_;
 	CameraManager cameraManager_;
+
+	DefaultCamera defaultCamera_;
+	FollowCamera followCamera_;
+	DebugCamera debugCamera_;
+	bool isDebugCamera_ = false;
+
+
 	// サウンド
 	Audio::SoundData soundData;
 
 
 	// プレイヤー
-
-	std::unique_ptr<Fade> fade_;
+	std::unique_ptr<ClearPlayer> player_;
 	std::unique_ptr<Sprite> sprite_;
 };
 
