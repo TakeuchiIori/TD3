@@ -369,6 +369,7 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrowthArea)) // 草の成長エリア
 			{
 				canSpitting_ = true;
+				grassXDir_ = other->GetCenterPosition().x - GetCenterPosition().x;
 				if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
 				{
 					// 唾を吐く
