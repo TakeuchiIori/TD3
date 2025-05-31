@@ -124,6 +124,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\SystemsApp\AppAudio\AudioVolumeManager.cpp" />
     <ClCompile Include="Application\Objects\Cloud\Cloud.cpp" />
     <ClCompile Include="Application\SpriteApp\Background.cpp" />
+    <ClCompile Include="Application\Objects\Player\ClearPlayer.cpp" />
+    <ClCompile Include="Application\SpriteApp\ClearScreen.cpp" />
     <ClCompile Include="Application\Objects\Balloon\Balloon.cpp" />
     <ClCompile Include="Engine\Generators\OffScreen\OffScreen.cpp" />
     <ClCompile Include="Engine\Graphics\Culling\OcclusionCullingManager.cpp" />
@@ -220,6 +222,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\SpriteApp\MenuOverlay.cpp" />
     <ClCompile Include="Math\Vector4.cpp" />
     <ClCompile Include="Engine\Generators\Particle\ParticleEffectManager.cpp" />
+    <ClCompile Include="Application\Objects\Planet\Planet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -237,6 +240,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\SystemsApp\AppAudio\AudioVolumeManager.h" />
     <ClInclude Include="Application\Objects\Cloud\Cloud.h" />
     <ClInclude Include="Application\SpriteApp\Background.h" />
+    <ClInclude Include="Application\Objects\Player\ClearPlayer.h" />
+    <ClInclude Include="Application\SpriteApp\ClearScreen.h" />
     <ClInclude Include="Application\Objects\Balloon\Balloon.h" />
     <ClInclude Include="Engine\Generators\OffScreen\OffScreen.h" />
     <ClInclude Include="Engine\Graphics\Culling\OcclusionCullingManager.h" />
@@ -337,6 +342,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Objects\Player\PlayerHaert.h" />
     <ClInclude Include="Application\SpriteApp\MenuOverlay.h" />
     <ClInclude Include="Engine\Generators\Particle\ParticleEffectManager.h" />
+    <ClInclude Include="Application\Objects\Planet\Planet.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Application\Objects\EnemyManager\SideEnemy.h" />
     <ClInclude Include="Application\SystemsApp\Picture\Picture.h" />

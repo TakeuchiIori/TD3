@@ -42,8 +42,7 @@ void FollowCamera::UpdateInput()
 			// 移動量に速さを反映
 			if (Length(move) > 0.0f) {
 				move = Normalize(move) * kRotateSpeed;
-			}
-			else {
+			} else {
 				move = { 0.0f, 0.0f, 0.0f };
 			}
 
@@ -54,19 +53,21 @@ void FollowCamera::UpdateInput()
 
 void FollowCamera::FollowProsess()
 {
-	// ターゲットがない場合は処理しない
-	if (target_ == nullptr)
+	// ターゲットがない場合、または追従が無効の場合は処理しない
+	if (target_ == nullptr || !isFollowEnabled_)
 	{
+		// 追従が無効の場合は現在の位置を維持
+		matView_ = Inverse(MakeAffineMatrix(scale_, rotate_, translate_));
 		return;
 	}
 	Vector3 offset = offset_;
 
-	
+
 
 	Matrix4x4 rotate = MakeRotateMatrixXYZ(rotate_);
 
 	offset = TransformNormal(offset, rotate);
-	
+
 	// このゲーム用にX、Z軸は無視する
 	Vector3 targetTranslate = Vector3(0.0f, target_->translation_.y, 0);
 

@@ -120,6 +120,9 @@
     <ClCompile Include="Math\Vector4.cpp" />
     <ClCompile Include="Engine\Generators\Particle\ParticleEffectManager.cpp" />
     <ClCompile Include="Application\SpriteApp\Background.cpp" />
+    <ClCompile Include="Application\Objects\Player\ClearPlayer.cpp" />
+    <ClCompile Include="Application\SpriteApp\ClearScreen.cpp" />
+    <ClCompile Include="Application\Objects\Planet\Planet.cpp" />
     <ClCompile Include="Application\Objects\Balloon\Balloon.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -246,6 +249,9 @@
     <ClInclude Include="Application\Objects\Cloud\Cloud.h" />
     <ClInclude Include="Engine\Generators\Particle\ParticleEffectManager.h" />
     <ClInclude Include="Application\SpriteApp\Background.h" />
+    <ClInclude Include="Application\Objects\Player\ClearPlayer.h" />
+    <ClInclude Include="Application\SpriteApp\ClearScreen.h" />
+    <ClInclude Include="Application\Objects\Planet\Planet.h" />
     <ClInclude Include="Application\Objects\Balloon\Balloon.h" />
   </ItemGroup>
   <ItemGroup>
