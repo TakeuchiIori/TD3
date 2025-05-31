@@ -13,6 +13,7 @@
 #include "Grass/GrassManager.h"
 #include "CheckPoint.h"
 #include "../SpriteApp/Background.h"
+#include "../Objects/Balloon/Balloon.h"
 
 
 class Stage
@@ -68,6 +69,7 @@ public:
 	void SetEnemyManager(EnemyManager* enemyManager) { enemyManager_ = enemyManager; }
 	void SetGrassManager(GrassManager* grassManager) { grassManager_ = grassManager; }
 	void SetBackground(Background* background) { background_ = background; }
+	void SetBalloon(Balloon* balloon) { balloon_ = balloon; }
 
 	/// <summary>
 	/// チェックポイントの座標を取得
@@ -93,6 +95,7 @@ private:
 	Player* player_ = nullptr;
 	EnemyManager* enemyManager_ = nullptr;
 	GrassManager* grassManager_ = nullptr;
+	Balloon* balloon_ = nullptr;
 
 	int checkPointElements_ = 0;
 

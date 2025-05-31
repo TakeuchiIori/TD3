@@ -14,5 +14,7 @@ enum class CollisionTypeIdDef : uint32_t
 	kBranch,		// 枝
 	kEnemy,			// 敵
 	kBook,			// タイトルシーンの本
+	kBalloon,		// 気球
+	kStopArea,		// 気球止めるエリア
 	kNone			// 当たり判定なし
 };

@@ -212,6 +212,8 @@ public: // getter&setter
 
 	bool IsBoost() { return behavior_ == BehaviorPlayer::Boost; }
 
+	bool StartReturn() { return behaviortRquest_ == BehaviorPlayer::Return; }
+
 	bool EndReturn() { return behaviortRquest_ == BehaviorPlayer::Root; }
 
 	bool IsPopGrass();
@@ -305,7 +307,8 @@ private:
 	Vector3 beforeDirection_ = { 0.0f,0.0f,0.0f };	// 動く向き(beforeFrame)
 	float defaultSpeed_ = 0.05f;					// 通常時の移動速度
 	float boostSpeed_ = 0.2f;						// ブースト時の速度
-	float returnSpeed_ = 1.0f;						// 帰還時の速度
+	float returnSpeed_ = 0.1f;						// 帰還時の速度
+	float returnBoost_ = 0.9f;						// 帰還時のブースト
 	float speed_ = defaultSpeed_;					// 動く速度
 
 	float moveInterval_ = 2.1f;
@@ -358,6 +361,8 @@ private:
 
 	float addTime_ = 0;
 	bool isAddTime_ = false;
+
+	float kAddLimit_ = 2.0f;
 
 
 	// コンボ用
