@@ -24,10 +24,10 @@ void ClearScene::Initialize()
 	debugCamera_.Initialize();
 
     sprite_ = std::make_unique<Sprite>();
-    sprite_->Initialize("Resources/Textures/BackGround/KoboClear.png");
+    sprite_->Initialize("Resources/Textures/BackGround/backGround.png");
     sprite_->SetSize(Vector2{ 1280.0f,720.0f });
     sprite_->SetTextureSize(Vector2{ 1280,720 });
-
+	sprite_->SetColor(Vector4{ 0.0f,0.0f,0.2f,1.0f });
 	player_ = std::make_unique<ClearPlayer>();
     player_->Initialize(sceneCamera_.get());
 	followCamera_.SetTarget(player_->GetWorldTransform());
@@ -83,7 +83,7 @@ void ClearScene::Draw()
     /// </summary>
     /// 
 
-    //sprite_->Draw();
+    sprite_->Draw();
 
 
 #pragma endregion
