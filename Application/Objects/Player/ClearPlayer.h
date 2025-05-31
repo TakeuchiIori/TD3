@@ -2,7 +2,7 @@
 #include "BaseObject/BaseObject.h"
 #include "Systems/GameTime/GameTime.h"
 #include "Loaders/Json/JsonManager.h"
-
+#include <string>
 
 class ClearPlayer : public BaseObject
 {
@@ -15,7 +15,6 @@ public:
 	/// <param name="camera"></param>
 	void Initialize(Camera* camera) override;
 	void InitJson();
-
 
 	/// <summary>
 	/// 更新処理
@@ -79,4 +78,12 @@ private:
 	// アニメーション向き切り替え用
 	bool wasAnimationFinished_ = false; // 前フレームでアニメーションが終了していたか
 	bool isRotationToggled_ = false;    // 向きが切り替わっているかの状態
+	bool animationJustFinished_ = false; // アニメーション終了を1度だけ処理するためのフラグ
+
+	// アニメーションファイル管理
+	const std::string animation1_ = "eat_1.gltf";  // 0度向きのアニメーション
+	const std::string animation2_ = "eat_2.gltf";  // 3.2度向きのアニメーション
+	// 必要に応じて追加のアニメーション
+	// const std::string animation3_ = "eat_3.gltf";
+	// const std::string animation4_ = "eat_4.gltf";
 };
