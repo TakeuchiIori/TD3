@@ -121,6 +121,7 @@
     <ClCompile Include="Engine\Generators\Particle\ParticleEffectManager.cpp" />
     <ClCompile Include="Application\SpriteApp\Background.cpp" />
     <ClCompile Include="Application\Objects\Player\ClearPlayer.cpp" />
+    <ClCompile Include="Application\SpriteApp\ClearScreen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -247,6 +248,7 @@
     <ClInclude Include="Engine\Generators\Particle\ParticleEffectManager.h" />
     <ClInclude Include="Application\SpriteApp\Background.h" />
     <ClInclude Include="Application\Objects\Player\ClearPlayer.h" />
+    <ClInclude Include="Application\SpriteApp\ClearScreen.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />

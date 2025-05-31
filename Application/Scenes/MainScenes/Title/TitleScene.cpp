@@ -137,7 +137,7 @@ void TitleScene::Update()
 
 
 	if (player_->GetWorldTransform().translation_.y > 35.0f) {
-		SceneManager::GetInstance()->ChangeScene("Game");
+		SceneManager::GetInstance()->ChangeScene("Clear");
 		Audio::GetInstance()->FadeOutStop(sourceVoice,1.0f, 2.0f);
 	}
 

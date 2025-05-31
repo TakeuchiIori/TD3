@@ -95,6 +95,9 @@ private:
 	DebugCamera debugCamera_;
 	bool isDebugCamera_ = false;
 
+	float cameraScrollStart_ = 16.0f;
+	float cameraScrollEnd_ = 22.0f;
+	float offsetY_ = -0.5f;
 
 	// サウンド
 	Audio::SoundData soundData;

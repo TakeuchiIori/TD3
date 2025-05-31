@@ -14,6 +14,14 @@ void ClearScene::Initialize()
     // カメラの生成
     sceneCamera_ = cameraManager_.AddCamera();
     Object3dCommon::GetInstance()->SetDefaultCamera(sceneCamera_.get());
+	// 初期カメラモード設定
+	cameraMode_ = CameraMode::FOLLOW;
+
+
+	// 各カメラの初期化
+	defaultCamera_.Initialize();
+	followCamera_.Initialize();
+	debugCamera_.Initialize();
 
     sprite_ = std::make_unique<Sprite>();
     sprite_->Initialize("Resources/Textures/BackGround/KoboClear.png");
@@ -22,7 +30,7 @@ void ClearScene::Initialize()
 
 	player_ = std::make_unique<ClearPlayer>();
     player_->Initialize(sceneCamera_.get());
-
+	followCamera_.SetTarget(player_->GetWorldTransform());
 
 }
 
@@ -41,6 +49,10 @@ void ClearScene::Update()
     }
 #endif // _DEBUG
 
+	if (player_->GetCenterPosition().y < cameraScrollStart_)
+	{
+		followCamera_.SetOffsetY(cameraScrollStart_ + offsetY_ - player_->GetCenterPosition().y);
+	} 
 
 
     player_->Update();
@@ -127,6 +139,7 @@ void ClearScene::UpdateCamera()
 	{
 
 		followCamera_.Update();
+		//sceneCamera_->SetFovY(followCamera_.GetFov());
 		sceneCamera_->viewMatrix_ = followCamera_.matView_;
 		sceneCamera_->transform_.translate = followCamera_.translate_;
 		sceneCamera_->transform_.rotate = followCamera_.rotate_;

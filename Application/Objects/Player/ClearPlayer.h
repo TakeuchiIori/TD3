@@ -30,7 +30,15 @@ public:
 	void Draw() override;
 
 
-
+	const WorldTransform& GetWorldTransform() { return worldTransform_; }
+	Vector3 GetCenterPosition() const {
+		return
+		{
+			worldTransform_.matWorld_.m[3][0],
+			worldTransform_.matWorld_.m[3][1],
+			worldTransform_.matWorld_.m[3][2]
+		};
+	}
 private:
 
 	std::unique_ptr<JsonManager> jsonManager_;

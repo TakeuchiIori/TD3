@@ -28,8 +28,10 @@ public:
 
     float GetOffsetY() { return offset_.y; }
 
-private:
+   // float GetFov() const { return (fov_ >= 110.0f) ? fov_ : fov_; }
 
+private:
+   // float fov_ = 0.45f;
     std::unique_ptr <JsonManager> jsonManager_;
     void ImGui();
     Vector3 rotation_;
