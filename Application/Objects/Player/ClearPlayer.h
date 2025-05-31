@@ -38,7 +38,7 @@ private:
 	WorldTransform neckTransform_;
 
 
-	float up_ = 0.0f;
+	float up_ = 0.1f;
 	const Vector4 defaultColorV4_ = { 0.90625f,0.87109f,0.125f,1.0f };
 };
 

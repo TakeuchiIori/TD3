@@ -26,7 +26,7 @@ void ClearPlayer::Initialize(Camera* camera)
 
 void ClearPlayer::InitJson()
 {
-	jsonManager_ = std::make_unique<JsonManager>("clearPlayer","Reources/Json/");
+	jsonManager_ = std::make_unique<JsonManager>("clearPlayer","Resources/Json/");
 	jsonManager_->SetCategory("ClearPlayer");
 	jsonManager_->Register("頭の位置", &worldTransform_.translation_);
 	jsonManager_->Register("首の位置", &neckTransform_.translation_);
