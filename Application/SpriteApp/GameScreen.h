@@ -111,6 +111,8 @@ private:
 	float visibleTimer_ = 0;
 	float deltaTime_ = 1.0f / 60.0f;
 
+	Vector2 timeSpritesSize_ = { 60.0f, 80.0f };
+
 
 	// 進んだ距離
 	std::unique_ptr<Sprite> mSprite_;
@@ -121,6 +123,7 @@ private:
 
 	std::unique_ptr<Sprite> uiYodare_;
 	Vector3 offsetYodare_ = Vector3(0.0f, 0.0f, 0.0f);
+	Vector2 sizeBaseLimit_ = {};
 
 	std::unique_ptr<Sprite> uiYodareop_;
 	Vector3 offsetYodareop_ = Vector3(0.0f, 0.0f, 0.0f);
