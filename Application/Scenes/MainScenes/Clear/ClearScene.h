@@ -28,6 +28,7 @@
 // App
 #include "../../../Objects/Player/ClearPlayer.h"
 #include "../../../Objects/Planet/Planet.h"
+#include "../../../SpriteApp/ClearScreen.h"
 
 class ClearScene : public BaseScene
 {
@@ -144,4 +145,5 @@ private:
 
 	=================================================================*/
 	std::unique_ptr<Sprite> sprite_;
+	std::unique_ptr<ClearScreen> clearScreen_;
 };

@@ -28,13 +28,17 @@ void ClearScene::Initialize()
 	sprite_->Initialize("Resources/Textures/BackGround/backGround.png");
 	sprite_->SetSize(Vector2{ 1280.0f,720.0f });
 	sprite_->SetTextureSize(Vector2{ 1280,720 });
-	sprite_->SetColor(Vector4{ 0.0f,0.0f,0.2f,1.0f });
+	sprite_->SetColor(Vector4{ 0.05f,0.0f,0.2f,1.0f });
 	player_ = std::make_unique<ClearPlayer>();
 	player_->Initialize(sceneCamera_.get());
 	followCamera_.SetTarget(player_->GetWorldTransform());
 
 	planet_ = std::make_unique<Planet>();
 	planet_->Initialize(sceneCamera_.get());
+
+
+	clearScreen_ = std::make_unique<ClearScreen>();
+	clearScreen_->Initialize();
 }
 
 void ClearScene::Finalize()
@@ -86,6 +90,8 @@ void ClearScene::Update()
 	JsonManager::ImGuiManager();
 	LightManager::GetInstance()->ShowLightingEditor();
 
+	clearScreen_->Update();
+
 }
 
 void ClearScene::Draw()
@@ -98,6 +104,7 @@ void ClearScene::Draw()
 #pragma endregion
 #pragma region 2Dスプライト描画
 	SpriteCommon::GetInstance()->DrawPreference();
+	clearScreen_->Draw();
 	/// <summary>
 	/// ここから描画可能です
 	/// </summary>
@@ -127,6 +134,8 @@ void ClearScene::Draw()
 
 #pragma endregion
 
+	SpriteCommon::GetInstance()->DrawPreference();
+	clearScreen_->Draw();
 }
 
 void ClearScene::DrawOffScreen()
