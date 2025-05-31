@@ -107,6 +107,11 @@ Stage::TransitionType Stage::ReachCheckPoint()
 		{
 			currentStageNum_++;
 			transitionType_ = TransitionType::kStage;
+			if (StageEditor::Instance()->GetMaxCheckPointNumber(currentStageNum_) == -1)
+			{
+				isClear_ = true;
+				transitionType_ = TransitionType::kClear;
+			}
 		}
 		else 
 		{
