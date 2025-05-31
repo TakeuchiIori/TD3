@@ -52,7 +52,7 @@ void ClearScene::Update()
 #endif // _DEBUG
 
 	// プレイヤーのY座標が57以上の場合は追従を無効にする
-	if (player_->GetWorldTransform().translation_.y >= 57.0f) {
+	if (player_->GetWorldTransform().translation_.y >= 55.0f) {
 		followCamera_.SetFollowEnabled(false);
 	} else {
 		followCamera_.SetFollowEnabled(true);
