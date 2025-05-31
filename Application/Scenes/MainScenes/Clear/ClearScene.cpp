@@ -8,12 +8,13 @@
 #include "Object3D/Object3dCommon.h"
 #include "Sprite/SpriteCommon.h"
 #include <LightManager/LightManager.h>
+#include <PipelineManager/SkinningManager.h>
 
 void ClearScene::Initialize()
 {
-    // カメラの生成
-    sceneCamera_ = cameraManager_.AddCamera();
-    Object3dCommon::GetInstance()->SetDefaultCamera(sceneCamera_.get());
+	// カメラの生成
+	sceneCamera_ = cameraManager_.AddCamera();
+	Object3dCommon::GetInstance()->SetDefaultCamera(sceneCamera_.get());
 	// 初期カメラモード設定
 	cameraMode_ = CameraMode::FOLLOW;
 
@@ -23,13 +24,13 @@ void ClearScene::Initialize()
 	followCamera_.Initialize();
 	debugCamera_.Initialize();
 
-    sprite_ = std::make_unique<Sprite>();
-    sprite_->Initialize("Resources/Textures/BackGround/backGround.png");
-    sprite_->SetSize(Vector2{ 1280.0f,720.0f });
-    sprite_->SetTextureSize(Vector2{ 1280,720 });
+	sprite_ = std::make_unique<Sprite>();
+	sprite_->Initialize("Resources/Textures/BackGround/backGround.png");
+	sprite_->SetSize(Vector2{ 1280.0f,720.0f });
+	sprite_->SetTextureSize(Vector2{ 1280,720 });
 	sprite_->SetColor(Vector4{ 0.0f,0.0f,0.2f,1.0f });
 	player_ = std::make_unique<ClearPlayer>();
-    player_->Initialize(sceneCamera_.get());
+	player_->Initialize(sceneCamera_.get());
 	followCamera_.SetTarget(player_->GetWorldTransform());
 
 	planet_ = std::make_unique<Planet>();
@@ -46,13 +47,16 @@ void ClearScene::Update()
 	if ((Input::GetInstance()->TriggerKey(DIK_LCONTROL)) || Input::GetInstance()->IsPadTriggered(0, GamePadButton::RT)) {
 		isDebugCamera_ = !isDebugCamera_;
 	}
-    if ( Input::GetInstance()->IsPadPressed(0, GamePadButton::A)) {
-        sceneManager_->ChangeScene("Title");
-    }
+	if (Input::GetInstance()->IsPadPressed(0, GamePadButton::A)) {
+		sceneManager_->ChangeScene("Title");
+	}
 #endif // _DEBUG
 
+	// プレイヤーの高度を取得
+	float playerHeight = player_->GetWorldTransform().translation_.y;
+
 	// プレイヤーのY座標が57以上の場合は追従を無効にする
-	if (player_->GetWorldTransform().translation_.y >= 55.0f) {
+	if (playerHeight >= 57.0f) {
 		followCamera_.SetFollowEnabled(false);
 	} else {
 		followCamera_.SetFollowEnabled(true);
@@ -63,48 +67,63 @@ void ClearScene::Update()
 		}
 	}
 
-	planet_->Update();
-    player_->Update();
+	// プレイヤーのイベント状態に応じてカメラの動作を調整
+	if (player_->IsEventActive()) {
+		// イベント中は追従カメラの感度を下げる、または固定する
+		followCamera_.SetFollowEnabled(false);
+		// または特別なカメラ演出を追加
+	}
 
-    sprite_->Update();
+	planet_->Update();
+	player_->Update(); // プレイヤー内でイベント処理が行われる
+
+	sprite_->Update();
 
 	UpdateCameraMode();
 	UpdateCamera();
 	cameraManager_.UpdateAllCameras();
 
-    JsonManager::ImGuiManager();
-    LightManager::GetInstance()->ShowLightingEditor();
-    
+	JsonManager::ImGuiManager();
+	LightManager::GetInstance()->ShowLightingEditor();
+
 }
 
 void ClearScene::Draw()
 {
 #pragma region 演出描画
-    ParticleManager::GetInstance()->Draw();
+	ParticleManager::GetInstance()->Draw();
 
 
 
 #pragma endregion
 #pragma region 2Dスプライト描画
-    SpriteCommon::GetInstance()->DrawPreference();
-    /// <summary>
-    /// ここから描画可能です
-    /// </summary>
-    /// 
+	SpriteCommon::GetInstance()->DrawPreference();
+	/// <summary>
+	/// ここから描画可能です
+	/// </summary>
+	/// 
 
-    sprite_->Draw();
+	sprite_->Draw();
 
 
 #pragma endregion
 
 #pragma region 3Dオブジェクト描画
-    Object3dCommon::GetInstance()->DrawPreference();
-    LightManager::GetInstance()->SetCommandList();
-    /// <summary>
-    /// ここから描画可能です
-    /// </summary>
-    player_->Draw();
+	Object3dCommon::GetInstance()->DrawPreference();
+	LightManager::GetInstance()->SetCommandList();
+	/// <summary>
+	/// ここから描画可能です
+	/// </summary>
+	player_->Draw();
 	planet_->Draw();
+
+
+	//---------
+	// Animation
+	//---------
+	SkinningManager::GetInstance()->DrawPreference();
+	LightManager::GetInstance()->SetCommandList();
+	player_->DrawAnimation();
 
 #pragma endregion
 
@@ -126,6 +145,15 @@ void ClearScene::UpdateCameraMode()
 	if (ImGui::Button("Debug Camera")) {
 		cameraMode_ = CameraMode::DEBUG;
 	}
+
+	// プレイヤーのイベント情報の表示
+	ImGui::Separator();
+	ImGui::Text("Player Event Status:");
+	ImGui::Text("Started: %s", player_->IsEventStarted() ? "Yes" : "No");
+	ImGui::Text("Active: %s", player_->IsEventActive() ? "Yes" : "No");
+	ImGui::Text("Timer: %.2f", player_->GetEventTimer());
+	ImGui::Text("Player Height: %.2f", player_->GetWorldTransform().translation_.y);
+
 	ImGui::End();
 #endif
 }
