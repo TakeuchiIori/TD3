@@ -111,6 +111,7 @@ void GameScreen::Initialize()
 
 	baseLimit_ = std::make_unique<UIBase>("BaseLimit");
 	baseLimit_->Initialize("Resources/JSON/UI/BaseLimit.json");
+	sizeBaseLimit_ = baseLimit_->GetScale();
 	for (int i = 0; i < 10; ++i) {
 		digitTexturePaths_[i] = "Resources/Textures/Each_Number/" + std::to_string(i) + ".png";
 	}
@@ -125,7 +126,7 @@ void GameScreen::Initialize()
 		// 初期は全部0.pngで初期化しておく（あとで切り替え）
 		timeSprites_[i]->Initialize("Resources/Textures/Each_Number/0.png");
 		timeSprites_[i]->SetAnchorPoint({ 0.5f, 0.5f });
-		timeSprites_[i]->SetSize({ 60.0f, 80.0f });
+		timeSprites_[i]->SetSize({ timeSpritesSize_ });
 	}
 
 	for (int i = 0; i < 5; ++i) {
@@ -347,7 +348,16 @@ void GameScreen::Update()
 		Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
 		Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
 		playerPos = Transform(playerPos, matViewProjectionViewport);
-		playerPos += offsetYodare_;
+		if(player_->GetGrassXDir() < 0)
+		{
+			playerPos.x += offsetYodare_.x;
+			playerPos.y += offsetYodare_.y;
+		}
+		else
+		{
+			playerPos.x -= offsetYodare_.x;
+			playerPos.y += offsetYodare_.y;
+		}
 		uiYodare_->SetPosition(playerPos);
 		uiYodare_->Update();
 	}
@@ -462,12 +472,54 @@ void GameScreen::UpdateLimit()
 	}
 	else
 	{
-		if(timeUpTimer_ <= kTimeUpTime_)
+		if (timeUpTimer_ <= kTimeUpTime_)
 		{
 			timeUpTimer_ += GameTime::GetDeltaTime();
+
+			// 拡大率（最大1.5倍、1秒かけて拡大）
+			float scale = 1.0f + 0.3f * std::min(timeUpTimer_ / kTimeUpTime_, 1.0f);
+
+			// 揺れ角度（-10～+10度を往復）
+			float angle = std::sin(timeUpTimer_ * 20.0f) * 10.0f;
+
+			// 中央位置（コロンの位置）を基準に揺らす
+			Vector2 timeUpOrigin = { basePos.x + spacing * 2, basePos.y };
+
+			for (int i = 0; i < 5; ++i)
+			{
+				Vector2 localOffset = {
+					basePos.x + spacing * i - timeUpOrigin.x,
+					basePos.y - timeUpOrigin.y
+				};
+
+				// 回転（2D変換）
+				float rad = angle * (std::numbers::pi_v<float> / 180.0f);
+				Vector2 rotated = {
+					std::cos(rad) * localOffset.x - std::sin(rad) * localOffset.y,
+					std::sin(rad) * localOffset.x + std::cos(rad) * localOffset.y
+				};
+
+				Vector2 newPos = {
+					timeUpOrigin.x + rotated.x * scale,
+					timeUpOrigin.y + rotated.y * scale - (scale - 0.5f) * 20.0f
+				};
+
+				timeSprites_[i]->SetPosition({ newPos.x, newPos.y, 0.0f });
+				timeSprites_[i]->SetSize(timeSpritesSize_ * scale);
+				timeSprites_[i]->SetRotation({ 0,0,rad }); // 回転揺れ
+				timeSprites_[i]->Update();
+				baseLimit_->SetScale(sizeBaseLimit_ * scale);
+			}
 		}
 		else
 		{
+			for (int i = 0; i < 5; ++i)
+			{
+				timeSprites_[i]->SetRotation({ 0,0,0 });
+				timeSprites_[i]->SetSize(timeSpritesSize_);
+				timeSprites_[i]->Update();
+			}
+			baseLimit_->SetScale(sizeBaseLimit_);
 			timeUpTimer_ = 0;
 			player_->ResumeUpdate();
 		}
@@ -502,11 +554,11 @@ void GameScreen::UpdateLimit()
 		{
 			if(i < 3)
 			{
-				plusTimeSprites_[i]->SetPosition({ playerPos.x + spacing * i - 80, playerPos.y - 0, 0.0f });
+				plusTimeSprites_[i]->SetPosition({ playerPos.x + spacing * i - 80, playerPos.y - 8, 0.0f });
 			}
 			else
 			{
-				plusTimeSprites_[i]->SetPosition({ playerPos.x + spacing * (i - 1) -75, playerPos.y - 0, 0.0f });
+				plusTimeSprites_[i]->SetPosition({ playerPos.x + spacing * (i - 1) -75, playerPos.y - 8, 0.0f });
 			}
 			plusTimeSprites_[i]->SetAlpha(1.0f);
 			plusTimeSprites_[i]->Update();

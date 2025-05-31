@@ -82,6 +82,7 @@ private:
 	std::unique_ptr<EnemyManager> enemyManager_;
 	std::unique_ptr<GrassManager> grassManager_;
 	std::unique_ptr<Background> background_;
+	std::unique_ptr<Balloon> balloon_;
 
 	float cameraScrollStart_ = 16.0f;
 	float cameraScrollEnd_ = 22.0f;

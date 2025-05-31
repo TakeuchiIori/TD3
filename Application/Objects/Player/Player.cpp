@@ -127,6 +127,7 @@ void Player::InitJson()
 	jsonManager_->Register("通常時の移動速度", &defaultSpeed_);
 	jsonManager_->Register("ブースト時の速度", &boostSpeed_);
 	jsonManager_->Register("帰還時の速度", &returnSpeed_);
+	jsonManager_->Register("帰還時のブースト", &returnBoost_);
 
 	jsonManager_->Register("ブーストの最大効果時間", &kBoostTime_);
 	jsonManager_->Register("ブーストのクールタイム", &kBoostCT_);
@@ -302,6 +303,13 @@ void Player::Reset()
 
 void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
+	if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+	{
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kBalloon)) // 気球なら
+		{
+			kTimeLimit_ += kAddLimit_;
+		}
+	}
 	if ((behavior_ == BehaviorPlayer::Moving || behavior_ == BehaviorPlayer::Boost) && self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
 	{
 		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrass)) // 草を食べたら
@@ -362,6 +370,22 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 
 void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 {
+	if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+	{
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kStopArea))
+		{
+			if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
+			{
+				// 唾を吐く
+
+				emitter_->EmitFromTo(worldTransform_.translation_, other->GetWorldTransform().translation_);
+				// オーディオの再生
+				sourceVoiceGrow = Audio::GetInstance()->SoundPlayAudio(soundDataGrow, false);
+				AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceGrow, kSE);
+			}
+		}
+	}
+
 	if (behavior_ == BehaviorPlayer::Moving || behavior_ == BehaviorPlayer::Boost)
 	{
 		if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
@@ -369,6 +393,7 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrowthArea)) // 草の成長エリア
 			{
 				canSpitting_ = true;
+				grassXDir_ = other->GetCenterPosition().x - GetCenterPosition().x;
 				if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
 				{
 					// 唾を吐く
@@ -1274,6 +1299,11 @@ void Player::BehaviorReturnInit()
 
 void Player::BehaviorReturnUpdate()
 {
+	speed_ = returnSpeed_;
+	if (input_->PushKey(DIK_E) || input_->IsPadPressed(0, GamePadButton::A))
+	{
+		speed_ = returnSpeed_ + returnBoost_;
+	}
 	if (moveHistory_.size() > 0)
 	{
 		if (Length(worldTransform_.translation_ - moveHistory_.back()) > speed_)

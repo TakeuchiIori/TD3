@@ -39,6 +39,11 @@ void Stage::Update()
 {
 	enemyManager_->Update();
 	grassManager_->Update();
+	if (player_->StartReturn() && GetCheckPointID() >= balloon_->GetEnableMapNum())
+	{
+		balloon_->BehaviorTransition();
+	}
+	balloon_->Update();
 
 	checkPoint_.DebugUpdate();
 #ifdef _DEBUG
@@ -69,6 +74,7 @@ void Stage::Draw()
 	player_->Draw();
 	enemyManager_->Draw();
 	grassManager_->Draw();
+	balloon_->Draw();
 
 	checkPoint_.DebugDraw();
 #ifdef _DEBUG
@@ -86,6 +92,7 @@ void Stage::DrawCollision()
 	player_->DrawCollision();
 	grassManager_->DrawCollision();
 	enemyManager_->DrawCollisions();
+	balloon_->DrawCollision();
 }
 
 void Stage::DrawSprite()
@@ -107,6 +114,11 @@ Stage::TransitionType Stage::ReachCheckPoint()
 		{
 			currentStageNum_++;
 			transitionType_ = TransitionType::kStage;
+			if (StageEditor::Instance()->GetMaxCheckPointNumber(currentStageNum_) == -1)
+			{
+				isClear_ = true;
+				transitionType_ = TransitionType::kClear;
+			}
 		}
 		else 
 		{

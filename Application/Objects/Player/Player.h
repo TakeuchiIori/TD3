@@ -212,6 +212,8 @@ public: // getter&setter
 
 	bool IsBoost() { return behavior_ == BehaviorPlayer::Boost; }
 
+	bool StartReturn() { return behaviortRquest_ == BehaviorPlayer::Return; }
+
 	bool EndReturn() { return behaviortRquest_ == BehaviorPlayer::Root; }
 
 	bool IsPopGrass();
@@ -267,6 +269,8 @@ public: // getter&setter
 
 	void ResumeUpdate() { pauseUpdate_ = false; }
 
+	float GetGrassXDir() { return grassXDir_; }
+
 private:
 	Input* input_ = nullptr;
 	
@@ -303,7 +307,8 @@ private:
 	Vector3 beforeDirection_ = { 0.0f,0.0f,0.0f };	// 動く向き(beforeFrame)
 	float defaultSpeed_ = 0.05f;					// 通常時の移動速度
 	float boostSpeed_ = 0.2f;						// ブースト時の速度
-	float returnSpeed_ = 1.0f;						// 帰還時の速度
+	float returnSpeed_ = 0.1f;						// 帰還時の速度
+	float returnBoost_ = 0.9f;						// 帰還時のブースト
 	float speed_ = defaultSpeed_;					// 動く速度
 
 	float moveInterval_ = 2.1f;
@@ -322,6 +327,8 @@ private:
 	int32_t kMaxGrassGauge_ = 2;			// 草ゲージ最大値
 	int32_t grassGauge_ = 0;				// 草ゲージ
 	float UIGauge_ = 0.0f;					// 草ゲージのUIに渡すための値
+
+	float grassXDir_ = 0;
 
 	//Haert
 	std::vector<std::unique_ptr<PlayerHaert>> haerts_;
@@ -354,6 +361,8 @@ private:
 
 	float addTime_ = 0;
 	bool isAddTime_ = false;
+
+	float kAddLimit_ = 2.0f;
 
 
 	// コンボ用
