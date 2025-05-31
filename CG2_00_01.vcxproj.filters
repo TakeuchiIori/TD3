@@ -122,6 +122,7 @@
     <ClCompile Include="Application\SpriteApp\Background.cpp" />
     <ClCompile Include="Application\Objects\Player\ClearPlayer.cpp" />
     <ClCompile Include="Application\SpriteApp\ClearScreen.cpp" />
+    <ClCompile Include="Application\Objects\Planet\Planet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Objects\BaseObject\BaseObject.h" />
@@ -249,6 +250,7 @@
     <ClInclude Include="Application\SpriteApp\Background.h" />
     <ClInclude Include="Application\Objects\Player\ClearPlayer.h" />
     <ClInclude Include="Application\SpriteApp\ClearScreen.h" />
+    <ClInclude Include="Application\Objects\Planet\Planet.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Models\plane\plane.bin" />

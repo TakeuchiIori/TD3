@@ -32,6 +32,8 @@ void ClearScene::Initialize()
     player_->Initialize(sceneCamera_.get());
 	followCamera_.SetTarget(player_->GetWorldTransform());
 
+	planet_ = std::make_unique<Planet>();
+	planet_->Initialize(sceneCamera_.get());
 }
 
 void ClearScene::Finalize()
@@ -55,6 +57,7 @@ void ClearScene::Update()
 	} 
 
 
+	planet_->Update();
     player_->Update();
 
     sprite_->Update();
@@ -95,7 +98,7 @@ void ClearScene::Draw()
     /// ここから描画可能です
     /// </summary>
     player_->Draw();
-
+	planet_->Draw();
 
 #pragma endregion
 
