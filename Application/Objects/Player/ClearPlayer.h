@@ -40,7 +40,7 @@ public:
 		};
 	}
 private:
-
+	// worldTransform = 57;
 	std::unique_ptr<JsonManager> jsonManager_;
 	std::unique_ptr<Object3d> neck_;
 	WorldTransform neckTransform_;

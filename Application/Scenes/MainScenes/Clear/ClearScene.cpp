@@ -51,11 +51,17 @@ void ClearScene::Update()
     }
 #endif // _DEBUG
 
-	if (player_->GetCenterPosition().y < cameraScrollStart_)
-	{
-		followCamera_.SetOffsetY(cameraScrollStart_ + offsetY_ - player_->GetCenterPosition().y);
-	} 
+	// プレイヤーのY座標が57以上の場合は追従を無効にする
+	if (player_->GetWorldTransform().translation_.y >= 57.0f) {
+		followCamera_.SetFollowEnabled(false);
+	} else {
+		followCamera_.SetFollowEnabled(true);
 
+		// 追従が有効な場合のみカメラスクロール処理を実行
+		if (player_->GetCenterPosition().y < cameraScrollStart_) {
+			followCamera_.SetOffsetY(cameraScrollStart_ + offsetY_ - player_->GetCenterPosition().y);
+		}
+	}
 
 	planet_->Update();
     player_->Update();

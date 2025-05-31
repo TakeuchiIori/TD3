@@ -28,8 +28,10 @@ public:
 
     float GetOffsetY() { return offset_.y; }
 
-   // float GetFov() const { return (fov_ >= 110.0f) ? fov_ : fov_; }
 
+    void SetFollowEnabled(bool enabled) { isFollowEnabled_ = enabled; }
+
+    bool IsFollowEnabled() const { return isFollowEnabled_; }
 private:
    // float fov_ = 0.45f;
     std::unique_ptr <JsonManager> jsonManager_;
@@ -39,5 +41,8 @@ private:
     // 追従対象
     const WorldTransform* target_;
     Vector3 offset_ = { 0.0f, 6.0f, -40.0f };
+
+    // 追従の有効/無効フラグ
+    bool isFollowEnabled_ = true;
 };
 
