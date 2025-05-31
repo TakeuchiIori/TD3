@@ -347,7 +347,16 @@ void GameScreen::Update()
 		Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
 		Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
 		playerPos = Transform(playerPos, matViewProjectionViewport);
-		playerPos += offsetYodare_;
+		if(player_->GetGrassXDir() < 0)
+		{
+			playerPos.x += offsetYodare_.x;
+			playerPos.y += offsetYodare_.y;
+		}
+		else
+		{
+			playerPos.x -= offsetYodare_.x;
+			playerPos.y += offsetYodare_.y;
+		}
 		uiYodare_->SetPosition(playerPos);
 		uiYodare_->Update();
 	}
@@ -502,11 +511,11 @@ void GameScreen::UpdateLimit()
 		{
 			if(i < 3)
 			{
-				plusTimeSprites_[i]->SetPosition({ playerPos.x + spacing * i - 80, playerPos.y - 0, 0.0f });
+				plusTimeSprites_[i]->SetPosition({ playerPos.x + spacing * i - 80, playerPos.y - 8, 0.0f });
 			}
 			else
 			{
-				plusTimeSprites_[i]->SetPosition({ playerPos.x + spacing * (i - 1) -75, playerPos.y - 0, 0.0f });
+				plusTimeSprites_[i]->SetPosition({ playerPos.x + spacing * (i - 1) -75, playerPos.y - 8, 0.0f });
 			}
 			plusTimeSprites_[i]->SetAlpha(1.0f);
 			plusTimeSprites_[i]->Update();

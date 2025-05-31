@@ -267,6 +267,8 @@ public: // getter&setter
 
 	void ResumeUpdate() { pauseUpdate_ = false; }
 
+	float GetGrassXDir() { return grassXDir_; }
+
 private:
 	Input* input_ = nullptr;
 	
@@ -322,6 +324,8 @@ private:
 	int32_t kMaxGrassGauge_ = 2;			// 草ゲージ最大値
 	int32_t grassGauge_ = 0;				// 草ゲージ
 	float UIGauge_ = 0.0f;					// 草ゲージのUIに渡すための値
+
+	float grassXDir_ = 0;
 
 	//Haert
 	std::vector<std::unique_ptr<PlayerHaert>> haerts_;
