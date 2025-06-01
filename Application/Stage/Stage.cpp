@@ -5,6 +5,11 @@
 void Stage::Initialize(Camera* camera)
 {
 	camera_ = camera;
+
+	// ランダムエンジンの初期化
+	std::random_device rd;
+	randomEngine_.seed(rd());
+
 	// TODO: それぞれのステージごとの初期化を呼び出す
 	checkPoint_.Initialize(camera_);
 
@@ -15,6 +20,9 @@ void Stage::Initialize(Camera* camera)
 
 	InitJson();
 	InitCheckPoint();
+
+	// 雲をランダム生成
+	GenerateRandomClouds();
 }
 
 void Stage::InitJson()
@@ -33,6 +41,69 @@ void Stage::InitCheckPoint()
 	pos.x = StageEditor::Instance()->GetInitX(currentStageNum_, currentCheckPoint_);
 	player_->SetTimeLimit(StageEditor::Instance()->GetTimeLimit(currentStageNum_, currentCheckPoint_));
 	ReloadObject();
+
+	// チェックポイント変更時も雲を再生成
+	GenerateRandomClouds();
+}
+
+void Stage::GenerateRandomClouds()
+{
+	// 既存の雲をクリア
+	clouds_.clear();
+	// ゴールの高さを取得
+	float goalHeight = GetCheckPoint();
+	// 雲の個数をランダムに決定
+	std::uniform_int_distribution<int> cloudCountDist(1, 5);
+	int cloudCount = cloudCountDist(randomEngine_);
+	// X軸の範囲
+	std::uniform_real_distribution<float> xPosDist(0.0f, 50.0f);
+	// Y軸の範囲
+	std::uniform_real_distribution<float> yPosDist(0.0f, goalHeight);
+	// Z軸の範囲
+	std::uniform_real_distribution<float> zPosDist(40.0f, 40.0f);
+	const float minDistanceX = 20.0f;
+	const float minDistanceY = 15.0f;
+	const float minDistanceZ = 3.0f; 
+	// 配置済み雲の位置を保存
+	std::vector<Vector3> placedPositions;
+	for (int i = 0; i < cloudCount; ++i) {
+		Vector3 candidatePos;
+		bool validPosition = false;
+		int attempts = 0;
+		const int maxAttempts = 100; // 無限ループ防止
+		// 重複しない位置を見つけるまで試行
+		while (!validPosition && attempts < maxAttempts) {
+			candidatePos = {
+				xPosDist(randomEngine_),
+				yPosDist(randomEngine_),
+				zPosDist(randomEngine_)
+			};
+			validPosition = true;
+			// 既存の雲との距離をチェック
+			for (const auto& existingPos : placedPositions) {
+				float deltaX = std::abs(candidatePos.x - existingPos.x);
+				float deltaY = std::abs(candidatePos.y - existingPos.y);
+				float deltaZ = std::abs(candidatePos.z - existingPos.z);
+
+				// 各軸で最小距離をチェック（いずれかの軸で十分離れていればOK）
+				// つまり、すべての軸で最小距離内にある場合のみ無効
+				if (deltaX < minDistanceX && deltaY < minDistanceY && deltaZ < minDistanceZ) {
+					validPosition = false;
+					break;
+				}
+			}
+			attempts++;
+		}
+		// 有効な位置が見つかったら雲を作成
+		if (validPosition) {
+			auto cloud = std::make_unique<Cloud>();
+			cloud->Initialize(camera_);
+			cloud->SetTranslate(candidatePos);
+			// 位置を記録
+			placedPositions.push_back(candidatePos);
+			clouds_.emplace_back(std::move(cloud));
+		}
+	}
 }
 
 void Stage::Update()
@@ -50,6 +121,11 @@ void Stage::Update()
 	}
 	balloon_->Update();
 
+	// 雲の更新
+	for (auto& cloud : clouds_) {
+		cloud->Update();
+	}
+
 	checkPoint_.DebugUpdate();
 #ifdef _DEBUG
 	//checkPoint_.DebugUpdate();
@@ -60,7 +136,6 @@ void Stage::Update()
 #endif // _DEBUG
 
 	background_->Update();
-
 }
 
 void Stage::NotDebugCameraUpdate()
@@ -80,6 +155,11 @@ void Stage::Draw()
 	enemyManager_->Draw();
 	grassManager_->Draw();
 	balloon_->Draw();
+
+	// 雲の描画
+	for (auto& cloud : clouds_) {
+		cloud->Draw();
+	}
 
 	checkPoint_.DebugDraw();
 #ifdef _DEBUG
@@ -114,8 +194,7 @@ Stage::TransitionType Stage::ReachCheckPoint()
 		{
 			currentCheckPoint_++;
 			transitionType_ = TransitionType::kCheckPoint;
-		}
-		else if (currentStageNum_ < StageEditor::Instance()->GetMaxStageNumber())
+		} else if (currentStageNum_ < StageEditor::Instance()->GetMaxStageNumber())
 		{
 			currentStageNum_++;
 			transitionType_ = TransitionType::kStage;
@@ -124,8 +203,7 @@ Stage::TransitionType Stage::ReachCheckPoint()
 				isClear_ = true;
 				transitionType_ = TransitionType::kClear;
 			}
-		}
-		else 
+		} else
 		{
 			isClear_ = true;
 			transitionType_ = TransitionType::kClear;
@@ -178,7 +256,6 @@ bool Stage::StageSelector(const char* label)
 
 	return changed;
 #endif // _DEBUG
-
 }
 
 void Stage::ReloadObject()
@@ -188,7 +265,7 @@ void Stage::ReloadObject()
 	if (obj)
 	{
 		grassManager_->ClearGrass();
-		for (const auto& o : *obj) 
+		for (const auto& o : *obj)
 		{
 			grassManager_->PopGrass(o.position);
 		}

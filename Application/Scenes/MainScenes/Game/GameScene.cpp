@@ -236,7 +236,7 @@ void GameScene::DrawOffScreen()
 
 void GameScene::DrawObject()
 {
-	giraffe_->Draw();
+	//giraffe_->Draw();
 	mpInfo_->Draw();
 	stageManager_->Draw();
 }

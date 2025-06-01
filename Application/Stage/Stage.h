@@ -6,6 +6,10 @@
 #include "WorldTransform/WorldTransform.h"
 #include "Systems/Camera/Camera.h"
 
+// C++
+#include <vector>
+#include <memory>
+#include <random>
 
 // Application
 #include "Player/Player.h"
@@ -14,7 +18,7 @@
 #include "CheckPoint.h"
 #include "../SpriteApp/Background.h"
 #include "../Objects/Balloon/Balloon.h"
-
+#include "Cloud/Cloud.h"
 
 class Stage
 {
@@ -60,6 +64,10 @@ public:
 private:
 	bool StageSelector(const char* label = "StageSelector");
 
+	/// <summary>
+	/// ランダムに雲を生成
+	/// </summary>
+	void GenerateRandomClouds();
 
 public:
 	void ReloadObject();
@@ -89,13 +97,17 @@ private:
 	CheckPoint checkPoint_;	// チェックポイントクラス
 
 	//std::unique_ptr<JsonManager> jsonManager_;
-	
+
 	Camera* camera_ = nullptr;
 	Background* background_ = nullptr;
 	Player* player_ = nullptr;
 	EnemyManager* enemyManager_ = nullptr;
-	GrassManager* grassManager_ = nullptr;
+	GrassManager* grassManager_ = grassManager_;
 	Balloon* balloon_ = nullptr;
+
+	// 雲管理
+	std::vector<std::unique_ptr<Cloud>> clouds_;
+	std::mt19937 randomEngine_;  // ランダム生成器
 
 	int checkPointElements_ = 0;
 
@@ -105,4 +117,3 @@ private:
 
 	TransitionType transitionType_ = TransitionType::kNone;
 };
-

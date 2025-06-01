@@ -35,8 +35,7 @@ void Cloud::Initialize(Camera* camera)
 {
     camera_ = camera;
 
-    // JSON初期化（コンストラクタで設定されたIDを使用）
-    InitJson();
+
 
     // 雲を生成
     cloud_ = std::make_unique<Object3d>();
@@ -50,6 +49,9 @@ void Cloud::Initialize(Camera* camera)
     // 雲の位置とスケールを設定
     cloudWorldTransform_->translation_ = cloudPosition_;
     cloudWorldTransform_->scale_ = cloudScale_;
+
+    // JSON初期化（コンストラクタで設定されたIDを使用）
+    InitJson();
 }
 
 void Cloud::Update()

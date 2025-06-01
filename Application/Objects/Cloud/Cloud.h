@@ -34,7 +34,12 @@ public:
     /// </summary>
     void Draw();
 
+public:
+
     Vector3 GetTranslate() { return cloudPosition_; }
+	void SetTranslate(const Vector3& translate) { cloudPosition_ = translate; }
+    Vector3 GetScale() { return cloudScale_; }
+    void SetScale(const Vector3& scale) { cloudScale_ = scale; }
 
 private:
     Camera* camera_ = nullptr;
@@ -50,5 +55,5 @@ private:
     float moveSpeed_;           // 雲の移動速度
     float resetDistance_;       // リセット距離
     Vector3 cloudPosition_;     // 雲の位置
-    Vector3 cloudScale_;        // 雲のスケール
+    Vector3 cloudScale_ = { 3.0f,3.0f,1.0f };        // 雲のスケール
 };
