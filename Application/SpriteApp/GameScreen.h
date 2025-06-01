@@ -76,10 +76,10 @@ private:
 	std::unique_ptr<UIBase> background_[2];
 	uint32_t numBGs_ = 2;
 
-	std::unique_ptr<UIBase> option_[6];
+	/*std::unique_ptr<UIBase> option_[6];
 	uint32_t numOptions_ = 6;
 	uint32_t keyBoardOption_ = 3;
-	uint32_t controllerOption_ = 4;
+	uint32_t controllerOption_ = 4;*/
 
 	std::unique_ptr<UIBase> grass_[2];
 	uint32_t numGrass_ = 2;
@@ -130,11 +130,12 @@ private:
 
 
 	std::unique_ptr<Sprite> uiMap_;
+	Vector3 startMapPos_ = Vector3(20.0f, 80.0f, 0.0f);
 	Vector3 offsetMapPos_ = Vector3(20.0f, 80.0f, 0.0f);
 	float offsetMapScale_ = 1.5f;
 
 	std::unique_ptr<Sprite> uiMapCurrent_;
-	Vector3 offsetMapCurrentPos_ = Vector3(20.0f, 80.0f, 0.0f);
+	Vector3 offsetMapCurrentPos_ = Vector3(0.0f, 0.0f, 0.0f);
 	Vector3 offsetMapCurrentScale_ = Vector3(offsetMapScale_, 1.0f, 1.0f);
 	int currentMapNum_ = -1;
 

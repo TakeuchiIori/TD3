@@ -30,32 +30,32 @@ void GameScreen::Initialize()
 	// 
 	///////////////////////////////////////////////////////////////////////////
 
-	// キーボード用UI
-	option_[0] = std::make_unique<UIBase>("KeyBoard_0");
-	option_[0]->Initialize("Resources/JSON/UI/KeyBoard_0.json");
-	option_[1] = std::make_unique<UIBase>("KeyBoard_1");
-	option_[1]->Initialize("Resources/JSON/UI/KeyBoard_1.json");
-	option_[2] = std::make_unique<UIBase>("KeyBoard_2");
-	option_[2]->Initialize("Resources/JSON/UI/KeyBoard_2.json");
+	//// キーボード用UI
+	//option_[0] = std::make_unique<UIBase>("KeyBoard_0");
+	//option_[0]->Initialize("Resources/JSON/UI/KeyBoard_0.json");
+	//option_[1] = std::make_unique<UIBase>("KeyBoard_1");
+	//option_[1]->Initialize("Resources/JSON/UI/KeyBoard_1.json");
+	//option_[2] = std::make_unique<UIBase>("KeyBoard_2");
+	//option_[2]->Initialize("Resources/JSON/UI/KeyBoard_2.json");
 
-	// コントローラUI
-	option_[3] = std::make_unique<UIBase>("Controller_3");
-	option_[3]->Initialize("Resources/JSON/UI/Controller_3.json");
-	option_[4] = std::make_unique<UIBase>("Controller_4");
-	option_[4]->Initialize("Resources/JSON/UI/Controller_4.json");
-	option_[5] = std::make_unique<UIBase>("Controller_5");
-	option_[5]->Initialize("Resources/JSON/UI/Controller_5.json");
+	//// コントローラUI
+	//option_[3] = std::make_unique<UIBase>("Controller_3");
+	//option_[3]->Initialize("Resources/JSON/UI/Controller_3.json");
+	//option_[4] = std::make_unique<UIBase>("Controller_4");
+	//option_[4]->Initialize("Resources/JSON/UI/Controller_4.json");
+	//option_[5] = std::make_unique<UIBase>("Controller_5");
+	//option_[5]->Initialize("Resources/JSON/UI/Controller_5.json");
 
-	// ImGuiの描画やめる
-	for (uint32_t i = 0; i < numOptions_; i++)
-	{
-		option_[i]->isDrawImGui_ = false;
-	}
+	//// ImGuiの描画やめる
+	//for (uint32_t i = 0; i < numOptions_; i++)
+	//{
+	//	option_[i]->isDrawImGui_ = true;
+	//}
 
 	// CurrentMap
 	uiMap_ = std::make_unique<Sprite>();
 	uiMap_->Initialize("Resources/Textures/In_Game/map.png");
-	uiMap_->SetPosition(offsetMapPos_);
+	uiMap_->SetPosition(startMapPos_);
 	uiMap_->SetSize(uiMap_->GetTextureSize() * offsetMapScale_);
 
 	uiMapCurrent_ = std::make_unique<Sprite>();
@@ -190,9 +190,10 @@ void GameScreen::InitJson()
 	jsonManager_->SetCategory("UI");
 	jsonManager_->Register("プレイヤー追従してるヨダレの位置", &offsetYodare_);
 	jsonManager_->Register("草の位置", &offset_);
-	jsonManager_->Register("ヨダレの位置", &offsetYodareop_);
-	jsonManager_->Register("HPの位置", &offsetH_);
-	jsonManager_->Register("ブーストの位置", &offsetB_);
+	jsonManager_->Register("ヨダレの操作アイコンの位置", &offsetYodareop_);
+	jsonManager_->Register("ハートの位置", &offsetH_);
+	jsonManager_->Register("ブーストの操作アイコンの位置", &offsetB_);
+	jsonManager_->Register("マップの位置", &offsetMapPos_);
 }
 
 void GameScreen::Update()
@@ -214,10 +215,10 @@ void GameScreen::Update()
 	// UIの更新処理
 	// 
 	///////////////////////////////////////////////////////////////////////////
-	for (uint32_t i = 0; i < numOptions_; i++)
+	/*for (uint32_t i = 0; i < numOptions_; i++)
 	{
 		option_[i]->Update();
-	}
+	}*/
 
 	UpdateMapView();
 
@@ -286,6 +287,12 @@ void GameScreen::Update()
 		}
 		boost_[i]->Update();
 
+	}
+
+	for (int i = 0; i < numHeart_; i++)
+	{
+		heart_[i]->SetPosition(offsetH_ + Vector3{ 70,0,0 } *float(i));
+		heart_[i]->Update();
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -380,7 +387,7 @@ void GameScreen::Draw()
 	}
 
 
-	if (Input::GetInstance()->IsControllerConnected())
+	/*if (Input::GetInstance()->IsControllerConnected())
 	{
 		for (uint32_t i = 3; i < controllerOption_; i++)
 		{
@@ -393,7 +400,7 @@ void GameScreen::Draw()
 		{
 			option_[i]->Draw();
 		}
-	}
+	}*/
 
 	uiMap_->Draw();
 	uiMapCurrent_->Draw();
@@ -643,37 +650,38 @@ void GameScreen::UpdateMapView()
 	ImGui::DragFloat2("scale", &offsetMapCurrentScale_.x, 0.1f);
 	ImGui::End();
 #endif // _DEBUG
+	uiMap_->SetPosition(offsetMapPos_);
 	uiMapCurrent_->SetSize({ size.x * offsetMapCurrentScale_.x, size.y * offsetMapCurrentScale_.y });
 	uiMapCurrent_->SetPosition(offsetMapCurrentPos_);
 	if (currentMapNum_ == 0)
 	{
 		uiMapCurrent_->SetSize({ size.x * 1.4f, size.y * 1.1f });
-		uiMapCurrent_->SetPosition(Vector3(173.0f, 535.9f, 0.0f));
+		uiMapCurrent_->SetPosition(Vector3(173.0f, 535.9f, 0.0f) - startMapPos_ + offsetMapPos_);
 	}
 	if (currentMapNum_ == 1)
 	{
 		uiMapCurrent_->SetSize({ size.x * 1.4f, size.y * 1.3f });
-		uiMapCurrent_->SetPosition(Vector3(173.0f, 477.6f, 0.0f));
+		uiMapCurrent_->SetPosition(Vector3(173.0f, 477.6f, 0.0f) - startMapPos_ + offsetMapPos_);
 	}
 	if (currentMapNum_ == 2)
 	{
 		uiMapCurrent_->SetSize({ size.x * 1.4f, size.y * 1.7f });
-		uiMapCurrent_->SetPosition(Vector3(173.0f, 406.9f, 0.0f));
+		uiMapCurrent_->SetPosition(Vector3(173.0f, 406.9f, 0.0f) - startMapPos_ + offsetMapPos_);
 	}
 	if (currentMapNum_ == 3)
 	{
 		uiMapCurrent_->SetSize({ size.x * 1.4f, size.y * 1.7f });
-		uiMapCurrent_->SetPosition(Vector3(173.0f, 328.2f, 0.0f));
+		uiMapCurrent_->SetPosition(Vector3(173.0f, 328.2f, 0.0f) - startMapPos_ + offsetMapPos_);
 	}
 	if (currentMapNum_ == 4)
 	{
 		uiMapCurrent_->SetSize({ size.x * 1.4f, size.y * 1.8f });
-		uiMapCurrent_->SetPosition(Vector3(173.0f, 246.0f, 0.0f));
+		uiMapCurrent_->SetPosition(Vector3(173.0f, 246.0f, 0.0f) - startMapPos_ + offsetMapPos_);
 	}
 	if (currentMapNum_ == 5)
 	{
 		uiMapCurrent_->SetSize({ size.x * 1.4f, size.y * 1.8f });
-		uiMapCurrent_->SetPosition(Vector3(173.0f, 164.0f, 0.0f));
+		uiMapCurrent_->SetPosition(Vector3(173.0f, 164.0f, 0.0f) - startMapPos_ + offsetMapPos_);
 	}
 	uiMap_->Update();
 	uiMapCurrent_->Update();
