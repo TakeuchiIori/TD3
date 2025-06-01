@@ -122,6 +122,14 @@ public:
 		LoadEnemyDataFromJson(fullPath_);
 	}
 
+	void SetIsStop(bool is)
+	{
+		for (auto&& enemy : enemies_)
+		{
+			enemy->SetIsStop(is);
+		}
+	}
+
 private:
 	Camera* camera_ = nullptr;
 	Player* player_ = nullptr;

@@ -114,7 +114,7 @@ void SideEnemy::Update()
 		return;
 	}
 
-	if (!IsStop()) // 攻撃を食らったら次まで動かない
+	if (!IsStop() || !isStop_) // 攻撃を食らったら次まで動かない
 	{
 		Move();
 

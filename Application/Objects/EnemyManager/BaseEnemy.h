@@ -85,6 +85,8 @@ public:
 
 	void KnockBack();
 
+	void SetIsStop(bool is) { isStop_ = is; }
+
 protected:
 	// 攻撃を受けた時
 	void TakeAttack()
@@ -131,6 +133,8 @@ protected:
 
 	bool isTakeAttack_ = false;
 	bool isFaint_ = false;
+
+	bool isStop_ = false;
 
 	bool isAlive_ = true;
 	std::shared_ptr<OBBCollider> obbCollider_;

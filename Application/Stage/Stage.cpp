@@ -37,6 +37,7 @@ void Stage::InitCheckPoint()
 
 void Stage::Update()
 {
+	enemyManager_->SetIsStop(player_->IsReturn());
 	enemyManager_->Update();
 	grassManager_->Update();
 	if (player_->StartReturn() && GetCheckPointID() >= balloon_->GetEnableMapNum())

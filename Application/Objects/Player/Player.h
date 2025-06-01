@@ -212,6 +212,8 @@ public: // getter&setter
 
 	bool IsBoost() { return behavior_ == BehaviorPlayer::Boost; }
 
+	bool IsReturn() { return behavior_ == BehaviorPlayer::Return; }
+
 	bool StartReturn() { return behaviortRquest_ == BehaviorPlayer::Return; }
 
 	bool EndReturn() { return behaviortRquest_ == BehaviorPlayer::Root; }
