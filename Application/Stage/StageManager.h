@@ -60,7 +60,16 @@ public:
 	/// </summary>
 	float GetCheckPoint() const { return stageList_[currentStageNum_]->GetCheckPoint(); }
 
-	bool IsClear() { return stageList_[currentStageNum_]->IsClear() || input_->TriggerKey(DIK_L); }
+	bool IsClear() 
+	{ 
+#ifdef _DEBUG
+		return stageList_[currentStageNum_]->IsClear() || input_->TriggerKey(DIK_L);
+#else
+		return stageList_[currentStageNum_]->IsClear();
+#endif // _DEBUG
+
+	}
+
 	void SetFollowCamera(FollowCamera* camera) { followCamera_ = camera; }
 
 	int GetCheckPointID() { return stageList_[currentStageNum_]->GetCheckPointID(); }
