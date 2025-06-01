@@ -143,7 +143,8 @@ private:
 	=================================================================*/
 	std::unique_ptr<TitlePlayer> player_;
 	std::unique_ptr<Book> book_;
-	std::unique_ptr<Cloud> cloud_;
+	std::vector<std::unique_ptr<Cloud>> clouds_;
+	int numClouds_ = 2;
 
 	/*=================================================================
 

@@ -68,9 +68,11 @@ void TitleScene::Initialize()
 	titleScreen_->Initialize();
 	titleScreen_->SetCamera(sceneCamera_.get());
 
-	cloud_ = std::make_unique<Cloud>();
-	cloud_->Initialize(sceneCamera_.get());
-
+	for (int i = 0; i < numClouds_; ++i) {
+		auto cloud = std::make_unique<Cloud>();
+		cloud->Initialize(sceneCamera_.get());
+		clouds_.emplace_back(std::move(cloud));
+	}
 
 	// 本を読み始めたら
 	book_->OnBookTrigger_ = [this]() {
@@ -151,7 +153,11 @@ void TitleScene::Update()
 		player_->Update();
 	}
 	book_->Update();
-	cloud_->Update();
+
+	for (auto& cloud : clouds_) {
+		cloud->Update();
+	}
+
 	titleScreen_->Update();
 
 
@@ -212,7 +218,9 @@ void TitleScene::DrawObject()
 	mpInfo_->Draw();
 	player_->Draw();
 	book_->Draw();
-	cloud_->Draw();
+	for (auto& cloud : clouds_) {
+		cloud->Draw();
+	}
 	// 制御点描画
 	//bookEventCamera_.Draw(sceneCamera_.get());
 }
