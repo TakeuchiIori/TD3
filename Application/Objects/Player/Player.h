@@ -31,6 +31,7 @@ enum class BehaviorPlayer
 	Moving,
 	Boost,
 	Return,
+	ZeroHP,
 };
 
 struct PointWithDirection {
@@ -201,6 +202,12 @@ private: // プレイヤーのふるまい
 	void BehaviorReturnInit();
 	// 帰還状態更新
 	void BehaviorReturnUpdate();
+
+
+	// 帰還状態初期化
+	void BehaviorZeroHPInit();
+	// 帰還状態更新
+	void BehaviorZeroHPUpdate();
 
 
 public: // getter&setter

@@ -223,10 +223,28 @@ void Player::Draw()
 		body->Draw();
 	}
 
+	// ハートを点滅させる処理
+	static bool isActive = false;
+	static int frameCount = 0;
 
-	for (size_t i = 0; i < drawCount_; ++i)
+	if(invincibleTimer_ > 0)
 	{
-		haerts_[i]->Draw();
+		frameCount++;
+		if (frameCount % 3 == 0) {
+			isActive = !isActive;
+		}
+	}
+	else
+	{
+		isActive = false;
+	}
+
+	if(!isActive)
+	{
+		for (size_t i = 0; i < drawCount_; ++i)
+		{
+			haerts_[i]->Draw();
+		}
 	}
 
 	legObj_->Draw(camera_, legWT_);
@@ -985,12 +1003,10 @@ void Player::TakeDamage()
 			// オーディオの再生
 			sourceVoiceDamage = Audio::GetInstance()->SoundPlayAudio(soundDataDamage, false);
 			AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceDamage, kSE);
+			invincibleTimer_ = kInvincibleTime_;
 			if (HP_ <= 0)
 			{
-			} 
-			else
-			{
-				invincibleTimer_ = kInvincibleTime_;
+				behaviortRquest_ = BehaviorPlayer::ZeroHP;
 			}
 		}
 	}
@@ -1194,6 +1210,9 @@ void Player::BehaviorInitialize()
 		case BehaviorPlayer::Return:
 			BehaviorReturnInit();
 			break;
+		case BehaviorPlayer::ZeroHP:
+			BehaviorZeroHPInit();
+			break;
 		}
 		// 振る舞いリクエストをリセット
 		behaviortRquest_ = std::nullopt;
@@ -1216,6 +1235,9 @@ void Player::BehaviorUpdate()
 		break;
 	case BehaviorPlayer::Return:
 		BehaviorReturnUpdate();
+		break;
+	case BehaviorPlayer::ZeroHP:
+		BehaviorZeroHPUpdate();
 		break;
 	}
 
@@ -1258,11 +1280,6 @@ void Player::BehaviorMovingUpdate()
 	{
 		EntryReturn();
 	}
-
-	if (HP_ <= 0)
-	{
-		EntryReturn();
-	}
 }
 
 void Player::BehaviorBoostInit()
@@ -1295,11 +1312,6 @@ void Player::BehaviorBoostUpdate()
 	}
 
 	if (0 >= extendTimer_)
-	{
-		EntryReturn();
-	}
-
-	if (HP_ <= 0)
 	{
 		EntryReturn();
 	}
@@ -1344,4 +1356,17 @@ void Player::BehaviorReturnUpdate()
 	}
 	nextWorldTransform_.translation_ = worldTransform_.translation_;
 	ShrinkBody();
+}
+
+void Player::BehaviorZeroHPInit()
+{
+	HP_ = kMaxHP_;
+}
+
+void Player::BehaviorZeroHPUpdate()
+{
+	if (invincibleTimer_ <= 0)
+	{
+		EntryReturn();
+	}
 }

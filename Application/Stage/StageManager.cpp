@@ -125,11 +125,6 @@ void StageManager::CameraScroll()
 	{
 		float offset = (cameraScrollEnd_ - offsetY_ + player_->GetCenterPosition().y) - stageList_[currentStageNum_]->GetCheckPoint();
 		followCamera_->SetOffsetY(-offset);
-#ifdef _DEBUG
-		/*ImGui::Begin("Scroll");
-		ImGui::Text("%.2f", offset);
-		ImGui::End();*/
-#endif // _DEBUG
 	}
 }
 
