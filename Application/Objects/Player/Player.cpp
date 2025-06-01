@@ -807,6 +807,14 @@ void Player::TimerManager()
 	{
 		createGrassTimer_ -= deltaTime_;
 	}
+
+	obj_->SetMaterialColor(defaultColorV3_);
+
+	for (const auto& body : playerBodys_)
+	{
+		body->SetColor(defaultColorV3_);
+	}
+
 	if (0 < invincibleTimer_)
 	{
 		static int time = 0;
