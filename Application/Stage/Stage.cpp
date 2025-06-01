@@ -43,6 +43,10 @@ void Stage::Update()
 	{
 		balloon_->BehaviorTransition();
 	}
+	if (player_->EndReturn())
+	{
+		balloon_->TransitionRoot();
+	}
 	balloon_->Update();
 
 	checkPoint_.DebugUpdate();

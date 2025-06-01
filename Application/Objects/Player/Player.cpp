@@ -979,7 +979,6 @@ void Player::TakeDamage()
 			AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceDamage, kSE);
 			if (HP_ <= 0)
 			{
-				EntryReturn();
 			} 
 			else
 			{
@@ -1251,6 +1250,11 @@ void Player::BehaviorMovingUpdate()
 	{
 		EntryReturn();
 	}
+
+	if (HP_ <= 0)
+	{
+		EntryReturn();
+	}
 }
 
 void Player::BehaviorBoostInit()
@@ -1283,6 +1287,11 @@ void Player::BehaviorBoostUpdate()
 	}
 
 	if (0 >= extendTimer_)
+	{
+		EntryReturn();
+	}
+
+	if (HP_ <= 0)
 	{
 		EntryReturn();
 	}

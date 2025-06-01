@@ -16,6 +16,7 @@ void Balloon::Initialize(Camera* camera)
 	worldTransform_.scale_ = balloonScale_;
 
 	worldTransform_.UpdateMatrix();
+	worldTransform_.translation_.z = 1.2f;
 
 	colliderWT_.Initialize();
 	colliderWT_.scale_ = worldTransform_.scale_;
@@ -106,7 +107,7 @@ void Balloon::BehaviorRootInit()
 	isVisible_ = false;
 	aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
 	aabbStopCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
-	worldTransform_.translation_.y = 0;
+	worldTransform_.translation_.y = defaultY_;
 }
 
 void Balloon::BehaviorRootUpdate()
@@ -119,7 +120,7 @@ void Balloon::BehaviorUPInit()
 	isVisible_ = true;
 	aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kBalloon));
 	aabbStopCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kStopArea));
-	worldTransform_.translation_.y = 0;
+	worldTransform_.translation_.y = defaultY_;
 
 	// X座標をランダムでスポーン
 	std::mt19937 random(seedGene_());
