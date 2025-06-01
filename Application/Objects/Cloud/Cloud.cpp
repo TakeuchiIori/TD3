@@ -1,5 +1,5 @@
 #include "Cloud.h"
-
+#include "Systems/GameTime/GameTime.h"
 Cloud::Cloud()
 {
     // コンストラクタで自動的にIDを割り当て、次のIDを準備
@@ -56,6 +56,30 @@ void Cloud::Initialize(Camera* camera)
 
 void Cloud::Update()
 {
+    // 雲の位置とスケールを更新
+    cloudWorldTransform_->translation_ = cloudPosition_;
+    cloudWorldTransform_->scale_ = cloudScale_;
+
+    // WorldTransformを更新
+    cloudWorldTransform_->UpdateMatrix();
+}
+
+void Cloud::UpdateScale()
+{
+    // アニメーションタイマーを更新
+    animationTime_ += GameTime::GetDeltaTime();
+
+    // sin波を使ってぷよぷよさせる
+    float scaleOffset = std::sin(animationTime_ * animationSpeed_) * scaleAmplitude_;
+
+    // 各軸で異なる位相を持たせることで、より自然な動きに
+    float scaleX = baseScale_.x + scaleOffset;
+    float scaleY = baseScale_.y + std::sin(animationTime_ * animationSpeed_ + 1.57f) * scaleAmplitude_; // 位相を90度ずらす
+    float scaleZ = baseScale_.z + std::sin(animationTime_ * animationSpeed_ + 3.14f) * scaleAmplitude_ * 0.5f; // Z軸は控えめに
+
+    // スケールを更新
+    cloudScale_ = { scaleX, scaleY, scaleZ };
+
     // 雲の位置とスケールを更新
     cloudWorldTransform_->translation_ = cloudPosition_;
     cloudWorldTransform_->scale_ = cloudScale_;

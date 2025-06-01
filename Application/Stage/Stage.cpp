@@ -124,6 +124,7 @@ void Stage::Update()
 	// 雲の更新
 	for (auto& cloud : clouds_) {
 		cloud->Update();
+		cloud->UpdateScale();
 	}
 
 	checkPoint_.DebugUpdate();

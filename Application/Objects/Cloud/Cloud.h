@@ -29,6 +29,8 @@ public:
     /// </summary>
     void Update();
 
+    void UpdateScale();
+
     /// <summary>
     /// 描画処理
     /// </summary>
@@ -56,4 +58,10 @@ private:
     float resetDistance_;       // リセット距離
     Vector3 cloudPosition_;     // 雲の位置
     Vector3 cloudScale_ = { 3.0f,3.0f,1.0f };        // 雲のスケール
+
+
+    float animationTime_ = 0.0f;        // アニメーション用のタイマー
+    float animationSpeed_ = 2.0f;       // アニメーションの速度
+    float scaleAmplitude_ = 0.3f;      // スケールの振幅（どれだけ大きさが変わるか）
+    Vector3 baseScale_ = { 3.0f, 3.0f, 1.0f };  // 基準となるスケール
 };
