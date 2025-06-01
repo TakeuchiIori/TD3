@@ -104,7 +104,13 @@ public:
 
 	void BehaviorTransition();
 
-	void TransitionRoot() { behaviortRquest_ = BehaviorBalloon::kROOT; }
+	void TransitionRoot()
+	{ 
+		if(behavior_ == BehaviorBalloon::kUP)
+		{
+			behaviortRquest_ = BehaviorBalloon::kROOT;
+		}
+	}
 
 public: // getter & setter
 	void SetPos(Vector3 pos) { worldTransform_.translation_ = pos; }
