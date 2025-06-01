@@ -227,7 +227,7 @@ void Player::Draw()
 	static bool isActive = false;
 	static int frameCount = 0;
 
-	if(invincibleTimer_ > 0)
+	if(invincibleTimer_ > 0 && behavior_ != BehaviorPlayer::Boost)
 	{
 		frameCount++;
 		if (frameCount % 3 == 0) {
@@ -809,7 +809,7 @@ void Player::EntryReturn()
 
 void Player::TimerManager()
 {
-	if (0 < extendTimer_)
+	if (0 < extendTimer_ && behavior_ != BehaviorPlayer::ZeroHP)
 	{
 		extendTimer_ -= deltaTime_;
 	}

@@ -32,6 +32,13 @@ public:
     void SetFollowEnabled(bool enabled) { isFollowEnabled_ = enabled; }
 
     bool IsFollowEnabled() const { return isFollowEnabled_; }
+
+    void SetZoom(bool is, Vector3 pos)
+    {
+        isZoom_ = is;
+        ZoomPos_ = pos;
+    }
+
 private:
    // float fov_ = 0.45f;
     std::unique_ptr <JsonManager> jsonManager_;
@@ -44,5 +51,9 @@ private:
 
     // 追従の有効/無効フラグ
     bool isFollowEnabled_ = true;
+
+    bool isZoom_ = false;
+    Vector3 ZoomPos_ = {};
+    float zoomOffsetZ_ = -30;
 };
 
