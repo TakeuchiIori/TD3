@@ -51,7 +51,7 @@ void Player::Initialize(Camera* camera)
 	worldTransform_.UpdateMatrix();
 	modelWT_.UpdateMatrix();
 	nextWorldTransform_.UpdateMatrix();
-	legWT_.UpdateMatrix();
+	//legWT_.UpdateMatrix();
 
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
@@ -62,7 +62,8 @@ void Player::Initialize(Camera* camera)
 
 	legObj_ = std::make_unique<Object3d>();
 	legObj_->Initialize();
-	legObj_->SetModel("body.obj", false);
+	legObj_->SetModel("walk.gltf", true);
+	legObj_->SetLoopAnimation(true);
 	legObj_->SetMaterialColor(defaultColorV4_);
 
 	for (size_t i = 0; i < kMaxHP_; ++i)
@@ -167,6 +168,8 @@ void Player::Update()
 		obj_->ChangeModelAnimation("Yodare.gltf", 1);
 		isAnimation_ = true;
 	}
+
+
 #ifdef _DEBUG
 
 	if (input_->IsPadPressed(0, GamePadButton::B)) {
@@ -202,6 +205,7 @@ void Player::Update()
 
 	//aabbCollider_->Update();
 	obj_->UpdateAnimation();
+	legObj_->UpdateAnimation();
 	obbCollider_->Update();
 	nextAabbCollider_->Update();
 
@@ -247,12 +251,13 @@ void Player::Draw()
 		}
 	}
 
-	legObj_->Draw(camera_, legWT_);
+
 }
 
 void Player::DrawAnimation()
 {
 	obj_->Draw(camera_, modelWT_);
+	legObj_->Draw(camera_, legWT_);
 }
 
 void Player::DrawCollision()
