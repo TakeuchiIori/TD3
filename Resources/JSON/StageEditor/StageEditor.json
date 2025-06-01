@@ -148,6 +148,46 @@
                 }
             ],
             "stageNumber": 0
+        },
+        {
+            "checkPoints": [
+                {
+                    "checkPointNumber": 0,
+                    "height": 100.0,
+                    "initX": 2.0,
+                    "timer": 10.0
+                },
+                {
+                    "checkPointNumber": 1,
+                    "height": 100.0,
+                    "initX": 2.0,
+                    "timer": 10.0
+                }
+            ],
+            "stageNumber": 1
+        },
+        {
+            "checkPoints": [
+                {
+                    "checkPointNumber": 0,
+                    "height": 100.0,
+                    "initX": 2.0,
+                    "timer": 10.0
+                },
+                {
+                    "checkPointNumber": 1,
+                    "height": 100.0,
+                    "initX": 2.0,
+                    "timer": 10.0
+                },
+                {
+                    "checkPointNumber": 2,
+                    "height": 100.0,
+                    "initX": 2.0,
+                    "timer": 10.0
+                }
+            ],
+            "stageNumber": 2
         }
     ]
 }
