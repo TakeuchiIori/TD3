@@ -29,6 +29,7 @@
 #include "../../../Objects/Player/ClearPlayer.h"
 #include "../../../Objects/Planet/Planet.h"
 #include "../../../SpriteApp/ClearScreen.h"
+#include <Cloud/Cloud.h>
 
 class ClearScene : public BaseScene
 {
@@ -137,8 +138,9 @@ private:
 	=================================================================*/
 	std::unique_ptr<ClearPlayer> player_;
 	std::unique_ptr< Planet> planet_;
-
-
+	std::vector<std::unique_ptr<Cloud>> clouds_;
+	int numClouds_ = 7;
+	
 
 	/*=================================================================
 

@@ -52,12 +52,8 @@ void ClearPlayer::Update()
 		UpdateEvent();
 	}
 	// 左スティックの入力を取得
-	Vector2 leftStick = Input::GetInstance()->GetLeftStickInput(0);
 	if (worldTransform_.translation_.y <= 55.0f) {
-		if (Input::GetInstance()->TriggerKey(DIK_W) ||
-			leftStick.y > up_) {
-			neckTransform_.scale_.y += up_;
-		}
+		neckTransform_.scale_.y += up_;
 	}
 	float stretchY = neckTransform_.scale_.y;
 	worldTransform_.translation_ = neckPos + Vector3(0.0f, stretchY + 1.0f, 0.0f);

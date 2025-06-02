@@ -43,6 +43,11 @@ public:
     Vector3 GetScale() { return cloudScale_; }
     void SetScale(const Vector3& scale) { cloudScale_ = scale; }
 
+    void SetModel(const std::string& modelName) {
+        if (cloud_) {
+            cloud_->ChangeModel(modelName);
+        }
+	}
 private:
     Camera* camera_ = nullptr;
     std::unique_ptr<JsonManager> jsonManager_ = nullptr;

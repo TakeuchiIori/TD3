@@ -59,7 +59,7 @@ private:
 	std::unique_ptr<Object3d> neck_;
 	WorldTransform neckTransform_;
 
-	float up_ = 0.1f;
+	float up_ = 0.07f;
 	const Vector4 defaultColorV4_ = { 0.90625f,0.87109f,0.125f,1.0f };
 
 	/*=================================================================
