@@ -79,18 +79,7 @@ void ParticleEmitter::EmitFrom(const Vector3& from, const Vector3& to)
 	params.randomFromCenter = false;
 	params.direction = direction;
 
-	// 回転設定を有効化
-	params.isRotateDirection = true;  // 進行方向に回転を合わせる
-
-	// atan2で方向ベクトルから角度を計算
-	float angleZ = std::atan2(direction.x, -direction.y);
-	params.baseTransform.rotateMin = Vector3(0.0f, 0.0f, angleZ);
-
-	// ランダム回転を無効化（方向を保持したい場合）
-	params.isRandomRotate = false;
-
-	// パーティクルを発射
-	ParticleManager::GetInstance()->EmitRotate(emitter_.name, from, params.baseTransform.rotateMin, emitter_.count);
+	ParticleManager::GetInstance()->Emit(emitter_.name, from, emitter_.count);
 }
 
 

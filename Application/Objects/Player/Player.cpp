@@ -168,7 +168,7 @@ void Player::Update()
 		sourceVoiceYodare = Audio::GetInstance()->SoundPlayAudio(soundDataYodare, false);
 		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceYodare, kSE);
 		obj_->ChangeModelAnimation("Yodare.gltf", 1);
-		emitter_->EmitFromTo(worldTransform_.translation_, worldTransform_.translation_);
+		//emitter_->EmitFrom(worldTransform_.translation_, worldTransform_.translation_);
 		isAnimation_ = true;
 	}
 
