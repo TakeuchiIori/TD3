@@ -185,6 +185,7 @@ void Stage::DrawSprite()
 {
 	player_->DrawSprite();
 	enemyManager_->DrawSprite();
+	balloon_->DrawSprite();
 }
 
 Stage::TransitionType Stage::ReachCheckPoint()
