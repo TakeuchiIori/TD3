@@ -952,7 +952,7 @@ void Player::UpdateSprite()
 
 bool Player::IsPopGrass()
 {
-	if (isStuckGrass_ && isCreateGrass_)
+	if (isStuckGrass_)
 	{
 		sourceVoiceTumari = Audio::GetInstance()->SoundPlayAudio(soundDataTumari);
 		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceTumari, kSE);
