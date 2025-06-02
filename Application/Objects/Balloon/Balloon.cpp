@@ -1,4 +1,5 @@
 #include "Balloon.h"
+#include "../../../Engine/Utility/Systems/GameTime/GameTIme.h"
 
 void Balloon::Initialize(Camera* camera)
 {
@@ -38,6 +39,12 @@ void Balloon::Initialize(Camera* camera)
 	timerObj_->SetModel("BalloonTimer.obj");
 
 	soundData_ = Audio::GetInstance()->LoadAudio(L"Resources/Audio/balloon.mp3");
+
+	uiTime_ = std::make_unique<Sprite>();
+	uiTime_->Initialize("Resources/Textures/In_Game/timerPlus.png");
+	uiTime_->SetPosition(endTimePos_);
+	uiTime_->SetSize({150.0f, 75.0f});
+	uiTime_->SetAnchorPoint({ 0.5f, 1.0f });
 }
 
 void Balloon::Update()
@@ -50,6 +57,18 @@ void Balloon::Update()
 	worldTransform_.UpdateMatrix();
 	colliderWT_.UpdateMatrix();
 	stopAreaWT_.UpdateMatrix();
+	if (timer < kTime)
+	{
+		uiTime_->SetPosition(startTimepPos_);
+		timer += GameTime::GetDeltaTime();
+		if (timer > kMidTime)
+		{
+			float t = (timer - kMidTime) / (kTime - kMidTime);
+
+			uiTime_->SetPosition(Lerp(startTimepPos_, endTimePos_, t));
+		}
+	}
+	uiTime_->Update();
 }
 
 void Balloon::Draw()
@@ -58,6 +77,14 @@ void Balloon::Draw()
 	{
 		obj_->Draw(camera_, worldTransform_);
 		timerObj_->Draw(camera_, worldTransform_);
+	}
+}
+
+void Balloon::DrawSprite()
+{
+	if (timer < kTime)
+	{
+		uiTime_->Draw();
 	}
 }
 
@@ -113,7 +140,6 @@ void Balloon::BehaviorRootInit()
 
 void Balloon::BehaviorRootUpdate()
 {
-	// 何もしない
 }
 
 void Balloon::BehaviorUPInit()
@@ -204,6 +230,12 @@ void Balloon::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 	{
 		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
 		{
+			Vector3 pos = worldTransform_.translation_;
+			Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
+			Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
+			pos = Transform(pos, matViewProjectionViewport);
+			startTimepPos_ = pos + offsetPos;
+			timer = 0;
 			getSoundSource_ = Audio::GetInstance()->SoundPlayAudio(soundData_);
 			AudioVolumeManager::GetInstance()->SetSourceToSubmix(getSoundSource_, kSE);
 			aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));

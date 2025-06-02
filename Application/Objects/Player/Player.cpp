@@ -886,10 +886,14 @@ void Player::TimerManager()
 	}
 
 	// コンボの処理
-
+	isStuckGrass_ = false;
 	if (comboTimer_ > 0.0f) {
 		comboTimer_ -= deltaTime_;
 		if (comboTimer_ <= 0.0f) {
+			if (comboCount_ == 3)
+			{
+				isStuckGrass_ = true;
+			}
 			comboCount_ = 0;
 			lastPlayedComboCount_ = 0;
 		}
@@ -948,7 +952,7 @@ void Player::UpdateSprite()
 
 bool Player::IsPopGrass()
 {
-	if (0 >= createGrassTimer_ && isCreateGrass_)
+	if (isStuckGrass_)
 	{
 		sourceVoiceTumari = Audio::GetInstance()->SoundPlayAudio(soundDataTumari);
 		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceTumari, kSE);
@@ -1112,6 +1116,12 @@ void Player::HeartPos()
 
 void Player::AddCombo(int amount)
 {
+	// ★ ここで3コンボ目が終わったらもう一度3コンボ目が発動されるようにする
+	if (comboCount_ == kMaxCombo_) {
+		comboCount_ = 2;
+		lastPlayedComboCount_ = 2;
+	}
+
 	if (comboCount_ < kMaxCombo_ + 1) {
 		comboCount_ = std::min(comboCount_ + amount, kMaxCombo_);
 		comboTimer_ = kComboTimeLimit_;
@@ -1125,11 +1135,6 @@ void Player::UpdateCombo()
 		obj_->ChangeModel("kirin.gltf", true);
 		isAnimation_ = false;
 
-		// ★ ここで3コンボ目が終わったらもう一度3コンボ目が発動されるようにする
-		if (comboCount_ == kMaxCombo_) {
-			comboCount_ = 2;
-			lastPlayedComboCount_ = 2;
-		}
 	}
 
 	if (comboCount_ == lastPlayedComboCount_) {
