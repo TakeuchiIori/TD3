@@ -186,8 +186,12 @@ void GameScreen::Initialize()
 	uiReturn_->SetSize({ 150.0f, 60.0f });
 	uiReturn_->SetAnchorPoint({ 0.5f, 0.5f });
 
+
 	InitJson();
 
+	uiMenuOpen_ = std::make_unique<Sprite>();
+	uiMenuOpen_->Initialize("Resources/Textures/Menu/menuUI.png");
+	uiMenuOpen_->SetPosition(offsetMenuOpen_);
 }
 
 void GameScreen::InitJson()
@@ -201,6 +205,8 @@ void GameScreen::InitJson()
 	jsonManager_->Register("ブーストの操作アイコンの位置", &offsetB_);
 	jsonManager_->Register("マップの位置", &offsetMapPos_);
 
+	jsonManager_->Register("メニュー開くボタンの座標", &offsetMenuOpen_);
+
 	jsonManager_->SetTreePrefix("BoostUI");
 	jsonManager_->Register("UIの位置", &boost_[1]->uvScale_);
 	jsonManager_->Register("UIのUVスケール", &boost_[1]->uvScale_);
@@ -208,6 +214,7 @@ void GameScreen::InitJson()
 
 	jsonManager_->Register("位置", &boost_[1]->position_);
 	jsonManager_->Register("サイズ", &boost_[1]->size_);
+
 
 }
 
@@ -405,7 +412,11 @@ void GameScreen::Update()
 	uiYodareop_->SetPosition(offsetYodareop_);
 	uiYodareop_->Update();
 
+#ifdef _DEBUG
+	uiMenuOpen_->SetPosition(offsetMenuOpen_);
+#endif // _DEBUG
 
+	uiMenuOpen_->Update();
 
 
 	Updatedistance();
@@ -437,6 +448,8 @@ void GameScreen::Draw()
 
 	uiMap_->Draw();
 	uiMapCurrent_->Draw();
+
+	uiMenuOpen_->Draw();
 
 	/*for (uint32_t i = 0; i < numGrass_; i++)
 	{
