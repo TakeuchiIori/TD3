@@ -7,6 +7,7 @@
 #include "Collision/AABB/AABBCollider.h"
 #include "Loaders/Json/JsonManager.h"
 #include "Easing.h"
+#include "../../../Engine/Generators/Sprite/Sprite.h"
 
 // Collision
 #include "Collision/Sphere/SphereCollider.h"
@@ -49,6 +50,8 @@ public:
 	void Draw() override;
 
 	void DrawCollision();
+
+	void DrawSprite();
 
 private:
 	/// <summary>
@@ -160,6 +163,14 @@ private:
 
 	IXAudio2SourceVoice* getSoundSource_ = nullptr;
 
+	std::unique_ptr<Sprite> uiTime_;
+	Vector3 startTimepPos_ = Vector3(0.0f, 0.0f, 0.0f);
+	Vector3 endTimePos_ = Vector3(640.0f, 660.0f, 0.0f);
+	Vector3 offsetPos = Vector3(0, -50, 0);
+
+	const float kMidTime = 0.7f;
+	const float kTime = 2.0f;
+	float timer = kTime;
 
 	// 振る舞い
 	BehaviorBalloon behavior_ = BehaviorBalloon::kROOT;

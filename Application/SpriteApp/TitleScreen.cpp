@@ -45,6 +45,11 @@ void TitleScreen::Initialize()
 	title_->Initialize("Resources/Textures/BackGround/title.png");
 	title_->SetAnchorPoint({ 0.5f, 0.5f });
 
+
+	ctrl_ = std::make_unique<Sprite>();
+	ctrl_->Initialize("Resources/Textures/BackGround/controller.png");
+	ctrl_->SetAnchorPoint({ 0.5f, 0.5f });
+
 	InitJson();
 }
 
@@ -53,6 +58,7 @@ void TitleScreen::InitJson()
 	jsonManager_ = std::make_unique<JsonManager>("TitleScene", "Resources/JSON/UI/");
 	jsonManager_->SetCategory("UI");
 	jsonManager_->Register("OffsetTitle", &offset[0]);
+	jsonManager_->Register("OffsetCtrl", &offsetCtrl_);
 
 }
 
@@ -76,8 +82,8 @@ void TitleScreen::Update()
 	{
 		option_[i]->Update();
 	}
-
-
+	ctrl_->SetPosition(offsetCtrl_);
+	ctrl_->Update();
 
 	Vector2 stickInput = Input::GetInstance()->GetLeftStickInput(0);
 	if (!isFadingTitle_ && (std::abs(stickInput.x) > 0.1f || std::abs(stickInput.y) > 0.1f)) {
@@ -131,6 +137,8 @@ void TitleScreen::Draw()
 			//option_[i]->Draw();
 		}
 	}
+
+	ctrl_->Draw();
 
 	title_->Draw();
 }

@@ -47,6 +47,10 @@ private:
 	float titleAlpha_ = 1.0f;
 
 
+	std::unique_ptr<Sprite> ctrl_;
+	Vector3 offsetCtrl_ = {};
+
+
 	std::unique_ptr<JsonManager> jsonManager_;
 };
 

@@ -172,13 +172,6 @@ void Player::Update()
 	}
 
 
-#ifdef _DEBUG
-
-	if (input_->IsPadPressed(0, GamePadButton::B)) {
-		emitter_->Emit();
-	}
-#endif // _DEBUG
-
 	// 各行動の初期化
 	BehaviorInitialize();
 	// 各行動の更新
@@ -218,6 +211,10 @@ void Player::Update()
 
 void Player::Draw()
 {
+
+	for (auto& drip : drips_) {
+		drip->Draw();
+	}
 
 	for (const auto& body : stuckGrassList_)
 	{
@@ -403,7 +400,7 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 			{
 				// 唾を吐く
 
-				emitter_->EmitFromTo(worldTransform_.translation_, other->GetWorldTransform().translation_);
+				CreateDrip(other->GetWorldTransform().translation_);
 				// オーディオの再生
 				sourceVoiceGrow = Audio::GetInstance()->SoundPlayAudio(soundDataGrow, false);
 				AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceGrow, kSE);
@@ -893,9 +890,12 @@ void Player::TimerManager()
 	if (comboTimer_ > 0.0f) {
 		comboTimer_ -= deltaTime_;
 		if (comboTimer_ <= 0.0f) {
+			if (comboCount_ == 3)
+			{
+				isStuckGrass_ = true;
+			}
 			comboCount_ = 0;
 			lastPlayedComboCount_ = 0;
-			isStuckGrass_ = true;
 		}
 	}
 
@@ -1116,6 +1116,12 @@ void Player::HeartPos()
 
 void Player::AddCombo(int amount)
 {
+	// ★ ここで3コンボ目が終わったらもう一度3コンボ目が発動されるようにする
+	if (comboCount_ == kMaxCombo_) {
+		comboCount_ = 2;
+		lastPlayedComboCount_ = 2;
+	}
+
 	if (comboCount_ < kMaxCombo_ + 1) {
 		comboCount_ = std::min(comboCount_ + amount, kMaxCombo_);
 		comboTimer_ = kComboTimeLimit_;
@@ -1129,11 +1135,6 @@ void Player::UpdateCombo()
 		obj_->ChangeModel("kirin.gltf", true);
 		isAnimation_ = false;
 
-		// ★ ここで3コンボ目が終わったらもう一度3コンボ目が発動されるようにする
-		if (comboCount_ == kMaxCombo_) {
-			comboCount_ = 2;
-			lastPlayedComboCount_ = 2;
-		}
 	}
 
 	if (comboCount_ == lastPlayedComboCount_) {
@@ -1164,6 +1165,22 @@ void Player::UpdateCombo()
 		break;
 	default:
 		break;
+	}
+}
+
+void Player::CreateDrip(Vector3 pos)
+{
+	for (int i = 0; i < numDrips_; i++) {
+		auto drip = std::make_unique<Drip>();
+		drip->Initialize(camera_);
+		Vector3 newPos = pos;
+		newPos.y += 2.0f;
+		drip->Shoot(newPos);
+		drips_.emplace_back(std::move(drip));
+	}
+
+	for(auto& drip : drips_) {
+		drip->Update();
 	}
 }
 

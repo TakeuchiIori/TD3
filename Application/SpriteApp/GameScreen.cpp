@@ -181,8 +181,17 @@ void GameScreen::Initialize()
 	uiYodareop_->Initialize("Resources/Textures/Option/yodareUI.png");
 	uiYodareop_->SetSize({ 120.0f, 120.0f });
 
+	uiReturn_ = std::make_unique<Sprite>();
+	uiReturn_->Initialize("Resources/Textures/In_Game/returnQuickly.png");
+	uiReturn_->SetSize({ 400.0f, 160.0f });
+	uiReturn_->SetAnchorPoint({ 0.5f, 0.5f });
+
+
 	InitJson();
 
+	uiMenuOpen_ = std::make_unique<Sprite>();
+	uiMenuOpen_->Initialize("Resources/Textures/Menu/menuUI.png");
+	uiMenuOpen_->SetPosition(offsetMenuOpen_);
 }
 
 void GameScreen::InitJson()
@@ -196,6 +205,8 @@ void GameScreen::InitJson()
 	jsonManager_->Register("ブーストの操作アイコンの位置", &offsetB_);
 	jsonManager_->Register("マップの位置", &offsetMapPos_);
 
+	jsonManager_->Register("メニュー開くボタンの座標", &offsetMenuOpen_);
+
 	jsonManager_->SetTreePrefix("BoostUI");
 	jsonManager_->Register("UIの位置", &boost_[1]->uvScale_);
 	jsonManager_->Register("UIのUVスケール", &boost_[1]->uvScale_);
@@ -203,6 +214,7 @@ void GameScreen::InitJson()
 
 	jsonManager_->Register("位置", &boost_[1]->position_);
 	jsonManager_->Register("サイズ", &boost_[1]->size_);
+
 
 }
 
@@ -383,11 +395,48 @@ void GameScreen::Update()
 		uiYodare_->SetPosition(playerPos);
 		uiYodare_->Update();
 	}
+	static float alp = 1.0f;
+	static float dirA = -1.0f;
+	if (player_->behavior_ == BehaviorPlayer::Return)
+	{
+		Vector3 playerPos = { 640, 100,0 };
+		if (dirA < 0)
+		{
+			if (alp < 0.2f)
+			{
+				dirA *= -1.0f;
+			}
+		}
+		else
+		{
+			if (alp > 1.0f)
+			{
+				dirA *= -1.0f;
+			}
+		}
+
+
+		alp += GameTime::GetDeltaTime() * dirA;
+		
+
+		uiReturn_->SetPosition(playerPos);
+		uiReturn_->SetAlpha(alp);
+		uiReturn_->Update();
+	}
+	else
+	{
+		alp = 1.0f;
+		dirA = -1.0f;
+	}
 
 	uiYodareop_->SetPosition(offsetYodareop_);
 	uiYodareop_->Update();
 
+#ifdef _DEBUG
+	uiMenuOpen_->SetPosition(offsetMenuOpen_);
+#endif // _DEBUG
 
+	uiMenuOpen_->Update();
 
 
 	Updatedistance();
@@ -419,6 +468,8 @@ void GameScreen::Draw()
 
 	uiMap_->Draw();
 	uiMapCurrent_->Draw();
+
+	uiMenuOpen_->Draw();
 
 	/*for (uint32_t i = 0; i < numGrass_; i++)
 	{
@@ -454,6 +505,10 @@ void GameScreen::Draw()
 
 	if (yodareState_ != YodareState::Hidden) {
 		uiYodare_->Draw();
+	}
+	if (player_->behavior_ == BehaviorPlayer::Return)
+	{
+		uiReturn_->Draw();
 	}
 
 	uiYodareop_->Draw();

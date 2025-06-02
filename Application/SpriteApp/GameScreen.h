@@ -126,6 +126,11 @@ private:
 	Vector3 offsetYodare_ = Vector3(0.0f, 0.0f, 0.0f);
 	Vector2 sizeBaseLimit_ = {};
 
+	std::unique_ptr<Sprite> uiReturn_;
+
+	std::unique_ptr<Sprite> uiMenuOpen_;
+	Vector3 offsetMenuOpen_ = Vector3(0.0f, 0.0f, 0.0f);
+
 	std::unique_ptr<Sprite> uiYodareop_;
 	Vector3 offsetYodareop_ = Vector3(0.0f, 0.0f, 0.0f);
 
