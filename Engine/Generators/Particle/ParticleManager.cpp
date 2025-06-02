@@ -383,6 +383,8 @@ ParticleManager::Particle ParticleManager::MakeNewParticle(const std::string& na
 		getValue(params.baseTransform.translateMin.z, params.baseTransform.translateMax.z, params.isRandom, randomEngine)
 	};
 
+	params.radialEmission.centerPosition = basePosition;
+
 	// 放射設定による位置補正
 	if (params.radialEmission.enabled && !params.radialEmission.fromCenter) {
 		// 外から中心へ向かう場合：指定された半径の位置に配置
@@ -573,7 +575,7 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 		// 放射設定のデフォルト値
 		params.radialEmission.enabled = false;
 		params.radialEmission.fromCenter = true;
-		params.radialEmission.centerPosition = { 0.0f, 0.0f, 0.0f };
+		//params.radialEmission.centerPosition = { 0.0f, 0.0f, 0.0f };
 		params.radialEmission.minRadius = 0.0f;
 		params.radialEmission.maxRadius = 5.0f;
 		params.radialEmission.uniformSpeed = 1.0f;
