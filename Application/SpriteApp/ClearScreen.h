@@ -64,4 +64,16 @@ private:
 	float sinTimer_ = 0.0f;
 	const float floatSpeed_ = 3.0f;    // 浮遊速度
 	const float floatAmplitude_ = 10.0f; // 浮遊幅
+
+	float sinVelocity_ = 0.0f;        // 位置Y用
+	float scaleVelocity_ = 0.0f;      // スケール用
+	float currentScale_ = 1.0f;       // スケールの現在値
+
+	// スプライトA出現アニメーション用
+	bool isAppearing_ = false;          // 出現中フラグ
+	float appearTimer_ = 0.0f;          // 出現タイマー
+	const float appearDuration_ = 1.0f;  // 出現にかかる時間
+	Vector3 targetPosition_ = { 776.1f, 692.3f, 0.0f }; // 最終位置
+	Vector2 originalSize_;
+
 };
