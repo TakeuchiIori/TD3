@@ -9,6 +9,13 @@ void Fade::Initialize(const std::string textureFilePath) {
 	sprite_->SetTextureSize(Vector2(1280, 720));
 	sprite_->SetColor(Vector4(0, 0, 0, 1));
 
+	transSprite_ = std::make_unique<Sprite>();
+	transSprite_->Initialize("Resources/Textures/In_Game/checkpointTrans.png");
+	transSprite_->SetAnchorPoint({ 0.5f, 0.5f });
+	transSpritePos_ = { 640,startY_,0 };
+	transSprite_->SetPosition(transSpritePos_);
+	transSprite_->SetSize(Vector2{ 660, 1024 });
+
 }
 
 void Fade::Update() {
@@ -40,11 +47,19 @@ void Fade::FadeIn()
 	// フェード継続時間に達したら打ち止め
 	if (counter_ >= duration_) {
 		counter_ = duration_;
+		isTitleToGame_ = false;
 	}
 	// 1.0fから0.0fの間で、経過時間がフェード継続時間に近づくほどアルファ値を小さくする
 	sprite_->SetColor(Vector4{ 0,0,0,std::clamp(1.0f - counter_ / duration_, 0.0f, 1.0f) });
 	sprite_->Update();
 
+	if (isTitleToGame_)
+	{
+		float t = counter_ / duration_;
+		transSpritePos_.y = Lerp(midY_, endY_, t);
+		transSprite_->SetPosition(transSpritePos_);
+		transSprite_->Update();
+	}
 }
 
 void Fade::FadeOut()
@@ -58,6 +73,14 @@ void Fade::FadeOut()
 	// 0.0fから1.0fの間で、経過時間がフェード継続時間に近づくほどアルファ値を大きくする
 	sprite_->SetColor(Vector4{ 0,0,0,std::clamp(counter_ / duration_, 0.0f, 1.0f) });
 	sprite_->Update();
+
+	if (isTitleToGame_)
+	{
+		float t = counter_ / duration_;
+		transSpritePos_.y = Lerp(startY_, midY_, t);
+		transSprite_->SetPosition(transSpritePos_);
+		transSprite_->Update();
+	}
 }
 
 void Fade::Draw() {
@@ -65,6 +88,11 @@ void Fade::Draw() {
 		return;
 	}
 	sprite_->Draw();
+
+	if (isTitleToGame_)
+	{
+		transSprite_->Draw();
+	}
 }
 
 void Fade::Start(Status status, float duration) {

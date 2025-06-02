@@ -12,6 +12,11 @@ public:
     void StartTransition()override;
     void EndTransition()override;
 
+    void SetTitleToGame(bool is)override
+    {
+        fade_->SetTitleToGame(is);
+    }
+
 private:
     std::unique_ptr<Fade> fade_;
 	float FADE_DURATION = 2.0f;
