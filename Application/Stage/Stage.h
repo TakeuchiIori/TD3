@@ -40,6 +40,7 @@ public:
 	/// </summary>
 	void Initialize(Camera* camera);
 	void InitJson();
+	void SetStageBackgroundColor();
 	void InitCheckPoint();
 
 	/// <summary>
@@ -85,6 +86,7 @@ public:
 	float GetCheckPoint();
 	Vector3 GetCheckPointPos();
 
+	int GetCurrentStageNum() const { return currentStageNum_; }
 	bool IsClear() { return isClear_; }
 
 	void TransitionEnd() { transitionType_ = TransitionType::kNone; }

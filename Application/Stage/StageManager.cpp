@@ -24,7 +24,7 @@ void StageManager::Initialize(Camera* camera)
 	// 背景
 	background_ = std::make_unique<Background>();
 	background_->Initialzie();
-	background_->SetColor({ 0.53f, 0.81f, 0.92f, 1.0f });
+	//background_->SetColor({ 0.53f, 0.81f, 0.92f, 1.0f });
 
 	// 気球
 	balloon_ = std::make_unique<Balloon>();
@@ -37,7 +37,6 @@ void StageManager::Initialize(Camera* camera)
 	stageList_[0]->SetBackground(background_.get());
 	stageList_[0]->SetBalloon(balloon_.get());
 	stageList_[0]->Initialize(camera_);
-
 
 	ReloadObject();
 
@@ -133,6 +132,8 @@ void StageManager::CameraScroll()
 void StageManager::ReloadObject()
 {
 	stageList_[currentStageNum_]->ReloadObject();
+
+
 }
 
 bool StageManager::CheckPointTransition()

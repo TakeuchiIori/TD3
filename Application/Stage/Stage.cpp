@@ -21,6 +21,8 @@ void Stage::Initialize(Camera* camera)
 	InitJson();
 	InitCheckPoint();
 
+	SetStageBackgroundColor();
+
 	// 雲をランダム生成
 	GenerateRandomClouds();
 }
@@ -28,6 +30,50 @@ void Stage::Initialize(Camera* camera)
 void Stage::InitJson()
 {
 }
+
+void Stage::SetStageBackgroundColor()
+{
+	Vector4 bgColor;
+
+	switch (currentStageNum_)
+	{
+	case 0:
+		// ステージ0: 既存の空色
+		bgColor = { 0.53f, 0.81f, 0.92f, 1.0f };
+		break;
+
+	case 1:
+		// ステージ1: #8279ba (紫がかった青)
+		bgColor = {
+			0x82 / 255.0f,  // R: 130/255 = 0.51f
+			0x79 / 255.0f,  // G: 121/255 = 0.475f
+			0xba / 255.0f,  // B: 186/255 = 0.729f
+			1.0f
+		};
+		break;
+
+	case 2:
+		// ステージ2: #282875 (濃い青紫)
+		bgColor = {
+			0x28 / 255.0f,  // R: 40/255 = 0.157f
+			0x28 / 255.0f,  // G: 40/255 = 0.157f
+			0x75 / 255.0f,  // B: 117/255 = 0.459f
+			1.0f
+		};
+		break;
+
+	default:
+		// デフォルトはステージ0と同じ色
+		bgColor = { 0.53f, 0.81f, 0.92f, 1.0f };
+		break;
+	}
+
+	// 背景色を設定
+	if (background_) {
+		background_->SetColor(bgColor);
+	}
+}
+
 
 void Stage::InitCheckPoint()
 {
@@ -41,6 +87,8 @@ void Stage::InitCheckPoint()
 	pos.x = StageEditor::Instance()->GetInitX(currentStageNum_, currentCheckPoint_);
 	player_->SetTimeLimit(StageEditor::Instance()->GetTimeLimit(currentStageNum_, currentCheckPoint_));
 	ReloadObject();
+
+	SetStageBackgroundColor();
 
 	// チェックポイント変更時も雲を再生成
 	GenerateRandomClouds();
