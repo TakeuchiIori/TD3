@@ -48,7 +48,7 @@
                             }
                         }
                     ],
-                    "timer": 10.0
+                    "timer": 5.0
                 },
                 {
                     "checkPointNumber": 1,
