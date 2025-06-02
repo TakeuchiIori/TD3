@@ -433,6 +433,8 @@ private:
 
 	bool pauseUpdate_ = false;
 
+	bool isStuckGrass_ = false;
+
 public:
 	// 振る舞い
 	BehaviorPlayer behavior_ = BehaviorPlayer::Root;

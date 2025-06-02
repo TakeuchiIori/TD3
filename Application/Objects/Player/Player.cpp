@@ -889,12 +889,13 @@ void Player::TimerManager()
 	}
 
 	// コンボの処理
-
+	isStuckGrass_ = false;
 	if (comboTimer_ > 0.0f) {
 		comboTimer_ -= deltaTime_;
 		if (comboTimer_ <= 0.0f) {
 			comboCount_ = 0;
 			lastPlayedComboCount_ = 0;
+			isStuckGrass_ = true;
 		}
 	}
 
@@ -951,7 +952,7 @@ void Player::UpdateSprite()
 
 bool Player::IsPopGrass()
 {
-	if (0 >= createGrassTimer_ && isCreateGrass_)
+	if (isStuckGrass_)
 	{
 		sourceVoiceTumari = Audio::GetInstance()->SoundPlayAudio(soundDataTumari);
 		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceTumari, kSE);
