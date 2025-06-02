@@ -420,6 +420,9 @@ private:
 	Audio::SoundData soundDataTimeUp = {};
 	IXAudio2SourceVoice* sourceVoiceTimeUp = nullptr;
 
+	Audio::SoundData soundDataDashGauge = {};
+	IXAudio2SourceVoice* sourceVoiceDashGauge = nullptr;
+
 
 	float time_ = 0;
 	float rootTimer_ = 0;
