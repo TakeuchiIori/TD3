@@ -9,6 +9,7 @@
 #include "Sprite/SpriteCommon.h"
 #include <LightManager/LightManager.h>
 #include <PipelineManager/SkinningManager.h>
+#include "../Application/SystemsApp/AppAudio/AudioVolumeManager.h"
 
 void ClearScene::Initialize()
 {
@@ -39,6 +40,14 @@ void ClearScene::Initialize()
 
 	clearScreen_ = std::make_unique<ClearScreen>();
 	clearScreen_->Initialize();
+
+
+	// オーディオファイルのロード（例: MP3）
+	soundData = Audio::GetInstance()->LoadAudio(L"Resources/Audio/clear.mp3");
+	// オーディオの再生
+	sourceVoice = Audio::GetInstance()->SoundPlayAudio(soundData, true);
+	//Audio::GetInstance()->FadeInPlay(sourceVoice, 2.0f);
+	AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoice, kBGM);
 }
 
 void ClearScene::Finalize()
@@ -75,6 +84,7 @@ void ClearScene::Update()
 		clearScreen_->UpdateKirin();
 		if (Input::GetInstance()->IsPadPressed(0, GamePadButton::A)) {
 			sceneManager_->ChangeScene("Title");
+			Audio::GetInstance()->FadeOutStop(sourceVoice, 1.0f, 2.0f);
 		}
 	}
 
