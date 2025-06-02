@@ -168,6 +168,7 @@ void Player::Update()
 		sourceVoiceYodare = Audio::GetInstance()->SoundPlayAudio(soundDataYodare, false);
 		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceYodare, kSE);
 		obj_->ChangeModelAnimation("Yodare.gltf", 1);
+		emitter_->EmitFromTo(worldTransform_.translation_, worldTransform_.translation_);
 		isAnimation_ = true;
 	}
 
@@ -402,9 +403,6 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 		{
 			if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
 			{
-				// 唾を吐く
-
-
 				// オーディオの再生
 				sourceVoiceGrow = Audio::GetInstance()->SoundPlayAudio(soundDataGrow, false);
 				AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceGrow, kSE);
@@ -423,7 +421,6 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 				if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
 				{
 					// 唾を吐く
-					CreateDrip(worldTransform_.translation_,other->GetWorldTransform().translation_);
 					emitter_->EmitFromTo(worldTransform_.translation_, other->GetWorldTransform().translation_);
 					// オーディオの再生
 					sourceVoiceGrow = Audio::GetInstance()->SoundPlayAudio(soundDataGrow, false);
