@@ -125,8 +125,7 @@ void TitlePlayer::Update()
 
 		// 左スティックが上方向（Y軸正の方向）に倒されているかチェック
 		// 閾値は0.5f程度に設定（スティックの感度調整）
-		if (Input::GetInstance()->TriggerKey(DIK_W) ||
-			leftStick.y > up_) {
+		if (leftStick.y > up_) {
 			isScaling_ = true;
 		}
 
@@ -270,15 +269,6 @@ void TitlePlayer::Move()
 		moveDirection_ = { 0.0f, 0.0f, 0.0f };
 		velocity_ = { 0.0f, 0.0f, 0.0f };
 		return;
-	}
-
-	// キーボード入力
-	if (input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A)) {
-		moveDirection_ = { -1.0f, 0.0f, 0.0f };
-	} else if (input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D)) {
-		moveDirection_ = { 1.0f, 0.0f, 0.0f };
-	} else {
-		moveDirection_ = { 0.0f, 0.0f, 0.0f };
 	}
 
 	// パッド入力
