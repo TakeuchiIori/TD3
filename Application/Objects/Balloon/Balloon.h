@@ -168,6 +168,9 @@ private:
 	Vector3 endTimePos_ = Vector3(640.0f, 660.0f, 0.0f);
 	Vector3 offsetPos = Vector3(0, -50, 0);
 
+	std::unique_ptr<Sprite> yodare_;
+	Vector3 offsetYodare_ = {};
+
 	const float kMidTime = 0.7f;
 	const float kTime = 2.0f;
 	float timer = kTime;
