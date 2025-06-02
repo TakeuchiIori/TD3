@@ -114,7 +114,7 @@ void GameScene::Update()
 	stageEditor_->DrawEditorUI();
 
 	if (Input::GetInstance()->PushKey(DIK_LEFTARROW)) {
-		sceneManager_->ChangeScene("Game");
+		sceneManager_->ChangeScene("Clear");
 	}
 
 #endif // _DEBUG

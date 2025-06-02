@@ -11,6 +11,8 @@ Cloud::~Cloud()
 {
     // WorldTransformのメモリを解放
     delete cloudWorldTransform_;
+    cloudId_ = 0;
+    nextCloudId_ = 0;
 }
 
 void Cloud::InitJson()
