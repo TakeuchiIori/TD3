@@ -261,7 +261,6 @@ void TitlePlayer::Reset()
 void TitlePlayer::Move()
 {
 	Vector3 oldDirection = moveDirection_;
-
 	deltaTime_ = GameTime::GetDeltaTime();
 
 	// スケーリング中は移動無効
@@ -271,24 +270,35 @@ void TitlePlayer::Move()
 		return;
 	}
 
+	// 毎フレーム移動方向をリセット
+	moveDirection_ = { 0.0f, 0.0f, 0.0f };
+
 	// パッド入力
 	Vector2 padInput = input_->GetLeftStickInput(0);
-	moveDirection_.x += padInput.x;
+	moveDirection_.x = padInput.x;  // += ではなく = で代入
+	moveDirection_.z = padInput.y;  // Z軸方向の入力も追加（3D空間の場合）
 
+	// 入力の正規化
 	float dir = Length(moveDirection_);
 	if (dir > 1.0f) {
 		moveDirection_ = Normalize(moveDirection_);
 	}
 
-	velocity_ = moveDirection_ * defaultSpeed_ * deltaTime_;
+	// 入力がない場合は速度を0に
+	if (dir < 0.1f) {  // デッドゾーンの設定
+		velocity_ = { 0.0f, 0.0f, 0.0f };
+	} else {
+		velocity_ = moveDirection_ * defaultSpeed_ * deltaTime_;
+	}
+
 	Vector3 newPos = rootTransform_.translation_ + velocity_;
+
 	// 回転処理を「方向が変わったときだけ」行う
 	if (LengthSquared(moveDirection_) > 0.0001f && moveDirection_ != oldDirection) {
 		float targetAngle = std::atan2(moveDirection_.z, moveDirection_.x);
 		rootTransform_.rotation_.y = -targetAngle;
 		worldTransform_.rotation_.y = rootTransform_.rotation_.y;
 	}
-
 
 	mpCollision_.DetectAndResolveCollision(
 		colliderRect_,
@@ -302,8 +312,6 @@ void TitlePlayer::Move()
 
 	rootTransform_.translation_ = newPos;
 }
-
-
 void TitlePlayer::UpdateParticle()
 {
 	for (auto it = breakParticles_.begin(); it != breakParticles_.end();) {
