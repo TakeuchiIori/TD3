@@ -47,6 +47,22 @@ void BaseEnemy::KnockBack()
 	}
 }
 
+void BaseEnemy::SetStage(int stageNum)
+{
+	if (stageNum == 0)
+	{
+		obj_->SetModel("bard.obj");
+	}
+	if (stageNum == 1)
+	{
+		obj_->SetModel("Plane.obj");
+	}
+	if (stageNum == 2)
+	{
+		obj_->SetModel("Ufo.obj");
+	}
+}
+
 void BaseEnemy::kirisuteUpdate()
 {
 	if (!isFaint_ && !isTakeAttack_)

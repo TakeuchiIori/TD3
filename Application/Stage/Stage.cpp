@@ -194,11 +194,14 @@ Stage::TransitionType Stage::ReachCheckPoint()
 	{
 		if (currentCheckPoint_ < StageEditor::Instance()->GetMaxCheckPointNumber(currentStageNum_))
 		{
+			enemyManager_->SetStage(currentStageNum_);
 			currentCheckPoint_++;
 			transitionType_ = TransitionType::kCheckPoint;
 		} else if (currentStageNum_ < StageEditor::Instance()->GetMaxStageNumber())
 		{
 			currentStageNum_++;
+			currentCheckPoint_ = 0;
+			enemyManager_->SetStage(currentStageNum_);
 			transitionType_ = TransitionType::kStage;
 			if (StageEditor::Instance()->GetMaxCheckPointNumber(currentStageNum_) == -1)
 			{
