@@ -45,6 +45,11 @@ void Balloon::Initialize(Camera* camera)
 	uiTime_->SetPosition(endTimePos_);
 	uiTime_->SetSize({150.0f, 75.0f});
 	uiTime_->SetAnchorPoint({ 0.5f, 1.0f });
+
+	yodare_ = std::make_unique<Sprite>();
+	yodare_->Initialize("Resources/Textures/In_Game/balloonYodare.png");
+	yodare_->SetAnchorPoint({ 0.5f, 0.9f });
+	yodare_->SetSize(yodare_->GetTextureSize() * 0.4f);
 }
 
 void Balloon::Update()
@@ -69,6 +74,7 @@ void Balloon::Update()
 		}
 	}
 	uiTime_->Update();
+	yodare_->Update();
 }
 
 void Balloon::Draw()
@@ -85,6 +91,10 @@ void Balloon::DrawSprite()
 	if (timer < kTime)
 	{
 		uiTime_->Draw();
+	}
+	if (behavior_ == BehaviorBalloon::kSTOP)
+	{
+		yodare_->Draw();
 	}
 }
 
@@ -167,7 +177,11 @@ void Balloon::BehaviorSTOPInit()
 
 void Balloon::BehaviorSTOPUpdate()
 {
-	// 何もしない
+	Vector3 pos = worldTransform_.translation_;
+	Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
+	Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
+	pos = Transform(pos, matViewProjectionViewport);
+	yodare_->SetPosition(pos + offsetYodare_);
 }
 
 void Balloon::ColliderOffset()
@@ -253,6 +267,7 @@ void Balloon::OnCollision(BaseCollider* self, BaseCollider* other)
 		{
 			if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
 			{
+				
 				behaviortRquest_ = BehaviorBalloon::kSTOP;
 			}
 		}
