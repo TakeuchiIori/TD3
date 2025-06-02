@@ -17,12 +17,14 @@ void ClearScreen::Initialize()
 	sprite_->Initialize("Resources/Textures/Option/clear_krin.png");
 	spriteA_ = std::make_unique<Sprite>();
 	spriteA_->Initialize("Resources/Textures/Option/title_go.png");
+	spriteA_->SetAnchorPoint(Vector2(0.5, 0.5));
 	// スプライトスライド初期化
 	spriteSlideTimer_ = 0.0f;
 	isSliding_ = true;
 	// sin波のタイマー初期化
 	sinTimer_ = 0.0f;
 	InitJson();
+	spriteA_->position_ = Vector3(776.1f, 692.3f,0.0f);
 }
 
 void ClearScreen::InitJson()
@@ -35,6 +37,8 @@ void ClearScreen::InitJson()
 	jsonManager_->Register("Y", &sprite_->position_.y);
 	jsonManager_->Register("Aサイズ", &spriteA_->size_);
 	jsonManager_->Register("offset", &offset_);
+	jsonManager_->Register("位置", &spriteA_->position_);
+
 }
 
 void ClearScreen::Update()
@@ -73,14 +77,19 @@ void ClearScreen::UpdateKirin()
 	if (!isSliding_) {
 		// sin波でAボタンをぷかぷか浮遊させる
 		sinTimer_ += 1.0f / 60.0f; // 60FPS想定
+
+		// Y座標の浮遊
 		float sinWave = sin(sinTimer_ * floatSpeed_) * floatAmplitude_;
-		spriteA_->position_.y += sinWave; // Y座標にsin波を加算
+		//spriteA_->position_.y += sinWave;
+
+		// サイズの変化（位相をずらして自然な動きに）
+		float scaleWave = sin(sinTimer_ * floatSpeed_ + 1.57f) * 0.007f; // 0.1fは変化の幅（10%）
+		spriteA_->size_ = spriteA_->size_ * (1.0f + scaleWave);
 	}
 
 	sprite_->Update();
 	spriteA_->Update();
 }
-
 void ClearScreen::Draw()
 {
 	for (uint32_t i = 0; i < numBGs_; i++)

@@ -64,4 +64,8 @@ private:
 	float sinTimer_ = 0.0f;
 	const float floatSpeed_ = 3.0f;    // 浮遊速度
 	const float floatAmplitude_ = 10.0f; // 浮遊幅
+
+	float sinVelocity_ = 0.0f;        // 位置Y用
+	float scaleVelocity_ = 0.0f;      // スケール用
+	float currentScale_ = 1.0f;       // スケールの現在値
 };
