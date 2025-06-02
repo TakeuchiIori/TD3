@@ -50,6 +50,9 @@ private:
 	std::unique_ptr<Sprite> ctrl_;
 	Vector3 offsetCtrl_ = {};
 
+	std::unique_ptr<Sprite> uiMenuOpen_;
+	Vector3 offsetMenuOpen_ = Vector3(0.0f, 0.0f, 0.0f);
+
 
 	std::unique_ptr<JsonManager> jsonManager_;
 };
