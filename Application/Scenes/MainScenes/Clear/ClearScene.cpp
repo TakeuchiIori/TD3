@@ -19,7 +19,7 @@ void ClearScene::Initialize()
 	// 初期カメラモード設定
 	cameraMode_ = CameraMode::FOLLOW;
 
-
+	ParticleManager::GetInstance()->SetCamera(sceneCamera_.get());
 	// 各カメラの初期化
 	defaultCamera_.Initialize();
 	followCamera_.Initialize();
@@ -58,6 +58,9 @@ void ClearScene::Initialize()
 		clouds_.emplace_back(std::move(cloud));
 	}
 
+
+	particleEmitter_ = std::make_unique<ParticleEmitter>("ClearParticle", Vector3{ 0.0f,0.0f,0.0f }, 10);
+	particleEmitter_->Initialize("Clear");
 }
 
 void ClearScene::Finalize()
@@ -108,6 +111,8 @@ void ClearScene::Update()
 	}
 	sprite_->Update();
 
+	particleEmitter_->Emit();
+
 	UpdateCameraMode();
 	UpdateCamera();
 	cameraManager_.UpdateAllCameras();
@@ -116,20 +121,20 @@ void ClearScene::Update()
 	LightManager::GetInstance()->ShowLightingEditor();
 
 	clearScreen_->Update();
-
+	ParticleManager::GetInstance()->Update();
 }
 
 void ClearScene::Draw()
 {
 #pragma region 演出描画
-	ParticleManager::GetInstance()->Draw();
+	
 
 
 
 #pragma endregion
 #pragma region 2Dスプライト描画
 	SpriteCommon::GetInstance()->DrawPreference();
-	clearScreen_->Draw();
+	//clearScreen_->Draw();
 	/// <summary>
 	/// ここから描画可能です
 	/// </summary>
@@ -162,6 +167,10 @@ void ClearScene::Draw()
 	player_->DrawAnimation();
 
 #pragma endregion
+
+
+
+	ParticleManager::GetInstance()->Draw();
 
 	SpriteCommon::GetInstance()->DrawPreference();
 	clearScreen_->Draw();
