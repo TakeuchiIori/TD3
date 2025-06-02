@@ -373,7 +373,7 @@ private:
 	float addTime_ = 0;
 	bool isAddTime_ = false;
 
-	float kAddLimit_ = 2.0f;
+	float kAddLimit_ = 1.0f;
 
 
 	// コンボ用
@@ -420,6 +420,9 @@ private:
 	Audio::SoundData soundDataTimeUp = {};
 	IXAudio2SourceVoice* sourceVoiceTimeUp = nullptr;
 
+	Audio::SoundData soundDataDashGauge = {};
+	IXAudio2SourceVoice* sourceVoiceDashGauge = nullptr;
+
 
 	float time_ = 0;
 	float rootTimer_ = 0;
@@ -429,6 +432,8 @@ private:
 	bool showUI_ = true;
 
 	bool pauseUpdate_ = false;
+
+	bool isStuckGrass_ = false;
 
 public:
 	// 振る舞い

@@ -42,7 +42,7 @@ void StageManager::Initialize(Camera* camera)
 	ReloadObject();
 
 
-	// コロンスプライトの初期化
+	// スプライトの初期化
 	transSprite_ = std::make_unique<Sprite>();
 	transSprite_->Initialize("Resources/Textures/In_Game/checkpointTrans.png");
 	transSprite_->SetAnchorPoint({ 0.5f, 0.5f });

@@ -51,7 +51,7 @@ void Player::Initialize(Camera* camera)
 	worldTransform_.UpdateMatrix();
 	modelWT_.UpdateMatrix();
 	nextWorldTransform_.UpdateMatrix();
-	legWT_.UpdateMatrix();
+	//legWT_.UpdateMatrix();
 
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
@@ -62,7 +62,8 @@ void Player::Initialize(Camera* camera)
 
 	legObj_ = std::make_unique<Object3d>();
 	legObj_->Initialize();
-	legObj_->SetModel("body.obj", false);
+	legObj_->SetModel("walk.gltf", true);
+	legObj_->SetLoopAnimation(true);
 	legObj_->SetMaterialColor(defaultColorV4_);
 
 	for (size_t i = 0; i < kMaxHP_; ++i)
@@ -86,6 +87,8 @@ void Player::Initialize(Camera* camera)
 
 	soundDataTumari = Audio::GetInstance()->LoadAudio(L"Resources/Audio/tumaru.mp3");
 	soundDataTimeUp = Audio::GetInstance()->LoadAudio(L"Resources/Audio/timeUp.mp3");
+
+	soundDataDashGauge = Audio::GetInstance()->LoadAudio(L"Resources/Audio/dashGauge.mp3");
 	// 音量の設定（0.0f ～ 1.0f）
 	//Audio::GetInstance()->SetVolume(sourceVoice, 0.5f);
 
@@ -167,6 +170,8 @@ void Player::Update()
 		obj_->ChangeModelAnimation("Yodare.gltf", 1);
 		isAnimation_ = true;
 	}
+
+
 #ifdef _DEBUG
 
 	if (input_->IsPadPressed(0, GamePadButton::B)) {
@@ -202,6 +207,7 @@ void Player::Update()
 
 	//aabbCollider_->Update();
 	obj_->UpdateAnimation();
+	legObj_->UpdateAnimation();
 	obbCollider_->Update();
 	nextAabbCollider_->Update();
 
@@ -247,12 +253,13 @@ void Player::Draw()
 		}
 	}
 
-	legObj_->Draw(camera_, legWT_);
+
 }
 
 void Player::DrawAnimation()
 {
 	obj_->Draw(camera_, modelWT_);
+	legObj_->Draw(camera_, legWT_);
 }
 
 void Player::DrawCollision()
@@ -816,6 +823,11 @@ void Player::TimerManager()
 	if (0 < boostCoolTimer_)
 	{
 		boostCoolTimer_ -= deltaTime_;
+		if (0 >= boostCoolTimer_)
+		{
+			sourceVoiceDashGauge = Audio::GetInstance()->SoundPlayAudio(soundDataDashGauge);
+			AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceDashGauge, kSE);
+		}
 	}
 	if (0 < boostTimer_)
 	{
@@ -877,12 +889,13 @@ void Player::TimerManager()
 	}
 
 	// コンボの処理
-
+	isStuckGrass_ = false;
 	if (comboTimer_ > 0.0f) {
 		comboTimer_ -= deltaTime_;
 		if (comboTimer_ <= 0.0f) {
 			comboCount_ = 0;
 			lastPlayedComboCount_ = 0;
+			isStuckGrass_ = true;
 		}
 	}
 
@@ -939,7 +952,7 @@ void Player::UpdateSprite()
 
 bool Player::IsPopGrass()
 {
-	if (0 >= createGrassTimer_ && isCreateGrass_)
+	if (isStuckGrass_)
 	{
 		sourceVoiceTumari = Audio::GetInstance()->SoundPlayAudio(soundDataTumari);
 		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceTumari, kSE);

@@ -139,12 +139,13 @@ void TitleScene::Update()
 
 
 	if (player_->GetWorldTransform().translation_.y > 35.0f) {
+		SceneManager::GetInstance()->SetTitleToGame(true);
 		SceneManager::GetInstance()->ChangeScene("Game");
 		Audio::GetInstance()->FadeOutStop(sourceVoice,1.0f, 2.0f);
 	}
 
 
-	//emitter_->UpdateTime();
+	emitter_->Emit();
 
 
 	mpInfo_->Update();
@@ -195,6 +196,11 @@ void TitleScene::Draw()
 	DrawAnimation();
 	DrawLine();
 
+	// Particle
+
+	ParticleManager::GetInstance()->Draw();
+
+
 	SpriteCommon::GetInstance()->DrawPreference();
 	DrawSprite();
 
@@ -202,9 +208,7 @@ void TitleScene::Draw()
 
 void TitleScene::DrawOffScreen()
 {
-	// Particle
-	//----------
-	ParticleManager::GetInstance()->Draw();
+
 	//----------
 	// Sprite
 	//----------

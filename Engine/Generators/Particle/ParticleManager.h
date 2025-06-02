@@ -65,7 +65,7 @@ public:
         MaterialData material;
     };
 
-    // 🎪 拡張力場構造体
+    // 拡張力場構造体
     struct ForceField {
         ForceType type = ForceType::None;
         Vector3 position = { 0.0f, 0.0f, 0.0f };
@@ -85,7 +85,7 @@ public:
         Vector3 windVariation = { 0.0f, 0.0f, 0.0f }; // 風の変動
     };
 
-    // 🎯 衝突設定
+    // 衝突設定
     struct CollisionSettings {
         bool enabled = false;
         float bounciness = 0.5f;        // 反発係数
@@ -96,7 +96,7 @@ public:
         bool hasGroundCollision = false; // 地面衝突有効
     };
 
-    // 🎭 拡張パーティクル構造体
+    // 拡張パーティクル構造体
     struct Particle {
         EulerTransform transform;
         Vector3 velocity;
@@ -174,7 +174,7 @@ public:
         Vector2 lifeTime;
     };
 
-    // 🎨 カラーアニメーション設定
+    // カラーアニメーション設定
     struct ColorAnimationSettings {
         ColorChangeType type = ColorChangeType::None;
         Vector4 startColor = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -186,7 +186,7 @@ public:
         bool smoothTransition = true;   // 滑らかな遷移
     };
 
-    // 📏 スケールアニメーション設定
+    // スケールアニメーション設定
     struct ScaleAnimationSettings {
         ScaleChangeType type = ScaleChangeType::None;
         Vector3 startScale = { 1.0f, 1.0f, 1.0f };
@@ -198,7 +198,7 @@ public:
         bool uniformScale = true;       // 均等スケール
     };
 
-    // 🔄 回転アニメーション設定
+    // 回転アニメーション設定
     struct RotationAnimationSettings {
         RotationType type = RotationType::None;
         Vector3 rotationSpeed = { 0.0f, 0.0f, 0.0f };
@@ -208,7 +208,7 @@ public:
         Vector3 faceDirection = { 0.0f, 0.0f, 1.0f }; // 向く方向
     };
 
-    // 🏃 移動パターン設定
+    // 移動パターン設定
     struct MovementSettings {
         MovementType type = MovementType::Linear;
         float curveStrength = 1.0f;     // 曲線の強さ
@@ -222,7 +222,7 @@ public:
         float zigzagAngle = 45.0f;      // ジグザグ角度
     };
 
-    // 🎵 ノイズ設定
+    // ノイズ設定
     struct NoiseSettings {
         bool enabled = false;
         float strength = 1.0f;
@@ -237,7 +237,7 @@ public:
         bool affectScale = false;       // スケールに影響
     };
 
-    // 🎯 発生形状設定
+    // 発生形状設定
     struct EmissionShapeSettings {
         EmissionType type = EmissionType::Point;
         Vector3 size = { 1.0f, 1.0f, 1.0f };        // 形状サイズ
@@ -251,7 +251,7 @@ public:
         float edgeThickness = 0.1f;               // エッジ厚み
     };
 
-    // 🎪 物理設定
+    // 物理設定
     struct PhysicsSettings {
         bool enabled = false;
         Vector3 gravity = { 0.0f, -9.8f, 0.0f };
@@ -264,7 +264,7 @@ public:
         bool useComplexPhysics = false;           // 複雑な物理計算
     };
 
-    // 🌟 軌跡設定
+    // 軌跡設定
     struct TrailSettings {
         bool enabled = false;
         int maxLength = 10;                       // 最大軌跡長
@@ -275,7 +275,7 @@ public:
         float minVelocity = 0.1f;                 // 軌跡生成最小速度
     };
 
-    // 🎭 LOD設定
+    // LOD設定
     struct LODSettings {
         bool enabled = false;
         float nearDistance = 10.0f;               // 近距離
@@ -286,7 +286,22 @@ public:
         bool dynamicLOD = true;                   // 動的LOD
     };
 
-    // 🎨 全体のパーティクル設定構造体（大幅拡張）
+    struct RadialEmissionSettings {
+        bool enabled = false;                           // 放射機能を有効にするか
+        bool fromCenter = true;                         // 中心から外へ 
+        Vector3 centerPosition = { 0.0f, 0.0f, 0.0f };  // 放射の中心点
+        float minRadius = 0.0f;                         // 最小半径
+        float maxRadius = 5.0f;                         // 最大半径
+        float uniformSpeed = 1.0f;                      // 均等な放射速度
+        bool useUniformSpeed = true;                    // 均等速度を使用するか
+        float angleVariation = 0.0f;                    // 角度のばらつき（度）
+        bool limitToHemisphere = false;                 // 半球に制限するか
+        Vector3 hemisphereUp = { 0.0f, 1.0f, 0.0f };    // 半球の上方向
+        float convergenceForce = 1.0f;                  // 収束力（外から中心へ向かう場合）
+        bool maintainDistance = false;                  // 距離を維持するか（軌道運動）
+    };
+
+    // 全体のパーティクル設定構造体
     struct ParticleParameters {
         // 既存の基本設定
         ParticleTransformSettings baseTransform;
@@ -294,7 +309,7 @@ public:
         ParticleColorSettings baseColor;
         ParticleLifeSettings baseLife;
 
-        // 🆕 新しい拡張設定
+        // 新しい拡張設定
         EmissionShapeSettings emissionShape;
         ColorAnimationSettings colorAnimation;
         ScaleAnimationSettings scaleAnimation;
@@ -305,7 +320,7 @@ public:
         CollisionSettings collision;
         TrailSettings trail;
         LODSettings lod;
-
+        RadialEmissionSettings radialEmission;
         // 力場（複数設定可能）
         std::vector<ForceField> forceFields;
 
@@ -342,7 +357,8 @@ public:
 
         // デバッグ設定
         bool showDebugInfo = false;               // デバッグ情報表示
-        Vector4 debugColor = { 1.0f, 0.0f, 0.0f, 1.0f }; // デバッグ色
+        Vector4 debugColor = { 1.0f, 0.0f, 0.0f, 1.0f };    // デバッグ色
+
     };
 
     struct AccelerationField {
@@ -434,6 +450,8 @@ public: // メンバ関数
 
 private:
     void InitJson(const std::string& name);
+    void UpdateRadialParticle(Particle& particle, const ParticleParameters& params, float deltaTime);
+    void UpdateRadialDynamicParameters(Particle& particle, const ParticleParameters& params);
     void UpdateParticles();
     void CreateMaterialResource();
     Particle MakeNewParticle(const std::string& name, std::mt19937& randomEngine, const Vector3& position);
@@ -449,7 +467,7 @@ private:
     void ApplyNoise(Particle& particle, const NoiseSettings& noise, float deltaTime);
     Vector3 SampleEmissionShape(const EmissionShapeSettings& shape, std::mt19937& rng);
     float PerlinNoise(const Vector3& position, float frequency);
-
+    Vector3 GenerateRadialDirection(const RadialEmissionSettings& radial, std::mt19937& rng);
 public:
     void SetCamera(Camera* camera) { camera_ = camera; }
 
