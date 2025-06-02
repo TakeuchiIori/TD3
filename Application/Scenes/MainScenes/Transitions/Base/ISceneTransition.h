@@ -9,5 +9,7 @@ public:
 	virtual bool IsFinished() const = 0;
 	virtual void StartTransition() = 0;
 	virtual void EndTransition() = 0;
+
+	virtual void SetTitleToGame(bool is) = 0;
 };
 

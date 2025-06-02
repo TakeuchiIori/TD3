@@ -44,6 +44,8 @@ public:
 	/// </summary>
 	bool IsFinished() const;
 
+	void SetTitleToGame(bool is) { isTitleToGame_ = is; }
+
 private:
 
 	/// <summary>
@@ -69,5 +71,13 @@ private:
 	float duration_ = 0.0f;
 	// 経過時間カウンター
 	float counter_ = 0.0f;
+
+	bool isTitleToGame_ = false;
+
+	std::unique_ptr<Sprite> transSprite_;
+	Vector3 transSpritePos_{};
+	float startY_ = 720.0f + 512.0f;
+	float midY_ = 360;
+	float endY_ = -512.0f;
 
 };
