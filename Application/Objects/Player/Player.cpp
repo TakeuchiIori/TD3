@@ -1168,7 +1168,9 @@ void Player::CreateDrip(Vector3 pos)
 	for (int i = 0; i < numDrips_; i++) {
 		auto drip = std::make_unique<Drip>();
 		drip->Initialize(camera_);
-		drip->Shoot(pos);
+		Vector3 newPos = pos;
+		newPos.y += 2.0f;
+		drip->Shoot(newPos);
 		drips_.emplace_back(std::move(drip));
 	}
 

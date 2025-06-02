@@ -78,6 +78,8 @@ void Drip::Shoot(const Vector3& targetPos)
 	// 初期位置を設定（現在の位置から開始）
 	startPos_ = worldTransform_.translation_;
 
+	startPos_.y += static_cast<float>(jsonId_);
+
 	// ターゲットへの方向ベクトルを計算
 	Vector3 direction = targetPos - startPos_;
 

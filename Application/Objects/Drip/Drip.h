@@ -46,5 +46,5 @@ private:
 
 
 	int jsonId_ = 0;
-	inline static int nextJsonId_ = 0;
+	inline static int nextJsonId_ = 2;
 };
