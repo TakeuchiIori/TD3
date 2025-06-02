@@ -37,6 +37,7 @@ void Balloon::Initialize(Camera* camera)
 	timerObj_->Initialize();
 	timerObj_->SetModel("BalloonTimer.obj");
 
+	soundData_ = Audio::GetInstance()->LoadAudio(L"Resources/Audio/balloon.mp3");
 }
 
 void Balloon::Update()
@@ -203,6 +204,8 @@ void Balloon::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 	{
 		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
 		{
+			getSoundSource_ = Audio::GetInstance()->SoundPlayAudio(soundData_);
+			AudioVolumeManager::GetInstance()->SetSourceToSubmix(getSoundSource_, kSE);
 			aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
 			aabbStopCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
 			behaviortRquest_ = BehaviorBalloon::kROOT;
