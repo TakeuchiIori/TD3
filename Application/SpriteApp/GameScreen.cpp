@@ -181,6 +181,11 @@ void GameScreen::Initialize()
 	uiYodareop_->Initialize("Resources/Textures/Option/yodareUI.png");
 	uiYodareop_->SetSize({ 120.0f, 120.0f });
 
+	uiReturn_ = std::make_unique<Sprite>();
+	uiReturn_->Initialize("Resources/Textures/In_Game/returnQuickly.png");
+	uiReturn_->SetSize({ 150.0f, 60.0f });
+	uiReturn_->SetAnchorPoint({ 0.5f, 0.5f });
+
 	InitJson();
 
 }
@@ -383,6 +388,19 @@ void GameScreen::Update()
 		uiYodare_->SetPosition(playerPos);
 		uiYodare_->Update();
 	}
+	if (player_->behavior_ == BehaviorPlayer::Return)
+	{
+		Vector3 playerPos = player_->GetWorldTransform().translation_;
+		Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
+		Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
+		playerPos = Transform(playerPos, matViewProjectionViewport);
+
+		playerPos.x += offsetYodare_.x + 20;
+		playerPos.y += offsetYodare_.y;
+
+		uiReturn_->SetPosition(playerPos);
+		uiReturn_->Update();
+	}
 
 	uiYodareop_->SetPosition(offsetYodareop_);
 	uiYodareop_->Update();
@@ -454,6 +472,10 @@ void GameScreen::Draw()
 
 	if (yodareState_ != YodareState::Hidden) {
 		uiYodare_->Draw();
+	}
+	if (player_->behavior_ == BehaviorPlayer::Return)
+	{
+		uiReturn_->Draw();
 	}
 
 	uiYodareop_->Draw();
