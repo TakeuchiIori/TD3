@@ -87,6 +87,8 @@ void Player::Initialize(Camera* camera)
 
 	soundDataTumari = Audio::GetInstance()->LoadAudio(L"Resources/Audio/tumaru.mp3");
 	soundDataTimeUp = Audio::GetInstance()->LoadAudio(L"Resources/Audio/timeUp.mp3");
+
+	soundDataDashGauge = Audio::GetInstance()->LoadAudio(L"Resources/Audio/dashGauge.mp3");
 	// 音量の設定（0.0f ～ 1.0f）
 	//Audio::GetInstance()->SetVolume(sourceVoice, 0.5f);
 
@@ -821,6 +823,11 @@ void Player::TimerManager()
 	if (0 < boostCoolTimer_)
 	{
 		boostCoolTimer_ -= deltaTime_;
+		if (0 >= boostCoolTimer_)
+		{
+			sourceVoiceDashGauge = Audio::GetInstance()->SoundPlayAudio(soundDataDashGauge);
+			AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceDashGauge, kSE);
+		}
 	}
 	if (0 < boostTimer_)
 	{

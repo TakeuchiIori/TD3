@@ -43,6 +43,7 @@ public:
     void SetTransitionFactory(std::unique_ptr<TransitionFactory> factory) { transitionFactory_ = std::move(factory); }
     BaseScene* GetScene() const { return scene_; }
 
+    void SetTitleToGame(bool is) { transition_->SetTitleToGame(is); }
 
 private:
     // シングルトン

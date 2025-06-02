@@ -15,6 +15,8 @@
 #include "Collision/Core/ColliderFactory.h"
 #include "Collision/Core/CollisionDirection.h"
 
+#include "../../SystemsApp/AppAudio/AudioVolumeManager.h"
+
 
 #include <random>
 
@@ -153,6 +155,10 @@ private:
 	int enableMapNum_ = 0;
 
 	std::random_device seedGene_;
+
+	Audio::SoundData soundData_;
+
+	IXAudio2SourceVoice* getSoundSource_ = nullptr;
 
 
 	// 振る舞い
