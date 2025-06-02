@@ -130,6 +130,11 @@ public:
 		}
 	}
 
+	void SetStage(int stageNum)
+	{
+		currenStage_ = stageNum;
+	}
+
 private:
 	Camera* camera_ = nullptr;
 	Player* player_ = nullptr;
@@ -147,4 +152,6 @@ private:
 	std::string checkPointPath_ = "";
 
 	std::string fullPath_;
+
+	int currenStage_ = 0;
 };
