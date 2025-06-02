@@ -166,7 +166,7 @@ private:
 
 	void UpdateCombo();
 
-	void CreateDrip(Vector3 pos);
+	void CreateDrip(Vector3 startPos,Vector3 pos);
 
 
 #ifdef _DEBUG

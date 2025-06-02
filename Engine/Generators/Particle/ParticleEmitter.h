@@ -62,6 +62,8 @@ public:
 	/// <param name="to"></param>
 	void EmitFromTo(const Vector3& from, const Vector3& to);
 
+	void EmitFrom(const Vector3& from, const Vector3& to);
+
 private:
 
 

@@ -631,6 +631,35 @@ std::list<ParticleManager::Particle> ParticleManager::Emit(const std::string& na
 	return emittedParticles;
 }
 
+std::list<ParticleManager::Particle> ParticleManager::EmitRotate(const std::string& name, const Vector3& position, Vector3 Min,uint32_t count)
+{
+	auto it = particleGroups_.find(name);
+	assert(it != particleGroups_.end());
+
+	ParticleGroup& group = it->second;
+	const ParticleParameters& params = particleParameters_[name];
+	std::list<Particle> emittedParticles;
+
+	// 最大パーティクル数制限
+	if (group.particles.size() + count > static_cast<size_t>(params.maxParticles)) {
+		count = (std::max)(0, params.maxParticles - static_cast<int>(group.particles.size()));
+	}
+
+	std::mt19937 randomEngine = std::mt19937(seedGenerator_());
+
+	// 各パーティクルを生成し追加
+	for (uint32_t i = 0; i < count; ++i) {
+		Particle newParticle = MakeNewParticle(name, randomEngine, position);
+		newParticle.transform.rotate = Min;
+		emittedParticles.push_back(newParticle);
+	}
+
+	// 既存のパーティクルリストに新しいパーティクルを追加
+	group.particles.splice(group.particles.end(), emittedParticles);
+
+	return emittedParticles;
+}
+
 void ParticleManager::SetDefaultPrimitiveMesh(const std::shared_ptr<Mesh>& mesh)
 {
 	defaultMesh_ = mesh;

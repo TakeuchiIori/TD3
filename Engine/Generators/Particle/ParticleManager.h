@@ -405,6 +405,8 @@ public: // メンバ関数
     /// <param name="count"></param>
     std::list<Particle> Emit(const std::string& name, const Vector3& position, uint32_t count);
 
+    std::list<Particle> EmitRotate(const std::string& name, const Vector3& position, Vector3 Min,uint32_t count);
+
     /// <summary>
     ///  マネージャ全体のデフォルトメッシュを設定  
     ///  指定しないグループはこれを使う
