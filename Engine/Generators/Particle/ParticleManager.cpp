@@ -344,7 +344,7 @@ void ParticleManager::CreateMaterialResource()
 	materialData_->uvTransform = MakeIdentity4x4();
 }
 
-// 🆕 拡張されたパーティクル生成
+// 拡張されたパーティクル生成
 ParticleManager::Particle ParticleManager::MakeNewParticle(const std::string& name, std::mt19937& randomEngine, const Vector3& position)
 {
 	Particle particle;

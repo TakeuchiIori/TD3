@@ -144,7 +144,7 @@ void TitleScene::Update()
 	}
 
 
-	//emitter_->UpdateTime();
+	emitter_->Emit();
 
 
 	mpInfo_->Update();
@@ -195,6 +195,11 @@ void TitleScene::Draw()
 	DrawAnimation();
 	DrawLine();
 
+	// Particle
+
+	ParticleManager::GetInstance()->Draw();
+
+
 	SpriteCommon::GetInstance()->DrawPreference();
 	DrawSprite();
 
@@ -202,9 +207,7 @@ void TitleScene::Draw()
 
 void TitleScene::DrawOffScreen()
 {
-	// Particle
-	//----------
-	ParticleManager::GetInstance()->Draw();
+
 	//----------
 	// Sprite
 	//----------
