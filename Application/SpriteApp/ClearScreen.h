@@ -72,7 +72,7 @@ private:
 	// スプライトA出現アニメーション用
 	bool isAppearing_ = false;          // 出現中フラグ
 	float appearTimer_ = 0.0f;          // 出現タイマー
-	const float appearDuration_ = 0.5f;  // 出現にかかる時間
+	const float appearDuration_ = 1.0f;  // 出現にかかる時間
 	Vector3 targetPosition_ = { 776.1f, 692.3f, 0.0f }; // 最終位置
 	Vector2 originalSize_;
 
