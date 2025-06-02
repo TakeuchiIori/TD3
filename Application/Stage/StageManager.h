@@ -93,8 +93,8 @@ private:
 	std::unique_ptr<Background> background_;
 	std::unique_ptr<Balloon> balloon_;
 
-	float cameraScrollStart_ = 16.0f;
-	float cameraScrollEnd_ = 22.0f;
+	float cameraScrollStart_ = 18.2f;
+	float cameraScrollEnd_ = 17.2f;
 	float offsetY_ = -0.5f;
 
 	bool isTransition_ = false; // ポイント遷移中か
