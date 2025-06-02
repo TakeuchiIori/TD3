@@ -1358,7 +1358,7 @@ void Player::BehaviorReturnInit()
 void Player::BehaviorReturnUpdate()
 {
 	speed_ = returnSpeed_;
-	if (input_->PushKey(DIK_E) || input_->IsPadPressed(0, GamePadButton::A))
+	if (input_->IsPadPressed(0, GamePadButton::A))
 	{
 		speed_ = returnSpeed_ + returnBoost_;
 	}

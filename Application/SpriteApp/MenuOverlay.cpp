@@ -167,7 +167,7 @@ void MenuOverlay::ShowHide()
 
 void MenuOverlay::Show()
 {
-	if (input_->TriggerKey(DIK_TAB) || input_->IsPadTriggered(0, GamePadButton::Start))
+	if (input_->IsPadTriggered(0, GamePadButton::Start))
 	{
 		menuSourceVoice_ = Audio::GetInstance()->SoundPlayAudio(menuSoundData_);
 		AudioVolumeManager::GetInstance()->SetSourceToSubmix(menuSourceVoice_, kSE);
@@ -187,7 +187,7 @@ void MenuOverlay::Show()
 
 void MenuOverlay::Hide()
 {
-	if (input_->TriggerKey(DIK_TAB) || input_->IsPadTriggered(0, GamePadButton::Start))
+	if (input_->IsPadTriggered(0, GamePadButton::Start))
 	{
 		menuSourceVoice_ = Audio::GetInstance()->SoundPlayAudio(menuSoundData_);
 		AudioVolumeManager::GetInstance()->SetSourceToSubmix(menuSourceVoice_, kSE);

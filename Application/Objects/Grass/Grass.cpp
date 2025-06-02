@@ -193,7 +193,7 @@ void Grass::OnCollision(BaseCollider* self, BaseCollider* other)
 					{
 
 						obj_->SetModel("leafRed.obj");
-						if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
+						if (input_->IsPadTriggered(0, GamePadButton::B))
 						{
 							if (worldTransform_.scale_.x != 0.0f) {
 								particleEmitter_->FollowEmit(worldTransform_.translation_);
