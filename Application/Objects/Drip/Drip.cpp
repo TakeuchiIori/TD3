@@ -70,14 +70,13 @@ void Drip::Draw()
 	obj_->Draw(camera_,worldTransform_);
 }
 
-void Drip::Shoot(const Vector3& targetPos)
+void Drip::Shoot(Vector3& startpos, const Vector3& targetPos)
 {
 	// アクティブ化
 	isActive_ = true;
 
 	// 初期位置を設定（現在の位置から開始）
-	startPos_ = worldTransform_.translation_;
-
+	worldTransform_.translation_ = startpos;
 	startPos_.y += static_cast<float>(jsonId_);
 
 	// ターゲットへの方向ベクトルを計算
@@ -96,15 +95,30 @@ void Drip::Shoot(const Vector3& targetPos)
 	}
 
 	// 初速度を設定
+		// 初速度を設定
 	velocity_ = direction * speed_;
+
+	// X方向の速度を左右判定で調整
+	if (targetPos.x > startPos_.x) {
+		// ターゲットが右側にある場合
+		velocity_.x = std::abs(velocity_.x);  // 確実に正の値にする
+	} else {
+		// ターゲットが左側にある場合
+		velocity_.x = -std::abs(velocity_.x); // 確実に負の値にする
+	}
+
 
 	// 透明度をリセット
 	alpha_ = 1.0f;
 
-	// Z軸回転の設定（方向に向ける）
-	worldTransform_.rotation_.z = std::atan2(direction.y, direction.x) - (3.14159265f / 2.0f);
-}
+	// Z軸回転の設定
+	// 雫の下部分（元の画像では下向き）が進行方向を向くように設定
+	// atan2は右向き(1,0)を0度とするため、下向き(0,-1)からの角度を計算
+	worldTransform_.rotation_.z = std::atan2(direction.x, -direction.y);
 
+	// もし雫の画像が上下逆の場合は以下を使用
+	// worldTransform_.rotation_.z = std::atan2(-direction.x, direction.y);
+}
 
 void Drip::InitJson()
 {
