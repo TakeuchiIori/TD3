@@ -163,7 +163,7 @@ void Player::Update()
 	beforebehavior_ = behavior_;
 
 	// Bボタンで一回だけ「食べるアニメーション」再生
-	if (!isAnimation_ && (input_->IsPadTriggered(0, GamePadButton::B) || input_->TriggerKey(DIK_Q))) {
+	if (!isAnimation_ && (input_->IsPadTriggered(0, GamePadButton::B))) {
 
 		sourceVoiceYodare = Audio::GetInstance()->SoundPlayAudio(soundDataYodare, false);
 		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceYodare, kSE);
@@ -401,7 +401,7 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 	{
 		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kStopArea))
 		{
-			if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
+			if (input_->IsPadTriggered(0, GamePadButton::B))
 			{
 				// オーディオの再生
 				sourceVoiceGrow = Audio::GetInstance()->SoundPlayAudio(soundDataGrow, false);
@@ -418,7 +418,7 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 			{
 				canSpitting_ = true;
 				grassXDir_ = other->GetCenterPosition().x - GetCenterPosition().x;
-				if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
+				if (input_->IsPadTriggered(0, GamePadButton::B))
 				{
 					// 唾を吐く
 					emitter_->EmitFromTo(worldTransform_.translation_, other->GetWorldTransform().translation_);
@@ -604,7 +604,7 @@ void Player::Move()
 
 void Player::ChangeDir()
 {
-	if ((input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP)) &&
+	/*if ((input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP)) &&
 		moveDirection_ != Vector3{ 0,1,0 } &&
 		moveDirection_ != Vector3{ 0,-1,0 })
 	{
@@ -624,7 +624,7 @@ void Player::ChangeDir()
 		moveDirection_ != Vector3{ -1,0,0 })
 	{
 		RightBody();
-	} else  if (std::abs(stick.x) > std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
+	} else  */if (std::abs(stick.x) > std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
 	{
 		if (stick.x > 0 &&
 			moveDirection_ != Vector3{ 1,0,0 } &&
@@ -652,7 +652,7 @@ void Player::ChangeDir()
 }
 
 void Player::ChangeDirRoot()
-{
+{/*
 	if ((input_->PushKey(DIK_A) || input_->PushKey(DIK_LEFT)))
 	{
 		moveDirection_ = { -1,0,0 };
@@ -661,7 +661,7 @@ void Player::ChangeDirRoot()
 	{
 		moveDirection_ = { 1,0,0 };
 		worldTransform_.rotation_.y = 0;
-	} else  if (std::abs(stick.x) > std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
+	} else  */if (std::abs(stick.x) > std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
 	{
 		if (stick.x > 0)
 		{
@@ -766,7 +766,7 @@ void Player::EntryMove()
 	worldTransform_.translation_ = newPos;
 	nextWorldTransform_.translation_ = newPos + velocity_;
 
-	if ((input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP)))
+/*	if ((input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP)))
 	{
 		behaviortRquest_ = BehaviorPlayer::Moving;
 		moveDirection_ = { 0,1,0 };
@@ -774,7 +774,7 @@ void Player::EntryMove()
 		moveHistory_.push_back(worldTransform_.translation_);
 		showUI_ = false;
 	} 
-	else if (std::abs(stick.x) < std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
+	else */if (std::abs(stick.x) < std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
 	{
 		if (stick.y > 0)
 		{
@@ -793,7 +793,7 @@ void Player::EntryBoost()
 {
 	if (0 >= boostCoolTimer_)
 	{
-		if (input_->TriggerKey(DIK_E) || input_->IsPadTriggered(0, GamePadButton::A))
+		if (/*input_->TriggerKey(DIK_E) ||*/ input_->IsPadTriggered(0, GamePadButton::A))
 		{
 			behaviortRquest_ = BehaviorPlayer::Boost;
 		}
