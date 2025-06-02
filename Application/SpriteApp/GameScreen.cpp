@@ -183,7 +183,7 @@ void GameScreen::Initialize()
 
 	uiReturn_ = std::make_unique<Sprite>();
 	uiReturn_->Initialize("Resources/Textures/In_Game/returnQuickly.png");
-	uiReturn_->SetSize({ 150.0f, 60.0f });
+	uiReturn_->SetSize({ 400.0f, 160.0f });
 	uiReturn_->SetAnchorPoint({ 0.5f, 0.5f });
 
 
@@ -395,18 +395,38 @@ void GameScreen::Update()
 		uiYodare_->SetPosition(playerPos);
 		uiYodare_->Update();
 	}
+	static float alp = 1.0f;
+	static float dirA = -1.0f;
 	if (player_->behavior_ == BehaviorPlayer::Return)
 	{
-		Vector3 playerPos = player_->GetWorldTransform().translation_;
-		Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
-		Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
-		playerPos = Transform(playerPos, matViewProjectionViewport);
+		Vector3 playerPos = { 640, 100,0 };
+		if (dirA < 0)
+		{
+			if (alp < 0.2f)
+			{
+				dirA *= -1.0f;
+			}
+		}
+		else
+		{
+			if (alp > 1.0f)
+			{
+				dirA *= -1.0f;
+			}
+		}
 
-		playerPos.x += offsetYodare_.x + 20;
-		playerPos.y += offsetYodare_.y;
+
+		alp += GameTime::GetDeltaTime() * dirA;
+		
 
 		uiReturn_->SetPosition(playerPos);
+		uiReturn_->SetAlpha(alp);
 		uiReturn_->Update();
+	}
+	else
+	{
+		alp = 1.0f;
+		dirA = -1.0f;
 	}
 
 	uiYodareop_->SetPosition(offsetYodareop_);
