@@ -52,6 +52,12 @@ void MenuOverlay::Initialize()
 		{
 			vol.pos.x = (i * intervalX_) + volumeUIOffset_.y; 
 			vol.pos.y = minY + (maxY - minY) * volume[i];
+			volumeControl_[i].pos.y = std::clamp(volumeControl_[i].pos.y, maxY, minY);
+			float liner = maxY - minY;
+			float current = maxY - volumeControl_[i].pos.y;
+			float t = 1.0f - (current / liner);
+			volume[static_cast<AudioType>(i)] = t;
+			volumeManager_->SetVolume(static_cast<AudioType>(i), t);
 			++i;
 		}
 
