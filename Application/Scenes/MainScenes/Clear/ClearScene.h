@@ -14,6 +14,7 @@
 #include "WorldTransform./WorldTransform.h"
 #include "Drawer/LineManager/Line.h"
 #include "../Transitions/Fade/Fade.h"
+#include <Particle/ParticleEmitter.h>
 
 // Cameras
 #include "../../../SystemsApp/Cameras/DebugCamera/DebugCamera.h"
@@ -30,6 +31,7 @@
 #include "../../../Objects/Planet/Planet.h"
 #include "../../../SpriteApp/ClearScreen.h"
 #include <Cloud/Cloud.h>
+
 
 class ClearScene : public BaseScene
 {
@@ -149,4 +151,7 @@ private:
 	=================================================================*/
 	std::unique_ptr<Sprite> sprite_;
 	std::unique_ptr<ClearScreen> clearScreen_;
+
+
+	std::unique_ptr<ParticleEmitter> particleEmitter_;
 };
