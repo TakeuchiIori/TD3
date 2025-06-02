@@ -137,9 +137,67 @@
             "checkPoints": [
                 {
                     "checkPointNumber": 0,
-                    "height": 100.0,
-                    "initX": 2.0,
-                    "timer": 10.0
+                    "height": 107.0,
+                    "initX": -15.0,
+                    "objects": [
+                        {
+                            "id": 0,
+                            "position": {
+                                "x": 16.0,
+                                "y": 40.0,
+                                "z": 0.0
+                            }
+                        },
+                        {
+                            "id": 0,
+                            "position": {
+                                "x": 25.0,
+                                "y": 48.0,
+                                "z": 0.0
+                            }
+                        },
+                        {
+                            "id": 0,
+                            "position": {
+                                "x": 18.0,
+                                "y": 54.0,
+                                "z": 0.0
+                            }
+                        },
+                        {
+                            "id": 0,
+                            "position": {
+                                "x": 28.0,
+                                "y": 15.0,
+                                "z": 0.0
+                            }
+                        },
+                        {
+                            "id": 0,
+                            "position": {
+                                "x": 5.0,
+                                "y": 78.0,
+                                "z": 0.0
+                            }
+                        },
+                        {
+                            "id": 0,
+                            "position": {
+                                "x": 28.0,
+                                "y": 84.0,
+                                "z": 0.0
+                            }
+                        },
+                        {
+                            "id": 0,
+                            "position": {
+                                "x": 18.0,
+                                "y": 89.0,
+                                "z": 0.0
+                            }
+                        }
+                    ],
+                    "timer": 7.5
                 },
                 {
                     "checkPointNumber": 1,
