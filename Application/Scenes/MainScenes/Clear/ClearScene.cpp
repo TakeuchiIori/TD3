@@ -9,6 +9,7 @@
 #include "Sprite/SpriteCommon.h"
 #include <LightManager/LightManager.h>
 #include <PipelineManager/SkinningManager.h>
+#include "../Application/SystemsApp/AppAudio/AudioVolumeManager.h"
 
 void ClearScene::Initialize()
 {
@@ -39,6 +40,24 @@ void ClearScene::Initialize()
 
 	clearScreen_ = std::make_unique<ClearScreen>();
 	clearScreen_->Initialize();
+
+
+	// オーディオファイルのロード（例: MP3）
+	soundData = Audio::GetInstance()->LoadAudio(L"Resources/Audio/clear.mp3");
+	// オーディオの再生
+	sourceVoice = Audio::GetInstance()->SoundPlayAudio(soundData, true);
+	//Audio::GetInstance()->FadeInPlay(sourceVoice, 2.0f);
+	AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoice, kBGM);
+
+	for (int i = 0; i < numClouds_; ++i) {
+		auto cloud = std::make_unique<Cloud>();
+		cloud->Initialize(sceneCamera_.get());
+		if (i % 2 == 1) {
+			cloud->SetModel("cloud2.obj");
+		}
+		clouds_.emplace_back(std::move(cloud));
+	}
+
 }
 
 void ClearScene::Finalize()
@@ -47,6 +66,8 @@ void ClearScene::Finalize()
 
 void ClearScene::Update()
 {
+	GameTime::Update();
+
 #ifdef _DEBUG
 	if ((Input::GetInstance()->TriggerKey(DIK_LCONTROL)) || Input::GetInstance()->IsPadTriggered(0, GamePadButton::RT)) {
 		isDebugCamera_ = !isDebugCamera_;
@@ -75,12 +96,16 @@ void ClearScene::Update()
 		clearScreen_->UpdateKirin();
 		if (Input::GetInstance()->IsPadPressed(0, GamePadButton::A)) {
 			sceneManager_->ChangeScene("Title");
+			Audio::GetInstance()->FadeOutStop(sourceVoice, 1.0f, 2.0f);
 		}
 	}
 
 	planet_->Update();
 	player_->Update(); // プレイヤー内でイベント処理が行われる
-
+	for (auto& cloud : clouds_) {
+		cloud->UpdateScale();
+		cloud->Update();
+	}
 	sprite_->Update();
 
 	UpdateCameraMode();
@@ -121,6 +146,10 @@ void ClearScene::Draw()
 	/// <summary>
 	/// ここから描画可能です
 	/// </summary>
+	
+	for (auto& cloud : clouds_) {
+		cloud->Draw();
+	}
 	player_->Draw();
 	planet_->Draw();
 
