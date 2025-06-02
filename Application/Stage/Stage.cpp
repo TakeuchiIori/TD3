@@ -348,7 +348,12 @@ int Stage::GetCheckPointID()
 	int prevStageNum = currentStageNum_ - 1;
 	if (prevStageNum >= 0)
 	{
-		return id = StageEditor::Instance()->GetMaxCheckPointNumber(prevStageNum) + currentCheckPoint_;
+		int a = 1;
+		if (currentStageNum_ == 2)
+		{
+			a = 3;
+		}
+		return id = StageEditor::Instance()->GetMaxCheckPointNumber(prevStageNum) + currentCheckPoint_ + a;
 	}
 	return id = currentCheckPoint_;
 }
