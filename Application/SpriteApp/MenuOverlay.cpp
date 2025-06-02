@@ -266,7 +266,7 @@ void MenuOverlay::VolumeSlider()
 	}
 
 
-	if (input_->IsTriggerMouse(0))
+	/*if (input_->IsTriggerMouse(0))
 	{
 		if (!isPush)
 		{
@@ -316,7 +316,7 @@ void MenuOverlay::VolumeSlider()
 			vol.isPush = false;
 		}
 		isPush = false;
-	}
+	}*/
 	for (auto&& vol : volumeSprites_)
 	{
 		vol->SetSize(vol->GetTextureSize());
