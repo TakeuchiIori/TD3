@@ -190,7 +190,7 @@ void Balloon::InitCollision()
 		this,
 		&colliderWT_,
 		camera_,
-		static_cast<uint32_t>(CollisionTypeIdDef::kBalloon)
+		static_cast<uint32_t>(CollisionTypeIdDef::kNone)
 	);
 
 
@@ -198,7 +198,7 @@ void Balloon::InitCollision()
 		this,
 		&stopAreaWT_,
 		camera_,
-		static_cast<uint32_t>(CollisionTypeIdDef::kStopArea)
+		static_cast<uint32_t>(CollisionTypeIdDef::kNone)
 	);
 }
 

@@ -81,6 +81,7 @@ void EnemyManager::SpawnAllEnemies()
 			enemy->SetPlayer(player_);
 			enemy->SetTranslate(data.position);
 			enemy->SetMoveSpeed(data.moveSpeed);
+			enemy->SetStage(currenStage_);
 			enemies_.emplace_back(std::move(enemy));
 			data.triggered = true;
 		}

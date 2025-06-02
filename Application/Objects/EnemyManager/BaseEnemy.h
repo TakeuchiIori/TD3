@@ -87,6 +87,8 @@ public:
 
 	void SetIsStop(bool is) { isStop_ = is; }
 
+	void SetStage(int stageNum);
+
 protected:
 	// 攻撃を受けた時
 	void TakeAttack()

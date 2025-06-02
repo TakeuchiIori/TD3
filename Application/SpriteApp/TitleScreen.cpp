@@ -51,6 +51,10 @@ void TitleScreen::Initialize()
 	ctrl_->SetAnchorPoint({ 0.5f, 0.5f });
 
 	InitJson();
+
+	uiMenuOpen_ = std::make_unique<Sprite>();
+	uiMenuOpen_->Initialize("Resources/Textures/Menu/menuUI.png");
+	uiMenuOpen_->SetPosition(offsetMenuOpen_);
 }
 
 void TitleScreen::InitJson()
@@ -59,6 +63,7 @@ void TitleScreen::InitJson()
 	jsonManager_->SetCategory("UI");
 	jsonManager_->Register("OffsetTitle", &offset[0]);
 	jsonManager_->Register("OffsetCtrl", &offsetCtrl_);
+	jsonManager_->Register("Offsetopenmenu", &offsetMenuOpen_);
 
 }
 
@@ -108,7 +113,7 @@ void TitleScreen::Update()
 	Vector3 pos = offset[0];
 	pos.y += bobbing;
 	
-
+	uiMenuOpen_->Update();
 
 	title_->SetPosition(pos);
 	title_->Update();
@@ -139,6 +144,7 @@ void TitleScreen::Draw()
 	}
 
 	ctrl_->Draw();
+	uiMenuOpen_->Draw();
 
 	title_->Draw();
 }

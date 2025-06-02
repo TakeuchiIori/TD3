@@ -17,12 +17,15 @@
 #include <Systems/GameTime/GameTIme.h>
 #include <Loaders/Json/JsonManager.h>
 
+#include "../../../SpriteApp/MenuOverlay.h"
+
 /// <summary>
 /// 初期化処理
 /// </summary>
 void TitleScene::Initialize()
 {
 	GameTime::Initailzie();
+	MenuOverlay::GetInstance()->Initialize();
 	// カメラの生成
 	sceneCamera_ = cameraManager_.AddCamera();
 	Object3dCommon::GetInstance()->SetDefaultCamera(sceneCamera_.get());
@@ -122,6 +125,39 @@ void TitleScene::Update()
 		book_->InitEvent();
 		isStartEvent_ = false;
 	}
+	else if(player_->GetWorldTransform().translation_.y < 35.0f)
+	{
+		MenuOverlay::GetInstance()->ShowHide();
+	}
+	if (MenuOverlay::GetInstance()->IsVisible())
+	{
+		MenuOverlay::GetInstance()->Update();
+	}
+	else
+	{
+		if (player_->GetWorldTransform().translation_.y > 35.0f) {
+			SceneManager::GetInstance()->SetTitleToGame(true);
+			SceneManager::GetInstance()->ChangeScene("Game");
+			Audio::GetInstance()->FadeOutStop(sourceVoice, 1.0f, 2.0f);
+		}
+
+
+		emitter_->Emit();
+
+
+		mpInfo_->Update();
+
+		if (!isDebugCamera_) {
+			player_->Update();
+		}
+		book_->Update();
+
+		for (auto& cloud : clouds_) {
+			cloud->Update();
+		}
+
+		titleScreen_->Update();
+	}
 
 #ifdef _DEBUG
 	if ((Input::GetInstance()->TriggerKey(DIK_LCONTROL)) || Input::GetInstance()->IsPadTriggered(0, GamePadButton::RT)) {
@@ -135,28 +171,6 @@ void TitleScene::Update()
 	}
 
 
-	if (player_->GetWorldTransform().translation_.y > 35.0f) {
-		SceneManager::GetInstance()->SetTitleToGame(true);
-		SceneManager::GetInstance()->ChangeScene("Game");
-		Audio::GetInstance()->FadeOutStop(sourceVoice, 1.0f, 2.0f);
-	}
-
-
-	emitter_->Emit();
-
-
-	mpInfo_->Update();
-
-	if (!isDebugCamera_) {
-		player_->Update();
-	}
-	book_->Update();
-
-	for (auto& cloud : clouds_) {
-		cloud->Update();
-	}
-
-	titleScreen_->Update();
 
 
 
@@ -231,6 +245,10 @@ void TitleScene::DrawSprite()
 	player_->DrawSprite();
 	titleScreen_->Draw();
 	book_->DrawSprite();
+	if (MenuOverlay::GetInstance()->IsVisible())
+	{
+		MenuOverlay::GetInstance()->Draw();
+	}
 }
 
 void TitleScene::DrawAnimation()
