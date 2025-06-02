@@ -172,13 +172,6 @@ void Player::Update()
 	}
 
 
-#ifdef _DEBUG
-
-	if (input_->IsPadPressed(0, GamePadButton::B)) {
-		emitter_->Emit();
-	}
-#endif // _DEBUG
-
 	// 各行動の初期化
 	BehaviorInitialize();
 	// 各行動の更新
@@ -218,6 +211,10 @@ void Player::Update()
 
 void Player::Draw()
 {
+
+	for (auto& drip : drips_) {
+		drip->Draw();
+	}
 
 	for (const auto& body : stuckGrassList_)
 	{
@@ -403,7 +400,7 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 			{
 				// 唾を吐く
 
-				emitter_->EmitFromTo(worldTransform_.translation_, other->GetWorldTransform().translation_);
+				CreateDrip(other->GetWorldTransform().translation_);
 				// オーディオの再生
 				sourceVoiceGrow = Audio::GetInstance()->SoundPlayAudio(soundDataGrow, false);
 				AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceGrow, kSE);
@@ -1163,6 +1160,20 @@ void Player::UpdateCombo()
 		break;
 	default:
 		break;
+	}
+}
+
+void Player::CreateDrip(Vector3 pos)
+{
+	for (int i = 0; i < numDrips_; i++) {
+		auto drip = std::make_unique<Drip>();
+		drip->Initialize(camera_);
+		drip->Shoot(pos);
+		drips_.emplace_back(std::move(drip));
+	}
+
+	for(auto& drip : drips_) {
+		drip->Update();
 	}
 }
 

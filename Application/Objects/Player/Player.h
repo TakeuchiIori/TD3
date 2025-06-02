@@ -22,7 +22,7 @@
 #include "PlayerBody.h"
 #include "StuckGrass.h"
 #include "PlayerHaert.h"
-
+#include "../Drip/Drip.h"
 #include "Systems/Audio/Audio.h"
 
 enum class BehaviorPlayer
@@ -166,6 +166,8 @@ private:
 
 	void UpdateCombo();
 
+	void CreateDrip(Vector3 pos);
+
 
 #ifdef _DEBUG
 	// デバッグ用 (ImGuiとか)
@@ -286,6 +288,8 @@ private:
 	Input* input_ = nullptr;
 	
 	std::unique_ptr<ParticleEmitter> emitter_;
+	std::list<std::unique_ptr<Drip>> drips_;
+	int numDrips_ = 3;
 
 	std::unique_ptr<JsonManager> jsonManager_;
 	std::unique_ptr<JsonManager> jsonCollider_;

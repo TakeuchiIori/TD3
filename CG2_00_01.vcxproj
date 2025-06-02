@@ -128,6 +128,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\SpriteApp\ClearScreen.cpp" />
     <ClCompile Include="Application\Objects\Balloon\Balloon.cpp" />
     <ClCompile Include="Application\Objects\Drip\Drip.cpp" />
+    <ClCompile Include="DripManager.cpp" />
     <ClCompile Include="Engine\Generators\OffScreen\OffScreen.cpp" />
     <ClCompile Include="Engine\Graphics\Culling\OcclusionCullingManager.cpp" />
     <ClCompile Include="Engine\Utility\Collision\AABB\AABBCollider.cpp" />
@@ -245,6 +246,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\SpriteApp\ClearScreen.h" />
     <ClInclude Include="Application\Objects\Balloon\Balloon.h" />
     <ClInclude Include="Application\Objects\Drip\Drip.h" />
+    <ClInclude Include="DripManager.h" />
     <ClInclude Include="Engine\Generators\OffScreen\OffScreen.h" />
     <ClInclude Include="Engine\Graphics\Culling\OcclusionCullingManager.h" />
     <ClInclude Include="Engine\Utility\Collision\AABB\AABBCollider.h" />
