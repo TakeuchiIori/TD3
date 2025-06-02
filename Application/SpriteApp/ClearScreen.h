@@ -68,4 +68,12 @@ private:
 	float sinVelocity_ = 0.0f;        // 位置Y用
 	float scaleVelocity_ = 0.0f;      // スケール用
 	float currentScale_ = 1.0f;       // スケールの現在値
+
+	// スプライトA出現アニメーション用
+	bool isAppearing_ = false;          // 出現中フラグ
+	float appearTimer_ = 0.0f;          // 出現タイマー
+	const float appearDuration_ = 0.5f;  // 出現にかかる時間
+	Vector3 targetPosition_ = { 776.1f, 692.3f, 0.0f }; // 最終位置
+	Vector2 originalSize_;
+
 };

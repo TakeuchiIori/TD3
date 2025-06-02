@@ -23,8 +23,20 @@ void ClearScreen::Initialize()
 	isSliding_ = true;
 	// sin波のタイマー初期化
 	sinTimer_ = 0.0f;
+
+
+
+    spriteA_->position_ = targetPosition_;
+    // スプライトスライド初期化
+    spriteSlideTimer_ = 0.0f;
+    isSliding_ = true;
+    // sin波のタイマー初期化
+    sinTimer_ = 0.0f;
+
 	InitJson();
-	spriteA_->position_ = Vector3(776.1f, 692.3f,0.0f);
+
+	originalSize_ = spriteA_->size_;
+
 }
 
 void ClearScreen::InitJson()
@@ -57,45 +69,67 @@ void ClearScreen::Update()
 
 void ClearScreen::UpdateKirin()
 {
-	// スプライトスライド処理
-	if (isSliding_) {
-		spriteSlideTimer_ += 1.0f / 60.0f; // 60FPS想定
-		if (spriteSlideTimer_ >= spriteSlideTime_) {
-			spriteSlideTimer_ = spriteSlideTime_;
-			isSliding_ = false;
-		}
-		// イージング計算（滑らかな動き）
-		float t = spriteSlideTimer_ / spriteSlideTime_;
-		float easedT = 1.0f - (1.0f - t) * (1.0f - t); // イーズアウト
-		sprite_->position_.x = spriteStartX_ + (spriteEndX_ - spriteStartX_) * easedT;
-	}
+    // スプライトスライド処理
+    if (isSliding_) {
+        spriteSlideTimer_ += 1.0f / 60.0f; // 60FPS想定
+        if (spriteSlideTimer_ >= spriteSlideTime_) {
+            spriteSlideTimer_ = spriteSlideTime_;
+            isSliding_ = false;
+            // スライド完了時にスプライトAの出現開始
+            isAppearing_ = true;
+            appearTimer_ = 0.0f;
+        }
+        // イージング計算（滑らかな動き）
+        float t = spriteSlideTimer_ / spriteSlideTime_;
+        float easedT = 1.0f - (1.0f - t) * (1.0f - t); // イーズアウト
+        sprite_->position_.x = spriteStartX_ + (spriteEndX_ - spriteStartX_) * easedT;
+    }
 
-	// Aボタンの基本位置を設定
-	spriteA_->position_ = sprite_->position_ + offset_;
+    // スプライトAの出現アニメーション
+    if (isAppearing_) {
+        appearTimer_ += 1.0f / 60.0f;
 
-	// スライド完了後のみsin波を適用
-	if (!isSliding_) {
-		// sin波でAボタンをぷかぷか浮遊させる
-		sinTimer_ += 1.0f / 60.0f; // 60FPS想定
+        if (appearTimer_ < appearDuration_) {
+            // 弾性的なイージング（ぽよよん効果）
+            float t = appearTimer_ / appearDuration_;
+            float elasticOut = 1.0f - pow(2.0f, -10.0f * t) * cos(t * 3.14159f * 3.0f);
 
-		// Y座標の浮遊
-		float sinWave = sin(sinTimer_ * floatSpeed_) * floatAmplitude_;
-		//spriteA_->position_.y += sinWave;
+            // サイズをぽよよんと大きくする
+            Vector2 currentScale = originalSize_ * elasticOut;
+            spriteA_->size_ = currentScale;
 
-		// サイズの変化（位相をずらして自然な動きに）
-		float scaleWave = sin(sinTimer_ * floatSpeed_ + 1.57f) * 0.007f; // 0.1fは変化の幅（10%）
-		spriteA_->size_ = spriteA_->size_ * (1.0f + scaleWave);
-	}
+            // 位置も少し上から落ちてくるような動き（オプション）
+            float yOffset = (1.0f - elasticOut) * -20.0f;
+            spriteA_->position_ = targetPosition_ + Vector3(0.0f, yOffset, 0.0f);
+        } else {
+            // アニメーション終了
+            isAppearing_ = false;
+            spriteA_->position_ = targetPosition_;
+        }
+    }
 
-	sprite_->Update();
-	spriteA_->Update();
+    // 出現完了後のみsin波でサイズ変化
+    if (!isSliding_ && !isAppearing_) {
+        sinTimer_ += 1.0f / 60.0f;
+
+        float scaleWave = sin(sinTimer_ * floatSpeed_) * 0.05f; // 5%の変化
+        spriteA_->size_ = originalSize_ * (1.0f + scaleWave);
+    }
+
+    sprite_->Update();
+    spriteA_->Update();
 }
+
 void ClearScreen::Draw()
 {
-	for (uint32_t i = 0; i < numBGs_; i++)
-	{
-		background_[i]->Draw();
-	}
-	sprite_->Draw();
-	spriteA_->Draw();
+    for (uint32_t i = 0; i < numBGs_; i++)
+    {
+        background_[i]->Draw();
+    }
+    sprite_->Draw();
+
+    // スプライトAはスライド完了後のみ描画
+    if (!isSliding_) {
+        spriteA_->Draw();
+    }
 }
