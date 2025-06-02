@@ -8,6 +8,7 @@
 #include "Collision/Core/CollisionDirection.h"
 #include <MathFunc.h>
 #include <Vector3.h>
+#include "Systems/Audio/Audio.h"
 
 class Player;
 
@@ -66,8 +67,17 @@ public:
 
 	bool IsDelete() { return isDelete_; }
 
+	bool IsPop() { 
+		if(isPop_) isDelete_ = true;
+		return isPop_;
+	}
+
 private:
 	Player* player_ = nullptr;
+
+	bool isVisible_ = true;
+
+	bool isPop_ = false;
 
 	bool isDelete_ = false;
 
@@ -76,9 +86,14 @@ private:
 	std::unique_ptr<JsonManager> jsonManager_;
 	std::unique_ptr<JsonManager> jsonCollider_;
 
+	float timer_ = 0;
+	float kScaleTime_ = 0.5f;
 
 	static int count_;    // 現在のインスタンス数
 	int id_;              // 各インスタンスのID
 
+
+	Audio::SoundData hakuSoundData_ = {};
+	IXAudio2SourceVoice* hakuSourceVoice_ = nullptr;
 };
 

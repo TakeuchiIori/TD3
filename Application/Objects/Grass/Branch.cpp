@@ -130,9 +130,11 @@ void Branch::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 
 			aabbCollider_->SetTypeID(static_cast<uint32_t>(CollisionTypeIdDef::kNone));
 
+			sourceVoiceBranch_ = Audio::GetInstance()->SoundPlayAudio(soundDataBranch_);
+			AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceBranch_, kSE);
+
 			if (parentGrass_) {
 				parentGrass_->StartFalling();
-				sourceVoiceBranch_ = Audio::GetInstance()->SoundPlayAudio(soundDataBranch_, false);
 			}
 		}
 	}

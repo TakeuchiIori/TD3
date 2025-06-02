@@ -126,6 +126,17 @@ bool Input::TriggerKey(BYTE keyNumber)
 	return false;
 }
 
+bool Input::IsAnyKeyPressed() const
+{
+
+	for (int i = 0; i < 256; ++i) {
+		if (key[i] & 0x80) {
+			return true;
+		}
+	}
+	return false;
+}
+
 /// <summary>
 /// 特定のキーが押され続けている時間を取得する
 /// </summary>

@@ -155,3 +155,6 @@ DirectX::XMMATRIX ConvertToXMMATRIX(const Matrix4x4& matrix);
 
 
 Matrix4x4 MakeLookAtMatrix(const Vector3& eye, const Vector3& target, const Vector3& up = { 0.0f, 1.0f, 0.0f });
+
+
+bool IsIdentityMatrix(const Matrix4x4& mat);

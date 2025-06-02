@@ -46,6 +46,8 @@ public: // アクセッサ
 
 	virtual void SetSceneManager(SceneManager* sceneManager) { sceneManager_ = sceneManager; }
 
+
+
 protected: // メンバ関数
 	SceneManager* sceneManager_ = nullptr;
 };

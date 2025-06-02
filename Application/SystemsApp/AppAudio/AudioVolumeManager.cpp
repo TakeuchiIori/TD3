@@ -10,7 +10,6 @@ void AudioVolumeManager::Initialize()
 
 	xAudio2_->CreateSubmixVoice(&BGMSubmixVoice_, 2, 44100);
 	xAudio2_->CreateSubmixVoice(&SESubmixVoice_, 2, 44100);
-	xAudio2_->CreateSubmixVoice(&UISoundSubmixVoice_, 2, 44100);
 }
 
 void AudioVolumeManager::Finalize()
@@ -35,12 +34,6 @@ void AudioVolumeManager::Finalize()
 		SESubmixVoice_->DestroyVoice();
 		SESubmixVoice_ = nullptr;
 	}
-
-	if (UISoundSubmixVoice_)
-	{
-		UISoundSubmixVoice_->DestroyVoice();
-		UISoundSubmixVoice_ = nullptr;
-	}
 }
 
 void AudioVolumeManager::SetSourceToSubmix(IXAudio2SourceVoice* pSourceVoice, AudioType audioType)
@@ -55,11 +48,6 @@ void AudioVolumeManager::SetSourceToSubmix(IXAudio2SourceVoice* pSourceVoice, Au
 	case kSE:
 		ConnectSourceToSubmix(SESubmixVoice_, pSourceVoice);
 		break;
-
-	case kUISound:
-		ConnectSourceToSubmix(UISoundSubmixVoice_, pSourceVoice);
-		break;
-	case kMaster:
 	default:
 		break;
 	}
@@ -76,11 +64,6 @@ void AudioVolumeManager::SetVolume(AudioType audioType, float volume)
 	case kSE:
 		SESubmixVoice_->SetVolume(volume);
 		break;
-
-	case kUISound:
-		UISoundSubmixVoice_->SetVolume(volume);
-		break;
-	case kMaster:
 	default:
 		Audio::GetInstance()->SetMasterVolume(volume);
 		break;

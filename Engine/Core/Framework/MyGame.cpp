@@ -17,8 +17,8 @@ void MyGame::Initialize()
 	offScreen_->Initialize();
 	//offScreen_->SetEffectType(OffScreen::OffScreenEffectType::RadialBlur);
 #ifdef _DEBUG
-	SceneManager::GetInstance()->ChangeScene("Game");
-#else
+	SceneManager::GetInstance()->ChangeScene("Clear");
+#else//Title
 	SceneManager::GetInstance()->ChangeScene("Title");
 #endif
 	// パーティクルマネージャ生成
@@ -26,18 +26,19 @@ void MyGame::Initialize()
 	ParticleManager::GetInstance()->Initialize(srvManager_);
 	auto planeMesh = MeshPrimitive::Createplane(1.0f, 1.0f);
 
-	ParticleManager::GetInstance()->Initialize(srvManager_);
-
 	
 	
 	
-	ParticleManager::GetInstance()->CreateParticleGroup("GrowthParticle", defaultTexturePath + "growth.png");
+	ParticleManager::GetInstance()->CreateParticleGroup("GrowthParticle", defaultTexturePath + "star.png");
 	ParticleManager::GetInstance()->CreateParticleGroup("YodareParticle", defaultTexturePath + "yodare.png");
-
-
+	ParticleManager::GetInstance()->CreateParticleGroup("TitleParticle", defaultTexturePath + "circle.png");
+	ParticleManager::GetInstance()->CreateParticleGroup("ClearParticle", defaultTexturePath + "star.png");
 
 	ParticleManager::GetInstance()->SetPrimitiveMesh("GrowthParticle", planeMesh);
 	ParticleManager::GetInstance()->SetPrimitiveMesh("YodareParticle", planeMesh);
+	ParticleManager::GetInstance()->SetPrimitiveMesh("TitleParticle", planeMesh);
+	ParticleManager::GetInstance()->SetPrimitiveMesh("ClearParticle", planeMesh);
+	
 }
 
 void MyGame::Finalize()

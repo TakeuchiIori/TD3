@@ -57,6 +57,8 @@ public:
 	/// </summary>
 	void DrawCollisions();
 
+	void DrawSprite();
+
 	void ClearAll();
 
 private:
@@ -120,6 +122,19 @@ public:
 		LoadEnemyDataFromJson(fullPath_);
 	}
 
+	void SetIsStop(bool is)
+	{
+		for (auto&& enemy : enemies_)
+		{
+			enemy->SetIsStop(is);
+		}
+	}
+
+	void SetStage(int stageNum)
+	{
+		currenStage_ = stageNum;
+	}
+
 private:
 	Camera* camera_ = nullptr;
 	Player* player_ = nullptr;
@@ -137,4 +152,6 @@ private:
 	std::string checkPointPath_ = "";
 
 	std::string fullPath_;
+
+	int currenStage_ = 0;
 };

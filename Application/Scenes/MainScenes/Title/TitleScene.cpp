@@ -6,6 +6,7 @@
 #include "Particle./ParticleManager.h"
 #include "Object3D/Object3dCommon.h"
 #include "../Graphics/PipelineManager/SkinningManager.h"
+#include "../Application/SystemsApp/AppAudio/AudioVolumeManager.h"
 
 #ifdef _DEBUG
 #include "imgui.h"
@@ -16,12 +17,15 @@
 #include <Systems/GameTime/GameTIme.h>
 #include <Loaders/Json/JsonManager.h>
 
+#include "../../../SpriteApp/MenuOverlay.h"
+
 /// <summary>
 /// 初期化処理
 /// </summary>
 void TitleScene::Initialize()
 {
 	GameTime::Initailzie();
+	MenuOverlay::GetInstance()->Initialize();
 	// カメラの生成
 	sceneCamera_ = cameraManager_.AddCamera();
 	Object3dCommon::GetInstance()->SetDefaultCamera(sceneCamera_.get());
@@ -37,23 +41,27 @@ void TitleScene::Initialize()
 	bookEventCamera_.Initialize();
 
 	// オーディオファイルのロード（例: MP3）
-	soundData = Audio::GetInstance()->LoadAudio(L"Resources./images./harpohikunezumi.mp3");
-	//// オーディオの再生
-	//sourceVoice = Audio::GetInstance()->SoundPlayAudio(soundData);
-	//// 音量の設定（0.0f ～ 1.0f）
-	//Audio::GetInstance()->SetVolume(sourceVoice, 0.05f); // 80%の音量に設定
+	soundData = Audio::GetInstance()->LoadAudio(L"Resources/Audio/title.mp3");
+	// オーディオの再生
+	sourceVoice = Audio::GetInstance()->SoundPlayAudio(soundData, true);
+	//Audio::GetInstance()->FadeInPlay(sourceVoice, 2.0f);
+	AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoice, kBGM);
+	// 音量の設定（0.0f ～ 1.0f）
+	//Audio::GetInstance()->SetVolume(sourceVoice, 1.0f); // 80%の音量に設定
 
 
 
 	mpInfo_ = std::make_unique<MapChipInfo>();
+	mpInfo_->GetMapChipField()->SetNumBlockVertical(19);
 	mpInfo_->Initialize();
 	mpInfo_->SetCamera(sceneCamera_.get());
-
+	mpInfo_->SetMapChip("Resources/images/MapChip_Title.csv");
 
 
 	player_ = std::make_unique<TitlePlayer>(mpInfo_->GetMapChipField());
 	player_->Initialize(sceneCamera_.get());
 	bookEventCamera_.SetTarget(player_->GetWorldTransform());
+	player_->SetMapChipInfo(mpInfo_.get());
 
 	book_ = std::make_unique<Book>(mpInfo_->GetMapChipField());
 	book_->Initialize(sceneCamera_.get());
@@ -63,6 +71,11 @@ void TitleScene::Initialize()
 	titleScreen_->Initialize();
 	titleScreen_->SetCamera(sceneCamera_.get());
 
+	for (int i = 0; i < numClouds_; ++i) {
+		auto cloud = std::make_unique<Cloud>();
+		cloud->Initialize(sceneCamera_.get());
+		clouds_.emplace_back(std::move(cloud));
+	}
 
 	// 本を読み始めたら
 	book_->OnBookTrigger_ = [this]() {
@@ -90,7 +103,8 @@ void TitleScene::Initialize()
 		GameTime::Resume();
 		};
 
-
+	emitter_ = std::make_unique<ParticleEmitter>("TitleParticle", Vector3{ 0.0f,0.0f,0.0f }, 3);
+	emitter_->Initialize("Title");
 }
 
 /// <summary>
@@ -111,6 +125,39 @@ void TitleScene::Update()
 		book_->InitEvent();
 		isStartEvent_ = false;
 	}
+	else if(player_->GetWorldTransform().translation_.y < 35.0f)
+	{
+		MenuOverlay::GetInstance()->ShowHide();
+	}
+	if (MenuOverlay::GetInstance()->IsVisible())
+	{
+		MenuOverlay::GetInstance()->Update();
+	}
+	else
+	{
+		if (player_->GetWorldTransform().translation_.y > 35.0f) {
+			SceneManager::GetInstance()->SetTitleToGame(true);
+			SceneManager::GetInstance()->ChangeScene("Game");
+			Audio::GetInstance()->FadeOutStop(sourceVoice, 1.0f, 2.0f);
+		}
+
+
+		emitter_->Emit();
+
+
+		mpInfo_->Update();
+
+		if (!isDebugCamera_) {
+			player_->Update();
+		}
+		book_->Update();
+
+		for (auto& cloud : clouds_) {
+			cloud->Update();
+		}
+
+		titleScreen_->Update();
+	}
 
 #ifdef _DEBUG
 	if ((Input::GetInstance()->TriggerKey(DIK_LCONTROL)) || Input::GetInstance()->IsPadTriggered(0, GamePadButton::RT)) {
@@ -119,30 +166,11 @@ void TitleScene::Update()
 #endif // _DEBUG
 
 	if (isAlreadyRead_) {
-		if (Input::GetInstance()->IsPadTriggered(0, GamePadButton::A)) {
-			// 本に当たっていないときだけ、首を伸ばすフラグをONにする
-			if (!book_->IsColliding()) {
-				// 読書が終わっている前提で
-				player_->SetIsFinishedReadBook(true);
-			}
-		}
-	}
-
-	if (player_->GetWorldTransform().translation_.y > 20.0f) {
-		SceneManager::GetInstance()->ChangeScene("Game");
+		// 読書が終わっている前提で
+		player_->SetIsFinishedReadBook(true);
 	}
 
 
-
-
-
-	mpInfo_->Update();
-
-	if (!isDebugCamera_) {
-		player_->Update();
-	}
-	book_->Update();
-	titleScreen_->Update();
 
 
 
@@ -151,6 +179,7 @@ void TitleScene::Update()
 	UpdateCamera();
 	cameraManager_.UpdateAllCameras();
 
+	ParticleManager::GetInstance()->Update();
 	LightManager::GetInstance()->ShowLightingEditor();
 	CollisionManager::GetInstance()->Update();
 	JsonManager::ImGuiManager();
@@ -178,6 +207,11 @@ void TitleScene::Draw()
 	DrawAnimation();
 	DrawLine();
 
+	// Particle
+
+	ParticleManager::GetInstance()->Draw();
+
+
 	SpriteCommon::GetInstance()->DrawPreference();
 	DrawSprite();
 
@@ -185,9 +219,7 @@ void TitleScene::Draw()
 
 void TitleScene::DrawOffScreen()
 {
-	// Particle
-	//----------
-	//ParticleManager::GetInstance()->Draw();
+
 	//----------
 	// Sprite
 	//----------
@@ -201,7 +233,9 @@ void TitleScene::DrawObject()
 	mpInfo_->Draw();
 	player_->Draw();
 	book_->Draw();
-
+	for (auto& cloud : clouds_) {
+		cloud->Draw();
+	}
 	// 制御点描画
 	//bookEventCamera_.Draw(sceneCamera_.get());
 }
@@ -211,6 +245,10 @@ void TitleScene::DrawSprite()
 	player_->DrawSprite();
 	titleScreen_->Draw();
 	book_->DrawSprite();
+	if (MenuOverlay::GetInstance()->IsVisible())
+	{
+		MenuOverlay::GetInstance()->Draw();
+	}
 }
 
 void TitleScene::DrawAnimation()

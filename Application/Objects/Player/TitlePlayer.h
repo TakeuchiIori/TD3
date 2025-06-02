@@ -65,6 +65,7 @@ public:
 	/// </summary>
 	/// <param name="info"></param>
 	void MapChipOnCollision(const CollisionInfo& info);
+	void MapChipOnCollision();
 	void Reset();
 
 private:
@@ -74,8 +75,10 @@ private:
 	/// </summary>
 	void Move();
 
-
-
+	/// <summary>
+	/// モデルパーティクルの更新
+	/// </summary>
+	void UpdateParticle();
 
 
 
@@ -104,18 +107,36 @@ public:
 	void OnExitCollision(BaseCollider* self, BaseCollider* other);
 	void OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir);
 
+	void GenerateCeilingBreakParticle(const Vector3& position);
+
 	void SetIsFinishedReadBook(bool isFinishedReadBook) { isFinishedReadBook_ = isFinishedReadBook; }
 	void SetShowUI(bool showUI) { showUI_ = showUI; }
+	void SetMapChipInfo(MapChipInfo* info) { mpInfo_ = info; }
+
+	void Shake();
 private:
 
 	// ポインタ
 	Input* input_ = nullptr;
-
+	MapChipInfo* mpInfo_ = nullptr;
 	std::unique_ptr<Object3d> neck_;
 	std::unique_ptr<Object3d> body_;
 
 	std::unique_ptr<Sprite> uiA_;
 	Vector3 offsetUI_ = {};
+
+
+	struct ExplosionParticle {
+		std::unique_ptr<Object3d> obj;
+		std::unique_ptr<WorldTransform> wt;
+		Vector3 velocity;
+		float lifetime;
+		float switchTime; // 噴火から放射に切り替えるタイミング
+		bool hasSwitched = false;
+		Vector3 rotationVelocity;
+	};
+
+	std::vector<ExplosionParticle> breakParticles_;
 
 
 	std::unique_ptr<JsonManager> jsonManager_;
@@ -141,11 +162,16 @@ private:
 	Vector3 velocity_ = {};
 	Vector3 moveDirection_ = {};
 	float defaultSpeed_ = 3.0f;
-
 	bool isFinishedReadBook_ = false;
 	bool showUI_ = false;
 	bool isScaling_ = false;
-
 	float targetRotationY_;
+	float UpPower_ = 0.0f;
+	bool isShake = false;
+	float up_ = 0.0f;
+	float time_ = 0.0f;
+
+	const Vector4 defaultColorV4_ = { 0.90625f,0.87109f,0.125f,1.0f };
 };
 
+Vector3 MakeExplosionVelocity(float minSpeed, float maxSpeed);

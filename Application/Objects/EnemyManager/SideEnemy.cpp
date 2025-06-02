@@ -26,11 +26,15 @@ void SideEnemy::Initialize(Camera* camera)
 
 	worldTransform_.Initialize();
 	startPos_ = worldTransform_.translation_;
+	kirisutegomennWT_.Initialize();
 
 	InitCollision();
 	//InitJson();
 
 	soundData_ = Audio::GetInstance()->LoadAudio(L"Resources/Audio/fly.mp3");
+
+	IconInit();
+	SoundInit();
 }
 
 void SideEnemy::InitCollision()
@@ -41,6 +45,7 @@ void SideEnemy::InitCollision()
 		camera_,
 		static_cast<uint32_t>(CollisionTypeIdDef::kEnemy)
 	);
+	obbCollider_->checkOutsideCamera = true;
 }
 
 void SideEnemy::InitJson()
@@ -54,9 +59,50 @@ void SideEnemy::InitJson()
 
 void SideEnemy::KnockBackDir()
 {
-	// 吹っ飛び方向の計算（プレイヤー中心 - 敵中心 → 正規化）
-	Vector3 direction = Normalize(GetCenterPosition() - player_->GetCenterPosition());
-	ApplyKnockback(direction, 0.6f); // ← 距離調整可能
+	Vector3 diff = GetCenterPosition() - player_->GetCenterPosition();
+	Vector3 flatDir = { diff.x, diff.y, 0.0f };
+
+	if (Length(flatDir) < 1e-5f) {
+		flatDir = { 1.0f, 1.0f, 0.0f };
+	}
+
+	static const Vector3 directions[4] = {
+		Normalize(Vector3{  1.0f,  1.0f, 0.0f }),
+		Normalize(Vector3{ -1.0f,  1.0f, 0.0f }),
+		Normalize(Vector3{  1.0f, -1.0f, 0.0f }),
+		Normalize(Vector3{ -1.0f, -1.0f, 0.0f })
+	};
+
+	float maxDot = -FLT_MAX;
+	Vector3 bestDir = directions[0];
+
+	for (const Vector3& dir : directions) {
+		float dot = Dot(Normalize(flatDir), dir);
+		if (dot > maxDot) {
+			maxDot = dot;
+			bestDir = dir;
+		}
+	}
+	float min = 2.0f;
+	float max = 32.0f;
+	float len = max - min;
+	float t = 0;
+	if (bestDir.x > 0)
+	{
+		t = max - GetCenterPosition().x;
+	}
+	else
+	{
+		t = GetCenterPosition().x - min;
+	}
+	t = t / len;
+	// ノックバック max4.9 min0.7
+	ApplyKnockback(bestDir, Lerp(0.7f, 4.9f, t));
+
+	// 吹っ飛び中の回転速度（ラジアン/秒）を設定
+	angularVelocityY_ = DirectX::XMConvertToRadians(360.0f * 1.0f);  // 1秒で1回転
+
+	isSpinning_ = true;  // 回転中フラグON
 }
 
 void SideEnemy::Update()
@@ -68,7 +114,7 @@ void SideEnemy::Update()
 		return;
 	}
 
-	if (!IsStop()) // 攻撃を食らったら次まで動かない
+	if (!IsStop() && !isStop_) // 攻撃を食らったら次まで動かない
 	{
 		Move();
 
@@ -87,16 +133,19 @@ void SideEnemy::Update()
 	}
 
 	KnockBack();
+	kirisuteUpdate();
 	worldTransform_.UpdateMatrix();
 	//aabbCollider_->Update();
 	obbCollider_->Update();
+
+	IconUpdate();
 }
 
 void SideEnemy::Draw()
 {
 	if (!isFaint_) // 攻撃を食らったら次まで描画しない
 	{
-		obj_->Draw(camera_, worldTransform_);
+		obj_->Draw(camera_, kirisutegomennWT_);
 	}
 }
 
@@ -143,9 +192,9 @@ void SideEnemy::OnDirectionCollision(BaseCollider* self, BaseCollider* other, Hi
 		HitDirection selfDir = Collision::GetSelfLocalHitDirection(self, other);
 		HitDirection otherDir = Collision::GetSelfLocalHitDirection(other, self);
 
-		if (player_->behavior_ == BehaviorPlayer::Moving)
+		/*if (player_->behavior_ == BehaviorPlayer::Moving)
 		{
-			if (selfDir != HitDirection::None && !isHit)
+			if (!isHit)
 			{
 				isHit = true;
 				if (selfDir != HitDirection::Back)
@@ -155,7 +204,7 @@ void SideEnemy::OnDirectionCollision(BaseCollider* self, BaseCollider* other, Hi
 					sourceVoice_ = Audio::GetInstance()->SoundPlayAudio(soundData_, false);
 				}
 			}
-		}
+		}*/
 	}
 }
 

@@ -14,7 +14,6 @@
 #include "Sprite/Sprite.h"
 #include "WorldTransform./WorldTransform.h"
 #include "Drawer/LineManager/Line.h"
-#include "Ground/Ground.h"
 #include "../Transitions/Fade/Fade.h"
 #include "Systems/MapChip/MapChipInfo.h"
 #include "Systems/UI/UIBase.h"
@@ -32,11 +31,10 @@
 #include "../SystemsApp/Picture/Picture.h"
 #include "Player/Player.h"
 #include "Grass/GrassManager.h"
-#include "../SpriteApp/ScreenApp/GameScreen.h"
+#include "../../../SpriteApp/GameScreen.h"
 #include "StageManager.h"
 #include "StageEditor.h"
 #include "Giraffe/Giraffe.h"
-
 #include "Particle/ParticleEmitter.h"
 
 enum class CameraMode
@@ -157,14 +155,13 @@ private:
 
     =================================================================*/
 	std::unique_ptr<GameScreen> gameScreen_;
-
+    std::unique_ptr<Sprite> back_;
 
     /*=================================================================
 
                                オブジェクト関連
 
     =================================================================*/
-    std::unique_ptr<Ground> ground_;
     std::unique_ptr<Giraffe> giraffe_;
 
     // 3Dモデル
@@ -182,6 +179,7 @@ private:
 
     =================================================================*/
     std::unique_ptr<MapChipInfo> mpInfo_;
+	std::unique_ptr<JsonManager> jsonManager_;
     bool isClear_ = false;
 
     // ステージ関連（3Dモデル含む）

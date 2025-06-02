@@ -99,6 +99,11 @@ public:
     bool TriggerKey(BYTE keyNumber);
 
     /// <summary>
+    /// いずれかのキーが押されているか
+    /// </summary>
+    bool IsAnyKeyPressed() const;
+
+    /// <summary>
     /// 特定のキーが押され続けている時間を取得する
     /// </summary>
     /// <param name="keyNumber">キー番号</param>
@@ -278,6 +283,8 @@ public:
     /// </summary>
     /// <returns></returns>
     bool IsRightStickMoving();
+
+
 
 private:
 

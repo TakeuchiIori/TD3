@@ -18,13 +18,14 @@ bool::Player::isHit = false;
 
 Player::~Player()
 {
-	//aabbCollider_->~AABBCollider();
 	obbCollider_->~OBBCollider();
 	nextAabbCollider_->~AABBCollider();
 	Audio::GetInstance()->PauseAudio(sourceVoiceGrow);
 	Audio::GetInstance()->PauseAudio(sourceVoiceBoost);
 	Audio::GetInstance()->PauseAudio(sourceVoiceDamage);
-	Audio::GetInstance()->PauseAudio(sourceVoiceEat);
+	Audio::GetInstance()->PauseAudio(sourceVoiceEat[0]);
+	Audio::GetInstance()->PauseAudio(sourceVoiceEat[1]);
+	Audio::GetInstance()->PauseAudio(sourceVoiceEat[2]);
 	Audio::GetInstance()->PauseAudio(sourceVoiceYodare);
 }
 
@@ -36,26 +37,34 @@ void Player::Initialize(Camera* camera)
 
 	// トランスフォームの初期化
 	worldTransform_.Initialize();
-	worldTransform_.translation_ = { 2.0f,6.0f,0.0f };
+	worldTransform_.translation_ = { 4.0f,0.0f,0.0f };
 	worldTransform_.scale_ = { 0.99f,0.99f,0.99f };
 	modelWT_.Initialize();
 	modelWT_.parent_ = &worldTransform_;
-	modelWT_.rotation_.y = std::numbers::pi_v<float>;
-	//worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
 	nextWorldTransform_.Initialize();
 	nextWorldTransform_.translation_ = worldTransform_.translation_;
 	nextWorldTransform_.scale_ = worldTransform_.scale_;
 
+	legWT_.Initialize();
+	legWT_.translation_ = worldTransform_.translation_;
+
 	worldTransform_.UpdateMatrix();
 	modelWT_.UpdateMatrix();
 	nextWorldTransform_.UpdateMatrix();
+	//legWT_.UpdateMatrix();
 
 	// オブジェクトの初期化
 	obj_ = std::make_unique<Object3d>();
 	obj_->Initialize();
-	obj_->SetModel("kirin_yodare.gltf",true);
+	obj_->SetModel("kirin.gltf", true);
 	obj_->SetMaterialColor(defaultColorV4_);
 	//obj_->SetLoopAnimation(true);  無限ループ再生
+
+	legObj_ = std::make_unique<Object3d>();
+	legObj_->Initialize();
+	legObj_->SetModel("walk.gltf", true);
+	legObj_->SetLoopAnimation(true);
+	legObj_->SetMaterialColor(defaultColorV4_);
 
 	for (size_t i = 0; i < kMaxHP_; ++i)
 	{
@@ -63,39 +72,39 @@ void Player::Initialize(Camera* camera)
 		haert->Initialize(camera_);
 		haerts_.push_back(std::move(haert));
 	}
-	
-
-	/*SphereCollider::SetCamera(BaseObject::camera_);
-	SphereCollider::Initialize();*/
 
 	InitCollision();
 	InitJson();
-	//colliderRct_.height = 2.0f;
-	//colliderRct_.width = 2.0f;
 
 	soundDataGrow = Audio::GetInstance()->LoadAudio(L"Resources/Audio/Grow.mp3");
 	soundDataBoost = Audio::GetInstance()->LoadAudio(L"Resources/Audio/acceleration.mp3");
 
 	soundDataDamage = Audio::GetInstance()->LoadAudio(L"Resources/Audio/damage.mp3");
-	soundDataEat = Audio::GetInstance()->LoadAudio(L"Resources/Audio/eat.mp3");
+	soundDataEat[0] = Audio::GetInstance()->LoadAudio(L"Resources/Audio/eat.mp3");
+	soundDataEat[1] = Audio::GetInstance()->LoadAudio(L"Resources/Audio/eat2.mp3");
+	soundDataEat[2] = Audio::GetInstance()->LoadAudio(L"Resources/Audio/eat3.mp3");
 	soundDataYodare = Audio::GetInstance()->LoadAudio(L"Resources/Audio/yodare.mp3");
+
+	soundDataTumari = Audio::GetInstance()->LoadAudio(L"Resources/Audio/tumaru.mp3");
+	soundDataTimeUp = Audio::GetInstance()->LoadAudio(L"Resources/Audio/timeUp.mp3");
+
+	soundDataDashGauge = Audio::GetInstance()->LoadAudio(L"Resources/Audio/dashGauge.mp3");
 	// 音量の設定（0.0f ～ 1.0f）
 	//Audio::GetInstance()->SetVolume(sourceVoice, 0.5f);
 
 
-	emitter_ = std::make_unique<ParticleEmitter>("YodareParticle",worldTransform_.translation_,3);
+	emitter_ = std::make_unique<ParticleEmitter>("YodareParticle", worldTransform_.translation_, 3);
 	emitter_->Initialize("Yodare");
+
+
+	uiA_ = std::make_unique<Sprite>();
+	uiA_->Initialize("Resources/Textures/Option/controller.png");
+	uiA_->SetSize({ 50.0f, 50.0f });
+	uiA_->SetAnchorPoint({ 0.5f, 0.5f });
 }
 
 void Player::InitCollision()
 {
-	/*aabbCollider_ = ColliderFactory::Create<AABBCollider>(
-		this,
-		&worldTransform_,
-		camera_,
-		static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)
-	);*/
-
 	obbCollider_ = ColliderFactory::Create<OBBCollider>(
 		this,
 		&worldTransform_,
@@ -116,11 +125,12 @@ void Player::InitJson()
 	jsonManager_ = std::make_unique<JsonManager>("Obj", "Resources/JSON/");
 	jsonManager_->SetCategory("Objects");
 	jsonManager_->SetSubCategory("Player");
-	jsonManager_->Register("位置", &worldTransform_.translation_);
-	jsonManager_->Register("通常時の移動速度",&defaultSpeed_);
+	jsonManager_->Register("頭の位置", &worldTransform_.translation_);
+	jsonManager_->Register("体の位置", &legWT_.translation_);
+	jsonManager_->Register("通常時の移動速度", &defaultSpeed_);
 	jsonManager_->Register("ブースト時の速度", &boostSpeed_);
 	jsonManager_->Register("帰還時の速度", &returnSpeed_);
-	jsonManager_->Register("伸びられるタイマーの限界値", &kTimeLimit_);
+	jsonManager_->Register("帰還時のブースト", &returnBoost_);
 
 	jsonManager_->Register("ブーストの最大効果時間", &kBoostTime_);
 	jsonManager_->Register("ブーストのクールタイム", &kBoostCT_);
@@ -135,8 +145,16 @@ void Player::InitJson()
 
 	jsonManager_->Register("方向転換できるまでの距離", &moveInterval_);
 
+	jsonManager_->Register("コンボタイマー持続秒数", &kComboTimeLimit_);
+	jsonManager_->Register("最大コンボ数", &kMaxCombo_);
+
+
+	jsonManager_->Register("スティックUIのオフセット", &offsetUI_);
+	jsonManager_->Register("説明のUIが表示されるまでの時間", &kShowRootTime_);
+	
+
+
 	jsonCollider_ = std::make_unique<JsonManager>("playerCollider", "Resources/JSON/");
-	//aabbCollider_->InitJson(jsonCollider_.get());
 }
 
 void Player::Update()
@@ -144,13 +162,19 @@ void Player::Update()
 	canSpitting_ = false;
 	beforebehavior_ = behavior_;
 
-	if (input_->IsPadTriggered(0, GamePadButton::B)) {
-		obj_->GetModel()->PlayAnimation();
+	// Bボタンで一回だけ「食べるアニメーション」再生
+	if (!isAnimation_ && (input_->IsPadTriggered(0, GamePadButton::B))) {
+
+		sourceVoiceYodare = Audio::GetInstance()->SoundPlayAudio(soundDataYodare, false);
+		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceYodare, kSE);
+		obj_->ChangeModelAnimation("Yodare.gltf", 1);
+		//emitter_->EmitFrom(worldTransform_.translation_, worldTransform_.translation_);
+		isAnimation_ = true;
 	}
+
 
 	// 各行動の初期化
 	BehaviorInitialize();
-
 	// 各行動の更新
 	BehaviorUpdate();
 
@@ -163,6 +187,10 @@ void Player::Update()
 
 	DamageProcessBodys();
 
+	UpdateCombo();
+
+	UpdateSprite();
+
 	TimerManager();
 
 	HeartPos();
@@ -170,12 +198,17 @@ void Player::Update()
 	HeadDir();
 
 	UpdateMatrices();
-	
+
 	//aabbCollider_->Update();
 	obj_->UpdateAnimation();
+	legObj_->UpdateAnimation();
 	obbCollider_->Update();
 	nextAabbCollider_->Update();
-	
+
+	for (auto& drip : drips_) {
+		drip->Update();
+	}
+
 #ifdef _DEBUG
 	DebugPlayer();
 #endif // _DEBUG
@@ -183,27 +216,52 @@ void Player::Update()
 
 void Player::Draw()
 {
-	
 
-	for (const auto& body : playerBodys_) 
+	for (auto& drip : drips_) {
+		drip->Draw();
+	}
+
+	for (const auto& body : stuckGrassList_)
 	{
 		body->Draw();
 	}
 
-	for (const auto& body : stuckGrassList_) 
+	for (const auto& body : playerBodys_)
 	{
 		body->Draw();
 	}
 
-	for (size_t i = 0; i < drawCount_; ++i)
+	// ハートを点滅させる処理
+	static bool isActive = false;
+	static int frameCount = 0;
+
+	if(invincibleTimer_ > 0 && behavior_ != BehaviorPlayer::Boost)
 	{
-		haerts_[i]->Draw();
+		frameCount++;
+		if (frameCount % 3 == 0) {
+			isActive = !isActive;
+		}
 	}
+	else
+	{
+		isActive = false;
+	}
+
+	if(!isActive)
+	{
+		for (size_t i = 0; i < drawCount_; ++i)
+		{
+			haerts_[i]->Draw();
+		}
+	}
+
+
 }
 
 void Player::DrawAnimation()
 {
 	obj_->Draw(camera_, modelWT_);
+	legObj_->Draw(camera_, legWT_);
 }
 
 void Player::DrawCollision()
@@ -216,6 +274,13 @@ void Player::DrawCollision()
 	}
 	for (const auto& body : stuckGrassList_) {
 		body->DrawCollision();
+	}
+}
+
+void Player::DrawSprite()
+{
+	if (showUI_) {
+		uiA_->Draw();
 	}
 }
 
@@ -246,6 +311,8 @@ void Player::MapChipOnCollision(const CollisionInfo& info)
 
 void Player::Reset()
 {
+	obj_->ChangeModel("kirin.gltf", true);
+	worldTransform_.translation_.y = 6.2f;
 	extendTimer_ = 0;
 	boostCoolTimer_ = 0;
 	boostTimer_ = 0;
@@ -263,39 +330,57 @@ void Player::Reset()
 
 void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 {
-	if (behavior_ != BehaviorPlayer::Return && self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+	if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+	{
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kBalloon)) // 気球なら
+		{
+			kTimeLimit_ += kAddLimit_;
+		}
+	}
+	if ((behavior_ == BehaviorPlayer::Moving || behavior_ == BehaviorPlayer::Boost) && self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
 	{
 		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrass)) // 草を食べたら
 		{
-			// オーディオの再生
-			sourceVoiceEat = Audio::GetInstance()->SoundPlayAudio(soundDataEat, false);
-			AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceEat, kSE);
+			AddCombo(1);
+
 			if (kMaxGrassGauge_ > grassGauge_ && createGrassTimer_ <= 0)
 			{
-				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.1f)
+				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= 2.1f)
 				{
-					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + grassTime_);
-				} 
-				else
+					isAddTime_ = true;
+					addTime_ = grassTime_;
+					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + addTime_);
+					addTime_ = grassTime_;
+				} else
 				{
-					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + largeGrassTime_);
+					isAddTime_ = true;
+					addTime_ = largeGrassTime_;
+					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + addTime_);
+					addTime_ = largeGrassTime_;
 				}
 				grassGauge_++;
+
 				if (kMaxGrassGauge_ <= grassGauge_)
 				{
+					isAddTime_ = true;
 					createGrassTimer_ = kCreateGrassTime_;
 					isCreateGrass_ = true;
 				}
-			}
-			else
+			} else
 			{
-				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= /*GetRadius()*/1.1f)
+				if (dynamic_cast<AABBCollider*>(other)->GetWorldTransform().scale_.x <= 2.1f)
 				{
-					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + (grassTime_ / 2.0f));
+					isAddTime_ = true;
+					addTime_ = grassTime_;
+					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + addTime_);
+					addTime_ = grassTime_;
 				}
 				else
 				{
-					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + (largeGrassTime_ / 2.0f));
+					isAddTime_ = true;
+					addTime_ = largeGrassTime_;
+					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + addTime_);
+					addTime_ = largeGrassTime_;
 				}
 			}
 		}
@@ -312,6 +397,19 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 
 void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 {
+	if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+	{
+		if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kStopArea))
+		{
+			if (input_->IsPadTriggered(0, GamePadButton::B))
+			{
+				// オーディオの再生
+				sourceVoiceGrow = Audio::GetInstance()->SoundPlayAudio(soundDataGrow, false);
+				AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceGrow, kSE);
+			}
+		}
+	}
+
 	if (behavior_ == BehaviorPlayer::Moving || behavior_ == BehaviorPlayer::Boost)
 	{
 		if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
@@ -319,15 +417,52 @@ void Player::OnCollision(BaseCollider* self, BaseCollider* other)
 			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kGrowthArea)) // 草の成長エリア
 			{
 				canSpitting_ = true;
-				if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
+				grassXDir_ = other->GetCenterPosition().x - GetCenterPosition().x;
+				if (input_->IsPadTriggered(0, GamePadButton::B))
 				{
-						// 唾を吐く
-						sourceVoiceYodare = Audio::GetInstance()->SoundPlayAudio(soundDataYodare, false);
-						AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceYodare, kSE);
-						//emitter_->EmitFromTo(worldTransform_.translation_, other->GetWorldTransform().translation_);
-						// オーディオの再生
-						sourceVoiceGrow = Audio::GetInstance()->SoundPlayAudio(soundDataGrow, false);
-						AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceGrow, kSE);
+					// 唾を吐く
+					emitter_->EmitFromTo(worldTransform_.translation_, other->GetWorldTransform().translation_);
+					// オーディオの再生
+					sourceVoiceGrow = Audio::GetInstance()->SoundPlayAudio(soundDataGrow, false);
+					AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceGrow, kSE);
+
+					if (moveDirection_ == Vector3{ 0, 1, 0 })
+					{
+						if (worldTransform_.translation_.x - other->GetCenterPosition().x >= 0)
+						{
+							worldTransform_.rotation_.y = std::numbers::pi_v<float>;
+						} else
+						{
+							worldTransform_.rotation_.y = 0;
+						}
+					} else if (moveDirection_ == Vector3{ 0, -1, 0 })
+					{
+						if (worldTransform_.translation_.x - other->GetCenterPosition().x >= 0)
+						{
+							worldTransform_.rotation_.y = 0;
+						} else
+						{
+							worldTransform_.rotation_.y = std::numbers::pi_v<float>;
+						}
+					} else if (moveDirection_ == Vector3{ 1, 0, 0 })
+					{
+						if (worldTransform_.translation_.y - other->GetCenterPosition().y >= 0)
+						{
+							worldTransform_.rotation_.y = 0;
+						} else
+						{
+							worldTransform_.rotation_.y = std::numbers::pi_v<float>;
+						}
+					} else if (moveDirection_ == Vector3{ -1, 0, 0 })
+					{
+						if (worldTransform_.translation_.y - other->GetCenterPosition().y >= 0)
+						{
+							worldTransform_.rotation_.y = std::numbers::pi_v<float>;
+						} else
+						{
+							worldTransform_.rotation_.y = 0;
+						}
+					}
 				}
 			}
 		}
@@ -360,26 +495,17 @@ void Player::OnExitCollision(BaseCollider* self, BaseCollider* other)
 ///////////////////////////////////////////////////////////
 void Player::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDirection dir)
 {
-	if(self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
+	if (self->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer))
 	{
 		// 敵からダメージ受ける
 		if (behavior_ == BehaviorPlayer::Moving)
 		{
 			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kEnemy))
 			{
-				HitDirection hitDir = Collision::GetSelfLocalHitDirection(self, other);
-				HitDirection otherDir = Collision::GetSelfLocalHitDirection(other, self);
-				if (otherDir != HitDirection::None && !isHit)
+				if (!isHit)
 				{
 					isHit = true;
-					if (otherDir == HitDirection::Back)
-					{
-						TakeDamage();
-					}
-					else
-					{
-						Eliminate();
-					}
+					TakeDamage();
 				}
 			}
 		}
@@ -392,11 +518,8 @@ void Player::OnDirectionCollision(BaseCollider* self, BaseCollider* other, HitDi
 			if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayerBody))
 			{
 				HitDirection hitDir = Collision::GetSelfLocalHitDirection(self, other);
-				if (hitDir == HitDirection::Top)
-				{
-					isCollisionBody = true;
-					TakeDamage();
-				}
+				isCollisionBody = true;
+				TakeDamage();
 			}
 
 		}
@@ -411,11 +534,12 @@ void Player::UpdateMatrices()
 	worldTransform_.UpdateMatrix();
 	modelWT_.UpdateMatrix();
 	nextWorldTransform_.UpdateMatrix();
-	for (const auto& body : playerBodys_) 
+	legWT_.UpdateMatrix();
+	for (const auto& body : playerBodys_)
 	{
 		body->Update();
 	}
-	for (const auto& body : stuckGrassList_) 
+	for (const auto& body : stuckGrassList_)
 	{
 		body->Update();
 	}
@@ -438,12 +562,12 @@ void Player::Move()
 		stick = {};
 	}
 
-	if(Length(moveHistory_.back() - worldTransform_.translation_) >= moveInterval_ || isCollisionBody) ChangeDir();
-	
+	if (Length(moveHistory_.back() - worldTransform_.translation_) >= moveInterval_ || isCollisionBody) ChangeDir();
+
 
 	moveDirection_ = Normalize(moveDirection_);
 
-	if(beforeDirection_ == moveDirection_)
+	if (beforeDirection_ == moveDirection_)
 	{
 		velocity_ += moveDirection_ * speed_;
 	}
@@ -466,71 +590,90 @@ void Player::Move()
 	if (isCollisionBody && beforeDirection_ == moveDirection_)
 	{
 		newPos = worldTransform_.translation_;
-		velocity_ = { 0,0,0 };
+		velocity_ = { 0.0f,0.0f,0.0f };
 		isCollisionBody = false;
+	} else {
+
+		worldTransform_.translation_ = newPos;
+		nextWorldTransform_.translation_ = newPos + velocity_;
+
 	}
-
-	worldTransform_.translation_ = newPos;
-	nextWorldTransform_.translation_ = newPos + velocity_;
-
 	ExtendBody();
 
 }
 
 void Player::ChangeDir()
 {
-	if ((input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP)) &&
+	/*if ((input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP)) &&
 		moveDirection_ != Vector3{ 0,1,0 } &&
 		moveDirection_ != Vector3{ 0,-1,0 })
 	{
 		UpBody();
-	}
-	else if ((input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN)) &&
+	} else if ((input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN)) &&
 		moveDirection_ != Vector3{ 0,-1,0 } &&
 		moveDirection_ != Vector3{ 0,1,0 })
 	{
 		DownBody();
-	}
-	else if ((input_->TriggerKey(DIK_A) || input_->TriggerKey(DIK_LEFT)) &&
+	} else if ((input_->TriggerKey(DIK_A) || input_->TriggerKey(DIK_LEFT)) &&
 		moveDirection_ != Vector3{ -1,0,0 } &&
 		moveDirection_ != Vector3{ 1,0,0 })
 	{
 		LeftBody();
-	}
-	else if ((input_->TriggerKey(DIK_D) || input_->TriggerKey(DIK_RIGHT)) &&
+	} else if ((input_->TriggerKey(DIK_D) || input_->TriggerKey(DIK_RIGHT)) &&
 		moveDirection_ != Vector3{ 1,0,0 } &&
 		moveDirection_ != Vector3{ -1,0,0 })
 	{
 		RightBody();
-	}
-	else  if (std::abs(stick.x) > std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
+	} else  */if (std::abs(stick.x) > std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
 	{
 		if (stick.x > 0 &&
 			moveDirection_ != Vector3{ 1,0,0 } &&
 			moveDirection_ != Vector3{ -1,0,0 })
 		{
 			RightBody();
-		}
-		else if (moveDirection_ != Vector3{ -1,0,0 } &&
+		} else if (moveDirection_ != Vector3{ -1,0,0 } &&
 			moveDirection_ != Vector3{ 1,0,0 })
 		{
 			LeftBody();
 		}
-	}
-	else if (stick.x != 0 || stick.y != 0)
+	} else if (stick.x != 0 || stick.y != 0)
 	{
 		if (stick.y > 0 &&
 			moveDirection_ != Vector3{ 0,1,0 } &&
 			moveDirection_ != Vector3{ 0,-1,0 })
 		{
 			UpBody();
-		}
-		else if (moveDirection_ != Vector3{ 0,-1,0 } &&
+		} else if (moveDirection_ != Vector3{ 0,-1,0 } &&
 			moveDirection_ != Vector3{ 0,1,0 })
 		{
 			DownBody();
 		}
 	}
+}
+
+void Player::ChangeDirRoot()
+{/*
+	if ((input_->PushKey(DIK_A) || input_->PushKey(DIK_LEFT)))
+	{
+		moveDirection_ = { -1,0,0 };
+		worldTransform_.rotation_.y = std::numbers::pi_v<float>;
+	} else if ((input_->PushKey(DIK_D) || input_->PushKey(DIK_RIGHT)))
+	{
+		moveDirection_ = { 1,0,0 };
+		worldTransform_.rotation_.y = 0;
+	} else  */if (std::abs(stick.x) > std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
+	{
+		if (stick.x > 0)
+		{
+			moveDirection_ = { 1,0,0 };
+			worldTransform_.rotation_.y = 0;
+		} else
+		{
+			moveDirection_ = { -1,0,0 };
+			worldTransform_.rotation_.y = std::numbers::pi_v<float>;
+		}
+	}
+	legWT_.rotation_.y = worldTransform_.rotation_.y;
 }
 
 #pragma region // 体が伸びる向き決定
@@ -590,6 +733,8 @@ void Player::RightBody()
 
 void Player::EntryMove()
 {
+	velocity_ = { 0.0f,0.0f,0.0f };
+	moveDirection_ = { 0.0f,0.0f,0.0f };
 
 	if (input_->IsControllerConnected())
 	{
@@ -599,14 +744,37 @@ void Player::EntryMove()
 		stick = {};
 	}
 
-	if ((input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP)))
+	ChangeDirRoot();
+
+	velocity_ += moveDirection_ * speed_;
+
+
+	Vector3 newPos = worldTransform_.translation_;
+	newPos = worldTransform_.translation_ + velocity_;
+
+	mpCollision_.DetectAndResolveCollision(
+		colliderRect_,  // 衝突判定用矩形
+		newPos,    // 更新される位置（衝突解決後）
+		velocity_,      // 更新される速度
+		MapChipCollision::CollisionFlag::All,  // すべての方向をチェック
+		[this](const CollisionInfo& info) {
+			// 衝突時の処理（例：特殊ブロック対応）
+			MapChipOnCollision(info);
+		}
+	);
+
+	worldTransform_.translation_ = newPos;
+	nextWorldTransform_.translation_ = newPos + velocity_;
+
+/*	if ((input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP)))
 	{
 		behaviortRquest_ = BehaviorPlayer::Moving;
 		moveDirection_ = { 0,1,0 };
 		extendTimer_ = kTimeLimit_;
 		moveHistory_.push_back(worldTransform_.translation_);
-	}
-	else if (std::abs(stick.x) < std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
+		showUI_ = false;
+	} 
+	else */if (std::abs(stick.x) < std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
 	{
 		if (stick.y > 0)
 		{
@@ -614,6 +782,7 @@ void Player::EntryMove()
 			moveDirection_ = { 0,1,0 };
 			extendTimer_ = kTimeLimit_;
 			moveHistory_.push_back(worldTransform_.translation_);
+			showUI_ = false;
 		}
 	}
 #ifdef _DEBUG
@@ -622,31 +791,41 @@ void Player::EntryMove()
 
 void Player::EntryBoost()
 {
-	if(0 >= boostCoolTimer_)
+	if (0 >= boostCoolTimer_)
 	{
-		if (input_->TriggerKey(DIK_E) || input_->IsPadTriggered(0, GamePadButton::A))
+		if (/*input_->TriggerKey(DIK_E) ||*/ input_->IsPadTriggered(0, GamePadButton::A))
 		{
 			behaviortRquest_ = BehaviorPlayer::Boost;
 		}
-#ifdef _DEBUG
-#endif // _DEBUG
 	}
 }
 
 void Player::EntryReturn()
 {
 	behaviortRquest_ = BehaviorPlayer::Return;
+	if(extendTimer_ <= 0)
+	{
+		sourceVoiceTimeUp = Audio::GetInstance()->SoundPlayAudio(soundDataTimeUp, false);
+		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceTimeUp, kSE);
+		pauseUpdate_ = true;
+	}
+	extendTimer_ = 0;
 }
 
 void Player::TimerManager()
 {
-	if (0 < extendTimer_) 
+	if (0 < extendTimer_ && behavior_ != BehaviorPlayer::ZeroHP)
 	{
 		extendTimer_ -= deltaTime_;
 	}
 	if (0 < boostCoolTimer_)
 	{
 		boostCoolTimer_ -= deltaTime_;
+		if (0 >= boostCoolTimer_)
+		{
+			sourceVoiceDashGauge = Audio::GetInstance()->SoundPlayAudio(soundDataDashGauge);
+			AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceDashGauge, kSE);
+		}
 	}
 	if (0 < boostTimer_)
 	{
@@ -656,6 +835,14 @@ void Player::TimerManager()
 	{
 		createGrassTimer_ -= deltaTime_;
 	}
+
+	obj_->SetMaterialColor(defaultColorV3_);
+
+	for (const auto& body : playerBodys_)
+	{
+		body->SetColor(defaultColorV3_);
+	}
+
 	if (0 < invincibleTimer_)
 	{
 		static int time = 0;
@@ -668,16 +855,14 @@ void Player::TimerManager()
 		if (isRed_)
 		{
 			changeColor_ = { 1,0,0 };
-		}
-		else
+		} else
 		{
 			if (time == 0)
 			{
-				if(changeColor_ == defaultColorV3_)
+				if (changeColor_ == defaultColorV3_)
 				{
 					changeColor_ = { 1,1,1 };
-				}
-				else
+				} else
 				{
 					changeColor_ = defaultColorV3_;
 				}
@@ -695,11 +880,26 @@ void Player::TimerManager()
 
 		obj_->SetMaterialColor(changeColor_);
 
-		for (const auto& body : playerBodys_) 
+		for (const auto& body : playerBodys_)
 		{
 			body->SetColor(changeColor_);
 		}
 	}
+
+	// コンボの処理
+	isStuckGrass_ = false;
+	if (comboTimer_ > 0.0f) {
+		comboTimer_ -= deltaTime_;
+		if (comboTimer_ <= 0.0f) {
+			if (comboCount_ == 3)
+			{
+				isStuckGrass_ = true;
+			}
+			comboCount_ = 0;
+			lastPlayedComboCount_ = 0;
+		}
+	}
+
 }
 
 void Player::TimerZero()
@@ -709,17 +909,61 @@ void Player::TimerZero()
 	boostTimer_ = 0;
 	createGrassTimer_ = 0;
 	invincibleTimer_ = 0;
+
+	comboCount_ = 0;
+	lastPlayedComboCount_ = 0;
+	comboTimer_ = 0.0f;
+}
+
+void Player::UpdateSprite()
+{
+
+	time_ += GameTime::GetDeltaTime();
+	if (time_ >= 1.0f) {
+		uiA_->ChangeTexture("Resources/Textures/Option/controller2.png");
+		uiA_->SetSize({ 50.0f, 50.0f });
+		uiA_->SetAnchorPoint({ 0.5f, 0.5f });
+	}
+
+	if (time_ >= 2.0f) {
+		time_ = 0.0f;
+		uiA_->ChangeTexture("Resources/Textures/Option/controller.png");
+		uiA_->SetSize({ 50.0f, 50.0f });
+		uiA_->SetAnchorPoint({ 0.5f, 0.5f });
+
+	}
+
+
+
+
+	Vector3 playerPos = worldTransform_.translation_;
+	Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kClientWidth, WinApp::kClientHeight, 0, 1);
+	Matrix4x4 matViewProjectionViewport = Multiply(camera_->GetViewMatrix(), Multiply(camera_->GetProjectionMatrix(), matViewport));
+	playerPos = Transform(playerPos, matViewProjectionViewport);
+	playerPos += offsetUI_;
+	uiA_->SetPosition(playerPos);
+	uiA_->Update();
+
+#ifdef _DEBUG
+	ImGui::Begin("DebugPlayer");
+	ImGui::DragFloat3("UITransration", &playerPos.x);
+	ImGui::End();
+#endif // _DEBUG
 }
 
 bool Player::IsPopGrass()
 {
-	if (0 >= createGrassTimer_ && isCreateGrass_)
+	if (isStuckGrass_)
 	{
+		sourceVoiceTumari = Audio::GetInstance()->SoundPlayAudio(soundDataTumari);
+		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceTumari, kSE);
 		grassGauge_ = 0;
 		std::unique_ptr<StuckGrass> stuck = std::make_unique<StuckGrass>();
 		stuck->Initialize(camera_);
 		stuck->SetPlayer(this);
-		stuck->SetPos(worldTransform_.translation_);
+		Vector3 newPos = worldTransform_.translation_;
+		newPos.z -= 0.5f;
+		stuck->SetPos(newPos);
 		stuckGrassList_.push_back(std::move(stuck));
 		isCreateGrass_ = false;
 		return true;
@@ -762,7 +1006,7 @@ void Player::ShrinkBody()
 
 void Player::TakeDamage()
 {
-	if(behavior_ != BehaviorPlayer::Return)
+	if (behavior_ != BehaviorPlayer::Return)
 	{
 		if (HP_ > 0 && invincibleTimer_ <= 0)
 		{
@@ -773,13 +1017,10 @@ void Player::TakeDamage()
 			// オーディオの再生
 			sourceVoiceDamage = Audio::GetInstance()->SoundPlayAudio(soundDataDamage, false);
 			AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceDamage, kSE);
+			invincibleTimer_ = kInvincibleTime_;
 			if (HP_ <= 0)
 			{
-				extendTimer_ = 0;
-			}
-			else
-			{
-				invincibleTimer_ = kInvincibleTime_;
+				behaviortRquest_ = BehaviorPlayer::ZeroHP;
 			}
 		}
 	}
@@ -792,8 +1033,7 @@ void Player::DamageProcessBodys()
 		if (0 < boostTimer_)
 		{
 			body->SetIsInvincible(true);
-		}
-		else
+		} else
 		{
 			body->SetIsInvincible(false);
 		}
@@ -811,8 +1051,7 @@ void Player::GrassGaugeUpdate()
 	if (grassGauge_ < kMaxGrassGauge_)
 	{
 		UIGauge_ = std::clamp(static_cast<float>(grassGauge_) / static_cast<float>(kMaxGrassGauge_), 0.0f, 1.0f);
-	}
-	else
+	} else
 	{
 		UIGauge_ = std::clamp(1.0f * (createGrassTimer_ / kCreateGrassTime_), 0.0f, 1.0f);
 	}
@@ -859,8 +1098,7 @@ void Player::HeartPos()
 				result.push_back({ position, angle });
 
 				targetDistance += length;
-			}
-			else {
+			} else {
 				accumulated += segLen;
 				prev = curr;
 				++it;
@@ -877,12 +1115,82 @@ void Player::HeartPos()
 	// resultに3つの配置場所が入っている（足りなければ少ない場合もある）
 }
 
+void Player::AddCombo(int amount)
+{
+	// ★ ここで3コンボ目が終わったらもう一度3コンボ目が発動されるようにする
+	if (comboCount_ == kMaxCombo_) {
+		comboCount_ = 2;
+		lastPlayedComboCount_ = 2;
+	}
+
+	if (comboCount_ < kMaxCombo_ + 1) {
+		comboCount_ = std::min(comboCount_ + amount, kMaxCombo_);
+		comboTimer_ = kComboTimeLimit_;
+	}
+}
+
+
+void Player::UpdateCombo()
+{
+	if (isAnimation_ && obj_->GetModel()->IsAnimationPlayFinished()) {
+		obj_->ChangeModel("kirin.gltf", true);
+		isAnimation_ = false;
+
+	}
+
+	if (comboCount_ == lastPlayedComboCount_) {
+		return;
+	}
+
+	switch (comboCount_) {
+	case 1:
+		obj_->ChangeModelAnimation("eat_1.gltf", 1);
+		isAnimation_ = true;
+		lastPlayedComboCount_ = comboCount_;
+		sourceVoiceEat[0] = Audio::GetInstance()->SoundPlayAudio(soundDataEat[0], false);
+		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceEat[0], kSE);
+		break;
+	case 2:
+		obj_->ChangeModelAnimation("eat_2.gltf", 1);
+		isAnimation_ = true;
+		lastPlayedComboCount_ = comboCount_;
+		sourceVoiceEat[1] = Audio::GetInstance()->SoundPlayAudio(soundDataEat[1], false);
+		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceEat[1], kSE);
+		break;
+	case 3:
+		obj_->ChangeModelAnimation("eat_3.gltf", 1);
+		isAnimation_ = true;
+		lastPlayedComboCount_ = comboCount_;
+		sourceVoiceEat[2] = Audio::GetInstance()->SoundPlayAudio(soundDataEat[2], false);
+		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceEat[2], kSE);
+		break;
+	default:
+		break;
+	}
+}
+
+void Player::CreateDrip(Vector3 startPos,Vector3 pos)
+{
+	for (int i = 0; i < numDrips_; i++) {
+		auto drip = std::make_unique<Drip>();
+		drip->Initialize(camera_);
+		Vector3 newPos = pos;
+		newPos.y += 2.0f;
+		drip->Shoot(startPos,newPos);
+		drips_.emplace_back(std::move(drip));
+	}
+
+
+}
+
+
 #ifdef _DEBUG
+
+
 void Player::DebugPlayer()
 {
 	int a = static_cast<int>(moveHistory_.size());
 	ImGui::Begin("DebugPlayer");
-	ImGui::Text("Start : SPACE  |  Boost : E or Pad:A  |  Return : N");
 	ImGui::Text("TimeLimit  : %.2f", extendTimer_);
 	ImGui::Text("BoostTimer : %.2f", boostTimer_);
 	ImGui::Text("BoostCT    : %.2f", boostCoolTimer_);
@@ -895,6 +1203,11 @@ void Player::DebugPlayer()
 	int c = HP_;
 	ImGui::Text("HP : %d", c);
 	ImGui::Text("Inv : %.2f", invincibleTimer_);
+
+
+	ImGui::Text("コンボ数：%d / %d", comboCount_, kMaxCombo_);
+	ImGui::Text("コンボタイマー：%.2f 秒", comboTimer_);
+	ImGui::Text("po-zujoutai: %d", pauseUpdate_);
 	ImGui::End();
 
 	if (input_->TriggerKey(DIK_N))
@@ -926,6 +1239,9 @@ void Player::BehaviorInitialize()
 		case BehaviorPlayer::Return:
 			BehaviorReturnInit();
 			break;
+		case BehaviorPlayer::ZeroHP:
+			BehaviorZeroHPInit();
+			break;
 		}
 		// 振る舞いリクエストをリセット
 		behaviortRquest_ = std::nullopt;
@@ -949,21 +1265,32 @@ void Player::BehaviorUpdate()
 	case BehaviorPlayer::Return:
 		BehaviorReturnUpdate();
 		break;
+	case BehaviorPlayer::ZeroHP:
+		BehaviorZeroHPUpdate();
+		break;
 	}
 
 }
 
 void Player::BehaviorRootInit()
 {
-	speed_ = 0;
+	speed_ = defaultSpeed_;
 	grassGauge_ = 0;
 	playerBodys_.clear();
 	isCollisionBody = false;
 	HP_ = kMaxHP_;
+	rootTimer_ = 0;
+	OffScreen::GetInstance()->SetEffectType(OffScreen::OffScreenEffectType::Copy);
 }
 
 void Player::BehaviorRootUpdate()
 {
+	rootTimer_ += GameTime::GetDeltaTime();
+	if (rootTimer_ >= kShowRootTime_)
+	{
+		showUI_ = true;
+	}
+	legWT_.translation_.x = worldTransform_.translation_.x;
 	EntryMove();
 }
 
@@ -1030,14 +1357,18 @@ void Player::BehaviorReturnInit()
 
 void Player::BehaviorReturnUpdate()
 {
+	speed_ = returnSpeed_;
+	if (input_->IsPadPressed(0, GamePadButton::A))
+	{
+		speed_ = returnSpeed_ + returnBoost_;
+	}
 	if (moveHistory_.size() > 0)
 	{
 		if (Length(worldTransform_.translation_ - moveHistory_.back()) > speed_)
 		{
 			Vector3 direction = Normalize(moveHistory_.back() - worldTransform_.translation_);
 			worldTransform_.translation_ += speed_ * direction;
-		}
-		else
+		} else
 		{
 			worldTransform_.translation_ = moveHistory_.back();
 			moveHistory_.pop_back();
@@ -1047,12 +1378,24 @@ void Player::BehaviorReturnUpdate()
 			{
 				return s->IsDelete();
 			});
-	}
-	else
+	} else
 	{
 		stuckGrassList_.clear();
 		behaviortRquest_ = BehaviorPlayer::Root;
 	}
 	nextWorldTransform_.translation_ = worldTransform_.translation_;
 	ShrinkBody();
+}
+
+void Player::BehaviorZeroHPInit()
+{
+	HP_ = kMaxHP_;
+}
+
+void Player::BehaviorZeroHPUpdate()
+{
+	if (invincibleTimer_ <= 0)
+	{
+		EntryReturn();
+	}
 }

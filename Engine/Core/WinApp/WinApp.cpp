@@ -102,7 +102,7 @@ bool WinApp::ProcessMessage()
 {
 	MSG msg{};
 
-	if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);

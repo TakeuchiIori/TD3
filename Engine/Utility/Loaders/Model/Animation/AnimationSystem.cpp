@@ -11,6 +11,7 @@
 // MAth
 #include "Vector3.h"
 #include "Quaternion.h"
+#include <Debugger/Logger.h>
 void AnimationSystem::Initialize(Animation& animation, Skeleton& skeleton, SkinCluster& skinCluster, Node* node)
 {
 	animation_ = &animation;
@@ -35,8 +36,10 @@ void AnimationSystem::Update(float deltaTime)
 	float duration = animation_->GetDuration();
 
 	if (animationTime_ >= duration) {
-		if (isLoop_) {
-			animationTime_ = 0.0f; // ループ
+		++loopCounter_;
+
+		if (isLoop_ && (loopCount_ == -1 || loopCounter_ < loopCount_)) {
+			animationTime_ = 0.0f; // 次のループへ
 		} else {
 			animationTime_ = duration;
 			isPlayRequested_ = false;
@@ -50,8 +53,8 @@ void AnimationSystem::Update(float deltaTime)
 			return;
 		}
 	}
-
 }
+
 
 
 
@@ -93,36 +96,36 @@ void AnimationSystem::Apply()
 
 
 void AnimationSystem::StartBlend(Animation& toAnimation, float blendDuration) {
+	// チェック済みブレンド可能なジョイントだけ処理
+	std::unordered_set<std::string> toAnimNodes;
+	for (const auto& [nodeName, _] : toAnimation.animation_.nodeAnimations_) {
+		toAnimNodes.insert(NormalizeNodeName(nodeName));
+	}
 
+	// ブレンド対象ノードをフィルタリング
 	for (Joint& joint : skeleton_->GetJoints()) {
 		std::string name = NormalizeNodeName(joint.GetName());
 
 		if (ignoreNodes.count(name)) {
 			continue; // 無視
 		}
-		bool found = false;
 
-		for (const auto& [nodeName, _] : toAnimation.animation_.nodeAnimations_) {
-			if (NormalizeNodeName(nodeName) == name) {
-				found = true;
-				break;
-			}
+		if (toAnimNodes.count(name) == 0) {
+			Logger("[Blend Warning] Node not found in destination animation: " + name + "\n");
+			continue;
 		}
 
-		if (!found) {
-			throw std::runtime_error("Animation" + name + "Not Blend Destination"); // ブレンド先が見つからない
-		}
 	}
 
-	/// アニメーションのブレンドの初期化
+	// アニメーションのブレンド初期化
 	animationBlendState_.from = *animation_;
-	animationBlendState_.fromTime = animationTime_;		// 現在の再生位置を保存
+	animationBlendState_.fromTime = animationTime_;
 	animationBlendState_.to = toAnimation;
-	animationBlendState_.toTime = 0.0f;					// 必要なら to 側も途中から再生可
+	animationBlendState_.toTime = 0.0f;
 	animationBlendState_.blendTime = blendDuration;
 	animationBlendState_.currentTime = 0.0f;
 	animationBlendState_.isBlending = true;
-	animation_ = &animationBlendState_.to;				// 今後は to を再生
+	animation_ = &animationBlendState_.to;
 }
 
 
@@ -245,3 +248,7 @@ void AnimationSystem::ResetPlay() {
 	animationTime_ = 0.0f;
 }
 
+void AnimationSystem::ResetPoseCache() {
+	initialPoseMap_.clear();
+	hasCachedInitialPose_ = false;
+}

@@ -21,23 +21,35 @@ void StageManager::Initialize(Camera* camera)
 	enemyManager_->SetPlayer(player_.get());
 	enemyManager_->Initialize(camera_, mpInfo_->GetMapChipField());
 
+	// 背景
+	background_ = std::make_unique<Background>();
+	background_->Initialzie();
+	//background_->SetColor({ 0.53f, 0.81f, 0.92f, 1.0f });
+
+	// 気球
+	balloon_ = std::make_unique<Balloon>();
+	balloon_->Initialize(camera_);
+
 	stageList_.push_back(std::make_unique<Stage>());
 	stageList_[0]->SetPlayer(player_.get());
 	stageList_[0]->SetGrassManager(grassManager_.get());
 	stageList_[0]->SetEnemyManager(enemyManager_.get());
+	stageList_[0]->SetBackground(background_.get());
+	stageList_[0]->SetBalloon(balloon_.get());
 	stageList_[0]->Initialize(camera_);
-
 
 	ReloadObject();
 
 
-	// コロンスプライトの初期化
+	// スプライトの初期化
 	transSprite_ = std::make_unique<Sprite>();
 	transSprite_->Initialize("Resources/Textures/In_Game/checkpointTrans.png");
 	transSprite_->SetAnchorPoint({ 0.5f, 0.5f });
 	transSpritePos_ = { 660,startY_,0 };
 	transSprite_->SetPosition(transSpritePos_);
 	transSprite_->SetSize(Vector2{ 616, 1024 });
+
+
 }
 
 void StageManager::InitJson()
@@ -72,6 +84,11 @@ void StageManager::NotDebugCameraUpdate()
 	stageList_[currentStageNum_]->NotDebugCameraUpdate();
 }
 
+void StageManager::DrawBackground()
+{
+	stageList_[currentStageNum_]->DrawBackground();
+}
+
 void StageManager::Draw()
 {
 	stageList_[currentStageNum_]->Draw();
@@ -85,6 +102,11 @@ void StageManager::DrawAnimation()
 void StageManager::DrawCollision()
 {
 	stageList_[currentStageNum_]->DrawCollision();
+}
+
+void StageManager::DrawSprite()
+{
+	stageList_[currentStageNum_]->DrawSprite();
 }
 
 void StageManager::DrawTransition()
@@ -102,17 +124,16 @@ void StageManager::CameraScroll()
 	{
 		float offset = (cameraScrollEnd_ - offsetY_ + player_->GetCenterPosition().y) - stageList_[currentStageNum_]->GetCheckPoint();
 		followCamera_->SetOffsetY(-offset);
-#ifdef _DEBUG
-		/*ImGui::Begin("Scroll");
-		ImGui::Text("%.2f", offset);
-		ImGui::End();*/
-#endif // _DEBUG
 	}
+
+	followCamera_->SetZoom(player_->IsZeroHP(), player_->GetCenterPosition());
 }
 
 void StageManager::ReloadObject()
 {
 	stageList_[currentStageNum_]->ReloadObject();
+
+
 }
 
 bool StageManager::CheckPointTransition()

@@ -16,6 +16,7 @@ void StageEditor::Save(const std::string& filename)
             cpJson["checkPointNumber"] = cp.checkPointNumber;
             cpJson["height"] = cp.height;
             cpJson["initX"] = cp.initX;
+            cpJson["timer"] = cp.timer;
 
             for (const auto& obj : cp.objects) {
                 cpJson["objects"].push_back({
@@ -66,6 +67,7 @@ void StageEditor::Load(const std::string& filename)
                 if (cpJson.contains("checkPointNumber")) cp.checkPointNumber = cpJson["checkPointNumber"];
                 if (cpJson.contains("height")) cp.height = cpJson["height"];
                 if (cpJson.contains("initX")) cp.initX = cpJson["initX"];
+                if (cpJson.contains("timer")) cp.timer = cpJson["timer"];
 
                 if (cpJson.contains("objects")) {
                     for (const auto& objJson : cpJson["objects"]) {
@@ -158,8 +160,9 @@ void StageEditor::DrawEditorUI()
 
                 if (selectedCheckPointIndex >= 0 && selectedCheckPointIndex < stage.checkPoints.size()) {
                     CheckPointStruct& cp = stage.checkPoints[selectedCheckPointIndex];
-                    ImGui::InputInt("チェックポイントの番号", &cp.checkPointNumber);
+                    ImGui::InputInt("チェックポイント番号", &cp.checkPointNumber);
                     ImGui::DragFloat("チェックポイントの高さ", &cp.height, 0.1f);
+                    ImGui::DragFloat("制限時間", &cp.timer, 0.1f);
                     ImGui::DragFloat("初期のX座標", &cp.initX, 0.1f);
 
                     for (int i = 0; i < cp.objects.size(); ++i) {

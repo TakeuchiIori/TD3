@@ -8,6 +8,7 @@
 #include "Collision/AABB/AABBCollider.h"
 #include "Loaders/Json/JsonManager.h"
 #include "Particle/ParticleEmitter.h"
+#include "Sprite/Sprite.h"
 
 // Collision
 #include "Collision/Sphere/SphereCollider.h"
@@ -21,7 +22,7 @@
 #include "PlayerBody.h"
 #include "StuckGrass.h"
 #include "PlayerHaert.h"
-
+#include "../Drip/Drip.h"
 #include "Systems/Audio/Audio.h"
 
 enum class BehaviorPlayer
@@ -30,6 +31,7 @@ enum class BehaviorPlayer
 	Moving,
 	Boost,
 	Return,
+	ZeroHP,
 };
 
 struct PointWithDirection {
@@ -71,6 +73,8 @@ public:
 
 	void DrawCollision();
 
+	void DrawSprite();
+
 	void MapChipOnCollision(const CollisionInfo& info);
 
 
@@ -107,6 +111,8 @@ private:
 
 	void ChangeDir();
 
+	void ChangeDirRoot();
+
 	void UpBody();
 	void DownBody();
 	void LeftBody();
@@ -125,6 +131,8 @@ private:
 	void TimerManager();
 	void TimerZero();
 
+	void UpdateSprite();
+
 	void ExtendBody();
 
 	void ShrinkBody();
@@ -139,7 +147,10 @@ private:
 
 	void HeartPos();
 
-	void HeadDir() {
+	void AddCombo(int amount);
+
+	void HeadDir() 
+	{
 		worldTransform_.rotation_.z = 0;
 		if (moveHistory_.size() > 1)
 		{
@@ -150,7 +161,12 @@ private:
 			worldTransform_.rotation_.z = angle + 3.0f * std::numbers::pi_v<float> / 2.0f;
 			nextWorldTransform_.rotation_ = worldTransform_.rotation_;
 		}
+
 	}
+
+	void UpdateCombo();
+
+	void CreateDrip(Vector3 startPos,Vector3 pos);
 
 
 #ifdef _DEBUG
@@ -190,6 +206,12 @@ private: // プレイヤーのふるまい
 	void BehaviorReturnUpdate();
 
 
+	// 帰還状態初期化
+	void BehaviorZeroHPInit();
+	// 帰還状態更新
+	void BehaviorZeroHPUpdate();
+
+
 public: // getter&setter
 
 	void SetMapInfo(MapChipField* mapChipField) { 
@@ -198,6 +220,12 @@ public: // getter&setter
 	}
 
 	bool IsBoost() { return behavior_ == BehaviorPlayer::Boost; }
+
+	bool IsReturn() { return behavior_ == BehaviorPlayer::Return; }
+
+	bool IsZeroHP() { return behavior_ == BehaviorPlayer::ZeroHP; }
+
+	bool StartReturn() { return behaviortRquest_ == BehaviorPlayer::Return; }
 
 	bool EndReturn() { return behaviortRquest_ == BehaviorPlayer::Root; }
 
@@ -224,10 +252,44 @@ public: // getter&setter
 		return 1.0f - boostCoolTimer_ / kBoostCT_;
 	}
 
+	void SetTimeLimit(float time) { kTimeLimit_ = time; }
+
+	bool IsAddTime()
+	{
+		if (isAddTime_)
+		{
+			isAddTime_ = false;
+			return true;
+		}
+		return false;
+	}
+
+	float GetAddtime() { return addTime_; }
+
+	bool StuckGrassPop() { 
+		if(stuckGrassList_.size() > 0)
+		{
+			return stuckGrassList_.back()->IsPop();
+		}
+		false;
+	}
+
+	bool CanBoost() { return boostCoolTimer_ <= 0 ? true : false; }
+
+	Vector3 GetMoveDirection() { return moveDirection_; }
+
+	bool PauseUpdate() { return pauseUpdate_; }
+
+	void ResumeUpdate() { pauseUpdate_ = false; }
+
+	float GetGrassXDir() { return grassXDir_; }
+
 private:
 	Input* input_ = nullptr;
 	
 	std::unique_ptr<ParticleEmitter> emitter_;
+	std::list<std::unique_ptr<Drip>> drips_;
+	int numDrips_ = 3;
 
 	std::unique_ptr<JsonManager> jsonManager_;
 	std::unique_ptr<JsonManager> jsonCollider_;
@@ -240,9 +302,13 @@ private:
 	MapChipCollision mpCollision_;
 	MapChipCollision::ColliderRect colliderRect_;
 
+	WorldTransform legWT_;
+	std::shared_ptr<Object3d> legObj_;
+
 	bool isCollisionBody = false;
 
 	bool isRed_ = false;
+	bool isAnimation_ = false;
 
 
 	const Vector4 defaultColorV4_ = { 0.90625f,0.87109f,0.125f,1.0f };
@@ -256,7 +322,8 @@ private:
 	Vector3 beforeDirection_ = { 0.0f,0.0f,0.0f };	// 動く向き(beforeFrame)
 	float defaultSpeed_ = 0.05f;					// 通常時の移動速度
 	float boostSpeed_ = 0.2f;						// ブースト時の速度
-	float returnSpeed_ = 1.0f;						// 帰還時の速度
+	float returnSpeed_ = 0.1f;						// 帰還時の速度
+	float returnBoost_ = 0.9f;						// 帰還時のブースト
 	float speed_ = defaultSpeed_;					// 動く速度
 
 	float moveInterval_ = 2.1f;
@@ -275,6 +342,8 @@ private:
 	int32_t kMaxGrassGauge_ = 2;			// 草ゲージ最大値
 	int32_t grassGauge_ = 0;				// 草ゲージ
 	float UIGauge_ = 0.0f;					// 草ゲージのUIに渡すための値
+
+	float grassXDir_ = 0;
 
 	//Haert
 	std::vector<std::unique_ptr<PlayerHaert>> haerts_;
@@ -305,6 +374,21 @@ private:
 
 	const float deltaTime_ = 1.0f / 60.0f;	// 仮対応
 
+	float addTime_ = 0;
+	bool isAddTime_ = false;
+
+	float kAddLimit_ = 1.0f;
+
+
+	// コンボ用
+	int comboCount_ = 0;                   // 現在のコンボ数
+	int kMaxCombo_ = 3;                    // 最大コンボ数
+	float comboTimer_ = 0.0f;              // コンボ残り時間
+	float kComboTimeLimit_ = 1.5f;         // コンボ持続時間（秒）
+	int lastPlayedComboCount_ = 0;
+	uint32_t eatingComboId_ = 0;
+
+
 	// ヒットポイント
 	int32_t kMaxHP_ = 3;
 	int32_t HP_ = kMaxHP_;
@@ -328,11 +412,32 @@ private:
 	Audio::SoundData soundDataDamage = {};
 	IXAudio2SourceVoice* sourceVoiceDamage = nullptr;
 
-	Audio::SoundData soundDataEat = {};
-	IXAudio2SourceVoice* sourceVoiceEat = nullptr;
+	Audio::SoundData soundDataEat[3] = {};
+	IXAudio2SourceVoice* sourceVoiceEat[3];
 
 	Audio::SoundData soundDataYodare = {};
 	IXAudio2SourceVoice* sourceVoiceYodare = nullptr;
+
+	Audio::SoundData soundDataTumari = {};
+	IXAudio2SourceVoice* sourceVoiceTumari = nullptr;
+
+	Audio::SoundData soundDataTimeUp = {};
+	IXAudio2SourceVoice* sourceVoiceTimeUp = nullptr;
+
+	Audio::SoundData soundDataDashGauge = {};
+	IXAudio2SourceVoice* sourceVoiceDashGauge = nullptr;
+
+
+	float time_ = 0;
+	float rootTimer_ = 0;
+	float kShowRootTime_ = 10.0f;
+	std::unique_ptr<Sprite> uiA_;
+	Vector3 offsetUI_ = {};
+	bool showUI_ = true;
+
+	bool pauseUpdate_ = false;
+
+	bool isStuckGrass_ = false;
 
 public:
 	// 振る舞い

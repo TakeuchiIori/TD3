@@ -13,7 +13,7 @@
     "flipY": false,
     "name": "TitleScreen_2",
     "position": {
-        "x": 1009.0,
+        "x": 948.0,
         "y": 0.0,
         "z": 0.0
     },
@@ -23,7 +23,7 @@
         "z": 0.0
     },
     "scale": {
-        "x": 273.0,
+        "x": 403.0,
         "y": 720.0
     },
     "textureLeftTop": {

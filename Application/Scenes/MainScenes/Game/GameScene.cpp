@@ -12,8 +12,8 @@
 #include "../Graphics/Culling/OcclusionCullingManager.h"
 
 // App
-#include "../Application/SystemsApp/AppAudio/AudioVolumeManager.h"
-#include "../Application/SpriteApp/ScreenApp/MenuOverlay.h"
+#include "../SystemsApp/AppAudio/AudioVolumeManager.h"
+#include "../SpriteApp/MenuOverlay.h"
 
 // C++
 #include <cstdlib>
@@ -50,6 +50,10 @@ void GameScene::Initialize()
 
 	// 各オブジェクトの初期化
 	mpInfo_ = std::make_unique<MapChipInfo>();
+	mpInfo_->GetMapChipField()->SetNumBlockVertical(154);
+	mpInfo_->GetMapChipField()->SetNumBlockHorizontal(18);
+
+
 	mpInfo_->Initialize();
 	mpInfo_->SetCamera(sceneCamera_.get());
 
@@ -69,10 +73,6 @@ void GameScene::Initialize()
 	giraffe_ = std::make_unique<Giraffe>();
 	giraffe_->Initialize();
 	giraffe_->SetCamera(sceneCamera_.get());
-    
-    // 地面
-    ground_ = std::make_unique<Ground>();
-    ground_->Initialize(sceneCamera_.get());
 
 
 
@@ -112,6 +112,11 @@ void GameScene::Update()
 		isDebugCamera_ = !isDebugCamera_;
 	}
 	stageEditor_->DrawEditorUI();
+
+	if (Input::GetInstance()->PushKey(DIK_LEFTARROW)) {
+		sceneManager_->ChangeScene("Game");
+	}
+
 #endif // _DEBUG
 
 	// クリアしたとき
@@ -136,18 +141,21 @@ void GameScene::Update()
 
 			if (!stageManager_->CheckPointTransition())
 			{
-				if (!isDebugCamera_)
+				if(!stageManager_->PauseUpdate())
 				{
-					stageManager_->NotDebugCameraUpdate();
+					if (!isDebugCamera_)
+					{
+						stageManager_->NotDebugCameraUpdate();
+					}
+					stageManager_->Update();
 				}
-				stageManager_->Update();
+				gameScreen_->SetCurrentMap(stageManager_->GetCheckPointID());
 			}
 		}
 
 	}
 
 	giraffe_->Update();
-	ground_->Update();
 
 	ParticleManager::GetInstance()->Update();
 	// カメラ更新
@@ -172,7 +180,7 @@ void GameScene::Update()
 	CollisionManager::GetInstance()->Update();
 
 	gameScreen_->Update();
-
+	
 }
 
 
@@ -181,6 +189,10 @@ void GameScene::Update()
 /// </summary>
 void GameScene::Draw()
 {
+
+	SpriteCommon::GetInstance()->DrawPreference();
+	stageManager_->DrawBackground();
+
 	//---------
 	// 3D
 	//---------
@@ -198,17 +210,9 @@ void GameScene::Draw()
 	DrawLine();
 
 
-}
-
-void GameScene::DrawOffScreen()
-{
 
 	//----------
-	// Particle
-	//----------
-	ParticleManager::GetInstance()->Draw();
-	//----------
-	ParticleManager::GetInstance()->Draw();
+
 	//----------
 	// Sprite
 	//----------
@@ -216,20 +220,33 @@ void GameScene::DrawOffScreen()
 	DrawSprite();
 
 
+
+	//----------
+	// Particle
+	//----------
+	ParticleManager::GetInstance()->Draw();
+}
+
+void GameScene::DrawOffScreen()
+{
+
+
+
+
 }
 
 
 void GameScene::DrawObject()
 {
-	giraffe_->Draw();
+	//giraffe_->Draw();
 	mpInfo_->Draw();
-	ground_->Draw();
 	stageManager_->Draw();
 }
 
 void GameScene::DrawSprite()
 {
 	gameScreen_->Draw();
+	stageManager_->DrawSprite();
 	stageManager_->DrawTransition();
 	if (MenuOverlay::GetInstance()->IsVisible()) {
 		MenuOverlay::GetInstance()->Draw();

@@ -53,7 +53,7 @@ void Grass::Initialize(Camera* camera)
 	InitCollision();
 	///InitJson();
 
-	particleEmitter_ = std::make_unique<ParticleEmitter>("GrowthParticle", worldTransform_.translation_, 20);
+	particleEmitter_ = std::make_unique<ParticleEmitter>("GrowthParticle", worldTransform_.translation_, 50);
 }
 
 void Grass::InitCollision()
@@ -92,7 +92,7 @@ void Grass::Update()
 	aabbCollider_->Update();
 	aabbGrowthCollider_->Update();
 
-
+	//particleEmitter_->Emit();
 
 	UpdateLeaf();
 
@@ -164,7 +164,7 @@ void Grass::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 	{
 		if (behavior_ == BehaviorGrass::Root)
 		{
-			if (player_->behavior_ != BehaviorPlayer::Return)
+			if (player_->behavior_ == BehaviorPlayer::Moving || player_->behavior_ == BehaviorPlayer::Boost)
 			{
 				if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
 				{
@@ -189,16 +189,17 @@ void Grass::OnCollision(BaseCollider* self, BaseCollider* other)
 			{
 				if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeIdDef::kPlayer)) // プレイヤーなら
 				{
-					if (player_->behavior_ != BehaviorPlayer::Return)
+					if (player_->behavior_ == BehaviorPlayer::Moving || player_->behavior_ == BehaviorPlayer::Boost)
 					{
 
 						obj_->SetModel("leafRed.obj");
-						if (input_->TriggerKey(DIK_Q) || input_->IsPadTriggered(0, GamePadButton::B))
+						if (input_->IsPadTriggered(0, GamePadButton::B))
 						{
 							if (worldTransform_.scale_.x != 0.0f) {
+								particleEmitter_->FollowEmit(worldTransform_.translation_);
 								obj_->SetMaterialColor(growthColor_);
 								behaviortRquest_ = BehaviorGrass::Growth;
-								particleEmitter_->FollowEmit(worldTransform_.translation_);
+								
 							}
 						}
 					}

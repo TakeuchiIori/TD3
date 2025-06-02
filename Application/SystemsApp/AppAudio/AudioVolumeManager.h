@@ -4,10 +4,8 @@
 
 enum AudioType
 {
-	kMaster,
 	kBGM,
 	kSE,
-	kUISound,
 	kAudioTypeNum,
 };
 
@@ -26,7 +24,7 @@ public:
 	void Finalize();
 
 public:
-	void SetSourceToSubmix(IXAudio2SourceVoice* pSourceVoice, AudioType audioType = kMaster);
+	void SetSourceToSubmix(IXAudio2SourceVoice* pSourceVoice, AudioType audioType = kSE);
 
 	void SetVolume(AudioType audioType, float volume);
 
@@ -39,7 +37,6 @@ private:
 
 	IXAudio2SubmixVoice* BGMSubmixVoice_ = nullptr;
 	IXAudio2SubmixVoice* SESubmixVoice_ = nullptr;
-	IXAudio2SubmixVoice* UISoundSubmixVoice_ = nullptr;
 
 	std::list<IXAudio2SourceVoice*> pSourceVoices_;
 };

@@ -62,6 +62,9 @@ public:
 
     void SetMap(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
 
+    MapChipField* GetMapChipField() const;
+
+
     // 指定した位置と速度をもとに衝突判定と解決を行う
     // colliderRect: 衝突判定に使用する矩形
     // position: 現在位置（参照渡しで修正可能）
@@ -74,6 +77,8 @@ public:
         Vector3& velocity,
         int checkFlags = CollisionFlag::All,
         std::function<void(const CollisionInfo&)> collisionCallback = nullptr);
+
+    std::optional<CollisionInfo> CheckHitAtPosition(const Vector3& position) const;
 
 
 protected:

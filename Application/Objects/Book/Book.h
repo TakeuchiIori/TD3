@@ -121,7 +121,6 @@ public:
 	void SetColliding(bool flag) { isColliding_ = flag; }
 
 
-
 private:
 
 	// ポインタ

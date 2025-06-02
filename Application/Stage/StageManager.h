@@ -4,6 +4,7 @@
 #include "Stage.h"
 #include "Systems/MapChip/MapChipInfo.h"
 #include "../SystemsApp/Cameras/FollowCamera/FollowCamera.h"
+#include "../SpriteApp/Background.h"
 
 class StageManager
 {
@@ -24,11 +25,16 @@ public:
 	/// <summary>
 	/// 描画
 	/// </summary>
+	
+	void DrawBackground();
+
 	void Draw();
 
 	void DrawAnimation();
 
 	void DrawCollision();
+
+	void DrawSprite();
 
 	void DrawTransition();
 
@@ -54,10 +60,21 @@ public:
 	/// </summary>
 	float GetCheckPoint() const { return stageList_[currentStageNum_]->GetCheckPoint(); }
 
-	bool IsClear() { return stageList_[currentStageNum_]->IsClear() || input_->TriggerKey(DIK_L); }
+	bool IsClear() 
+	{ 
+#ifdef _DEBUG
+		return stageList_[currentStageNum_]->IsClear() || input_->TriggerKey(DIK_L);
+#else
+		return stageList_[currentStageNum_]->IsClear();
+#endif // _DEBUG
+
+	}
+
 	void SetFollowCamera(FollowCamera* camera) { followCamera_ = camera; }
 
+	int GetCheckPointID() { return stageList_[currentStageNum_]->GetCheckPointID(); }
 
+	bool PauseUpdate() { return player_->PauseUpdate(); }
 private:
 	Input* input_ = nullptr;
 
@@ -73,9 +90,11 @@ private:
 	std::unique_ptr<Player> player_;
 	std::unique_ptr<EnemyManager> enemyManager_;
 	std::unique_ptr<GrassManager> grassManager_;
+	std::unique_ptr<Background> background_;
+	std::unique_ptr<Balloon> balloon_;
 
-	float cameraScrollStart_ = 16.0f;
-	float cameraScrollEnd_ = 22.0f;
+	float cameraScrollStart_ = 18.2f;
+	float cameraScrollEnd_ = 17.2f;
 	float offsetY_ = -0.5f;
 
 	bool isTransition_ = false; // ポイント遷移中か

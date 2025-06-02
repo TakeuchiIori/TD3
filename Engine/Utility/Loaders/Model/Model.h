@@ -43,6 +43,9 @@ public: // メンバ関数
 	/// </summary>
 	void Initialize(ModelCommon* modelCommon, const std::string& directorypath, const std::string& filename ,bool isAnimation = false);
 
+	void ChangeModel(const std::string& directoryPath, const std::string& filename, bool isAnimation);
+	void ChangeModelAnimation(const std::string& directoryPath, const std::string& filename,int count);
+
 	/// <summary>
 	/// 更新処理
 	/// </summary>
@@ -82,7 +85,6 @@ public:
 	bool GetHasBones() { return hasBones_; }
 	Node GetRootNode() { return *rootNode_; }
 	bool IsAnimationPlayedOnceFinished() const { return animationSystem_->IsPlayOnceFinished(); }
-	// Model.h に追加
 	bool IsAnimationPlayFinished() const;
 	void ResetAnimationPlay();
 

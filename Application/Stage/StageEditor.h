@@ -22,8 +22,9 @@ struct PlacedObject {
 
 struct CheckPointStruct {
     int checkPointNumber;
-    float height = 0.0f;
+    float height = 100.0f;
     float initX = 2.0f;
+    float timer = 10.0f;
     std::vector<PlacedObject> objects;
 };
 
@@ -80,6 +81,17 @@ public: // getter setter
             if (s.stageNumber == stageNum) {
                 for (const auto& cp : s.checkPoints) {
                     if (cp.checkPointNumber == checkPointNum) return cp.initX;
+                }
+            }
+        }
+        return 2.0f;
+    }
+
+    float GetTimeLimit(int stageNum, int checkPointNum) const {
+        for (const auto& s : stages_) {
+            if (s.stageNumber == stageNum) {
+                for (const auto& cp : s.checkPoints) {
+                    if (cp.checkPointNumber == checkPointNum) return cp.timer;
                 }
             }
         }

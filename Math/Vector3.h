@@ -6,7 +6,6 @@
 #include <cassert>
 #include <algorithm>
 
-
 struct Vector3 final {
     float x;
     float y;
@@ -38,7 +37,6 @@ struct Vector3 final {
         return Vector3(-x, -y, -z);
     }
 
-
     // 減算代入演算子 -=
     Vector3& operator-=(const Vector3& other) {
         x -= other.x;
@@ -47,9 +45,14 @@ struct Vector3 final {
         return *this;
     }
 
-    // スカラーとの乗算演算子 *
+    // スカラーとの乗算演算子 * (Vector3 * float)
     Vector3 operator*(float scalar) const {
         return { x * scalar, y * scalar, z * scalar };
+    }
+
+    // 要素ごとの乗算演算子 * (Vector3 * Vector3)
+    Vector3 operator*(const Vector3& other) const {
+        return Vector3(x * other.x, y * other.y, z * other.z);
     }
 
     // スカラー乗算代入演算子 *=
@@ -60,12 +63,18 @@ struct Vector3 final {
         return *this;
     }
 
+    // 要素ごとの乗算代入演算子 *= (Vector3 *= Vector3)
+    Vector3& operator*=(const Vector3& other) {
+        x *= other.x;
+        y *= other.y;
+        z *= other.z;
+        return *this;
+    }
+
     // スカラーを掛け算する演算子の反転（float * Vector3 の場合も対応）
     friend Vector3 operator*(float scalar, const Vector3& vec) {
         return { vec.x * scalar, vec.y * scalar, vec.z * scalar };
     }
-
-
 
     // スカラーとの割り算演算子 /
     Vector3 operator/(float scalar) const {
@@ -134,8 +143,6 @@ struct EulerTransform {
 
 //============================================================================//
 
-
-
 // ベクトルにスカラーを掛け算する関数
 Vector3 Multiply(const Vector3& v, float scalar);
 
@@ -150,8 +157,6 @@ std::vector<Vector3> GenerateCatmullRomSplinePoints(const std::vector<Vector3>& 
 // ご提供
 Vector3 CatmullRomInterpolation(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t);
 Vector3 CatmullRomPosition(const std::vector<Vector3>& points, float t);
-
-
 
 // Vector3同士の加算を行う関数
 Vector3 Add(const Vector3& v1, const Vector3& v2);
@@ -179,7 +184,6 @@ Vector3 Slerp(const Vector3& v0, const Vector3& v1, float t);
 /// <returns></returns>
 Vector3 GetEulerAnglesFromToDirection(const Vector3& from, const Vector3& to);
 
-
 std::vector<double> CubicSplineInterpolation(
     const std::vector<double>& xData,
     const std::vector<double>& yData,
@@ -187,7 +191,3 @@ std::vector<double> CubicSplineInterpolation(
 );
 
 Vector3 Clamp(const Vector3& v, const Vector3& min, const Vector3& max);
-
-
-
-
