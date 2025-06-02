@@ -420,10 +420,10 @@ void GameScreen::Draw()
 	uiMap_->Draw();
 	uiMapCurrent_->Draw();
 
-	for (uint32_t i = 0; i < numGrass_; i++)
+	/*for (uint32_t i = 0; i < numGrass_; i++)
 	{
 		grass_[i]->Draw();
-	}
+	}*/
 
 
 	boost_[1]->Draw();
