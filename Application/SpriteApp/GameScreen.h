@@ -1,6 +1,7 @@
 #pragma once
 #include "Systems/UI/UIBase.h"
 #include "Loaders/Json/JsonManager.h"
+#include "Particle/ParticleEmitter.h"
 
 class Player;
 class Camera;

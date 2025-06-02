@@ -89,6 +89,7 @@ void GameScreen::Initialize()
 	boost_[0]->Initialize("Resources/Textures/In_Game/dashGauge_base.png");
 	boost_[0]->SetAnchorPoint({ 1.0f, 0.0f });
 	boost_[0]->SetSize({ 100.0f, 100.0f });
+	boost_[0]->SetUVScale({ 1.0f, 1.0f });
 	boost_[1] = std::make_unique<Sprite>();
 	boost_[1]->Initialize("Resources/Textures/In_Game/dashGauge_fill.png");
 	boost_[1]->SetAnchorPoint({ 1.0f, 0.0f });
@@ -194,6 +195,15 @@ void GameScreen::InitJson()
 	jsonManager_->Register("ハートの位置", &offsetH_);
 	jsonManager_->Register("ブーストの操作アイコンの位置", &offsetB_);
 	jsonManager_->Register("マップの位置", &offsetMapPos_);
+
+	jsonManager_->SetTreePrefix("BoostUI");
+	jsonManager_->Register("UIの位置", &boost_[1]->uvScale_);
+	jsonManager_->Register("UIのUVスケール", &boost_[1]->uvScale_);
+	jsonManager_->Register("UIのUVオフセット", &boost_[1]->uvTranslate_);
+
+	jsonManager_->Register("位置", &boost_[1]->position_);
+	jsonManager_->Register("サイズ", &boost_[1]->size_);
+
 }
 
 void GameScreen::Update()
@@ -271,22 +281,27 @@ void GameScreen::Update()
 		if (i == 1) {
 			float ratio = player_->GetUIBoostGauge();
 
-
 			Vector2 baseSize = { 100.0f, 100.0f }; // ブースト画像の本来のサイズ
 
 			// 補正用オフセット計算（比率1.0なら0、0.5なら半分ズレる）
 			playerPos.y += baseSize.y * (1.0f - ratio);
 			Vector3 position = playerPos;
-			//position.y += yOffset;
 
 			boost_[1]->SetPosition(position);
+
 			// UV設定（比率に応じて縦方向に縮小 & 下から満ちる）
 			boost_[1]->SetSize({ baseSize.x, baseSize.y * ratio });
 			boost_[1]->SetUVScale({ 1.0f, ratio });
 			boost_[1]->SetUVTranslate({ 0.0f, 1.0f - ratio });
-		}
-		boost_[i]->Update();
 
+			if (player_->CanBoost()) {
+				if (ratio >= 0.9f) {
+					
+				}
+			}
+		}
+
+		boost_[i]->Update();
 	}
 
 	for (int i = 0; i < numHeart_; i++)

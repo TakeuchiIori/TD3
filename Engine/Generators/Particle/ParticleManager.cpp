@@ -228,32 +228,40 @@ void ParticleManager::UpdateParticles()
 			particle.currentTime += kDeltaTime;
 			particle.age = particle.currentTime / particle.lifeTime; // 正規化された年齢
 
-			// 🌪️ 力場の影響
+			// 放射状パーティクル専用の更新処理
+			if (params.radialEmission.enabled) {
+				UpdateRadialParticle(particle, params, kDeltaTime);
+				// 放射設定による動的パラメータ調整
+				UpdateRadialDynamicParameters(particle, params);
+			}
+
+
+			// 力場の影響
 			UpdateParticleForces(particle, params, kDeltaTime);
 
-			// 🏃 移動パターンの適用
+			// 移動パターンの適用
 			UpdateParticleMovement(particle, params, kDeltaTime);
 
-			// 🎨 カラーアニメーション
+			// カラーアニメーション
 			UpdateParticleColor(particle, params);
 
-			// 📏 スケールアニメーション
+			// スケールアニメーション
 			UpdateParticleScale(particle, params);
 
-			// 🔄 回転アニメーション
+			// 回転アニメーション
 			UpdateParticleRotation(particle, params, kDeltaTime);
 
-			// 🎪 物理計算
+			// 物理計算
 			if (params.physics.enabled) {
 				UpdateParticlePhysics(particle, params, kDeltaTime);
 			}
 
-			// 🎵 ノイズ適用
+			// ノイズ適用
 			if (params.noise.enabled) {
 				ApplyNoise(particle, params.noise, kDeltaTime);
 			}
 
-			// 🎯 衝突判定
+			// 衝突判定
 			if (params.collision.enabled) {
 				UpdateParticleCollision(particle, params);
 			}
@@ -322,6 +330,8 @@ void ParticleManager::UpdateParticles()
 	}
 }
 
+
+
 void ParticleManager::CreateMaterialResource()
 {
 	// リソース作成
@@ -350,10 +360,10 @@ ParticleManager::Particle ParticleManager::MakeNewParticle(const std::string& na
 		}
 		};
 
-	// 発生形状からの位置サンプリング
+	// 発生形状からの位置サンプリング（既存機能）
 	Vector3 shapeOffset = SampleEmissionShape(params.emissionShape, randomEngine);
 
-	// Transform設定
+	// Transform設定（既存）
 	particle.transform.scale = {
 		getValue(params.baseTransform.scaleMin.x, params.baseTransform.scaleMax.x, params.isRandom, randomEngine),
 		getValue(params.baseTransform.scaleMin.y, params.baseTransform.scaleMax.y, params.isRandom, randomEngine),
@@ -366,31 +376,82 @@ ParticleManager::Particle ParticleManager::MakeNewParticle(const std::string& na
 		getValue(params.baseTransform.rotateMin.z, params.baseTransform.rotateMax.z, params.isRandom, randomEngine)
 	};
 
-	particle.transform.translate = position + shapeOffset + Vector3{
+	// 位置設定：放射設定がある場合とない場合を統合
+	Vector3 basePosition = position + shapeOffset + Vector3{
 		getValue(params.baseTransform.translateMin.x, params.baseTransform.translateMax.x, params.isRandom, randomEngine),
 		getValue(params.baseTransform.translateMin.y, params.baseTransform.translateMax.y, params.isRandom, randomEngine),
 		getValue(params.baseTransform.translateMin.z, params.baseTransform.translateMax.z, params.isRandom, randomEngine)
 	};
 
+	// 放射設定による位置補正
+	if (params.radialEmission.enabled && !params.radialEmission.fromCenter) {
+		// 外から中心へ向かう場合：指定された半径の位置に配置
+		Vector3 radialDirection = GenerateRadialDirection(params.radialEmission, randomEngine);
+		std::uniform_real_distribution<float> radiusDist(params.radialEmission.minRadius, params.radialEmission.maxRadius);
+		float radius = radiusDist(randomEngine);
+
+		particle.transform.translate = params.radialEmission.centerPosition + (radialDirection * radius);
+	} else {
+		// 通常の位置設定（中心から外へ、または放射無効）
+		particle.transform.translate = basePosition;
+	}
+
 	// 初期値保存
 	particle.initialPosition = particle.transform.translate;
 	particle.initialScale = particle.transform.scale;
 
-	// ランダム回転
+	// ランダム回転（既存機能）
 	if (params.isRandomRotate) {
 		std::uniform_real_distribution<float> distRotate(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
 		particle.transform.rotate.z = distRotate(randomEngine);
 	}
 
-	// ランダムスケール
+	// ランダムスケール（既存機能）
 	if (params.isRandomScale) {
 		std::uniform_real_distribution<float> distScale(params.minmaxScale.x, params.minmaxScale.y);
 		particle.transform.scale.y = distScale(randomEngine);
 	}
 
-	// Velocity設定
-	if (params.randomFromCenter) {
-		// 中心からランダム方向
+	// 速度設定：放射設定と既存システムを統合
+	if (params.radialEmission.enabled) {
+		// 放射設定が有効な場合
+		Vector3 radialDirection;
+
+		if (params.radialEmission.fromCenter) {
+			// 中心から外へ：中心から現在位置への方向
+			Vector3 toParticle = particle.transform.translate - params.radialEmission.centerPosition;
+			if (Vector3::Length(toParticle) > 0.0f) {
+				radialDirection = Vector3::Normalize(toParticle);
+			} else {
+				// 中心と同じ位置の場合はランダム方向
+				radialDirection = GenerateRadialDirection(params.radialEmission, randomEngine);
+			}
+		} else {
+			// 外から中心へ：中心に向かう方向
+			Vector3 toCenter = params.radialEmission.centerPosition - particle.transform.translate;
+			if (Vector3::Length(toCenter) > 0.0f) {
+				radialDirection = Vector3::Normalize(toCenter);
+				// 収束力を適用
+				radialDirection *= params.radialEmission.convergenceForce;
+			} else {
+				radialDirection = { 0.0f, 0.0f, 0.0f };
+			}
+		}
+
+		// 放射速度を設定
+		float speed = params.radialEmission.useUniformSpeed ?
+			params.radialEmission.uniformSpeed : params.speed;
+		particle.velocity = radialDirection * speed;
+
+		// 軌道運動の場合は接線成分を追加
+		if (params.radialEmission.maintainDistance && !params.radialEmission.fromCenter) {
+			Vector3 toCenter = params.radialEmission.centerPosition - particle.transform.translate;
+			Vector3 tangent = Vector3::Cross(Vector3{ 0.0f, 1.0f, 0.0f }, Vector3::Normalize(toCenter));
+			particle.velocity += tangent * speed * 0.5f;
+		}
+
+	} else if (params.randomFromCenter) {
+		// 既存のランダム中心発生
 		std::uniform_real_distribution<float>
 			dx(params.randomDirectionMin.x, params.randomDirectionMax.x),
 			dy(params.randomDirectionMin.y, params.randomDirectionMax.y),
@@ -398,7 +459,9 @@ ParticleManager::Particle ParticleManager::MakeNewParticle(const std::string& na
 
 		Vector3 dir = Normalize(Vector3{ dx(randomEngine), dy(randomEngine), dz(randomEngine) });
 		particle.velocity = dir * params.speed;
+
 	} else {
+		// 既存の通常速度設定
 		if (params.isUnRandomSpeed) {
 			particle.velocity = {
 				getValue(params.baseVelocity.velocityMin.x, params.baseVelocity.velocityMax.x, params.isRandom, randomEngine),
@@ -413,7 +476,7 @@ ParticleManager::Particle ParticleManager::MakeNewParticle(const std::string& na
 
 	particle.initialVelocity = particle.velocity;
 
-	// Color設定
+	// Color設定（既存）
 	particle.color = {
 		getValue(params.baseColor.minColor.x, params.baseColor.maxColor.x, params.isRandom, randomEngine),
 		getValue(params.baseColor.minColor.y, params.baseColor.maxColor.y, params.isRandom, randomEngine),
@@ -422,17 +485,18 @@ ParticleManager::Particle ParticleManager::MakeNewParticle(const std::string& na
 	};
 	particle.initialColor = particle.color;
 
-	// LifeTime設定
+	// LifeTime設定（既存）
 	particle.lifeTime = getValue(params.baseLife.lifeTime.x, params.baseLife.lifeTime.y, params.isRandom, randomEngine);
 	particle.currentTime = 0.0f;
 	particle.age = 0.0f;
 
-	// 物理プロパティ
+	// 物理プロパティ（既存）
 	particle.mass = params.physics.mass;
 	particle.drag = params.physics.drag;
 
 	return particle;
 }
+
 
 void ParticleManager::CreateParticleGroup(const std::string name, const std::string textureFilePath)
 {
@@ -505,6 +569,20 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 		params.frustumCulling = true;
 		params.showDebugInfo = false;
 		params.debugColor = { 1.0f, 0.0f, 0.0f, 1.0f };
+
+		// 放射設定のデフォルト値
+		params.radialEmission.enabled = false;
+		params.radialEmission.fromCenter = true;
+		params.radialEmission.centerPosition = { 0.0f, 0.0f, 0.0f };
+		params.radialEmission.minRadius = 0.0f;
+		params.radialEmission.maxRadius = 5.0f;
+		params.radialEmission.uniformSpeed = 1.0f;
+		params.radialEmission.useUniformSpeed = true;
+		params.radialEmission.angleVariation = 0.0f;
+		params.radialEmission.limitToHemisphere = false;
+		params.radialEmission.hemisphereUp = { 0.0f, 1.0f, 0.0f };
+		params.radialEmission.convergenceForce = 1.0f;
+		params.radialEmission.maintainDistance = false;
 	}
 
 	// UV設定
@@ -769,13 +847,155 @@ void ParticleManager::InitJson(const std::string& name)
 	pm->Register("デバッグ情報表示", &params.showDebugInfo);
 	pm->Register("デバッグ色", &params.debugColor);
 
+	pm->SetTreePrefix("放射設定");
+	pm->Register("放射機能有効", &params.radialEmission.enabled);
+	pm->Register("中心から外へ", &params.radialEmission.fromCenter);
+	pm->Register("中心位置", &params.radialEmission.centerPosition);
+	pm->Register("最小半径", &params.radialEmission.minRadius);
+	pm->Register("最大半径", &params.radialEmission.maxRadius);
+	pm->Register("均等速度", &params.radialEmission.uniformSpeed);
+	pm->Register("均等速度使用", &params.radialEmission.useUniformSpeed);
+	pm->Register("角度ばらつき", &params.radialEmission.angleVariation);
+	pm->Register("半球制限", &params.radialEmission.limitToHemisphere);
+	pm->Register("半球上方向", &params.radialEmission.hemisphereUp);
+	pm->Register("収束力", &params.radialEmission.convergenceForce);
+	pm->Register("距離維持", &params.radialEmission.maintainDistance);
+
 	pm->ClearTreePrefix();
-}// ParticleManager.cppの末尾に追加する実装
+}
 
-// 🌪️ 力場の影響を適用
-// ParticleManager.cppの末尾に追加する実装
+void ParticleManager::UpdateRadialParticle(Particle& particle, const ParticleParameters& params, float deltaTime)
+{
+	const auto& radial = params.radialEmission;
 
-// 🌪️ 力場の影響を適用
+	if (!radial.enabled) return;
+
+	// 🎯 収束処理（外から中心へ向かう場合）
+	if (!radial.fromCenter) {
+		Vector3 toCenter = radial.centerPosition - particle.transform.translate;
+		float distanceToCenter = Vector3::Length(toCenter);
+
+		// 中心に近づいたら収束力を強化
+		if (distanceToCenter > 0.0f) {
+			Vector3 centerDirection = Vector3::Normalize(toCenter);
+
+			// 距離に応じた収束力の調整
+			float distanceFactor = 1.0f;
+			if (distanceToCenter < radial.maxRadius * 0.5f) {
+				// 中心に近づくほど強力に収束
+				distanceFactor = 1.0f + (1.0f - distanceToCenter / (radial.maxRadius * 0.5f)) * 2.0f;
+			}
+
+			// 収束力を速度に追加
+			Vector3 convergenceForce = centerDirection * radial.convergenceForce * distanceFactor;
+			particle.velocity += convergenceForce * deltaTime;
+
+			// 軌道運動の場合：中心周りの接線方向の力を追加
+			if (radial.maintainDistance) {
+				Vector3 tangent = Vector3::Cross(Vector3{ 0.0f, 1.0f, 0.0f }, centerDirection);
+				float tangentForce = radial.uniformSpeed * 0.3f; // 軌道速度調整
+
+				// 距離を維持するための力
+				float targetDistance = (radial.minRadius + radial.maxRadius) * 0.5f;
+				if (std::abs(distanceToCenter - targetDistance) > 0.1f) {
+					float distanceCorrection = (targetDistance - distanceToCenter) * 0.5f;
+					particle.velocity += centerDirection * distanceCorrection * deltaTime;
+				}
+
+				particle.velocity += tangent * tangentForce * deltaTime;
+			}
+		}
+	}
+
+	// 🌪️ 中心からの放射の場合の速度調整
+	else {
+		// 放射方向の維持
+		Vector3 fromCenter = particle.transform.translate - radial.centerPosition;
+		float distance = Vector3::Length(fromCenter);
+
+		if (distance > 0.0f) {
+			Vector3 radialDirection = Vector3::Normalize(fromCenter);
+
+			// 放射方向への速度成分を強化
+			float radialComponent = Vector3::Dot(particle.velocity, radialDirection);
+			if (radialComponent < radial.uniformSpeed * 0.5f) {
+				// 放射方向の速度が不足している場合は補正
+				Vector3 radialBoost = radialDirection * (radial.uniformSpeed * 0.5f - radialComponent);
+				particle.velocity += radialBoost * deltaTime;
+			}
+		}
+	}
+
+	// 🎭 角度ばらつきによる微調整（時間経過で減衰）
+	if (radial.angleVariation > 0.0f && particle.age < 0.5f) {
+		float variationStrength = radial.angleVariation * (1.0f - particle.age * 2.0f); // 0.5秒で減衰
+		std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
+
+		Vector3 randomVariation = {
+			dist(randomEngine_) * variationStrength * 0.01f,
+			dist(randomEngine_) * variationStrength * 0.01f,
+			dist(randomEngine_) * variationStrength * 0.01f
+		};
+
+		particle.velocity += randomVariation * deltaTime;
+	}
+
+	// 🏔️ 半球制限の適用
+	if (radial.limitToHemisphere) {
+		Vector3 up = Vector3::Normalize(radial.hemisphereUp);
+
+		// パーティクルが半球の下側に行こうとした場合の補正
+		Vector3 particleDirection = particle.transform.translate - radial.centerPosition;
+		float upComponent = Vector3::Dot(particleDirection, up);
+
+		if (upComponent < 0.0f) {
+			// 半球の境界面に向かって速度を補正
+			Vector3 correction = up * (-upComponent * 2.0f);
+			particle.velocity += correction * deltaTime;
+		}
+	}
+
+	// 🎪 速度制限（暴走防止）
+	float currentSpeed = Vector3::Length(particle.velocity);
+	float maxAllowedSpeed = radial.uniformSpeed * 3.0f; // 最大3倍まで
+
+	if (currentSpeed > maxAllowedSpeed) {
+		particle.velocity = Vector3::Normalize(particle.velocity) * maxAllowedSpeed;
+	}
+}
+
+void ParticleManager::UpdateRadialDynamicParameters(Particle& particle, const ParticleParameters& params)
+{
+	const auto& radial = params.radialEmission;
+
+	if (!radial.enabled) return;
+
+	Vector3 toCenter = radial.centerPosition - particle.transform.translate;
+	float distance = Vector3::Length(toCenter);
+	float normalizedDistance = distance / radial.maxRadius; // 0.0-1.0に正規化
+
+	// 🎨 距離に応じた色の調整
+	if (params.colorAnimation.type == ColorChangeType::None) {
+		// 中心に近いほど明るく、遠いほど暗く
+		float brightness = radial.fromCenter ?
+			(1.0f - normalizedDistance * 0.5f) :  // 中心から外：徐々に暗く
+			(0.5f + normalizedDistance * 0.5f);   // 外から中心：徐々に明るく
+
+		particle.color.x = particle.initialColor.x * brightness;
+		particle.color.y = particle.initialColor.y * brightness;
+		particle.color.z = particle.initialColor.z * brightness;
+	}
+
+	// 📏 距離に応じたスケール調整
+	if (params.scaleAnimation.type == ScaleChangeType::None && !params.enableScale) {
+		float scaleFactor = radial.fromCenter ?
+			(1.0f + normalizedDistance * 0.3f) :  // 中心から外：徐々に大きく
+			(1.3f - normalizedDistance * 0.3f);   // 外から中心：徐々に小さく
+
+		particle.transform.scale = particle.initialScale * scaleFactor;
+	}
+}
+// 力場の影響を適用
 void ParticleManager::UpdateParticleForces(Particle& particle, const ParticleParameters& params, float deltaTime)
 {
 	for (const auto& forceField : params.forceFields) {
@@ -860,7 +1080,7 @@ void ParticleManager::UpdateParticleForces(Particle& particle, const ParticlePar
 	}
 }
 
-// 🏃 移動パターンの適用
+// 移動パターンの適用
 void ParticleManager::UpdateParticleMovement(Particle& particle, const ParticleParameters& params, float deltaTime)
 {
 	const auto& movement = params.movement;
@@ -932,7 +1152,7 @@ void ParticleManager::UpdateParticleMovement(Particle& particle, const ParticleP
 	}
 }
 
-// 🎨 カラーアニメーション
+// カラーアニメーション
 void ParticleManager::UpdateParticleColor(Particle& particle, const ParticleParameters& params)
 {
 	const auto& colorAnim = params.colorAnimation;
@@ -1019,7 +1239,7 @@ void ParticleManager::UpdateParticleColor(Particle& particle, const ParticlePara
 	}
 }
 
-// 📏 スケールアニメーション
+// スケールアニメーション
 void ParticleManager::UpdateParticleScale(Particle& particle, const ParticleParameters& params)
 {
 	const auto& scaleAnim = params.scaleAnimation;
@@ -1078,7 +1298,7 @@ void ParticleManager::UpdateParticleScale(Particle& particle, const ParticlePara
 	}
 }
 
-// 🔄 回転アニメーション
+// 回転アニメーション
 void ParticleManager::UpdateParticleRotation(Particle& particle, const ParticleParameters& params, float deltaTime)
 {
 	const auto& rotAnim = params.rotationAnimation;
@@ -1128,7 +1348,7 @@ void ParticleManager::UpdateParticleRotation(Particle& particle, const ParticleP
 	particle.transform.rotate += particle.angularVelocity * deltaTime;
 }
 
-// 🎪 物理計算
+// 物理計算
 void ParticleManager::UpdateParticlePhysics(Particle& particle, const ParticleParameters& params, float deltaTime)
 {
 	const auto& physics = params.physics;
@@ -1157,7 +1377,7 @@ void ParticleManager::UpdateParticlePhysics(Particle& particle, const ParticlePa
 	}
 }
 
-// 🎯 衝突判定
+// 衝突判定
 void ParticleManager::UpdateParticleCollision(Particle& particle, const ParticleParameters& params)
 {
 	const auto& collision = params.collision;
@@ -1187,7 +1407,7 @@ void ParticleManager::UpdateParticleCollision(Particle& particle, const Particle
 	}
 }
 
-// 🎵 ノイズ適用
+// ノイズ適用
 void ParticleManager::ApplyNoise(Particle& particle, const NoiseSettings& noise, float deltaTime)
 {
 	Vector3 noisePos = particle.transform.translate + noise.scrollSpeed * particle.currentTime;
@@ -1236,7 +1456,7 @@ void ParticleManager::ApplyNoise(Particle& particle, const NoiseSettings& noise,
 	}
 }
 
-// 📐 発生形状からの位置サンプリング
+// 発生形状からの位置サンプリング
 Vector3 ParticleManager::SampleEmissionShape(const EmissionShapeSettings& shape, std::mt19937& rng)
 {
 	std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
@@ -1385,8 +1605,64 @@ float ParticleManager::PerlinNoise(const Vector3& position, float frequency)
 
 	return lerp(y1, y2, w);
 }
+Vector3 ParticleManager::GenerateRadialDirection(const RadialEmissionSettings& radial, std::mt19937& rng)
+{
+	std::uniform_real_distribution<float> angleDist(0.0f, 2.0f * std::numbers::pi_v<float>);
+	std::uniform_real_distribution<float> variationDist(-1.0f, 1.0f);
 
-// 🌟 便利メソッドの実装
+	Vector3 direction;
+
+	if (radial.limitToHemisphere) {
+		// 半球制限がある場合
+		float theta = angleDist(rng); // 水平角度
+		std::uniform_real_distribution<float> phiDist(0.0f, std::numbers::pi_v<float> / 2.0f); // 垂直角度（0-90度）
+		float phi = phiDist(rng);
+
+		// 球面座標から直交座標へ変換
+		direction.x = std::sin(phi) * std::cos(theta);
+		direction.y = std::cos(phi);
+		direction.z = std::sin(phi) * std::sin(theta);
+
+		// 半球の上方向に合わせて回転（簡易実装）
+		if (radial.hemisphereUp.y < 0.0f) {
+			direction.y = -direction.y;
+		}
+	} else {
+		// 完全な球面上の均等分布（Marsaglia's method）
+		std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
+
+		float x1, x2, w;
+		do {
+			x1 = dist(rng);
+			x2 = dist(rng);
+			w = x1 * x1 + x2 * x2;
+		} while (w >= 1.0f);
+
+		float factor = 2.0f * std::sqrt(1.0f - w);
+		direction.x = x1 * factor;
+		direction.y = x2 * factor;
+		direction.z = 2.0f * w - 1.0f;
+	}
+
+	// 角度のばらつきを適用
+	if (radial.angleVariation > 0.0f) {
+		float variationRad = radial.angleVariation * std::numbers::pi_v<float> / 180.0f;
+
+		Vector3 variation = {
+			variationDist(rng) * variationRad,
+			variationDist(rng) * variationRad,
+			variationDist(rng) * variationRad
+		};
+
+		// 簡易的な回転適用
+		direction += variation;
+		direction = Vector3::Normalize(direction);
+	}
+
+	return direction;
+}
+
+// 便利メソッドの実装
 void ParticleManager::AddForceField(const std::string& groupName, const ForceField& field)
 {
 	if (particleParameters_.find(groupName) != particleParameters_.end()) {
