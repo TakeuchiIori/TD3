@@ -655,33 +655,38 @@ void GameScreen::UpdateMapView()
 	uiMapCurrent_->SetPosition(offsetMapCurrentPos_);
 	if (currentMapNum_ == 0)
 	{
-		uiMapCurrent_->SetSize({ size.x * 1.4f, size.y * 1.1f });
-		uiMapCurrent_->SetPosition(Vector3(173.0f, 535.9f, 0.0f) - startMapPos_ + offsetMapPos_);
+		uiMapCurrent_->SetSize({ size.x * 1.5f, size.y * 1.1f });
+		uiMapCurrent_->SetPosition(Vector3(173.0f, 622.3f, 0.0f) - startMapPos_ + offsetMapPos_);
 	}
 	if (currentMapNum_ == 1)
 	{
 		uiMapCurrent_->SetSize({ size.x * 1.4f, size.y * 1.3f });
-		uiMapCurrent_->SetPosition(Vector3(173.0f, 477.6f, 0.0f) - startMapPos_ + offsetMapPos_);
+		uiMapCurrent_->SetPosition(Vector3(173.0f, 564.2f, 0.0f) - startMapPos_ + offsetMapPos_);
 	}
 	if (currentMapNum_ == 2)
 	{
 		uiMapCurrent_->SetSize({ size.x * 1.4f, size.y * 1.7f });
-		uiMapCurrent_->SetPosition(Vector3(173.0f, 406.9f, 0.0f) - startMapPos_ + offsetMapPos_);
+		uiMapCurrent_->SetPosition(Vector3(173.0f, 495.3f, 0.0f) - startMapPos_ + offsetMapPos_);
 	}
 	if (currentMapNum_ == 3)
 	{
 		uiMapCurrent_->SetSize({ size.x * 1.4f, size.y * 1.7f });
-		uiMapCurrent_->SetPosition(Vector3(173.0f, 328.2f, 0.0f) - startMapPos_ + offsetMapPos_);
+		uiMapCurrent_->SetPosition(Vector3(173.0f, 416.0f, 0.0f) - startMapPos_ + offsetMapPos_);
 	}
 	if (currentMapNum_ == 4)
 	{
 		uiMapCurrent_->SetSize({ size.x * 1.4f, size.y * 1.8f });
-		uiMapCurrent_->SetPosition(Vector3(173.0f, 246.0f, 0.0f) - startMapPos_ + offsetMapPos_);
+		uiMapCurrent_->SetPosition(Vector3(173.0f, 335.7f, 0.0f) - startMapPos_ + offsetMapPos_);
 	}
 	if (currentMapNum_ == 5)
 	{
-		uiMapCurrent_->SetSize({ size.x * 1.4f, size.y * 1.8f });
-		uiMapCurrent_->SetPosition(Vector3(173.0f, 164.0f, 0.0f) - startMapPos_ + offsetMapPos_);
+		uiMapCurrent_->SetSize({ size.x * 1.4f, size.y * 1.4f });
+		uiMapCurrent_->SetPosition(Vector3(173.0f, 257.6f, 0.0f) - startMapPos_ + offsetMapPos_);
+	}
+	if (currentMapNum_ == 6)
+	{
+		uiMapCurrent_->SetSize({ size.x * 1.4f, size.y * 1.6f });
+		uiMapCurrent_->SetPosition(Vector3(173.0f, 184.1f, 0.0f) - startMapPos_ + offsetMapPos_);
 	}
 	uiMap_->Update();
 	uiMapCurrent_->Update();
