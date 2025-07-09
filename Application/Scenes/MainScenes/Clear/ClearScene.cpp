@@ -117,7 +117,7 @@ void ClearScene::Update()
 	UpdateCamera();
 	cameraManager_.UpdateAllCameras();
 
-	JsonManager::ImGuiManager();
+	JsonManager::DrawImGui();
 	LightManager::GetInstance()->ShowLightingEditor();
 
 	clearScreen_->Update();

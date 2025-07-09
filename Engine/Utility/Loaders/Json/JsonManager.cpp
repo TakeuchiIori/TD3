@@ -205,7 +205,7 @@ void JsonManager::ImGui(const std::string& className)
 }
 
 // JsonManager.cpp の ImGuiManager を修正
-void JsonManager::ImGuiManager()
+void JsonManager::DrawImGui()
 {
 #ifdef _DEBUG
 	ImGui::Begin("JsonManager");

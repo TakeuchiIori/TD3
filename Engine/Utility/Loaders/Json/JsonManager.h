@@ -79,7 +79,7 @@ public:
 	/// <summary>
 	/// 実際にImGuiを表示する
 	/// </summary>
-	static void ImGuiManager();
+	static void DrawImGui();
 
 
 	template <typename T>

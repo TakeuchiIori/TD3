@@ -167,7 +167,7 @@ void GameScene::Update()
 
 
 
-	JsonManager::ImGuiManager();
+	JsonManager::DrawImGui();
 	// ワールドトランスフォーム更新
 	cameraManager_.UpdateAllCameras();
 

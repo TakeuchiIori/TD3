@@ -182,7 +182,7 @@ void TitleScene::Update()
 	ParticleManager::GetInstance()->Update();
 	LightManager::GetInstance()->ShowLightingEditor();
 	CollisionManager::GetInstance()->Update();
-	JsonManager::ImGuiManager();
+	JsonManager::DrawImGui();
 }
 
 
