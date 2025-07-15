@@ -107,15 +107,15 @@ void BookEventCamera::RegisterControlPoints()
 
 Vector3 BookEventCamera::EvaluateSpline(float t)
 {
-    if (controlPoints_.size() < 2) return Vector3{};
+    if (controlPoints_.size() < 4) {
+        return Vector3{}; // 最低4点必要
+    }
 
-    int seg = std::clamp(int(t), 0, int(controlPoints_.size() - 2));
-    float localT = t - float(seg);
+    // 0.0〜1.0 に正規化された t を CatmullRomPosition に渡す
+    float normalizedT = t / float(controlPoints_.size() - 1);
+    normalizedT = std::clamp(normalizedT, 0.0f, 1.0f);
 
-    return Lerp(controlPoints_[seg], controlPoints_[seg + 1], localT);
-
-
-
+    return CatmullRomPosition(controlPoints_, normalizedT);
 
 }
 
