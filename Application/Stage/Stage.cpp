@@ -111,7 +111,7 @@ void Stage::GenerateRandomClouds()
 	std::uniform_real_distribution<float> zPosDist(40.0f, 40.0f);
 	const float minDistanceX = 20.0f;
 	const float minDistanceY = 15.0f;
-	const float minDistanceZ = 3.0f; 
+	const float minDistanceZ = 3.0f;
 	// 配置済み雲の位置を保存
 	std::vector<Vector3> placedPositions;
 	for (int i = 0; i < cloudCount; ++i) {
@@ -156,6 +156,10 @@ void Stage::GenerateRandomClouds()
 
 void Stage::Update()
 {
+	if (Input::GetInstance()->IsLTTriggered(0) && Input::GetInstance()->IsRTTriggered(0))
+	{
+		InitCheckPoint();
+	}
 	enemyManager_->SetIsStop(player_->IsReturn());
 	enemyManager_->Update();
 	grassManager_->Update();
