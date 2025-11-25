@@ -1,5 +1,6 @@
 #include "Input.h"
 
+static const BYTE TRIGGER_THRESHOLD = 0;
 Input* Input::instance = nullptr;
 Input* Input::GetInstance()
 {
@@ -125,7 +126,6 @@ bool Input::TriggerKey(BYTE keyNumber)
 	}
 	return false;
 }
-
 bool Input::IsAnyKeyPressed() const
 {
 
@@ -136,7 +136,6 @@ bool Input::IsAnyKeyPressed() const
 	}
 	return false;
 }
-
 /// <summary>
 /// 特定のキーが押され続けている時間を取得する
 /// </summary>
@@ -148,8 +147,7 @@ int32_t Input::GetKeyPressDuration(BYTE keyNumber)
 			keyPressStart[keyNumber] = now;
 		}
 		return static_cast<int32_t>(std::chrono::duration_cast<std::chrono::milliseconds>(now - keyPressStart[keyNumber]).count());
-	}
-	else {
+	} else {
 		keyPressStart[keyNumber] = std::chrono::steady_clock::time_point();
 		return 0;
 	}
@@ -452,4 +450,111 @@ bool Input::IsRightStickMoving() {
 	// 入力が閾値を超えているか判定
 	const float deadZoneThreshold = 0.1f; // スティックの動きを無視する閾値
 	return (std::fabs(rightStickX) > deadZoneThreshold || std::fabs(rightStickY) > deadZoneThreshold);
+}
+
+/// <summary>
+/// LT押し続け判定
+/// </summary>
+bool Input::IsLTPressed(int32_t playerIndex) const {
+	if (playerIndex < 0 || playerIndex >= devJoysticks_.size()) return false;
+
+	const auto& gamepad = devJoysticks_[playerIndex].state_.xInput_.Gamepad;
+	return gamepad.bLeftTrigger > TRIGGER_THRESHOLD;
+}
+
+/// <summary>
+/// RT押し続け判定
+/// </summary>
+bool Input::IsRTPressed(int32_t playerIndex) const {
+	if (playerIndex < 0 || playerIndex >= devJoysticks_.size()) return false;
+
+	const auto& gamepad = devJoysticks_[playerIndex].state_.xInput_.Gamepad;
+	return gamepad.bRightTrigger > TRIGGER_THRESHOLD;
+}
+
+/// <summary>
+/// LTトリガー（押した瞬間）
+/// </summary>
+bool Input::IsLTTriggered(int32_t playerIndex) const {
+	if (playerIndex < 0 || playerIndex >= devJoysticks_.size()) return false;
+
+	const auto& now = devJoysticks_[playerIndex].state_.xInput_.Gamepad;
+	const auto& prev = devJoysticks_[playerIndex].statePre_.xInput_.Gamepad;
+
+	return now.bLeftTrigger > TRIGGER_THRESHOLD &&
+		prev.bLeftTrigger <= TRIGGER_THRESHOLD;
+}
+
+/// <summary>
+/// RTトリガー（押した瞬間）
+/// </summary>
+bool Input::IsRTTriggered(int32_t playerIndex) const {
+	if (playerIndex < 0 || playerIndex >= devJoysticks_.size()) return false;
+
+	const auto& now = devJoysticks_[playerIndex].state_.xInput_.Gamepad;
+	const auto& prev = devJoysticks_[playerIndex].statePre_.xInput_.Gamepad;
+
+	return now.bRightTrigger > TRIGGER_THRESHOLD &&
+		prev.bRightTrigger <= TRIGGER_THRESHOLD;
+}
+
+
+/// <summary>
+/// 左スティックのX軸を取得する
+/// </summary>
+float Input::GetLeftStickX(int32_t stickNo) const {
+	if (stickNo < 0 || stickNo >= devJoysticks_.size()) {
+		return 0.0f;
+	}
+	const auto& joystick = devJoysticks_[stickNo];
+	if (joystick.type_ != PadType::XInput) {
+		return 0.0f;
+	}
+	const auto& gamepad = joystick.state_.xInput_.Gamepad;
+	return static_cast<float>(gamepad.sThumbLX) / 32768.0f;
+}
+
+/// <summary>
+/// 左スティックのY軸を取得する
+/// </summary>
+float Input::GetLeftStickY(int32_t stickNo) const {
+	if (stickNo < 0 || stickNo >= devJoysticks_.size()) {
+		return 0.0f;
+	}
+	const auto& joystick = devJoysticks_[stickNo];
+	if (joystick.type_ != PadType::XInput) {
+		return 0.0f;
+	}
+	const auto& gamepad = joystick.state_.xInput_.Gamepad;
+	return static_cast<float>(gamepad.sThumbLY) / 32768.0f;
+}
+
+/// <summary>
+/// 右スティックのX軸を取得する
+/// </summary>
+float Input::GetRightStickX(int32_t stickNo) const {
+	if (stickNo < 0 || stickNo >= devJoysticks_.size()) {
+		return 0.0f;
+	}
+	const auto& joystick = devJoysticks_[stickNo];
+	if (joystick.type_ != PadType::XInput) {
+		return 0.0f;
+	}
+	const auto& gamepad = joystick.state_.xInput_.Gamepad;
+	return static_cast<float>(gamepad.sThumbRX) / 32768.0f;
+}
+
+/// <summary>
+/// 右スティックのY軸を取得する
+/// </summary>
+float Input::GetRightStickY(int32_t stickNo) const {
+	if (stickNo < 0 || stickNo >= devJoysticks_.size()) {
+		return 0.0f;
+	}
+	const auto& joystick = devJoysticks_[stickNo];
+	if (joystick.type_ != PadType::XInput) {
+		return 0.0f;
+	}
+	const auto& gamepad = joystick.state_.xInput_.Gamepad;
+	return static_cast<float>(gamepad.sThumbRY) / 32768.0f;
 }
