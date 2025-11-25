@@ -151,7 +151,7 @@ void Player::InitJson()
 
 	jsonManager_->Register("スティックUIのオフセット", &offsetUI_);
 	jsonManager_->Register("説明のUIが表示されるまでの時間", &kShowRootTime_);
-	
+
 
 
 	jsonCollider_ = std::make_unique<JsonManager>("playerCollider", "Resources/JSON/");
@@ -235,19 +235,18 @@ void Player::Draw()
 	static bool isActive = false;
 	static int frameCount = 0;
 
-	if(invincibleTimer_ > 0 && behavior_ != BehaviorPlayer::Boost)
+	if (invincibleTimer_ > 0 && behavior_ != BehaviorPlayer::Boost)
 	{
 		frameCount++;
 		if (frameCount % 3 == 0) {
 			isActive = !isActive;
 		}
-	}
-	else
+	} else
 	{
 		isActive = false;
 	}
 
-	if(!isActive)
+	if (!isActive)
 	{
 		for (size_t i = 0; i < drawCount_; ++i)
 		{
@@ -313,11 +312,7 @@ void Player::Reset()
 {
 	obj_->ChangeModel("kirin.gltf", true);
 	worldTransform_.translation_.y = 6.2f;
-	extendTimer_ = 0;
-	boostCoolTimer_ = 0;
-	boostTimer_ = 0;
-	createGrassTimer_ = 0;
-	invincibleTimer_ = 0;
+	TimerZero();
 	playerBodys_.clear();
 	moveHistory_.clear();
 	stuckGrassList_.clear();
@@ -374,8 +369,7 @@ void Player::OnEnterCollision(BaseCollider* self, BaseCollider* other)
 					addTime_ = grassTime_;
 					extendTimer_ = (std::min)(kTimeLimit_, extendTimer_ + addTime_);
 					addTime_ = grassTime_;
-				}
-				else
+				} else
 				{
 					isAddTime_ = true;
 					addTime_ = largeGrassTime_;
@@ -766,17 +760,7 @@ void Player::EntryMove()
 	worldTransform_.translation_ = newPos;
 	nextWorldTransform_.translation_ = newPos + velocity_;
 
-/*	if ((input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP)))
-	{
-		behaviortRquest_ = BehaviorPlayer::Moving;
-		moveDirection_ = { 0,1,0 };
-		extendTimer_ = kTimeLimit_;
-		moveHistory_.push_back(worldTransform_.translation_);
-		showUI_ = false;
-	} 
-	else */if (std::abs(stick.x) < std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
-	{
-		if (stick.y > 0)
+	/*	if ((input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP)))
 		{
 			behaviortRquest_ = BehaviorPlayer::Moving;
 			moveDirection_ = { 0,1,0 };
@@ -784,7 +768,17 @@ void Player::EntryMove()
 			moveHistory_.push_back(worldTransform_.translation_);
 			showUI_ = false;
 		}
-	}
+		else */if (std::abs(stick.x) < std::abs(stick.y) && (stick.x != 0 || stick.y != 0))
+		{
+			if (stick.y > 0)
+			{
+				behaviortRquest_ = BehaviorPlayer::Moving;
+				moveDirection_ = { 0,1,0 };
+				extendTimer_ = kTimeLimit_;
+				moveHistory_.push_back(worldTransform_.translation_);
+				showUI_ = false;
+			}
+		}
 #ifdef _DEBUG
 #endif // _DEBUG
 }
@@ -803,7 +797,7 @@ void Player::EntryBoost()
 void Player::EntryReturn()
 {
 	behaviortRquest_ = BehaviorPlayer::Return;
-	if(extendTimer_ <= 0)
+	if (extendTimer_ <= 0)
 	{
 		sourceVoiceTimeUp = Audio::GetInstance()->SoundPlayAudio(soundDataTimeUp, false);
 		AudioVolumeManager::GetInstance()->SetSourceToSubmix(sourceVoiceTimeUp, kSE);
@@ -1169,14 +1163,14 @@ void Player::UpdateCombo()
 	}
 }
 
-void Player::CreateDrip(Vector3 startPos,Vector3 pos)
+void Player::CreateDrip(Vector3 startPos, Vector3 pos)
 {
 	for (int i = 0; i < numDrips_; i++) {
 		auto drip = std::make_unique<Drip>();
 		drip->Initialize(camera_);
 		Vector3 newPos = pos;
 		newPos.y += 2.0f;
-		drip->Shoot(startPos,newPos);
+		drip->Shoot(startPos, newPos);
 		drips_.emplace_back(std::move(drip));
 	}
 
